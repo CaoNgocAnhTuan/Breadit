@@ -25,7 +25,7 @@ const Logout = () => {
             className="text-textGray text-sm"
             onClick={() => setOpen(false)}
           >
-            User Profile
+            User Profile Page
           </Link>
           <Link
             href="/profile"
