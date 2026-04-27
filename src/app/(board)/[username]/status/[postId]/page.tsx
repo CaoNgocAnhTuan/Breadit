@@ -2,7 +2,7 @@ import Comments from "@/components/Comments";
 import Image from "@/components/Image";
 import Post from "@/components/Post";
 import { prisma } from "@/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -11,7 +11,8 @@ const StatusPage = async ({
 }: {
   params: Promise<{ username: string; postId: string }>;
 }) => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
   const postId = (await params).postId;
 
   if (!userId) return;

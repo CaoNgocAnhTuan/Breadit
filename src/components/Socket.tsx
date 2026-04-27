@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 
 export default function Socket() {
   const [isConnected, setIsConnected] = useState(false);
   const [transport, setTransport] = useState("N/A");
 
-  const { user } = useUser();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   useEffect(() => {
     if (socket.connected) {

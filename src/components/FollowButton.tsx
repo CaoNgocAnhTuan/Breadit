@@ -2,7 +2,7 @@
 
 import { followUser } from "@/action";
 import { socket } from "@/socket";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { useOptimistic, useState } from "react";
 
 const FollowButton = ({
@@ -16,7 +16,8 @@ const FollowButton = ({
 }) => {
   const [state, setState] = useState(isFollowed);
 
-  const { user } = useUser();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   const [optimisticFollow, switchOptimisticFollow] = useOptimistic(
     state,

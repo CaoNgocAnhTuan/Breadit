@@ -1,0 +1,47 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: breadit
+      MYSQL_USER: breadit
+      MYSQL_PASSWORD: breaditpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mysql://breadit:breaditpassword@db:3306/breadit
+      AUTH_SECRET: ${AUTH_SECRET:-l7ulBp1on98gbJkHyQ/JHOIZOA12Q4XWSsCddmcAkBc=}
+      AUTH_URL: http://localhost:3000
+      AUTH_TRUST_HOST: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads_data:/app/public/uploads
+    command: sh -c "npx prisma db push --accept-data-loss && node server.js"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/sign-in"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+volumes:
+  mysql_data:
+  uploads_data:

@@ -1,5 +1,5 @@
 import { prisma } from "@/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
   const page = searchParams.get("cursor");
   const LIMIT = 3;
 
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) return;
 

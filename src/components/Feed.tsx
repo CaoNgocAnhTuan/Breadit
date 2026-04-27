@@ -1,10 +1,11 @@
 import { prisma } from "@/prisma";
 import Post from "./Post";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import InfiniteFeed from "./InfiniteFeed";
 
 const Feed = async ({ userProfileId }: { userProfileId?: string }) => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) return;
 

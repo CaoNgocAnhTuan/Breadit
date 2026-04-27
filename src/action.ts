@@ -1,14 +1,14 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import { prisma } from "./prisma";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { UploadResponse } from "imagekit/dist/libs/interfaces";
-import { imagekit } from "./utils";
+import { uploadFile } from "./utils";
 
 export const followUser = async (targetUserId: string) => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) return;
 
@@ -30,7 +30,8 @@ export const followUser = async (targetUserId: string) => {
   }
 };
 export const likePost = async (postId: number) => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) return;
 
@@ -52,7 +53,8 @@ export const likePost = async (postId: number) => {
   }
 };
 export const rePost = async (postId: number) => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) return;
 
@@ -75,7 +77,8 @@ export const rePost = async (postId: number) => {
 };
 
 export const savePost = async (postId: number) => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) return;
 
@@ -101,7 +104,8 @@ export const addComment = async (
   prevState: { success: boolean; error: boolean },
   formData: FormData
 ) => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) return { success: false, error: true };
 
@@ -143,7 +147,8 @@ export const addPost = async (
   prevState: { success: boolean; error: boolean },
   formData: FormData
 ) => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) return { success: false, error: true };
 
@@ -151,34 +156,6 @@ export const addPost = async (
   const file = formData.get("file") as File;
   const isSensitive = formData.get("isSensitive") as string;
   const imgType = formData.get("imgType");
-
-  const uploadFile = async (file: File): Promise<UploadResponse> => {
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    const transformation = `w-600,${
-      imgType === "square" ? "ar-1-1" : imgType === "wide" ? "ar-16-9" : ""
-    }`;
-
-    return new Promise((resolve, reject) => {
-      imagekit.upload(
-        {
-          file: buffer,
-          fileName: file.name,
-          folder: "/posts",
-          ...(file.type.includes("image") && {
-            transformation: {
-              pre: transformation,
-            },
-          }),
-        },
-        function (error, result) {
-          if (error) reject(error);
-          else resolve(result as UploadResponse);
-        }
-      );
-    });
-  };
 
   const Post = z.object({
     desc: z.string().max(140),
@@ -200,7 +177,7 @@ export const addPost = async (
   let video = "";
 
   if (file.size) {
-    const result: UploadResponse = await uploadFile(file);
+    const result = await uploadFile(file, (imgType as "original" | "square" | "wide") ?? "original");
 
     if (result.fileType === "image") {
       img = result.filePath;

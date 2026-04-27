@@ -1,6 +1,6 @@
 "use client";
 
-import { IKImage } from "imagekitio-next";
+import NextImage from "next/image";
 
 type ImageType = {
   path?: string;
@@ -12,24 +12,23 @@ type ImageType = {
   tr?: boolean;
 };
 
-const urlEndpoint = process.env.NEXT_PUBLIC_URL_ENDPOINT;
+const resolve = (p?: string, src?: string) => {
+  if (src) return src;
+  if (!p) return "";
+  return p.startsWith("/") ? p : `/${p}`;
+};
 
-if (!urlEndpoint) {
-  throw new Error('Error: Please add urlEndpoint to .env or .env.local')
-}
-
-const Image = ({ path, src, w, h, alt, className, tr }: ImageType) => {
+const Image = ({ path, src, w, h, alt, className, tr: _tr }: ImageType) => {
+  const url = resolve(path, src);
+  if (!url) return null;
   return (
-    <IKImage
-      urlEndpoint={urlEndpoint}
-      path={path}
-      src={src}
-      {...(tr
-        ? { transformation: [{ width: `${w}`, height: `${h}` }] }
-        : { width: w, height: h })}
-      lqip={{ active: true, quality: 20 }}
+    <NextImage
+      src={url}
+      width={w ?? 100}
+      height={h ?? 100}
       alt={alt}
       className={className}
+      unoptimized={url.startsWith("blob:") || url.startsWith("data:")}
     />
   );
 };

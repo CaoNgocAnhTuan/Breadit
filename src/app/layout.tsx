@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
+import { SessionProvider } from "next-auth/react";
 import QueryProvider from "@/providers/QueryProvider";
 
 export const metadata: Metadata = {
@@ -15,12 +15,12 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <SessionProvider>
       <QueryProvider>
         <html lang="en">
           <body>{children}</body>
         </html>
       </QueryProvider>
-    </ClerkProvider>
+    </SessionProvider>
   );
 }

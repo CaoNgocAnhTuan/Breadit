@@ -1,8 +1,11 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  const passwordHash = await bcrypt.hash('password', 10);
+
   // Create 5 users with unique details
   const users = [];
   for (let i = 1; i <= 5; i++) {
@@ -11,6 +14,8 @@ async function main() {
         id: `user${i}`,
         email: `user${i}@example.com`,
         username: `user${i}`,
+        password: passwordHash,
+        emailVerified: new Date(),
         displayName: `User ${i}`,
         bio: `Hi I'm user${i}. Welcome to my profile!`,
         location: `USA`,

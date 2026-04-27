@@ -2,7 +2,7 @@
 
 import { likePost, rePost, savePost } from "@/action";
 import { socket } from "@/socket";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useOptimistic, useState } from "react";
 
@@ -29,7 +29,8 @@ const PostInteractions = ({
     isSaved,
   });
 
-  const { user } = useUser();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   const likeAction = async () => {
     if (!user) return;

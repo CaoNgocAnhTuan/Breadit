@@ -2,7 +2,7 @@ import Feed from "@/components/Feed";
 import FollowButton from "@/components/FollowButton";
 import Image from "@/components/Image";
 import { prisma } from "@/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -11,7 +11,8 @@ const UserPage = async ({
 }: {
   params: Promise<{ username: string }>;
 }) => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   const username = (await params).username;
 

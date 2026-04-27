@@ -5,12 +5,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import Post from "./Post";
 
 const fetchPosts = async (pageParam: number, userProfileId?: string) => {
-  const res = await fetch(
-    "http://localhost:3000/api/posts?cursor=" +
-      pageParam +
-      "&user=" +
-      userProfileId
-  );
+  const res = await fetch(`/api/posts?cursor=${pageParam}&user=${userProfileId}`);
   return res.json();
 };
 
@@ -25,8 +20,6 @@ const InfiniteFeed = ({ userProfileId }: { userProfileId?: string }) => {
 
   if (error) return "Something went wrong!";
   if (status === "pending") return "Loading...";
-
-  console.log(data);
 
   const allPosts = data?.pages?.flatMap((page) => page.posts) || [];
 

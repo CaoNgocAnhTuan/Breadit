@@ -4,7 +4,7 @@ import React, { useActionState, useEffect, useRef, useState } from "react";
 import Image from "./Image";
 import NextImage from "next/image";
 import ImageEditor from "./ImageEditor";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { addPost } from "@/action";
 
 const Share = () => {
@@ -26,7 +26,8 @@ const Share = () => {
 
   const previewURL = media ? URL.createObjectURL(media) : null;
 
-  const { user } = useUser();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   const [state, formAction, isPending] = useActionState(addPost, {
     success: false,
@@ -52,7 +53,7 @@ const Share = () => {
     >
       {/* AVATAR */}
       <div className="relative w-10 h-10 rounded-full overflow-hidden">
-        <Image src={user?.imageUrl} alt="" w={100} h={100} tr={true} />
+        <Image src={user?.image || undefined} alt="" w={100} h={100} tr={true} />
       </div>
       {/* OTHERS */}
       <div className="flex-1 flex flex-col gap-4">

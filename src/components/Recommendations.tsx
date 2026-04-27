@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Image from "./Image";
 import { prisma } from "@/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 
 const Recommendations = async () => {
-  const { userId } = await auth();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   if (!userId) return;
 

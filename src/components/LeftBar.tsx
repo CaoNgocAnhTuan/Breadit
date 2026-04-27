@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "./Image";
 import Socket from "./Socket";
 import Notification from "./Notification";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@/auth";
 import Logout from "./Logout";
 
 const menuList = [
@@ -69,7 +69,8 @@ const menuList = [
 ];
 
 const LeftBar = async () => {
-  const user = await currentUser();
+  const session = await auth();
+  const user = session?.user;
 
   return (
     <div className="h-screen sticky top-0 flex flex-col justify-between pt-2 pb-8">
@@ -125,7 +126,7 @@ const LeftBar = async () => {
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 relative rounded-full overflow-hidden">
                 <Image
-                  src={user?.imageUrl}
+                  src={user?.image || undefined}
                   alt=""
                   w={100}
                   h={100}

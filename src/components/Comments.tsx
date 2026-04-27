@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import Image from "./Image";
 import Post from "./Post";
 import { Post as PostType } from "@prisma/client";
@@ -25,7 +25,8 @@ const Comments = ({
   postId: number;
   username: string;
 }) => {
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   const [state, formAction, isPending] = useActionState(addComment, {
     success: false,
@@ -37,7 +38,7 @@ const Comments = ({
       socket.emit("sendNotification", {
         receiverUsername: username,
         data: {
-          senderUsername: user?.username,
+          senderUsername: user?.username ?? null,
           type: "comment",
           link: `/${username}/status/${postId}`,
         },
@@ -54,7 +55,7 @@ const Comments = ({
         >
           <div className="relative w-10 h-10 rounded-full overflow-hidden -z-10">
             <Image
-              src={user?.imageUrl}
+              src={user?.image || undefined}
               alt="Lama Dev"
               w={100}
               h={100}

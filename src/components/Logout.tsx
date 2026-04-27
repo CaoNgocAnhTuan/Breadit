@@ -1,14 +1,11 @@
 "use client";
 
-import { useClerk } from "@clerk/nextjs";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
-import Image from "./Image";
 
 const Logout = () => {
   const [open, setOpen] = useState(false);
-
-  const { signOut } = useClerk();
 
   return (
     <div className="hidden xxl:block relative">
@@ -43,8 +40,8 @@ const Logout = () => {
           </Link>
           <hr />
           <button
-            className="bg-black rounded-md px-2 py-1 "
-            onClick={() => signOut()}
+            className="bg-black rounded-md px-2 py-1 text-white"
+            onClick={() => signOut({ callbackUrl: "/sign-in" })}
           >
             Logout
           </button>
