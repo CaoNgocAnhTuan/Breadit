@@ -1,0 +1,3 @@
+-- AlterEnum
+ALTER TYPE "NotificationType" ADD VALUE 'COMMUNITY_POST';
+ALTER TYPE "NotificationType" ADD VALUE 'COMMUNITY_NEW_POST';

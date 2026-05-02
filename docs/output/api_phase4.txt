@@ -1,0 +1,275 @@
+# Breadit API — Phase 4 Postman Reference
+# Base URL: http://localhost:4000
+# Auth: session cookie `breadit_session` (httpOnly) set automatically on login/register.
+#        In Postman: enable "Send cookies" and use Cookie Manager, or copy the Set-Cookie value.
+# Content-Type: application/json unless noted as multipart/form-data.
+
+================================================================
+INTERACTIONS  —  /api/posts/:id/like  |  /api/posts/:id/save  |  /api/posts/:id/repost
+================================================================
+
+--- Toggle like on a post ---
+POST /api/posts/:id/like
+(requires breadit_session cookie + verified email)
+
+  :id  integer  post ID
+
+→ 200 { "liked": true, "count": 5 }     (liked)
+→ 200 { "liked": false, "count": 4 }    (unliked)
+→ 401 / 403
+
+--- Toggle save (bookmark) on a post ---
+POST /api/posts/:id/save
+(requires breadit_session cookie + verified email)
+
+  :id  integer  post ID
+
+→ 200 { "saved": true }     (saved)
+→ 200 { "saved": false }    (unsaved)
+→ 401 / 403
+
+--- Toggle repost / create quote-repost ---
+POST /api/posts/:id/repost
+Content-Type: application/json
+(requires breadit_session cookie + verified email)
+
+  :id  integer  post ID
+
+Body (raw JSON):
+  {}                       → plain repost (toggled: creates if not exists, soft-deletes if exists)
+  { "desc": "My take" }   → quote-repost (always creates a new post; never toggled)
+
+→ 200 { "reposted": true,  "count": 3 }    (plain repost created  OR quote-repost created)
+→ 200 { "reposted": false, "count": 2 }    (plain repost removed)
+→ 401 / 403
+
+================================================================
+COMMENTS  —  /api/posts/:id/comments
+================================================================
+
+--- Reply to a post ---
+POST /api/posts/:id/comments
+Content-Type: multipart/form-data
+(requires breadit_session cookie + verified email)
+
+  :id  integer  ID of the post being replied to
+
+Form fields:
+  desc     string  optional  reply text (max 255 chars)
+  imgType  string  optional  "original" | "square" | "wide"
+  file     file    optional  image or video
+
+Returns the newly created Post object (same shape as POST /api/posts).
+
+→ 201 { post object }
+→ 401 / 403
+→ 413  file exceeds 25 MB limit
+
+================================================================
+FOLLOW  —  /api/users/:id/follow
+================================================================
+
+--- Toggle follow / unfollow a user ---
+POST /api/users/:id/follow
+Content-Type: application/json
+(requires breadit_session cookie; no email-verified requirement)
+
+  :id  string  target user ID (cuid)
+
+Body (raw JSON):
+  {}                    → toggle follow without bell notifications
+  { "notify": true }   → follow and opt-in to notifications (UC-U-SG-01-ext-a)
+
+→ 200 { "following": true }     (now following)
+→ 200 { "following": false }    (unfollowed)
+→ 401
+
+================================================================
+POSTMAN COLLECTION — QUICK SETUP
+================================================================
+
+Base URL variable: {{base}}  =  http://localhost:4000
+
+Step 1 — Login (captures session cookie)
+  POST  {{base}}/api/auth/login
+  Body (raw JSON): { "email": "user1@example.com", "password": "password" }
+  Settings: cookie jar enabled
+
+--- LIKE ---
+
+Step 2 — Like a post
+  POST  {{base}}/api/posts/1/like
+  (no body required)
+
+  Expected: 200 { "liked": true, "count": <n+1> }
+
+Step 3 — Unlike the same post (toggle)
+  POST  {{base}}/api/posts/1/like
+
+  Expected: 200 { "liked": false, "count": <n> }
+
+--- SAVE ---
+
+Step 4 — Save a post
+  POST  {{base}}/api/posts/1/save
+  (no body required)
+
+  Expected: 200 { "saved": true }
+
+Step 5 — Unsave the same post (toggle)
+  POST  {{base}}/api/posts/1/save
+
+  Expected: 200 { "saved": false }
+
+--- REPOST ---
+
+Step 6 — Plain repost
+  POST  {{base}}/api/posts/1/repost
+  Body (raw JSON): {}
+
+  Expected: 200 { "reposted": true, "count": <n+1> }
+
+Step 7 — Undo plain repost (toggle)
+  POST  {{base}}/api/posts/1/repost
+  Body (raw JSON): {}
+
+  Expected: 200 { "reposted": false, "count": <n> }
+
+Step 8 — Quote-repost (always creates, never toggles)
+  POST  {{base}}/api/posts/1/repost
+  Body (raw JSON): { "desc": "Great post!" }
+
+  Expected: 200 { "reposted": true, "count": <n+1> }
+
+--- COMMENTS ---
+
+Step 9 — Reply to a post (text only)
+  POST  {{base}}/api/posts/1/comments
+  Body: form-data
+    Key: desc | Type: Text | Value: My reply
+
+  Expected: 201 { post object with parentPostId: 1 }
+
+Step 10 — Reply with an image
+  POST  {{base}}/api/posts/1/comments
+  Body: form-data
+    Key: desc    | Type: Text | Value: Reply with photo
+    Key: imgType | Type: Text | Value: original
+    Key: file    | Type: File | Value: [select image file]
+
+  Expected: 201 { post object with img: "<uuid>.jpg", parentPostId: 1 }
+
+Step 11 — Confirm reply appears in parent post thread
+  GET  {{base}}/api/posts/1
+
+  Expected: 200  post object, comments array includes the new reply
+
+--- FOLLOW ---
+
+Step 12 — Follow a user (by their user ID)
+  POST  {{base}}/api/users/<userId>/follow
+  Body (raw JSON): {}
+
+  Expected: 200 { "following": true }
+
+Step 13 — Unfollow the same user (toggle)
+  POST  {{base}}/api/users/<userId>/follow
+  Body (raw JSON): {}
+
+  Expected: 200 { "following": false }
+
+Step 14 — Follow with notification bell
+  POST  {{base}}/api/users/<userId>/follow
+  Body (raw JSON): { "notify": true }
+
+  Expected: 200 { "following": true }
+
+Step 15 — Confirm follower count updated
+  GET  {{base}}/api/users/<username>
+
+  Expected: 200  user object, _count.followers incremented or decremented
+
+================================================================
+EXPECTED RESPONSE SHAPES
+================================================================
+
+POST /api/posts/:id/like → 200:
+{
+  "liked": true,
+  "count": 5
+}
+
+POST /api/posts/:id/save → 200:
+{
+  "saved": true
+}
+
+POST /api/posts/:id/repost (plain) → 200:
+{
+  "reposted": true,
+  "count": 3
+}
+
+POST /api/posts/:id/repost (quote, desc present) → 200:
+{
+  "reposted": true,
+  "count": 3
+}
+
+POST /api/posts/:id/comments → 201:
+{
+  "id": 42,
+  "desc": "My reply",
+  "img": null,
+  "imgHeight": null,
+  "video": null,
+  "isSensitive": false,
+  "deletedAt": null,
+  "createdAt": "2026-04-29T10:00:00.000Z",
+  "updatedAt": "2026-04-29T10:00:00.000Z",
+  "userId": "cmohepnas0002o3012cukibvd",
+  "parentPostId": 1,
+  "rePostId": null,
+  "user": {
+    "displayName": "Alice",
+    "username": "alice",
+    "img": null
+  },
+  "_count": { "likes": 0, "rePosts": 0, "comments": 0 },
+  "likes": [],
+  "rePosts": [],
+  "saves": [],
+  "rePost": null
+}
+
+POST /api/users/:id/follow → 200:
+{
+  "following": true
+}
+
+================================================================
+FRONTEND — PAGES TO TEST IN BROWSER
+================================================================
+
+  http://localhost:3000/
+    - Click the heart icon on any post → liked (pink); click again → unliked
+    - Click the bookmark icon → saved (blue); click again → unsaved
+    - Click the repost icon → QuoteRepostModal opens:
+        · Click "Repost"     → plain repost (toggled); post count increments
+        · Type text + "Quote" → quote-repost created; count increments
+    - Click the upload/share icon → URL copied to clipboard (or native share sheet)
+      Toast-like: icon turns blue briefly to confirm copy
+
+  http://localhost:3000/<username>/status/<postId>
+    - Reply input at top of comment thread; type and click "Reply"
+    - New comment appears immediately (query invalidated)
+
+  http://localhost:3000/<username>
+    - "Follow" / "Unfollow" button toggles instantly (optimistic update)
+    - Follower count on profile updates after refetch
+
+  http://localhost:3000/<username>/followers  |  /following
+    - Follow buttons on each listed user work the same way
+
+  Sign-in redirects:
+    - Clicking like/repost/save/follow when logged out → redirected to /sign-in

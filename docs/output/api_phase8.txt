@@ -1,0 +1,234 @@
+# Breadit API — Phase 8 Postman Reference
+# Base URL: http://localhost:4000
+# Auth: session cookie `breadit_session` (httpOnly) set automatically on login/register.
+#        In Postman: enable "Send cookies" and use Cookie Manager, or copy the Set-Cookie value.
+# Content-Type: application/json unless noted.
+
+================================================================
+UPDATE PROFILE  —  /api/users/me
+================================================================
+
+Requires `breadit_session` cookie (JwtAuthGuard).
+All body fields are optional — only fields present in the body are updated.
+
+--- Patch profile text fields ---
+PATCH /api/users/me
+  Content-Type: application/json
+  Body (raw JSON):
+  {
+    "displayName": "Alice Wonder",
+    "bio":         "Building things on the internet.",
+    "location":    "Ho Chi Minh City",
+    "job":         "Software Engineer",
+    "website":     "https://example.com"
+  }
+
+→ 200 {
+    "id":           "cmohepnas...",
+    "username":     "alice",
+    "email":        "alice@example.com",
+    "emailVerified": "2026-04-29T06:00:00.000Z",
+    "displayName":  "Alice Wonder",
+    "bio":          "Building things on the internet.",
+    "location":     "Ho Chi Minh City",
+    "job":          "Software Engineer",
+    "website":      "https://example.com",
+    "img":          null,
+    "cover":        null
+  }
+
+--- Patch avatar (after uploading image) ---
+PATCH /api/users/me
+  Content-Type: application/json
+  Body: { "img": "550e8400-e29b-41d4-a716-446655440000.jpg" }
+
+→ 200 { ..., "img": "550e8400-e29b-41d4-a716-446655440000.jpg" }
+
+--- Patch cover (after uploading image) ---
+PATCH /api/users/me
+  Content-Type: application/json
+  Body: { "cover": "7c9e6679-7425-40de-944b-e07fc1f90ae7.jpg" }
+
+→ 200 { ..., "cover": "7c9e6679-7425-40de-944b-e07fc1f90ae7.jpg" }
+
+--- Unauthenticated ---
+PATCH /api/users/me  (no cookie)
+
+→ 401 { "statusCode": 401, "message": "Unauthorized" }
+
+================================================================
+UPLOAD IMAGE  —  /api/uploads  (Phase 3, reused here)
+================================================================
+
+Requires `breadit_session` cookie (JwtAuthGuard + EmailVerifiedGuard).
+
+--- Upload avatar (square crop) ---
+POST /api/uploads
+  Content-Type: multipart/form-data
+  Form fields:
+    imgType  =  "square"
+    file     =  <image file>
+
+→ 201 { "filename": "550e8400-e29b-41d4-a716-446655440000.jpg" }
+
+Processing: input image → Sharp → 600×600 JPEG (cover fit).
+Stored at: $UPLOAD_DIR/<filename>
+Served at: GET /uploads/<filename>
+
+--- Upload cover (wide crop) ---
+POST /api/uploads
+  Content-Type: multipart/form-data
+  Form fields:
+    imgType  =  "wide"
+    file     =  <image file>
+
+→ 201 { "filename": "7c9e6679-7425-40de-944b-e07fc1f90ae7.jpg" }
+
+Processing: input image → Sharp → 600×338 JPEG (cover fit).
+
+--- GET /api/auth/me (extended) ---
+GET /api/auth/me
+  (cookie required)
+
+→ 200 {
+    "id":           "cmohepnas...",
+    "username":     "alice",
+    "email":        "alice@example.com",
+    "emailVerified": "2026-04-29T06:00:00.000Z",
+    "img":          "550e8400-e29b-41d4-a716-446655440000.jpg",
+    "displayName":  "Alice Wonder",
+    "bio":          "Building things on the internet.",
+    "location":     "Ho Chi Minh City",
+    "job":          "Software Engineer",
+    "website":      "https://example.com",
+    "cover":        "7c9e6679-7425-40de-944b-e07fc1f90ae7.jpg"
+  }
+
+Note: GET /api/auth/me now returns all profile fields (extended in Phase 8).
+Previously it returned only: id, username, email, emailVerified, img.
+
+================================================================
+POSTMAN COLLECTION — QUICK SETUP
+================================================================
+
+Base URL variable: {{base}}  =  http://localhost:4000
+
+Step 1 — Login
+  POST  {{base}}/api/auth/login
+  Body: { "email": "user1@example.com", "password": "password" }
+  Settings: cookie jar enabled
+
+--- PROFILE UPDATE FLOW ---
+
+Step 2 — Update text fields
+  PATCH  {{base}}/api/users/me
+  Content-Type: application/json
+  Body: {
+    "displayName": "My Display Name",
+    "bio": "Hello world",
+    "location": "Hanoi",
+    "job": "Developer",
+    "website": "https://myblog.com"
+  }
+
+  Expected: 200 with updated user object.
+
+Step 3 — Upload a new avatar
+  POST  {{base}}/api/uploads
+  Content-Type: multipart/form-data
+    imgType  =  square
+    file     =  (select an image file)
+
+  Expected: 201 { "filename": "<uuid>.jpg" }
+
+Step 4 — Set avatar on profile
+  PATCH  {{base}}/api/users/me
+  Body: { "img": "<filename from Step 3>" }
+
+  Expected: 200 { ..., "img": "<filename>" }
+
+Step 5 — Upload a new cover
+  POST  {{base}}/api/uploads
+  Content-Type: multipart/form-data
+    imgType  =  wide
+    file     =  (select an image file)
+
+  Expected: 201 { "filename": "<uuid>.jpg" }
+
+Step 6 — Set cover on profile
+  PATCH  {{base}}/api/users/me
+  Body: { "cover": "<filename from Step 5>" }
+
+  Expected: 200 { ..., "cover": "<filename>" }
+
+Step 7 — Verify session reflects changes
+  GET  {{base}}/api/auth/me
+
+  Expected: 200 with the updated displayName, img, cover, etc.
+
+--- PARTIAL UPDATE (only changed fields) ---
+
+Step 8 — Update only bio
+  PATCH  {{base}}/api/users/me
+  Body: { "bio": "Updated bio only" }
+
+  Expected: 200 — only bio changes; all other fields unchanged.
+
+--- ERROR CASES ---
+
+Step 9 — No auth cookie
+  PATCH  {{base}}/api/users/me
+  Body: { "displayName": "Hacker" }
+  (do NOT send cookie)
+
+  Expected: 401 Unauthorized.
+
+Step 10 — Upload oversized file
+  POST  {{base}}/api/uploads
+  (send a file > 25 MB)
+
+  Expected: 413 Payload Too Large.
+
+================================================================
+EXPECTED RESPONSE SHAPES
+================================================================
+
+PATCH /api/users/me → 200:
+{
+  "id":           "cmohepnas...",
+  "username":     "alice",
+  "email":        "alice@example.com",
+  "emailVerified": "2026-04-29T06:00:00.000Z",
+  "displayName":  "Alice Wonder",
+  "bio":          "Building things on the internet.",
+  "location":     "Ho Chi Minh City",
+  "job":          "Software Engineer",
+  "website":      "https://example.com",
+  "img":          "550e8400-e29b-41d4-a716-446655440000.jpg",
+  "cover":        "7c9e6679-7425-40de-944b-e07fc1f90ae7.jpg"
+}
+
+POST /api/uploads → 201:
+{ "filename": "550e8400-e29b-41d4-a716-446655440000.jpg" }
+
+================================================================
+FRONTEND — PAGES TO TEST IN BROWSER
+================================================================
+
+  Edit own profile:
+    1. Login at http://localhost:3000/sign-in
+    2. Navigate to http://localhost:3000/<your_username>
+    3. Click "Edit profile" button (top-right of the action row)
+    4. Modal opens with all current fields pre-filled
+    5. Change display name / bio / location / job / website
+    6. Click cover strip to upload a new cover image
+    7. Click avatar circle to upload a new avatar image
+    8. Click "Save" — modal closes and profile updates in place
+
+  Other user's profile — no edit button:
+    - Visit http://localhost:3000/<other_username>
+    - "Edit profile" button is NOT shown; "Block/Follow" controls appear instead
+
+  Guest — no edit button:
+    - Log out, visit any profile page
+    - Neither "Edit profile" nor block/follow controls are shown

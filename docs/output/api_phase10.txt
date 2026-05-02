@@ -1,0 +1,97 @@
+# Breadit API — Phase 10 Postman Reference
+# Base URL: http://localhost:4000
+# Auth: session cookie `breadit_session` (httpOnly) required for all messaging.
+
+================================================================
+CONVERSATIONS  —  /api/conversations
+================================================================
+
+--- List conversations ---
+GET /api/conversations?cursor=<id>
+  cursor  integer  optional ID of the last conversation for pagination
+
+→ 200 { "items": [ <ConversationListItem> ], "nextCursor": number | null }
+
+--- Start/Find conversation ---
+POST /api/conversations
+Body: { "targetUserId": "string" }
+
+→ 201 { "id": number, "createdAt": Date, "updatedAt": Date }
+
+--- Get unread conversation count ---
+GET /api/conversations/unread-count
+
+→ 200 { "count": number }
+
+--- Mark conversation as read ---
+PATCH /api/conversations/:id/read
+
+→ 204 (No Content)
+
+================================================================
+MESSAGES  —  /api/conversations/:id/messages
+================================================================
+
+--- Get messages (paginated) ---
+GET /api/conversations/:id/messages?cursor=<id>
+  cursor  integer  optional ID of the last message for pagination
+
+→ 200 { "items": [ <MessageItem> ], "nextCursor": number | null }
+
+--- Send message ---
+POST /api/conversations/:id/messages
+Body:
+  { "body": "text content" }
+  OR
+  { "mediaUrl": "bare_filename_or_full_url" }
+
+→ 201 { Message object }
+
+================================================================
+POSTS (Updated for Multi-media)  —  /api/posts
+================================================================
+
+--- Create multi-media post ---
+POST /api/posts
+Content-Type: multipart/form-data
+
+Form fields:
+  desc     string   optional
+  file     file     optional (can be multiple)
+  imgType  string   "square" | "wide" | "original"
+
+→ 201 {
+    "id": 123,
+    "media": [
+      { "url": "...", "type": "IMAGE" },
+      { "url": "...", "type": "VIDEO" }
+    ],
+    ...
+  }
+
+================================================================
+POSTMAN COLLECTION — QUICK SETUP
+================================================================
+
+Base URL variable: {{base}}  =  http://localhost:4000
+
+Step 1 — Create a conversation
+  POST  {{base}}/api/conversations
+  Body: { "targetUserId": "user_id_here" }
+
+Step 2 — Send a text message
+  POST  {{base}}/api/conversations/<id>/messages
+  Body: { "body": "Hello there!" }
+
+Step 3 — Send an image message
+  (First upload via /api/uploads to get filename)
+  POST  {{base}}/api/conversations/<id>/messages
+  Body: { "mediaUrl": "uuid.jpg" }
+
+Step 4 — Create a post with 3 images
+  POST  {{base}}/api/posts
+  Body: form-data
+    Key: file  |  Type: File | [Select Image 1]
+    Key: file  |  Type: File | [Select Image 2]
+    Key: file  |  Type: File | [Select Image 3]
+    Key: desc  |  Type: Text | "Multi-media post"

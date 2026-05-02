@@ -1,0 +1,227 @@
+# Breadit API — Phase 3 Postman Reference
+# Base URL: http://localhost:4000
+# Auth: session cookie `breadit_session` (httpOnly) set automatically on login/register.
+#        In Postman: enable "Send cookies" and use Cookie Manager, or copy the Set-Cookie value.
+# Content-Type: application/json unless noted as multipart/form-data.
+
+================================================================
+UPLOADS  —  /api/uploads
+================================================================
+
+--- Upload a file ---
+POST /api/uploads
+Content-Type: multipart/form-data
+(requires breadit_session cookie + verified email)
+
+Form fields:
+  file     file    required  image (image/*) or video (video/*)
+  imgType  string  optional  crop/resize preset for images only:
+                               "original" → resize to 600 px wide, keep aspect ratio
+                               "square"   → crop to 600×600
+                               "wide"     → crop to 600×338 (banner)
+                             omit for video (no processing applied)
+
+→ 201 { "filename": "<uuid>.jpg" }          (image)
+→ 201 { "filename": "<uuid>.mp4" }          (video — extension preserved from upload)
+→ 400 { "message": "No file attached" }
+→ 401 / 403
+
+--- Serve an uploaded file (no auth) ---
+GET /uploads/:filename
+  Served directly by @fastify/static — no NestJS controller, no auth required.
+
+→ 200  binary file bytes
+→ 404  file not found
+
+================================================================
+POSTS  —  /api/posts
+================================================================
+
+--- Feed (paginated) ---
+GET /api/posts?cursor=1&user=alice
+  cursor  : page number, default 1
+  user    : optional — filter to a specific username's posts
+  (cookie optional — if provided, liked/saved/reposted flags are populated)
+
+→ 200 { "posts": [ <post objects> ], "hasMore": true }
+
+--- Single post ---
+GET /api/posts/:id
+  :id  integer post ID
+  (cookie optional; returns 404 if post is soft-deleted)
+
+→ 200 { post object with nested comments }
+→ 404 { "message": "Not Found" }
+
+--- Create post ---
+POST /api/posts
+Content-Type: multipart/form-data
+(requires breadit_session cookie + verified email)
+
+Form fields:
+  desc          string   optional  post text (max 255 chars)
+  imgType       string   optional  "original" | "square" | "wide"  (only when attaching image)
+  rePostId      integer  optional  ID of post being reposted
+  parentPostId  integer  optional  ID of parent post (reply / comment)
+  file          file     optional  image or video file
+
+→ 201 { post object }
+→ 401 { "message": "Unauthorized" }
+→ 403 { "message": "Forbidden" }    (email not verified)
+
+--- Delete post (soft delete) ---
+DELETE /api/posts/:id
+(requires breadit_session cookie; must own the post)
+
+Sets deletedAt = now(). Post becomes invisible in all feeds and returns 404 on detail.
+
+→ 200 { "success": true }
+→ 403 { "message": "Forbidden" }    (not the post owner)
+→ 404 { "message": "Not Found" }    (post does not exist or already deleted)
+
+================================================================
+POSTMAN COLLECTION — QUICK SETUP
+================================================================
+
+Base URL variable: {{base}}  =  http://localhost:4000
+
+Step 1 — Login (captures session cookie)
+  POST  {{base}}/api/auth/login
+  Body (raw JSON): { "email": "user1@example.com", "password": "password" }
+  Settings: cookie jar enabled
+
+Step 2 — Upload image (original crop)
+  POST  {{base}}/api/uploads
+  Body: form-data
+    Key: file    | Type: File | Value: [select image file]
+    Key: imgType | Type: Text | Value: original
+
+Step 3 — Upload image (square crop)
+  POST  {{base}}/api/uploads
+  Body: form-data
+    Key: file    | Type: File | Value: [select image file]
+    Key: imgType | Type: Text | Value: square
+
+Step 4 — Upload image (wide/banner crop)
+  POST  {{base}}/api/uploads
+  Body: form-data
+    Key: file    | Type: File | Value: [select image file]
+    Key: imgType | Type: Text | Value: wide
+
+Step 5 — Upload video
+  POST  {{base}}/api/uploads
+  Body: form-data
+    Key: file | Type: File | Value: [select .mp4 file]
+
+Step 6 — Verify file is served
+  GET  {{base}}/uploads/<filename from step 2 response>
+
+Step 7 — Create text-only post
+  POST  {{base}}/api/posts
+  Body: form-data
+    Key: desc | Type: Text | Value: Hello from Postman
+
+Step 8 — Create post with image
+  POST  {{base}}/api/posts
+  Body: form-data
+    Key: desc    | Type: Text | Value: My photo post
+    Key: imgType | Type: Text | Value: original
+    Key: file    | Type: File | Value: [select image file]
+
+Step 9 — Create post with video
+  POST  {{base}}/api/posts
+  Body: form-data
+    Key: desc | Type: Text | Value: My video post
+    Key: file | Type: File | Value: [select .mp4 file]
+
+Step 10 — Reply to a post
+  POST  {{base}}/api/posts
+  Body: form-data
+    Key: desc         | Type: Text | Value: My reply
+    Key: parentPostId | Type: Text | Value: 1
+
+Step 11 — Repost
+  POST  {{base}}/api/posts
+  Body: form-data
+    Key: rePostId | Type: Text | Value: 1
+
+Step 12 — Get feed (confirm post appears)
+  GET  {{base}}/api/posts
+
+Step 13 — Delete a post
+  DELETE  {{base}}/api/posts/<id>
+
+Step 14 — Confirm deletion (404 on detail)
+  GET  {{base}}/api/posts/<id>
+
+================================================================
+EXPECTED RESPONSE SHAPES
+================================================================
+
+POST /api/uploads → 201:
+{
+  "filename": "a3f2d1c0-1234-5678-abcd-ef0123456789.jpg"
+}
+
+  File is then accessible at: http://localhost:4000/uploads/<filename>
+
+POST /api/posts → 201:
+{
+  "id": 10,
+  "desc": "Hello world",
+  "img": "a3f2d1c0-1234-5678-abcd-ef0123456789.jpg",  // bare filename; null if no image
+  "imgHeight": null,
+  "video": null,                                        // filename if video post
+  "isSensitive": false,
+  "deletedAt": null,
+  "createdAt": "2026-04-28T04:30:00.000Z",
+  "updatedAt": "2026-04-28T04:30:00.000Z",
+  "userId": "cmohepnas0002o3012cukibvd",
+  "user": {
+    "displayName": "Alice",
+    "username": "alice",
+    "img": null
+  },
+  "_count": { "likes": 0, "rePosts": 0, "comments": 0 },
+  "likes": [],      // [ { "id": <likeId> } ] when logged in and you liked it
+  "rePosts": [],    // [ { "id": <repostId> } ] when logged in and you reposted it
+  "saves": [],      // [ { "id": <saveId> } ] when logged in and you saved it
+  "rePost": null    // nested post object when this is a repost
+}
+
+GET /api/posts → 200:
+{
+  "posts": [ <post objects> ],
+  "hasMore": true
+}
+
+DELETE /api/posts/:id → 200:
+{ "success": true }
+
+DELETE /api/posts/:id (wrong owner) → 403:
+{ "statusCode": 403, "message": "Forbidden" }
+
+DELETE /api/posts/:id (not found / already deleted) → 404:
+{ "statusCode": 404, "message": "Not Found" }
+
+================================================================
+FRONTEND — PAGES TO TEST IN BROWSER
+================================================================
+
+  http://localhost:3000/
+    - Compose box (Share component) at top of feed
+    - Click image icon to attach a photo — select imgType via Edit button
+    - Click "Post" → new post appears at top of feed
+    - As guest: compose box is shown but posting redirects to /sign-in
+
+  http://localhost:3000/@modal/compose/post  (internal modal route)
+    - Triggered by any "compose" nav button in the app
+    - Same Share component inside a modal overlay
+    - X button closes modal (router.back())
+
+  http://localhost:3000/<username>
+    - On own posts: click the "⋯" icon → "Delete post" option appears
+    - On other users' posts: "⋯" icon has no delete option
+
+  http://localhost:3000/<username>/status/<postId>
+    - Deleted posts return 404

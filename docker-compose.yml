@@ -1,41 +1,86 @@
 services:
   db:
-    image: mysql:8.0
+    image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: breadit
-      MYSQL_USER: breadit
-      MYSQL_PASSWORD: breaditpassword
+      POSTGRES_USER: breadit
+      POSTGRES_PASSWORD: breaditpassword
+      POSTGRES_DB: breadit
     ports:
-      - "3306:3306"
+      - "5433:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      test: ["CMD", "pg_isready", "-U", "breadit", "-d", "breadit"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-  app:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6378:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: apps/backend/Dockerfile
     restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       NODE_ENV: production
-      DATABASE_URL: mysql://breadit:breaditpassword@db:3306/breadit
-      AUTH_SECRET: ${AUTH_SECRET:-l7ulBp1on98gbJkHyQ/JHOIZOA12Q4XWSsCddmcAkBc=}
-      AUTH_URL: http://localhost:3000
-      AUTH_TRUST_HOST: "true"
+      DATABASE_URL: postgresql://breadit:breaditpassword@db:5432/breadit
+      REDIS_URL: redis://redis:6379
+      FRONTEND_URL: http://localhost:3000
+      JWT_SECRET: ${JWT_SECRET}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      UPLOAD_DIR: /var/lib/breadit/uploads
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+    ports:
+      - "4000:4000"
+    volumes:
+      - uploads_data:/var/lib/breadit/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  app:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://breadit:breaditpassword@db:5432/breadit
+      BACKEND_INTERNAL_URL: http://backend:4000
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:4000
     ports:
       - "3000:3000"
     volumes:
       - uploads_data:/app/public/uploads
-    command: sh -c "npx prisma db push --accept-data-loss && node server.js"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/sign-in"]
       interval: 10s
@@ -43,5 +88,5 @@ services:
       retries: 6
 
 volumes:
-  mysql_data:
+  postgres_data:
   uploads_data:

@@ -1,0 +1,228 @@
+# Breadit API — Phase 6 Postman Reference
+# Base URL: http://localhost:4000
+# Auth: session cookie `breadit_session` (httpOnly) set automatically on login/register.
+#        In Postman: enable "Send cookies" and use Cookie Manager, or copy the Set-Cookie value.
+# Content-Type: application/json unless noted.
+
+================================================================
+NOTIFICATIONS  —  /api/notifications
+================================================================
+
+All endpoints require the `breadit_session` cookie (JwtAuthGuard).
+
+--- List notifications (paginated) ---
+GET /api/notifications?cursor=1
+  cursor  integer  page number, default 1
+
+→ 200 {
+    "items":      [ <NotificationItem> ],
+    "nextCursor": 2 | null,
+    "total":      integer
+  }
+
+--- List unread count only ---
+GET /api/notifications?unread=true&cursor=1
+  unread  boolean  when true, filters to readAt = null only
+
+→ 200 { "items": [], "nextCursor": null, "total": 3 }
+  (items array is present but the frontend uses only `total` for the badge)
+
+--- Mark a single notification as read ---
+PATCH /api/notifications/:id/read
+  :id  integer  notification ID
+
+→ 200 { "ok": true }
+→ 200 { "ok": true }  (idempotent — already-read notifications are no-ops)
+
+--- Mark all notifications as read ---
+PATCH /api/notifications/read-all
+
+→ 200 { "count": 5 }   (number of rows updated; 0 if already all read)
+
+================================================================
+NOTIFICATIONS  —  WebSocket (Socket.IO)
+================================================================
+
+The Phase 5 gateway is unchanged. Phase 6 adds server-to-client pushes
+when Notification rows are created, so the client no longer needs to emit
+`sendNotification` manually — the backend handles this internally.
+
+Client still connects to: ws://localhost:4000 with { withCredentials: true }
+
+--- Server → Client ---
+
+getNotification
+  Emitted automatically whenever a new Notification row is created.
+  Payload is the full Notification object:
+  {
+    "id":        5,
+    "type":      "LIKE" | "REPLY" | "REPOST" | "FOLLOW" | "MENTION",
+    "readAt":    null,
+    "createdAt": "2026-04-29T07:00:00.000Z",
+    "actor": { "id": "...", "username": "alice", "displayName": "Alice", "img": null },
+    "post": { "id": 12, "user": { "username": "bob" } } | null
+  }
+
+  FOLLOW notifications have post = null.
+  LIKE / REPLY / REPOST / MENTION notifications include the relevant post.
+
+================================================================
+POSTMAN COLLECTION — QUICK SETUP
+================================================================
+
+Base URL variable: {{base}}  =  http://localhost:4000
+
+Step 1 — Login as user A (captures session cookie)
+  POST  {{base}}/api/auth/login
+  Body (raw JSON): { "email": "user1@example.com", "password": "password" }
+  Settings: cookie jar enabled
+
+Step 2 — Login as user B in a second Postman environment or browser tab
+  POST  {{base}}/api/auth/login
+  Body: { "email": "user2@example.com", "password": "password" }
+
+--- LIKE NOTIFICATION ---
+
+Step 3 — User A likes a post owned by User B
+  POST  {{base}}/api/posts/1/like
+  (logged in as User A; post id 1 must belong to User B)
+
+  Expected:
+  - 200 { "liked": true, "count": 1 }
+  - User B's connected socket receives getNotification { type: "LIKE", actor: { username: "user1" }, ... }
+
+Step 4 — Fetch User B's notifications
+  (switch to User B's cookie)
+  GET  {{base}}/api/notifications
+
+  Expected: 200 { items: [ { type: "LIKE", actor: { username: "user1" }, ... } ], ... }
+
+--- FOLLOW NOTIFICATION ---
+
+Step 5 — User A follows User B
+  POST  {{base}}/api/users/<user_b_id>/follow
+  Body: {}
+
+  Expected:
+  - 200 { "following": true }
+  - User B receives getNotification { type: "FOLLOW", post: null, ... }
+
+--- MENTION NOTIFICATION ---
+
+Step 6 — User A posts with @user2 in the body
+  POST  {{base}}/api/posts
+  Body: form-data
+    Key: desc | Type: Text | Value: Hey @user2, check this out!
+
+  Expected:
+  - 201 post object
+  - User B receives getNotification { type: "MENTION", post: { id: <new post id> }, ... }
+
+--- UNREAD COUNT ---
+
+Step 7 — Get unread count for User B
+  (switch to User B's cookie)
+  GET  {{base}}/api/notifications?unread=true&cursor=1
+
+  Expected: 200 { "items": [...], "nextCursor": null, "total": 3 }
+  (total = number of unread notifications)
+
+--- MARK READ ---
+
+Step 8 — Mark a single notification as read
+  PATCH  {{base}}/api/notifications/1/read
+
+  Expected: 200 { "ok": true }
+
+Step 9 — Verify the notification is marked read
+  GET  {{base}}/api/notifications
+
+  Expected: the notification with id=1 now has "readAt": "<timestamp>"
+
+Step 10 — Mark all notifications as read
+  PATCH  {{base}}/api/notifications/read-all
+
+  Expected: 200 { "count": 2 }  (remaining unread count)
+
+Step 11 — Verify unread count is now 0
+  GET  {{base}}/api/notifications?unread=true&cursor=1
+
+  Expected: 200 { "items": [], "nextCursor": null, "total": 0 }
+
+--- SELF-NOTIFICATION GUARD ---
+
+Step 12 — Like your own post
+  POST  {{base}}/api/posts/<your_own_post_id>/like
+  (logged in as User A; post also owned by User A)
+
+  Expected:
+  - 200 { "liked": true, "count": 1 }
+  - No Notification row created (actorId === recipientId guard)
+  - GET /api/notifications returns no new entry
+
+================================================================
+EXPECTED RESPONSE SHAPES
+================================================================
+
+GET /api/notifications → 200:
+{
+  "items": [
+    {
+      "id": 5,
+      "type": "LIKE",
+      "readAt": null,
+      "createdAt": "2026-04-29T07:12:00.000Z",
+      "actor": {
+        "id": "cmohep...",
+        "username": "alice",
+        "displayName": "Alice",
+        "img": null
+      },
+      "post": {
+        "id": 3,
+        "user": { "username": "bob" }
+      }
+    },
+    {
+      "id": 4,
+      "type": "FOLLOW",
+      "readAt": "2026-04-29T06:00:00.000Z",
+      "createdAt": "2026-04-29T05:50:00.000Z",
+      "actor": {
+        "id": "cmohep...",
+        "username": "charlie",
+        "displayName": "Charlie",
+        "img": null
+      },
+      "post": null
+    }
+  ],
+  "nextCursor": null,
+  "total": 2
+}
+
+PATCH /api/notifications/read-all → 200:
+{ "count": 2 }
+
+================================================================
+FRONTEND — PAGES TO TEST IN BROWSER
+================================================================
+
+  http://localhost:3000/notifications
+    - Must be logged in (redirects to /sign-in if not)
+    - Lists all notifications newest-first
+    - Unread items have a blue-tinted background and a blue dot on the right
+    - Clicking an item marks it read and navigates to:
+        FOLLOW → /<actor username>
+        others → /<post owner username>/status/<post id>
+    - "Mark all as read" button at top clears all blue indicators
+
+  Left sidebar bell icon (http://localhost:3000/)
+    - Badge shows unread count; disappears when count is 0
+    - Perform an action (e.g. have another user like your post) while on this page
+    - Badge increments in real time without a page reload
+
+  Mention flow:
+    - User A posts "hello @userB" via http://localhost:3000/compose/post
+    - User B's bell badge increments immediately if logged in
+    - User B opens /notifications → MENTION notification appears at top

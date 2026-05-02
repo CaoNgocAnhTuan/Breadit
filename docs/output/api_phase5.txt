@@ -1,0 +1,226 @@
+# Breadit API — Phase 5 Postman Reference
+# Base URL: http://localhost:4000
+# Auth: session cookie `breadit_session` (httpOnly) set automatically on login/register.
+#        In Postman: enable "Send cookies" and use Cookie Manager, or copy the Set-Cookie value.
+# Content-Type: application/json unless noted.
+
+================================================================
+NOTIFICATIONS  —  WebSocket via Socket.IO
+================================================================
+
+Backend Socket.IO server runs on the same port as the HTTP API (port 4000).
+
+Client connects to: ws://localhost:4000  (or NEXT_PUBLIC_BACKEND_URL)
+Options: { withCredentials: true }
+
+Connection is rejected (socket.disconnect()) if the `breadit_session`
+cookie is missing or invalid.
+
+--- Events emitted by the client ---
+
+newUser
+  payload: string  (username)
+  Effect: socket joins a room named after the username.
+          Future getNotification events are delivered to this room.
+
+sendNotification
+  payload: { receiverUsername: string; data: { senderUsername, type, link, ... } }
+  Effect: server emits getNotification to the room matching receiverUsername.
+
+--- Events emitted by the server ---
+
+getNotification
+  payload: { id: "<uuid>", senderUsername, type, link, ... }
+  Received by: all sockets that have joined the receiverUsername room
+               (routed across replicas via @socket.io/redis-adapter).
+
+================================================================
+HASHTAGS  —  /api/hashtags
+================================================================
+
+--- Posts tagged with a hashtag ---
+GET /api/hashtags/:tag/posts?cursor=1
+  :tag    string   hashtag name (case-insensitive; normalized to lowercase)
+  cursor  integer  page number, default 1
+  (cookie optional — liked/saved/reposted flags populated when logged in)
+
+→ 200 { "posts": [ <post objects> ], "hasMore": bool, "tag": "<normalized>" }
+→ 200 { "posts": [], "hasMore": false, "tag": "<tag>" }  (tag not found)
+
+Note: hashtags are auto-created when a post containing #word is submitted.
+
+================================================================
+SEARCH  —  /api/search
+================================================================
+
+--- Full-text search across posts, users, and hashtags ---
+GET /api/search?q=<query>
+  q  string  search term (case-insensitive ILIKE); empty → { posts:[], users:[], hashtags:[] }
+  (cookie optional — liked/saved/reposted flags populated when logged in)
+
+→ 200 {
+    "posts":    [ <post objects> ],           max 5
+    "users":    [ { id, username, displayName, img } ],  max 5
+    "hashtags": [ { id, tag } ],              max 5
+  }
+
+================================================================
+POSTS (extended)  —  /api/posts?feed=explore
+================================================================
+
+--- Explore feed (all posts, ordered by popularity) ---
+GET /api/posts?feed=explore&cursor=1
+  feed    string   "explore" → returns all posts ordered by total like count desc
+  cursor  integer  page number, default 1
+  (cookie optional)
+
+→ 200 { "posts": [ <post objects ordered by likes._count desc> ], "hasMore": bool }
+
+Existing feeds still work:
+  GET /api/posts              → personalised feed (follows) when logged in; public all-posts when guest
+  GET /api/posts?user=alice   → posts by alice only
+
+================================================================
+POSTMAN COLLECTION — QUICK SETUP
+================================================================
+
+Base URL variable: {{base}}  =  http://localhost:4000
+
+Step 1 — Login (captures session cookie)
+  POST  {{base}}/api/auth/login
+  Body (raw JSON): { "email": "user1@example.com", "password": "password" }
+  Settings: cookie jar enabled
+
+--- HASHTAGS ---
+
+Step 2 — Create a post with a hashtag
+  POST  {{base}}/api/posts
+  Body: form-data
+    Key: desc | Type: Text | Value: Hello #nestjs world!
+
+  Expected: 201 post object
+
+Step 3 — Fetch posts tagged #nestjs
+  GET  {{base}}/api/hashtags/nestjs/posts
+
+  Expected: 200 { posts: [ <the post from step 2> ], hasMore: false, tag: "nestjs" }
+
+Step 4 — Hashtag is case-insensitive
+  GET  {{base}}/api/hashtags/NestJS/posts
+
+  Expected: same result as step 3 (normalized to lowercase)
+
+--- EXPLORE FEED ---
+
+Step 5 — Get explore feed (page 1)
+  GET  {{base}}/api/posts?feed=explore
+
+  Expected: 200 { posts: [ <ordered by likes count desc> ], hasMore: bool }
+
+Step 6 — Page 2 of explore feed
+  GET  {{base}}/api/posts?feed=explore&cursor=2
+
+  Expected: 200 { posts: [ ... ], hasMore: bool }
+
+--- SEARCH ---
+
+Step 7 — Search for a user
+  GET  {{base}}/api/search?q=alice
+
+  Expected: 200 { posts: [...], users: [{ username: "alice", ... }], hashtags: [] }
+
+Step 8 — Search for a hashtag
+  GET  {{base}}/api/search?q=nestjs
+
+  Expected: 200 { posts: [...], users: [], hashtags: [{ tag: "nestjs" }] }
+
+Step 9 — Search for post text
+  GET  {{base}}/api/search?q=hello+world
+
+  Expected: 200 { posts: [<posts whose desc contains "hello world">], users: [], hashtags: [] }
+
+Step 10 — Empty query
+  GET  {{base}}/api/search?q=
+
+  Expected: 200 { posts: [], users: [], hashtags: [] }
+
+--- WEBSOCKET (via Postman WebSocket client or browser DevTools) ---
+
+Step 11 — Connect to Socket.IO backend
+  URL: ws://localhost:4000/socket.io/?EIO=4&transport=websocket
+  (use Postman's WebSocket tab or a simple browser test)
+  Note: the `breadit_session` cookie must be present in the handshake.
+
+Step 12 — Send newUser event
+  Emit: 42["newUser","alice"]
+
+Step 13 — Send a notification
+  Emit: 42["sendNotification",{"receiverUsername":"user2","data":{"senderUsername":"alice","type":"follow","link":"/alice"}}]
+
+  Expected: user2's connected socket receives: 42["getNotification",{"id":"<uuid>","senderUsername":"alice","type":"follow","link":"/alice"}]
+
+================================================================
+EXPECTED RESPONSE SHAPES
+================================================================
+
+GET /api/hashtags/:tag/posts → 200:
+{
+  "posts": [ <post objects> ],
+  "hasMore": false,
+  "tag": "nestjs"
+}
+
+GET /api/search?q=alice → 200:
+{
+  "posts": [
+    {
+      "id": 3,
+      "desc": "Alice posted something",
+      "user": { "displayName": "Alice", "username": "alice", "img": null },
+      "_count": { "likes": 2, "rePosts": 0, "comments": 1 },
+      ...
+    }
+  ],
+  "users": [
+    { "id": "cmohepnas...", "username": "alice", "displayName": "Alice", "img": null }
+  ],
+  "hashtags": []
+}
+
+GET /api/posts?feed=explore → 200:
+{
+  "posts": [
+    { ... post with most likes ... },
+    { ... post with second-most likes ... }
+  ],
+  "hasMore": true
+}
+
+================================================================
+FRONTEND — PAGES TO TEST IN BROWSER
+================================================================
+
+  http://localhost:3000/
+    - "For you" tab (default) — personalised feed based on follows
+    - "Explore" tab — all posts ordered by popularity (click to switch)
+    - Active tab shows blue underline indicator
+
+  http://localhost:3000/?feed=explore
+    - Explore feed loaded server-side (shareable URL)
+
+  http://localhost:3000/hashtag/nestjs
+    - All posts tagged #nestjs, paginated
+    - Empty state: "No posts for #nestjs yet."
+
+  http://localhost:3000/ (right sidebar search box)
+    - Type in search box → results dropdown appears after 300ms debounce
+    - People section: click user → navigates to /@username profile
+    - Hashtags section: click tag → navigates to /hashtag/<tag>
+    - Posts section: click result → navigates to post permalink
+    - Click outside search box → dropdown closes
+
+  Real-time notifications:
+    - Login as user1, login as user2 in another tab
+    - user1 follows user2 → user2 receives socket notification in real time
+    - user1 likes user2's post → user2 receives notification in real time
+    - Notifications come from the backend WebSocket, not from server.js

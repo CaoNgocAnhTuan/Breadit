@@ -1,0 +1,216 @@
+================================================================
+PHASE 2 — API ENDPOINTS & FRONTEND ROUTES
+================================================================
+Backend base URL : http://localhost:4000
+Frontend base URL: http://localhost:3000
+Auth cookie name : breadit_session (httpOnly, set on login)
+================================================================
+
+
+----------------------------------------------------------------
+BACKEND — REST ENDPOINTS (new in Phase 2)
+----------------------------------------------------------------
+
+1. PROFILE TAB POSTS
+   GET /api/users/:username/posts
+
+   Query params:
+     tab    = posts | replies | media | likes   (default: posts)
+     cursor = page number, 1-based              (default: 1)
+
+   Response: { posts: Post[], hasMore: boolean }
+
+   --- curl examples ---
+
+   # Posts tab (default)
+   curl http://localhost:4000/api/users/alice/posts
+
+   # Replies tab
+   curl "http://localhost:4000/api/users/alice/posts?tab=replies"
+
+   # Media tab
+   curl "http://localhost:4000/api/users/alice/posts?tab=media"
+
+   # Likes tab
+   curl "http://localhost:4000/api/users/alice/posts?tab=likes"
+
+   # Second page
+   curl "http://localhost:4000/api/users/alice/posts?tab=posts&cursor=2"
+
+   # Authenticated (includes isLiked / isReposted / isSaved per post)
+   curl "http://localhost:4000/api/users/alice/posts?tab=likes" \
+     --cookie "breadit_session=<YOUR_JWT>"
+
+
+----------------------------------------------------------------
+
+2. FOLLOWERS LIST
+   GET /api/users/:username/followers
+
+   Query params:
+     cursor = page number, 1-based   (default: 1)
+
+   Response: { users: UserSummary[], hasMore: boolean }
+   UserSummary: { id, username, displayName, img, bio }
+
+   --- curl examples ---
+
+   curl http://localhost:4000/api/users/alice/followers
+
+   # Second page (10 users per page)
+   curl "http://localhost:4000/api/users/alice/followers?cursor=2"
+
+
+----------------------------------------------------------------
+
+3. FOLLOWING LIST
+   GET /api/users/:username/following
+
+   Query params:
+     cursor = page number, 1-based   (default: 1)
+
+   Response: { users: UserSummary[], hasMore: boolean }
+
+   --- curl examples ---
+
+   curl http://localhost:4000/api/users/alice/following
+
+   curl "http://localhost:4000/api/users/alice/following?cursor=2"
+
+
+----------------------------------------------------------------
+BACKEND — EXISTING ENDPOINTS (Phase 1, referenced by Phase 2 UI)
+----------------------------------------------------------------
+
+4. USER PROFILE
+   GET /api/users/:username
+
+   curl http://localhost:4000/api/users/alice
+
+   Authenticated:
+   curl http://localhost:4000/api/users/alice \
+     --cookie "breadit_session=<YOUR_JWT>"
+
+   Response includes:
+     _count.followers, _count.followings
+     followings[]  (non-empty if current user follows this user)
+
+
+5. PUBLIC FEED
+   GET /api/posts?cursor=1
+
+   curl http://localhost:4000/api/posts
+   curl "http://localhost:4000/api/posts?cursor=2"
+
+
+6. POST DETAIL
+   GET /api/posts/:id
+
+   curl http://localhost:4000/api/posts/1
+
+
+7. AUTH — login (to get a session cookie for testing)
+   POST /api/auth/login
+
+   curl -X POST http://localhost:4000/api/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"you@example.com","password":"yourpassword"}' \
+     -c cookies.txt
+
+   # Use saved cookie in subsequent requests:
+   curl http://localhost:4000/api/users/alice/posts?tab=likes \
+     -b cookies.txt
+
+
+================================================================
+FRONTEND — PAGES TO CHECK IN BROWSER
+================================================================
+
+Replace "alice" with a real username that exists in your database.
+
+  http://localhost:3000/alice
+    - Profile page with tab bar (Posts / Replies / Media / Likes)
+    - Follower & following counts are clickable links
+    - As guest: Follow button redirects to /sign-in
+
+  http://localhost:3000/alice?tab=replies   (tabs are client-side state,
+  http://localhost:3000/alice?tab=media      click the tab buttons in UI)
+  http://localhost:3000/alice?tab=likes
+
+  http://localhost:3000/alice/followers
+    - Paginated list of users following alice
+    - Each user card shows avatar, display name, @handle, bio
+
+  http://localhost:3000/alice/following
+    - Paginated list of users alice follows
+
+  http://localhost:3000/sign-in
+    - Reached automatically when guest clicks Like / Repost / Save / Follow
+
+
+================================================================
+POSTMAN COLLECTION — QUICK SETUP
+================================================================
+
+Base URL variable: {{base}}  =  http://localhost:4000
+
+Request 1: Login (run first to capture cookie)
+  POST  {{base}}/api/auth/login
+  Body (JSON): { "email": "...", "password": "..." }
+  Settings: "Automatically follow redirects" ON, cookie jar ON
+
+Request 2: Profile posts — Posts tab
+  GET   {{base}}/api/users/alice/posts
+  Params: tab=posts, cursor=1
+
+Request 3: Profile posts — Likes tab
+  GET   {{base}}/api/users/alice/posts
+  Params: tab=likes, cursor=1
+
+Request 4: Followers
+  GET   {{base}}/api/users/alice/followers
+  Params: cursor=1
+
+Request 5: Following
+  GET   {{base}}/api/users/alice/following
+  Params: cursor=1
+
+================================================================
+EXPECTED RESPONSE SHAPES
+================================================================
+
+Profile tab posts:
+{
+  "posts": [
+    {
+      "id": 1,
+      "desc": "hello world",
+      "img": null,
+      "video": null,
+      "isSensitive": false,
+      "createdAt": "2026-04-27T00:00:00.000Z",
+      "updatedAt": "2026-04-27T00:00:00.000Z",
+      "userId": "clxxx",
+      "user": { "displayName": "Alice", "username": "alice", "img": null },
+      "_count": { "likes": 3, "rePosts": 1, "comments": 2 },
+      "likes":  [],          // [] = not liked by me;  [{ id: N }] = liked
+      "rePosts": [],
+      "saves":  []
+    }
+  ],
+  "hasMore": true
+}
+
+Followers / Following:
+{
+  "users": [
+    {
+      "id": "clyyy",
+      "username": "bob",
+      "displayName": "Bob",
+      "img": null,
+      "bio": "Just a guy"
+    }
+  ],
+  "hasMore": false
+}

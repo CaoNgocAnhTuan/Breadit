@@ -1,0 +1,210 @@
+# Breadit API — Postman Reference
+# Base URL: http://localhost:4000
+# Auth: session cookie `breadit_session` (httpOnly) set automatically on login/register.
+#        In Postman: enable "Send cookies" and use Cookie Manager, or copy the Set-Cookie value.
+# Content-Type: application/json unless noted as multipart/form-data.
+
+================================================================
+HEALTH
+================================================================
+
+GET /api/health
+  → 200 { "status": "ok" }
+
+================================================================
+AUTH  —  /api/auth
+================================================================
+
+--- Register ---
+POST /api/auth/register
+Content-Type: application/json
+
+Body:
+{
+  "username": "alice",        // 3–30 chars, alphanumeric + underscore only
+  "email": "alice@example.com",
+  "password": "secret123"    // min 6 chars
+}
+
+→ 201 { "userId": "<cuid>" }
+→ 409 { "message": "Email or username already taken" }
+→ 400 { "message": ["<validation errors>"] }
+
+--- Login ---
+POST /api/auth/login
+Content-Type: application/json
+
+Body:
+{
+  "email": "alice@example.com",
+  "password": "secret123"
+}
+
+→ 200 { "user": { "id", "username", "email", "emailVerified", "img" } }
+    + Sets cookie: breadit_session=<jwt>; HttpOnly; Path=/
+→ 401 { "message": "Invalid email or password" }
+
+--- Logout ---
+POST /api/auth/logout
+(no body; requires breadit_session cookie)
+
+→ 200 { "ok": true }
+    + Clears breadit_session cookie
+
+--- Session check ---
+GET /api/auth/me
+(requires breadit_session cookie)
+
+→ 200 { "id", "username", "email", "emailVerified", "img" }
+→ 401 { "message": "Unauthorized" }
+
+--- Verify email ---
+GET /api/auth/verify?token=<uuid>
+
+→ 200 { "ok": true }
+→ 400 { "message": "Token is invalid or has expired" }
+
+--- Forgot password ---
+POST /api/auth/forgot-password
+Content-Type: application/json
+
+Body:
+{
+  "email": "alice@example.com"
+}
+
+→ 200 { "ok": true }   (always 200 — no email enumeration)
+
+--- Reset password ---
+POST /api/auth/reset-password
+Content-Type: application/json
+
+Body:
+{
+  "token": "<uuid from reset email>",
+  "password": "newpassword123"   // min 6 chars
+}
+
+→ 200 { "ok": true }
+→ 400 { "message": "Token is invalid or has expired" }
+
+================================================================
+POSTS  —  /api/posts
+================================================================
+
+--- Feed (paginated) ---
+GET /api/posts?cursor=1&user=alice
+  cursor  : page number, default 1
+  user    : optional — filter to a specific username's posts
+  (cookie optional — if provided, liked/saved/reposted flags are populated)
+
+→ 200 [ { post objects } ]
+
+--- Single post ---
+GET /api/posts/:id
+  :id  integer post ID
+  (cookie optional)
+
+→ 200 { post object }
+→ 404 { "message": "Not Found" }
+
+--- Create post ---
+POST /api/posts
+Content-Type: multipart/form-data
+(requires breadit_session cookie + verified email)
+
+Form fields:
+  desc         string    optional  post text
+  imgType      string    optional  "image" | "video"
+  rePostId     integer   optional  ID of post being reposted
+  parentPostId integer   optional  ID of parent post (for comments)
+  file         file      optional  image or video file
+
+→ 201 { post object }
+→ 401 / 403
+
+--- Delete post ---
+DELETE /api/posts/:id
+(requires breadit_session cookie; must own the post)
+
+→ 200 { "ok": true }
+→ 401 / 403 / 404
+
+================================================================
+USERS  —  /api/users
+================================================================
+
+--- User profile ---
+GET /api/users/:username
+  (cookie optional — if provided, `isFollowing` flag is populated)
+
+→ 200 { "id", "username", "email", "img", "bio", "_count": { "followers", "following", "posts" }, "isFollowing" }
+→ 404 { "message": "Not Found" }
+
+--- Profile posts (tabbed) ---
+GET /api/users/:username/posts?tab=posts&cursor=1
+  tab     : "posts" | "replies" | "media" | "likes" | "saved"  (default: "posts")
+  cursor  : page number, default 1
+  (cookie optional)
+
+→ 200 [ { post objects } ]
+
+--- Followers list ---
+GET /api/users/:username/followers?cursor=1
+  cursor  : page number, default 1
+
+→ 200 [ { user objects } ]
+
+--- Following list ---
+GET /api/users/:username/following?cursor=1
+  cursor  : page number, default 1
+
+→ 200 [ { user objects } ]
+
+--- Follow recommendations ---
+GET /api/users/recommendations
+(requires breadit_session cookie)
+
+→ 200 [ { user objects } ]
+→ 401 { "message": "Unauthorized" }
+
+================================================================
+UPLOADS  —  /api/uploads
+================================================================
+
+--- Upload a file ---
+POST /api/uploads
+Content-Type: multipart/form-data
+(requires breadit_session cookie + verified email)
+
+Form fields:
+  imgType  string  optional  "image" | "video"
+  file     file    required  the file to upload
+
+→ 201 { "filename": "<stored filename>" }
+→ 400 { "message": "No file attached" }
+→ 401 / 403
+
+================================================================
+NOTES FOR POSTMAN
+================================================================
+
+1. Cookie handling
+   - After POST /api/auth/login, Postman automatically stores the
+     `breadit_session` cookie if "Automatically follow redirects" and
+     "Send cookies" are enabled (default in Postman desktop).
+   - All subsequent requests in the same collection share the cookie.
+
+2. Multipart posts (POST /api/posts, POST /api/uploads)
+   - Set Body → form-data.
+   - Add text fields (desc, imgType, etc.) with Type = Text.
+   - Add the file field with Type = File and select a local file.
+
+3. Pagination
+   - All paginated endpoints use cursor = page number (1, 2, 3 …).
+   - An empty array [] signals the last page.
+
+4. Verified email requirement
+   - POST /api/posts and POST /api/uploads require `emailVerified` to
+     be non-null on the account. Use GET /api/auth/verify?token=<uuid>
+     first (retrieve the token from the DB in dev).

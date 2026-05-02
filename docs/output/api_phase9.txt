@@ -1,0 +1,175 @@
+# Breadit API — Phase 9 Postman Reference
+# Base URL: http://localhost:4000
+# Auth: session cookie `breadit_session` (httpOnly) set automatically on login/register.
+#        In Postman: enable "Send cookies" and use Cookie Manager, or copy the Set-Cookie value.
+# Content-Type: application/json unless noted.
+# Phase 9 changes: Cloudinary upload responses, rate limiting (429), OG meta (browser-side).
+
+================================================================
+UPLOAD FILE (updated)  —  /api/uploads
+================================================================
+
+Requires `breadit_session` cookie (JwtAuthGuard + EmailVerifiedGuard).
+
+--- Upload image with Cloudinary active ---
+POST /api/uploads
+  Content-Type: multipart/form-data
+  Form fields:
+    imgType  =  "square"          # or "wide" / "original"
+    file     =  <image file>
+
+→ 201 {
+    "filename": "https://res.cloudinary.com/your-cloud/image/upload/v1234567890/breadit/abc123.jpg"
+  }
+
+Note: when CLOUDINARY_CLOUD_NAME env is set, `filename` is a full https:// URL.
+      When Cloudinary is absent (local dev), `filename` is a bare UUID string as in Phase 3.
+
+imgType → Cloudinary transformation:
+  "square"   →  w_600,h_600,c_fill
+  "wide"     →  w_600,h_338,c_fill
+  "original" →  w_1200,c_limit
+
+--- Upload video (Cloudinary) ---
+POST /api/uploads
+  Content-Type: multipart/form-data
+  Form fields:
+    file  =  <video file>
+
+→ 201 {
+    "filename": "https://res.cloudinary.com/your-cloud/video/upload/v1234567890/breadit/xyz789.mp4"
+  }
+
+--- File too large ---
+POST /api/uploads  (file > 25 MB)
+
+→ 413 { "statusCode": 413, "message": "File exceeds 25 MB limit" }
+
+================================================================
+RATE LIMITING  —  HTTP 429 responses
+================================================================
+
+When a client exceeds the per-route limit within the rolling 60-second window,
+every subsequent request returns:
+
+→ 429 {
+    "statusCode": 429,
+    "message": "ThrottlerException: Too Many Requests"
+  }
+
+Rate limits by route:
+
+  POST /api/auth/register      →  10 req / 60 s
+  POST /api/auth/login         →  10 req / 60 s
+  POST /api/auth/verify        →  10 req / 60 s
+  POST /api/auth/verify/resend →   5 req / 60 s
+  POST /api/auth/forgot-password→  5 req / 60 s
+  POST /api/auth/reset-password →  5 req / 60 s
+  GET  /api/auth/me            →  no limit (@SkipThrottle)
+  All other routes             →  120 req / 60 s (global default)
+
+--- Test login throttle ---
+POST /api/auth/login  (send 11 times in under 60 s)
+  Body: { "email": "user1@example.com", "password": "wrongpassword" }
+
+  Requests 1–10 → 401 Unauthorized (wrong password, but not throttled)
+  Request 11    → 429 Too Many Requests
+
+================================================================
+POSTMAN COLLECTION — QUICK SETUP
+================================================================
+
+Base URL variable: {{base}}  =  http://localhost:4000
+
+--- CLOUDINARY UPLOAD FLOW ---
+
+Step 1 — Login
+  POST  {{base}}/api/auth/login
+  Body: { "email": "user1@example.com", "password": "password" }
+  Settings: cookie jar enabled
+
+Step 2 — Upload avatar to Cloudinary
+  POST  {{base}}/api/uploads
+  Content-Type: multipart/form-data
+    imgType  =  square
+    file     =  (select an image file)
+
+  Expected: 201 { "filename": "https://res.cloudinary.com/..." }
+  Save filename value as {{cloudinary_url}}
+
+Step 3 — Set new avatar on profile
+  PATCH  {{base}}/api/users/me
+  Content-Type: application/json
+  Body: { "img": "{{cloudinary_url}}" }
+
+  Expected: 200 with updated user; img field = full Cloudinary URL.
+
+Step 4 — Upload cover image
+  POST  {{base}}/api/uploads
+  Content-Type: multipart/form-data
+    imgType  =  wide
+    file     =  (select an image file)
+
+  Expected: 201 { "filename": "https://res.cloudinary.com/..." }
+
+Step 5 — Verify profile reflects Cloudinary URLs
+  GET  {{base}}/api/auth/me
+
+  Expected: 200 with img / cover as full https://res.cloudinary.com/... URLs.
+
+--- RATE LIMIT FLOW ---
+
+Step 6 — Trigger 429 on login
+  Send POST  {{base}}/api/auth/login  with wrong credentials 11 times in 60 s.
+  First 10: 401 Unauthorized
+  11th:     429 Too Many Requests
+
+Step 7 — Verify /me is exempt
+  GET  {{base}}/api/auth/me  (send 200 times — should never 429)
+
+================================================================
+EXPECTED RESPONSE SHAPES
+================================================================
+
+POST /api/uploads → 201 (Cloudinary active):
+{ "filename": "https://res.cloudinary.com/your-cloud/image/upload/v123/breadit/uuid.jpg" }
+
+POST /api/uploads → 201 (local disk fallback):
+{ "filename": "550e8400-e29b-41d4-a716-446655440000.jpg" }
+
+HTTP 429 (throttled):
+{ "statusCode": 429, "message": "ThrottlerException: Too Many Requests" }
+
+================================================================
+FRONTEND — PAGES TO TEST IN BROWSER
+================================================================
+
+  Cloudinary image upload:
+    1. Login at http://localhost:3000/sign-in
+    2. Go to your profile, click "Edit profile"
+    3. Click avatar circle, select an image, click Save
+    4. Avatar in Share box and LeftBar should show the Cloudinary-hosted image
+    5. Inspect the <img> src in DevTools — should start with https://res.cloudinary.com/
+
+  OpenGraph meta — profile page:
+    1. Navigate to http://localhost:3000/<username>
+    2. Open DevTools → Elements → search for og:title
+    3. Should contain "{displayName} (@{username})"
+    4. og:description should match the user's bio (if set)
+    5. og:image should be the avatar URL (if set)
+
+  OpenGraph meta — post permalink:
+    1. Click any post to open the permalink (e.g. http://localhost:3000/alice/status/42)
+    2. DevTools → Elements → search for og:title
+    3. Should contain the author name and truncated post text
+    4. twitter:card should be "summary_large_image" if the post has an image
+
+  Error boundary:
+    1. Navigate to http://localhost:3000/nonexistent_user_xyzzy
+    2. Should see "Could not load this profile." with a "Try again" button
+       (or notFound() depending on backend response — boundary catches render errors)
+
+  Rate limit (browser):
+    1. Open the sign-in page and submit wrong credentials rapidly 11+ times
+    2. After the 10th attempt the backend returns 429 — the sign-in form
+       should show a generic error (frontend does not yet distinguish 429 specifically)

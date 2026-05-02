@@ -1,0 +1,269 @@
+# Breadit API — Phase 7 Postman Reference
+# Base URL: http://localhost:4000
+# Auth: session cookie `breadit_session` (httpOnly) set automatically on login/register.
+#        In Postman: enable "Send cookies" and use Cookie Manager, or copy the Set-Cookie value.
+# Content-Type: application/json unless noted.
+
+================================================================
+BLOCK  —  /api/users/:id/block
+================================================================
+
+Requires `breadit_session` cookie (JwtAuthGuard).
+
+--- Toggle block (block or unblock) ---
+POST /api/users/:id/block
+  :id  string  the user ID to block/unblock
+
+→ 200 { "blocked": true }   (block created; follows removed in both directions)
+→ 200 { "blocked": false }  (block removed; follows are NOT restored)
+
+Notes:
+- Blocking removes Follow rows in both directions atomically.
+- Unblocking does NOT restore follows. Users must re-follow manually.
+- Blocking yourself returns an error (blockerId === blockedId produces a DB unique conflict).
+
+--- isBlocked field on user profile ---
+GET /api/users/:username
+  (cookie required to receive isBlocked)
+
+→ 200 {
+    "id": "...",
+    "username": "alice",
+    ...
+    "isBlocked": true | false
+  }
+
+isBlocked is true if either:
+  - the requesting user has blocked this profile, OR
+  - this profile has blocked the requesting user.
+isBlocked is false (not present) when the request is unauthenticated.
+
+================================================================
+REPORT  —  /api/posts/:id/report
+================================================================
+
+Requires `breadit_session` cookie (JwtAuthGuard).
+
+--- Create a report ---
+POST /api/posts/:id/report
+  :id  integer  the post ID to report
+  Body (raw JSON): { "reason": "string" }
+
+→ 201 {
+    "id":         12,
+    "createdAt":  "2026-04-29T08:00:00.000Z",
+    "reason":     "Spam",
+    "status":     "OPEN",
+    "reporterId": "cmohep...",
+    "postId":     7
+  }
+
+Valid reason values: any non-empty string (e.g. "Spam", "Harassment", "Other").
+There is no uniqueness constraint — a user can report the same post multiple times.
+
+--- List open reports (admin) ---
+GET /api/posts/admin/reports
+  (JwtAuthGuard only — role-based restriction added in Phase 12)
+
+→ 200 [
+    {
+      "id": 12,
+      "createdAt": "2026-04-29T08:00:00.000Z",
+      "reason": "Spam",
+      "status": "OPEN",
+      "reporterId": "...",
+      "postId": 7,
+      "reporter": { "username": "alice" },
+      "post": { "id": 7, "desc": "some post text", "userId": "..." }
+    }
+  ]
+
+================================================================
+FEED FILTERING (block side-effect)
+================================================================
+
+After User A blocks User B, the following endpoints automatically exclude
+User B's content from User A's responses (and User A's content from User B's):
+
+  GET /api/posts?cursor=1            — home feed
+  GET /api/posts?feed=explore        — explore feed
+  GET /api/posts (guest, no cookie)  — not filtered (no userId available)
+  GET /api/search?q=<term>           — posts and users sections
+  GET /api/notifications             — actorId of blocked users excluded
+
+Profile feeds are NOT filtered:
+  GET /api/users/:username/posts     — shows all posts by that user regardless of blocks
+
+================================================================
+POSTMAN COLLECTION — QUICK SETUP
+================================================================
+
+Base URL variable: {{base}}  =  http://localhost:4000
+
+Step 1 — Login as User A
+  POST  {{base}}/api/auth/login
+  Body: { "email": "user1@example.com", "password": "password" }
+  Settings: cookie jar enabled
+
+Step 2 — Login as User B in a second environment / browser tab
+  POST  {{base}}/api/auth/login
+  Body: { "email": "user2@example.com", "password": "password" }
+
+--- BLOCK FLOW ---
+
+Step 3 — User A blocks User B
+  POST  {{base}}/api/users/<user_b_id>/block
+
+  Expected: 200 { "blocked": true }
+
+Step 4 — Verify follows removed
+  GET  {{base}}/api/users/user2/followers
+  (logged in as User A)
+
+  Expected: User A is no longer in User B's followers list.
+
+Step 5 — Verify feed filtering (as User A)
+  GET  {{base}}/api/posts
+
+  Expected: User B's posts are absent from the response.
+
+Step 6 — Verify feed filtering (as User B)
+  GET  {{base}}/api/posts
+
+  Expected: User A's posts are absent from the response.
+
+Step 7 — Verify search filtering (as User A)
+  GET  {{base}}/api/search?q=<user_b_username>
+
+  Expected: User B does not appear in the users section.
+
+Step 8 — Verify notification filtering (as User A)
+  (Have User B like a post owned by User A — this creates a LIKE notification)
+  GET  {{base}}/api/notifications
+
+  Expected: The LIKE notification from User B is absent.
+
+Step 9 — Unblock User B
+  POST  {{base}}/api/users/<user_b_id>/block
+
+  Expected: 200 { "blocked": false }
+
+Step 10 — Verify User B's posts reappear (as User A)
+  GET  {{base}}/api/posts
+
+  Expected: User B's posts are visible again.
+
+Step 11 — Check isBlocked field on profile
+  GET  {{base}}/api/users/user2
+
+  Expected (while User A has User B blocked):
+  { ..., "isBlocked": true }
+
+  Expected (after unblock):
+  { ..., "isBlocked": false }
+
+--- REPORT FLOW ---
+
+Step 12 — User A reports a post owned by User B
+  POST  {{base}}/api/posts/1/report
+  Body: { "reason": "Spam" }
+
+  Expected: 201 { "id": 1, "status": "OPEN", "reason": "Spam", ... }
+
+Step 13 — Verify report in admin queue
+  GET  {{base}}/api/posts/admin/reports
+
+  Expected: 200 [ { "id": 1, "status": "OPEN", "reason": "Spam", "reporter": { "username": "user1" }, "post": { ... } } ]
+
+Step 14 — Try to report your own post
+  POST  {{base}}/api/posts/<your_own_post_id>/report
+  Body: { "reason": "Test" }
+
+  Expected: 201 (API does not prevent self-reports; UI prevents it by not showing the Report button on own posts)
+
+--- EDGE CASES ---
+
+Step 15 — Block yourself
+  POST  {{base}}/api/users/<your_own_id>/block
+
+  Expected: 500 / unique constraint error (blockerId = blockedId is not a valid state)
+
+Step 16 — Report a non-existent post
+  POST  {{base}}/api/posts/99999/report
+  Body: { "reason": "Test" }
+
+  Expected: 500 / foreign key constraint error (postId references a non-existent Post row)
+
+================================================================
+EXPECTED RESPONSE SHAPES
+================================================================
+
+POST /api/users/:id/block → 200:
+{ "blocked": true }
+
+POST /api/posts/:id/report → 201:
+{
+  "id":         3,
+  "createdAt":  "2026-04-29T08:05:00.000Z",
+  "reason":     "Spam",
+  "status":     "OPEN",
+  "reporterId": "cmohepnas...",
+  "postId":     7
+}
+
+GET /api/posts/admin/reports → 200:
+[
+  {
+    "id":         3,
+    "createdAt":  "2026-04-29T08:05:00.000Z",
+    "reason":     "Spam",
+    "status":     "OPEN",
+    "reporterId": "cmohepnas...",
+    "postId":     7,
+    "reporter": { "username": "alice" },
+    "post": {
+      "id":     7,
+      "desc":   "This is a spammy post",
+      "userId": "cmohepxyz..."
+    }
+  }
+]
+
+GET /api/users/:username (authenticated) → 200:
+{
+  "id":          "cmohepnas...",
+  "username":    "user2",
+  "displayName": "User Two",
+  "img":         null,
+  "bio":         null,
+  "isBlocked":   true,
+  "_count": { "followers": 2, "followings": 1 },
+  "followings":  []
+}
+
+================================================================
+FRONTEND — PAGES TO TEST IN BROWSER
+================================================================
+
+  Block flow:
+    1. Login as User A at http://localhost:3000/sign-in
+    2. Visit User B's profile, e.g. http://localhost:3000/user2
+    3. Click the "…" (more) button in the action row
+    4. Click "Block @user2"
+    5. Follow button disappears; return to home feed — User B's posts are gone
+    6. Click "…" again → "Unblock @user2" — posts reappear after navigating back to feed
+
+  Report flow:
+    1. Open any post in the feed that belongs to another user
+    2. Click the "…" icon in the top-right corner of the post card
+    3. "Report post" option appears (not visible on your own posts)
+    4. Click it — button shows "Reporting…" then completes silently
+    5. Verify: GET http://localhost:4000/api/posts/admin/reports — new OPEN report visible
+
+  Own profile — no block button:
+    - Visit http://localhost:3000/<your_username>
+    - The "…" block dropdown is NOT rendered (userId === user.id check)
+
+  Guest — no report option:
+    - Log out, visit any post feed
+    - Click "…" icon on a post card — no dropdown appears (static icon for guests)

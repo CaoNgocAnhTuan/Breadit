@@ -1,0 +1,64 @@
+export type NotificationType = 'LIKE' | 'REPLY' | 'REPOST' | 'FOLLOW' | 'MENTION' | 'COMMUNITY_POST' | 'COMMUNITY_NEW_POST' | 'REPORT' | 'COMMUNITY_MOD_ADDED';
+
+export type NotificationItem = {
+  id: number;
+  type: NotificationType;
+  readAt: string | null;
+  createdAt: string;
+  actor: { id: string; username: string; displayName: string | null; img: string | null };
+  post: { id: number; user: { username: string } } | null;
+};
+
+export type Role = 'USER' | 'ADMIN';
+
+export type User = {
+  id: string;
+  username: string;
+  displayName: string | null;
+  img: string | null;
+  role: Role;
+  banned: boolean;
+};
+
+export type MessageItem = {
+  id: number;
+  body: string | null;
+  mediaUrl: string | null;
+  senderId: string;
+  createdAt: string;
+};
+
+export type ConversationListItem = {
+  id: number;
+  updatedAt: string;
+  otherMember: { id: string; username: string; displayName: string | null; img: string | null };
+  lastMessage: MessageItem | null;
+  unreadCount: number;
+};
+
+export type PostMedia = {
+  id: number;
+  url: string;
+  type: string;
+  height: number | null;
+  width: number | null;
+};
+
+export type Post = {
+  id: number;
+  desc: string | null;
+  media: PostMedia[];
+  isSensitive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  user: User;
+  _count?: {
+    likes: number;
+    rePosts: number;
+    comments: number;
+  };
+  isLiked?: boolean;
+  isReposted?: boolean;
+  isSaved?: boolean;
+};
