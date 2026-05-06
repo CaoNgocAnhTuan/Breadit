@@ -6,7 +6,7 @@ import QueryProvider from "@/providers/QueryProvider";
 import { getSession } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Lama Dev X Clone",
+  title: "Thesis - Breadit Application",
   description: "Next.js social media application project",
 };
 

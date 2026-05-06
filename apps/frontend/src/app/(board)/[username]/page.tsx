@@ -79,20 +79,25 @@ const UserPage = async ({
             />
           </div>
           {/* AVATAR */}
-          <div className="w-1/5 aspect-square rounded-full overflow-hidden border-4 border-black bg-gray-300 absolute left-4 -translate-y-1/2">
+          <div className="relative w-1/5 aspect-square rounded-full overflow-hidden border-4 border-black bg-gray-300 absolute left-4 top-full -translate-y-1/2">
             <Image
               path={user.img || "general/noAvatar.png"}
               alt=""
-              w={100}
-              h={100}
+              fill
+              className="object-cover object-center"
               tr={true}
             />
           </div>
         </div>
         <div className="flex w-full items-center justify-end gap-2 p-2">
-          <div className="w-9 h-9 flex items-center justify-center rounded-full border-[1px] border-gray-500 cursor-pointer">
-            <Image path="icons/explore.svg" alt="more" w={20} h={20} />
-          </div>
+          <Link
+            href="/search"
+            className="w-9 h-9 flex items-center justify-center rounded-full border-[1px] border-gray-500 hover:bg-white/5 transition-colors"
+            aria-label="Search"
+            title="Search"
+          >
+            <Image path="icons/explore.svg" alt="" w={20} h={20} />
+          </Link>
           {userId && userId !== user.id && (
             <MessageButton targetUserId={user.id} />
           )}
@@ -108,7 +113,7 @@ const UserPage = async ({
           )}
         </div>
         {/* USER DETAILS */}
-        <div className="p-4 flex flex-col gap-2">
+        <div className="p-4 pt-0 flex flex-col gap-2" style={{ marginTop: '-5rem' }}>
           {/* USERNAME & HANDLE */}
           <div className="">
             <h1 className="text-2xl font-bold">{user.displayName}</h1>

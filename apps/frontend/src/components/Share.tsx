@@ -116,7 +116,7 @@ const Share = ({ communityId }: { communityId?: number }) => {
     <div className="p-4 flex gap-4">
       {/* AVATAR */}
       <div className="relative w-10 h-10 rounded-full overflow-hidden">
-        <Image path={user?.img || "general/noAvatar.png"} alt="" w={100} h={100} tr={true} />
+        <Image path={user?.img || "general/noAvatar.png"} alt="" fill className="object-cover object-center" tr={true} />
       </div>
       {/* OTHERS */}
       <div className="flex-1 flex flex-col gap-4">
@@ -204,7 +204,7 @@ const Share = ({ communityId }: { communityId?: number }) => {
           <button
             onClick={handlePost}
             disabled={mutation.isPending}
-            className="bg-white text-black font-bold rounded-full py-2 px-4 disabled:cursor-not-allowed"
+            className="bg-white text-black font-bold rounded-full py-1.5 px-4 text-sm disabled:cursor-not-allowed"
           >
             {mutation.isPending ? "Posting" : "Post"}
           </button>

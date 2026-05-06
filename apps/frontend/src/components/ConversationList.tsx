@@ -152,9 +152,9 @@ const ConversationList = ({ initialData }: Props) => {
                 <div className="w-12 h-12 relative rounded-full overflow-hidden shrink-0">
                   <Image
                     path={conv.otherMember.img || "general/noAvatar.png"}
-                    alt=""
-                    w={48}
-                    h={48}
+                    alt=""  
+                    fill
+                    className="object-cover object-center"
                     tr={true}
                   />
                 </div>

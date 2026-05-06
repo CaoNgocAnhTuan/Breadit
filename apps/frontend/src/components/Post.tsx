@@ -89,8 +89,8 @@ const Post = ({
           <Image
             path={originalPost.user.img || "general/noAvatar.png"}
             alt=""
-            w={100}
-            h={100}
+            fill
+            className="object-cover object-center"
             tr={true}
           />
         </div>
@@ -111,8 +111,8 @@ const Post = ({
                 <Image
                   path={originalPost.user.img || "general/noAvatar.png"}
                   alt=""
-                  w={100}
-                  h={100}
+                  fill
+                  className="object-cover object-center"
                   tr={true}
                 />
               </div>

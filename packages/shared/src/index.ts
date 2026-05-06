@@ -62,3 +62,32 @@ export type Post = {
   isReposted?: boolean;
   isSaved?: boolean;
 };
+
+export type Comment = {
+  id: number;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  userId: string;
+  postId: number;
+  parentCommentId: number | null;
+  user: {
+    username: string;
+    displayName: string | null;
+    img: string | null;
+  };
+  _count: {
+    replies: number;
+    likes: number;
+  };
+  likes?: { id: number }[];
+  replies?: Comment[];
+  post?: {
+    id: number;
+    desc: string | null;
+    createdAt: string;
+    userId: string;
+    user: { username: string; displayName: string | null; img: string | null };
+  };
+};

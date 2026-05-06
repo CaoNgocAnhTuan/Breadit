@@ -27,7 +27,7 @@ export class PostsService {
       likes: userId ? { where: { userId }, select: { id: true } } : (false as const),
       rePosts: userId ? { where: { userId }, select: { id: true } } : (false as const),
       saves: userId ? { where: { userId }, select: { id: true } } : (false as const),
-    };
+    } as const;
   }
 
   async findAll(cursor: number, userParam?: string, userId?: string, feed?: string, communityId?: number) {
@@ -112,17 +112,6 @@ export class PostsService {
       include: {
         ...include,
         community: { select: { name: true, slug: true } },
-        parentPost: {
-          select: { id: true, user: { select: { username: true } } },
-        },
-        comments: {
-          where: { deletedAt: null },
-          orderBy: { createdAt: 'desc' },
-          include: {
-            ...include,
-            community: { select: { name: true, slug: true } },
-          },
-        },
       },
     });
   }
@@ -133,7 +122,6 @@ export class PostsService {
       desc?: string;
       imgType?: string;
       rePostId?: number;
-      parentPostId?: number;
       isSensitive?: boolean;
       communityId?: number;
     },
@@ -168,7 +156,6 @@ export class PostsService {
       data: {
         desc: body.desc,
         rePostId: body.rePostId ?? null,
-        parentPostId: body.parentPostId ?? null,
         isSensitive: body.isSensitive ?? false,
         communityId: body.communityId ?? null,
         isApproved: body.communityId
@@ -228,16 +215,6 @@ export class PostsService {
             this.notificationsService.emit('MENTION', userId, u.id, post.id),
           ),
         );
-      }
-    }
-
-    if (body.parentPostId) {
-      const parentPost = await this.prisma.post.findUnique({
-        where: { id: body.parentPostId },
-        select: { userId: true },
-      });
-      if (parentPost) {
-        void this.notificationsService.emit('REPLY', userId, parentPost.userId, body.parentPostId);
       }
     }
 

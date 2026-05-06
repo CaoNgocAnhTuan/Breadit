@@ -79,19 +79,31 @@ async function main() {
   });
   console.log('Likes created.');
 
-  // Create some comments (each comment is a post linked to a parent post)
+  // Create comments using the Comment table
   const comments: any[] = [];
   for (let i = 0; i < posts.length; i++) {
-    const comment = await prisma.post.create({
+    const comment = await prisma.comment.create({
       data: {
-        desc: `Comment on Post ${posts[i].id} by ${users[(i + 1) % 5].username}`,
+        body: `Comment on Post ${posts[i].id} by ${users[(i + 1) % 5].username}`,
         userId: users[(i + 1) % 5].id,
-        parentPostId: posts[i].id, // Linking the comment to the post
+        postId: posts[i].id,
       },
     });
     comments.push(comment);
   }
-  console.log('Comments created.');
+
+  // Create some threaded replies
+  for (let i = 0; i < comments.length; i += 2) {
+    await prisma.comment.create({
+      data: {
+        body: `Reply to comment ${comments[i].id} by ${users[(i + 3) % 5].username}`,
+        userId: users[(i + 3) % 5].id,
+        postId: comments[i].postId,
+        parentCommentId: comments[i].id,
+      },
+    });
+  }
+  console.log('Comments and replies created.');
 
   // Create reposts using the Post model's rePostId
   const reposts: any[] = [];

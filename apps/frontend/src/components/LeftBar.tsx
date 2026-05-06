@@ -66,8 +66,12 @@ const LeftBar = async () => {
       {/* LOGO MENU BUTTON */}
       <div className="flex flex-col gap-4 text-lg items-center xxl:items-start flex-1 overflow-y-auto no-scrollbar">
         {/* LOGO */}
-        <Link href="/" className="p-2 rounded-full hover:bg-[#181818] ">
-          <Image path="icons/logo.svg" alt="logo" w={24} h={24} />
+        <Link
+          href="/"
+          className="p-2 rounded-full hover:bg-[#181818] flex items-center gap-3"
+        >
+          <Image path="icons/logo.svg" alt="logo" w={30} h={30} />
+          <span className="hidden xxl:inline font-bold tracking-tight">Breadit</span>
         </Link>
         {/* MENU LIST */}
         <div className="flex flex-col gap-4">
@@ -145,7 +149,7 @@ const LeftBar = async () => {
         </Link>
         <Link
           href="/compose/post"
-          className="hidden xxl:block bg-white text-black rounded-full font-bold py-2 px-20 mb-6"
+          className="hidden xxl:block bg-white text-black rounded-full font-bold py-2 px-14 text-center mb-6"
         >
           Post
         </Link>
@@ -156,12 +160,12 @@ const LeftBar = async () => {
           {/* USER */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 relative rounded-full overflow-hidden">
+              <div className="w-12 h-12 relative rounded-full overflow-hidden">
                 <Image
                   path={user?.img || "general/noAvatar.png"}
                   alt=""
-                  w={100}
-                  h={100}
+                  fill
+                  className="object-cover object-center"
                   tr={true}
                 />
               </div>

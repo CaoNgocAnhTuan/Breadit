@@ -287,7 +287,7 @@ const MessageThread = ({ conversationId, initialData, otherUser }: Props) => {
       )}
 
       {/* ── header ── */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-borderGray shrink-0">
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-borderGray shrink-0">
         <button
           onClick={() => router.push("/messages")}
           className="p-1 rounded-full hover:bg-[#181818] lg:hidden"
@@ -295,7 +295,7 @@ const MessageThread = ({ conversationId, initialData, otherUser }: Props) => {
           ←
         </button>
         <div className="w-10 h-10 relative rounded-full overflow-hidden shrink-0">
-          <Image path={otherUser.img || "general/noAvatar.png"} alt="" w={40} h={40} tr={true} />
+          <Image path={otherUser.img || "general/noAvatar.png"} alt="" fill className="object-cover object-center" tr={true} />
         </div>
         <div>
           <p className="font-semibold">{otherUser.displayName || otherUser.username}</p>

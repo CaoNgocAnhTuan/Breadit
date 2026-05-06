@@ -12,8 +12,7 @@ const RightBar = () => {
         <Link href="/">Privacy Policy</Link>
         <Link href="/">Cookie Policy</Link>
         <Link href="/">Accessibility</Link>
-        <Link href="/">Ads Info</Link>
-        <span>© 2025 L Corp.</span>
+        <span>© 2026 CaoNgocAnhTuan ~ Thesis.</span>
       </div>
     </div>
   );

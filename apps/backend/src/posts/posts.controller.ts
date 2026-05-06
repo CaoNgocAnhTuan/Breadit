@@ -64,7 +64,6 @@ export class PostsController {
       desc?: string;
       imgType?: string;
       rePostId?: number;
-      parentPostId?: number;
       isSensitive?: boolean;
       communityId?: number;
     } = {};
@@ -79,9 +78,6 @@ export class PostsController {
           else if (part.fieldname === 'rePostId') {
             const n = parseInt(val, 10);
             if (!isNaN(n)) body.rePostId = n;
-          } else if (part.fieldname === 'parentPostId') {
-            const n = parseInt(val, 10);
-            if (!isNaN(n)) body.parentPostId = n;
           } else if (part.fieldname === 'communityId') {
             const n = parseInt(val, 10);
             if (!isNaN(n)) body.communityId = n;
@@ -106,43 +102,6 @@ export class PostsController {
     }
 
     return this.postsService.create(req.user!.id, body, bufferedFiles);
-  }
-
-  @Post(':id/comments')
-  @HttpCode(HttpStatus.CREATED)
-  @UseGuards(JwtAuthGuard, EmailVerifiedGuard)
-  async createComment(@Param('id') id: string, @Req() req: FastifyRequest & { user?: { id: string } }) {
-    const body: { desc?: string; imgType?: string } = {};
-    const bufferedFiles: { buffer: Buffer; mimetype: string; filename: string }[] = [];
-
-    try {
-      for await (const part of req.parts()) {
-        if (part.type === 'field') {
-          const val = part.value as string;
-          if (part.fieldname === 'desc') body.desc = val;
-          else if (part.fieldname === 'imgType') body.imgType = val;
-        } else if (part.type === 'file') {
-          const buffer = await part.toBuffer();
-          bufferedFiles.push({
-            buffer,
-            mimetype: part.mimetype,
-            filename: part.filename,
-          });
-        }
-      }
-    } catch (err) {
-      const code = (err as { code?: string }).code;
-      if (code === 'FST_REQ_FILE_TOO_LARGE') {
-        throw new PayloadTooLargeException('File exceeds 500 MB limit');
-      }
-      throw new BadRequestException(`Malformed upload: ${(err as Error).message}`);
-    }
-
-    return this.postsService.create(
-      req.user!.id,
-      { ...body, parentPostId: +id },
-      bufferedFiles,
-    );
   }
 
   @Post(':id/report')

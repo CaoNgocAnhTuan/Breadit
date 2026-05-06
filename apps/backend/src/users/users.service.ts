@@ -58,10 +58,12 @@ export class UsersService {
     cursor: number,
     currentUserId?: string,
   ) {
-    let whereCondition: object;
     if (tab === 'replies') {
-      whereCondition = { user: { username }, parentPostId: { not: null }, deletedAt: null };
-    } else if (tab === 'media') {
+      return this.getUserComments(username, cursor, currentUserId);
+    }
+
+    let whereCondition: object;
+    if (tab === 'media') {
       whereCondition = {
         user: { username },
         parentPostId: null,
@@ -81,18 +83,6 @@ export class UsersService {
       include: {
         rePost: { include },
         ...include,
-        ...(tab === 'replies' ? {
-          parentPost: {
-            select: {
-              id: true,
-              desc: true,
-              media: true,
-              createdAt: true,
-              userId: true,
-              user: { select: { username: true, displayName: true, img: true } },
-            },
-          },
-        } : {}),
       },
       take: POST_LIMIT,
       skip: (cursor - 1) * POST_LIMIT,
@@ -100,6 +90,40 @@ export class UsersService {
     });
     const total = await this.prisma.post.count({ where: whereCondition });
     return { posts, hasMore: cursor * POST_LIMIT < total };
+  }
+
+  private async getUserComments(
+    username: string,
+    cursor: number,
+    currentUserId?: string,
+  ) {
+    const where = { user: { username }, deletedAt: null };
+    const [comments, total] = await Promise.all([
+      this.prisma.comment.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (cursor - 1) * POST_LIMIT,
+        take: POST_LIMIT,
+        include: {
+          user: { select: { displayName: true, username: true, img: true } },
+          _count: { select: { replies: true, likes: true } },
+          likes: currentUserId
+            ? { where: { userId: currentUserId }, select: { id: true } }
+            : (false as const),
+          post: {
+            select: {
+              id: true,
+              desc: true,
+              createdAt: true,
+              userId: true,
+              user: { select: { username: true, displayName: true, img: true } },
+            },
+          },
+        },
+      }),
+      this.prisma.comment.count({ where }),
+    ]);
+    return { posts: comments, hasMore: cursor * POST_LIMIT < total };
   }
 
   async getFollowers(username: string, cursor: number) {

@@ -104,8 +104,8 @@ const NotificationsFeed = ({ initialData }: { initialData: NotifPage }) => {
               <Image
                 path={n.actor.img || "general/noAvatar.png"}
                 alt={n.actor.username}
-                w={40}
-                h={40}
+                fill
+                className="object-cover object-center"
                 tr={true}
               />
             </div>

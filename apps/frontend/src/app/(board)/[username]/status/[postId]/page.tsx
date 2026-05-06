@@ -55,25 +55,16 @@ const StatusPage = async ({
   if (!res.ok) return notFound();
   const post = await res.json();
 
-  const backHref = post.parentPost
-    ? `/${post.parentPost.user.username}/status/${post.parentPostId}`
-    : "/";
-
   return (
     <div className="">
       <div className="flex items-center gap-8 sticky top-0 backdrop-blur-md p-4 z-10 bg-[#00000084]">
-        <Link href={backHref}>
+        <Link href="/">
           <Image path="icons/back.svg" alt="back" w={24} h={24} />
         </Link>
         <h1 className="font-bold text-lg">Post</h1>
       </div>
       <Post type="status" post={post} />
-      <Comments
-        comments={post.comments}
-        postId={post.id}
-        username={post.user.username}
-        depth={post.parentPostId ? 1 : 0}
-      />
+      <Comments postId={post.id} />
     </div>
   );
 };

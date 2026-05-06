@@ -17,8 +17,8 @@ const UserCard = ({ user }: { user: UserSummary }) => {
           <Image
             path={user.img || "general/noAvatar.png"}
             alt=""
-            w={40}
-            h={40}
+            fill
+            className="object-cover object-center"
             tr={true}
           />
         </div>

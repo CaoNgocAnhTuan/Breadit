@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function BoardLayoutClient({
   leftBar,
@@ -11,8 +12,14 @@ export default function BoardLayoutClient({
   rightBar: React.ReactNode;
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isMessages = pathname?.startsWith("/messages");
   const [showLeft, setShowLeft] = useState(true);
   const [showRight, setShowRight] = useState(true);
+
+  useEffect(() => {
+    if (isMessages) setShowRight(false);
+  }, [isMessages]);
 
   return (
     <div className="max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl xxl:max-w-screen-xxl mx-auto flex justify-between relative">
@@ -34,19 +41,21 @@ export default function BoardLayoutClient({
       </div>
 
       <div className="fixed bottom-4 right-4 lg:right-8 z-[60] flex gap-2">
-        <button
-          onClick={() => setShowRight(!showRight)}
-          className="p-2 rounded-full bg-black/80 backdrop-blur border border-borderGray text-textGray hover:text-white transition-colors shadow-lg hidden lg:flex"
-          title={showRight ? "Hide Right Panel" : "Show Right Panel"}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {showRight ? (
-              <path d="M9 18l6-6-6-6" />
-            ) : (
-              <path d="M15 18l-6-6 6-6" />
-            )}
-          </svg>
-        </button>
+        {!isMessages && (
+          <button
+            onClick={() => setShowRight(!showRight)}
+            className="p-2 rounded-full bg-black/80 backdrop-blur border border-borderGray text-textGray hover:text-white transition-colors shadow-lg hidden lg:flex"
+            title={showRight ? "Hide Right Panel" : "Show Right Panel"}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {showRight ? (
+                <path d="M9 18l6-6-6-6" />
+              ) : (
+                <path d="M15 18l-6-6 6-6" />
+              )}
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Left Bar Area */}
@@ -58,7 +67,7 @@ export default function BoardLayoutClient({
 
       {/* Center Feed Area */}
       <div
-        className={`flex-1 border-x-[1px] border-borderGray transition-all duration-300 ${
+        className={`flex-1 border-x-[1px] border-borderGray transition-all duration-300 lg:ml-3 ${
           !showLeft && !showRight ? "max-w-3xl mx-auto" : "lg:min-w-[600px]"
         }`}
       >

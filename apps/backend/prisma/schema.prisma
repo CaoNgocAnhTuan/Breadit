@@ -43,6 +43,9 @@ model User {
   accounts Account[]
   sessions Session[]
 
+  comments     Comment[]
+  commentLikes CommentLike[]
+
   receivedNotifications Notification[] @relation("ReceivedNotifications")
   sentNotifications     Notification[] @relation("SentNotifications")
 
@@ -112,7 +115,9 @@ model Post {
 
   parentPostId Int?
   parentPost   Post?  @relation("PostComments", fields: [parentPostId], references: [id])
-  comments     Post[] @relation("PostComments")
+  postReplies  Post[] @relation("PostComments")
+
+  comments Comment[]
 
   likes Like[]
 
@@ -187,12 +192,14 @@ model Notification {
   recipientId String
   actorId     String
   postId      Int?
+  commentId   Int?
   readAt      DateTime?
   createdAt   DateTime         @default(now())
 
-  recipient User  @relation("ReceivedNotifications", fields: [recipientId], references: [id])
-  actor     User  @relation("SentNotifications",     fields: [actorId],     references: [id])
-  post      Post? @relation(fields: [postId], references: [id])
+  recipient User     @relation("ReceivedNotifications", fields: [recipientId], references: [id])
+  actor     User     @relation("SentNotifications",     fields: [actorId],     references: [id])
+  post      Post?    @relation(fields: [postId], references: [id])
+  comment   Comment? @relation(fields: [commentId], references: [id])
 }
 
 model Follow {
@@ -338,4 +345,38 @@ model CommunityBannedUser {
   community Community @relation(fields: [communityId], references: [id])
 
   @@unique([userId, communityId])
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  body      String    @db.VarChar(1000)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  postId Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  parentCommentId Int?
+  parentComment   Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies         Comment[] @relation("CommentReplies")
+
+  likes         CommentLike[]
+  notifications Notification[]
+}
+
+model CommentLike {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  userId    String
+  commentId Int
+
+  user    User    @relation(fields: [userId], references: [id])
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
 }
