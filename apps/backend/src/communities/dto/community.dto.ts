@@ -27,6 +27,14 @@ export class UpdateCommunityDto {
   @IsOptional()
   @MaxLength(255)
   description?: string;
+
+  @IsString()
+  @IsOptional()
+  img?: string;
+
+  @IsString()
+  @IsOptional()
+  cover?: string;
 }
 
 export class AddRuleDto {

@@ -71,6 +71,38 @@ export class PostsService {
         ...(blockedIds.length ? { userId: { notIn: blockedIds } } : {}),
       };
       orderBy = [{ likes: { _count: 'desc' } }, { createdAt: 'desc' }];
+    } else if (feed === 'following' && userId) {
+      // Following feed: posts from followed users only (not self)
+      const followees = await this.prisma.follow.findMany({
+        where: { followerId: userId },
+        select: { followingId: true },
+      });
+      const followingIds = followees.map((f) => f.followingId);
+
+      whereCondition = {
+        parentPostId: null,
+        deletedAt: null,
+        communityId: null,
+        userId: {
+          in: followingIds,
+          ...(blockedIds.length ? { notIn: blockedIds } : {}),
+        },
+      };
+    } else if (feed === 'communities' && userId) {
+      // Communities feed: posts from all communities user is a member of
+      const memberships = await this.prisma.communityMember.findMany({
+        where: { userId },
+        select: { communityId: true },
+      });
+      const communityIds = memberships.map((m) => m.communityId);
+
+      whereCondition = {
+        parentPostId: null,
+        deletedAt: null,
+        isApproved: true,
+        communityId: { in: communityIds },
+        ...(blockedIds.length ? { userId: { notIn: blockedIds } } : {}),
+      };
     } else if (userParam && userParam !== 'undefined') {
       whereCondition = { parentPostId: null, userId: userParam, deletedAt: null, communityId: null };
     } else if (userId) {

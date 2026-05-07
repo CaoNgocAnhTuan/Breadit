@@ -2,6 +2,7 @@ import LeftBar from "@/components/LeftBar";
 import RightBar from "@/components/RightBar";
 import HideOnMessages from "@/components/HideOnMessages";
 import ChatPopupManager from "@/components/ChatPopupManager";
+import ChatDrawerManager from "@/components/ChatDrawerManager";
 import BoardLayoutClient from "./BoardLayoutClient";
 import { getSession } from "@/lib/session";
 import Link from "next/link";
@@ -63,6 +64,7 @@ export default async function BoardLayout({
         {centerContent}
       </BoardLayoutClient>
       <ChatPopupManager />
+      <ChatDrawerManager />
     </>
   );
 }

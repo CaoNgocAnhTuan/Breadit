@@ -27,6 +27,11 @@ type AuthedRequest = FastifyRequest & {
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 
+  @Get('search')
+  searchConversations(@Req() req: AuthedRequest, @Query('q') q = '') {
+    return this.messagesService.searchConversations(req.user!.id, q);
+  }
+
   @Get()
   getConversations(
     @Req() req: AuthedRequest,

@@ -21,6 +21,80 @@ export class MessagesService {
     private readonly gateway: NotificationsGateway,
   ) {}
 
+  async searchConversations(userId: string, q: string) {
+    const term = (q ?? '').trim();
+    if (!term) return { users: [], messages: [] };
+
+    const memberships = await this.prisma.conversationMember.findMany({
+      where: { userId },
+      select: { conversationId: true },
+      take: 500,
+    });
+    const convIds = memberships.map((m) => m.conversationId);
+    if (convIds.length === 0) return { users: [], messages: [] };
+
+    const [userRows, messageRows] = await Promise.all([
+      this.prisma.conversationMember.findMany({
+        where: {
+          conversationId: { in: convIds },
+          userId: { not: userId },
+          user: {
+            OR: [
+              { username: { contains: term, mode: 'insensitive' } },
+              { displayName: { contains: term, mode: 'insensitive' } },
+            ],
+          },
+        },
+        select: {
+          conversationId: true,
+          user: { select: MEMBER_SELECT },
+        },
+        take: 10,
+      }),
+      this.prisma.message.findMany({
+        where: {
+          conversationId: { in: convIds },
+          body: { contains: term, mode: 'insensitive' },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+        include: {
+          conversation: {
+            select: {
+              id: true,
+              members: { include: { user: { select: MEMBER_SELECT } } },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const users = userRows.map((r) => ({
+      conversationId: r.conversationId,
+      otherMember: r.user,
+    }));
+
+    const messages = messageRows.map((m) => {
+      const otherMember =
+        m.conversation.members.find((mem) => mem.userId !== userId)?.user ??
+        { id: '', username: '[deleted]', displayName: null, img: null };
+
+      return {
+        conversationId: m.conversationId,
+        otherMember,
+        message: {
+          id: m.id,
+          body: m.body,
+          mediaUrl: m.mediaUrl,
+          senderId: m.senderId,
+          createdAt: m.createdAt,
+        },
+      };
+    });
+
+    return { users, messages };
+  }
+
   async getConversations(userId: string, cursor?: number) {
     const where: Record<string, unknown> = {
       members: { some: { userId } },

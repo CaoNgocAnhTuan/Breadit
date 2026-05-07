@@ -1,6 +1,7 @@
 import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
 import { CreateCommunityDto, UpdateCommunityDto } from './dto/community.dto';
 import { CommunityRole } from '@prisma/client';
 
@@ -9,6 +10,7 @@ export class CommunitiesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly uploadsService: UploadsService,
   ) {}
 
   async create(userId: string, dto: CreateCommunityDto) {
@@ -159,6 +161,52 @@ export class CommunitiesService {
     return this.prisma.community.update({
       where: { id: communityId },
       data: dto,
+    });
+  }
+
+  async updateImages(
+    userId: string,
+    communityId: number,
+    files: { avatar?: BufferedFile; cover?: BufferedFile },
+  ) {
+    const member = await this.prisma.communityMember.findUnique({
+      where: { userId_communityId: { userId, communityId } },
+    });
+
+    if (!member || (member.role !== CommunityRole.OWNER && member.role !== CommunityRole.MOD)) {
+      throw new ForbiddenException('Only owners and mods can update community images');
+    }
+
+    const community = await this.prisma.community.findUnique({
+      where: { id: communityId },
+    });
+    if (!community) throw new NotFoundException('Community not found');
+
+    const updateData: { img?: string; cover?: string } = {};
+
+    if (files.avatar) {
+      // Delete old avatar if exists
+      if (community.img) {
+        await this.uploadsService.deleteFile(community.img);
+      }
+      updateData.img = await this.uploadsService.saveFile(files.avatar, 'square');
+    }
+
+    if (files.cover) {
+      // Delete old cover if exists
+      if (community.cover) {
+        await this.uploadsService.deleteFile(community.cover);
+      }
+      updateData.cover = await this.uploadsService.saveFile(files.cover, 'wide');
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return community;
+    }
+
+    return this.prisma.community.update({
+      where: { id: communityId },
+      data: updateData,
     });
   }
 

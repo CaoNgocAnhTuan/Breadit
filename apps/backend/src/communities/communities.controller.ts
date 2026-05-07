@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -59,6 +60,35 @@ export class CommunitiesController {
     @Body() dto: UpdateCommunityDto,
   ) {
     return this.communitiesService.update(req.user!.id, id, dto);
+  }
+
+  @Patch(':id/images')
+  @UseGuards(JwtAuthGuard, BannedUserGuard)
+  async updateImages(
+    @Req() req: FastifyRequest & { user?: { id: string } },
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    const files: {
+      avatar?: { buffer: Buffer; mimetype: string; filename: string };
+      cover?: { buffer: Buffer; mimetype: string; filename: string };
+    } = {};
+
+    try {
+      for await (const part of req.parts()) {
+        if (part.type === 'file') {
+          const buffer = await part.toBuffer();
+          if (part.fieldname === 'avatar') {
+            files.avatar = { buffer, mimetype: part.mimetype, filename: part.filename };
+          } else if (part.fieldname === 'cover') {
+            files.cover = { buffer, mimetype: part.mimetype, filename: part.filename };
+          }
+        }
+      }
+    } catch (err) {
+      throw new BadRequestException(`Upload failed: ${(err as Error).message}`);
+    }
+
+    return this.communitiesService.updateImages(req.user!.id, id, files);
   }
 
   @Post(':id/rules')
