@@ -6,7 +6,7 @@ import ProfileTabFeed from "./ProfileTabFeed";
 const TABS = ["posts", "replies", "media", "likes"] as const;
 type Tab = (typeof TABS)[number];
 
-const ProfileTabs = ({ username }: { username: string }) => {
+const ProfileTabs = ({ username, query }: { username: string; query?: string }) => {
   const [activeTab, setActiveTab] = useState<Tab>("posts");
 
   return (
@@ -26,7 +26,7 @@ const ProfileTabs = ({ username }: { username: string }) => {
           </button>
         ))}
       </div>
-      <ProfileTabFeed username={username} tab={activeTab} />
+      <ProfileTabFeed username={username} tab={activeTab} query={query ?? ""} />
     </div>
   );
 };

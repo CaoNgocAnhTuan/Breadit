@@ -209,7 +209,24 @@ const Post = ({
             </div>
           )}
           {type === "status" && (
-            <span className="text-textGray">8:41 PM · Dec 5, 2024</span>
+            <span className="text-textGray">
+              {new Date(originalPost.createdAt).toLocaleString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true,
+              })}{" "}
+              ·{" "}
+              {new Date(originalPost.createdAt).toLocaleString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+              {new Date(originalPost.updatedAt).getTime() -
+                new Date(originalPost.createdAt).getTime() >
+                1000
+                ? " (edited)"
+                : ""}
+            </span>
           )}
           <PostInteractions
             username={originalPost.user.username}

@@ -104,6 +104,8 @@ export default async function CommunityAboutPage({ params }: { params: Promise<{
             <CommunityAboutAdmin
               communityId={community.id}
               communitySlug={community.slug}
+              communityImg={community.img}
+              communityCover={community.cover}
               members={community.members ?? []}
               role={memberRole as "OWNER" | "MOD"}
             />

@@ -59,19 +59,14 @@ export default function CommunityHeader({ community }: { community: {
 
   return (
     <div className="border-b border-borderGray pb-4">
-      <div className="h-32 bg-iconBlue/10 relative">
+      <div className="relative w-full aspect-[3/1] bg-iconBlue/10 overflow-hidden">
         {community.cover && (
-          <Image path={community.cover} alt="" fill className="object-cover" />
+          <Image path={community.cover} alt="" fill className="object-cover object-center" />
         )}
       </div>
       <div className="px-4 -mt-6 flex justify-between items-end">
-        <div className="w-20 h-20 rounded-xl overflow-hidden border-4 border-black bg-iconBlue/20">
-          <Image
-            path={community.img || "general/event.png"}
-            alt={community.name}
-            w={200}
-            h={200}
-          />
+        <div className="relative w-20 h-20 rounded-xl overflow-hidden border-4 border-black bg-iconBlue/20">
+          <Image path={community.img || "general/event.png"} alt={community.name} fill className="object-cover object-center" />
         </div>
         {isBanned ? (
           <span className="text-xs font-bold px-3 py-1 rounded-full border border-red-500 text-red-400">

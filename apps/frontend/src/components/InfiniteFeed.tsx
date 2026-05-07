@@ -43,6 +43,7 @@ const InfiniteFeed = ({
     initialData: initialData
       ? { pages: [initialData], pageParams: [1] }
       : undefined,
+    refetchOnMount: true,
     getNextPageParam: (lastPage, pages) =>
       lastPage.hasMore ? pages.length + 1 : undefined,
   });

@@ -63,10 +63,13 @@ export class UsersService {
     tab: string,
     cursor: number,
     currentUserId?: string,
+    q?: string,
   ) {
     if (tab === 'replies') {
       return this.getUserComments(username, cursor, currentUserId);
     }
+
+    const term = (q ?? '').trim();
 
     let whereCondition: object;
     if (tab === 'media') {
@@ -80,7 +83,20 @@ export class UsersService {
     } else if (tab === 'likes') {
       whereCondition = { likes: { some: { user: { username } } }, deletedAt: null };
     } else {
-      whereCondition = { user: { username }, parentPostId: null, deletedAt: null, communityId: null };
+      whereCondition = {
+        user: { username },
+        parentPostId: null,
+        deletedAt: null,
+        communityId: null,
+        ...(term
+          ? {
+              OR: [
+                { desc: { contains: term, mode: 'insensitive' as const } },
+                { rePost: { desc: { contains: term, mode: 'insensitive' as const } } },
+              ],
+            }
+          : {}),
+      };
     }
 
     const include = this.postInclude(currentUserId);

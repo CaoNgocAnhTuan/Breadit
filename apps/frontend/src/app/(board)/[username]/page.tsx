@@ -4,6 +4,7 @@ import UserActions from "@/components/UserActions";
 import EditProfileButton from "@/components/EditProfileButton";
 import MessageButton from "@/components/MessageButton";
 import Image from "@/components/Image";
+import ProfilePostSearch from "@/components/ProfilePostSearch";
 import { getSession, serverFetch } from "@/lib/session";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -90,14 +91,6 @@ const UserPage = async ({
           </div>
         </div>
         <div className="flex w-full items-center justify-end gap-2 p-2">
-          <Link
-            href="/search"
-            className="w-9 h-9 flex items-center justify-center rounded-full border-[1px] border-gray-500 hover:bg-white/5 transition-colors"
-            aria-label="Search"
-            title="Search"
-          >
-            <Image path="icons/explore.svg" alt="" w={20} h={20} />
-          </Link>
           {userId && userId !== user.id && (
             <MessageButton targetUserId={user.id} />
           )}
@@ -158,7 +151,7 @@ const UserPage = async ({
         </div>
       </div>
       {/* PROFILE TABS */}
-      <ProfileTabs username={username} />
+      <ProfilePostSearch username={username} />
     </div>
   );
 };

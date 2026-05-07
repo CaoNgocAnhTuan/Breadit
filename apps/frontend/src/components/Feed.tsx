@@ -16,6 +16,7 @@ const Feed = async ({
 
   return (
     <InfiniteFeed
+      key={[userProfileId ?? "", feed ?? "", ""].join("|")}
       userProfileId={userProfileId}
       feed={feed}
       initialData={initialData}

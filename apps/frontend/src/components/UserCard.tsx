@@ -13,7 +13,7 @@ const UserCard = ({ user }: { user: UserSummary }) => {
   return (
     <div className="flex items-start gap-4 p-4 border-b border-borderGray hover:bg-white/5 transition-colors">
       <Link href={`/${user.username}`} className="shrink-0">
-        <div className="w-10 h-10 rounded-full overflow-hidden">
+        <div className="relative w-10 h-10 rounded-full overflow-hidden">
           <Image
             path={user.img || "general/noAvatar.png"}
             alt=""

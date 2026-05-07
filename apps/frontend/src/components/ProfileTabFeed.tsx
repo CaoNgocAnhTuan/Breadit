@@ -98,15 +98,22 @@ function ReplyThread({ comment }: { comment: any }) {
 const ProfileTabFeed = ({
   username,
   tab,
+  query,
 }: {
   username: string;
   tab: string;
+  query: string;
 }) => {
   const { data, error, status, hasNextPage, fetchNextPage } = useInfiniteQuery({
-    queryKey: ["profile-posts", username, tab],
+    queryKey: ["profile-posts", username, tab, query],
     queryFn: async ({ pageParam = 1 }) => {
+      const params = new URLSearchParams({
+        tab,
+        cursor: String(pageParam),
+      });
+      if (tab === "posts" && query.trim()) params.set("q", query.trim());
       const res = await fetch(
-        `${BACKEND_URL}/api/users/${username}/posts?tab=${tab}&cursor=${pageParam}`,
+        `${BACKEND_URL}/api/users/${username}/posts?${params.toString()}`,
         { credentials: "include" }
       );
       return res.json();

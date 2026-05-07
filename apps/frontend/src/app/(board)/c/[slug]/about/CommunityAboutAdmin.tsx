@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
+import { api, apiMultipartWithMethod } from "@/lib/api";
 import { format } from "timeago.js";
+import Image from "@/components/Image";
 
 type Member = {
   id: number;
@@ -29,15 +30,79 @@ type PendingPost = {
 export default function CommunityAboutAdmin({
   communityId,
   communitySlug,
+  communityImg,
+  communityCover,
   members,
   role,
 }: {
   communityId: number;
   communitySlug: string;
+  communityImg?: string | null;
+  communityCover?: string | null;
   members: Member[];
   role: "OWNER" | "MOD";
 }) {
   const router = useRouter();
+
+  // ── Images (avatar / cover) ─────────────────────────────────────
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [imagesSaving, setImagesSaving] = useState(false);
+  const [imagesError, setImagesError] = useState<string | null>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCoverFile(file);
+    setCoverPreview(URL.createObjectURL(file));
+  };
+
+  const saveImages = async () => {
+    if (!avatarFile && !coverFile) return;
+    setImagesSaving(true);
+    setImagesError(null);
+    try {
+      const fd = new FormData();
+      if (avatarFile) fd.append("avatar", avatarFile);
+      if (coverFile) fd.append("cover", coverFile);
+
+      const res = await apiMultipartWithMethod(
+        `/api/communities/${communityId}/images`,
+        "PATCH",
+        fd,
+        60_000
+      );
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d?.message || "Failed to update community images");
+      }
+
+      // cleanup previews
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+      if (coverPreview) URL.revokeObjectURL(coverPreview);
+      setAvatarFile(null);
+      setCoverFile(null);
+      setAvatarPreview(null);
+      setCoverPreview(null);
+
+      router.refresh();
+    } catch (e) {
+      setImagesError(e instanceof Error ? e.message : "Failed to update images");
+    } finally {
+      setImagesSaving(false);
+    }
+  };
 
   // ── Pending posts ──────────────────────────────────────────────
   const [pendingPosts, setPendingPosts] = useState<PendingPost[]>([]);
@@ -165,6 +230,79 @@ export default function CommunityAboutAdmin({
 
   return (
     <div className="flex flex-col gap-6">
+
+      {/* Community Images */}
+      <div className="border border-borderGray rounded-xl overflow-hidden">
+        <div className="p-4 border-b border-borderGray flex items-center justify-between gap-3">
+          <div>
+            <h3 className="font-bold">Community images</h3>
+            <p className="text-xs text-textGray">
+              Owners and mods can update avatar and cover.
+            </p>
+          </div>
+          <button
+            onClick={saveImages}
+            disabled={imagesSaving || (!avatarFile && !coverFile)}
+            className="bg-white text-black font-bold text-sm px-4 py-1.5 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {imagesSaving ? "Saving…" : "Save"}
+          </button>
+        </div>
+
+        {/* Cover preview */}
+        <div
+          className="relative w-full aspect-[3/1] bg-iconBlue/10 cursor-pointer"
+          onClick={() => coverInputRef.current?.click()}
+        >
+          <Image
+            path={coverPreview ?? communityCover ?? undefined}
+            alt="community cover"
+            fill
+            className="object-cover object-center"
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/35 opacity-0 hover:opacity-100 transition-opacity">
+            <span className="text-sm font-bold px-4 py-1.5 rounded-full bg-black/60 border border-white/10">
+              Change cover
+            </span>
+          </div>
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleCoverChange}
+          />
+        </div>
+
+        {/* Avatar preview */}
+        <div className="p-4 flex items-center gap-4">
+          <div
+            className="relative w-20 h-20 rounded-xl overflow-hidden border border-borderGray bg-iconBlue/20 cursor-pointer"
+            onClick={() => avatarInputRef.current?.click()}
+          >
+            <Image
+              path={avatarPreview ?? communityImg ?? "general/event.png"}
+              alt="community avatar"
+              fill
+              className="object-cover object-center"
+            />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-bold">Avatar</p>
+            <p className="text-xs text-textGray">
+              Click the image to upload a new square avatar.
+            </p>
+            {imagesError && <p className="text-xs text-red-400 mt-2">{imagesError}</p>}
+          </div>
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
+        </div>
+      </div>
 
       {/* Pending Posts */}
       <div className="border border-borderGray rounded-xl p-4">

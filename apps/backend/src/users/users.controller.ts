@@ -88,6 +88,7 @@ export class UsersController {
     @Param('username') username: string,
     @Query('tab') tab: string,
     @Query('cursor') cursor: string,
+    @Query('q') q: string,
     @Req() req: AuthedRequest,
   ) {
     return this.usersService.getPostsByTab(
@@ -95,6 +96,7 @@ export class UsersController {
       tab ?? 'posts',
       parseInt(cursor ?? '1', 10),
       req.user?.id,
+      q ?? '',
     );
   }
 

@@ -206,7 +206,7 @@ const Share = ({ communityId }: { communityId?: number }) => {
           <button
             onClick={handlePost}
             disabled={mutation.isPending}
-            className="bg-white text-black font-bold rounded-full py-1.5 px-4 text-sm disabled:cursor-not-allowed"
+            className="bg-iconBlue text-white font-bold rounded-full py-1.5 px-4 text-sm hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {mutation.isPending ? "Posting" : "Post"}
           </button>

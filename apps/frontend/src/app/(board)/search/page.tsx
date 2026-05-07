@@ -2,8 +2,6 @@ import Link from "next/link";
 import { serverFetch } from "@/lib/session";
 import Image from "@/components/Image";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
-
 type SearchUser = {
   id: string;
   username: string;
@@ -61,12 +59,12 @@ export default async function SearchPage({
               href={`/${u.username}`}
               className="flex items-center gap-3 px-4 py-3 hover:bg-white/5"
             >
-              <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+              <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-iconBlue/20">
                 <Image
-                  src={u.img ? `${BACKEND_URL}/uploads/${u.img}` : undefined}
+                  path={u.img || "general/noAvatar.png"}
                   alt={u.username}
-                  w={40}
-                  h={40}
+                  fill
+                  className="object-cover object-center"
                   tr
                 />
               </div>

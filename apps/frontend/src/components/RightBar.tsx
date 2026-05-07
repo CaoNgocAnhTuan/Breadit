@@ -11,11 +11,15 @@ const RightBar = () => {
       <div className="mt-auto sticky bottom-4 flex justify-end">
         <ChatToggleButton />
       </div>
-      <div className="text-textGray text-sm flex gap-x-4 flex-wrap">
+      <div className="text-textGray text-[12px] flex flex-wrap items-center">
         <Link href="/">Terms of Service</Link>
+        <span className="mx-2">|</span>
         <Link href="/">Privacy Policy</Link>
+        <span className="mx-2">|</span>
         <Link href="/">Cookie Policy</Link>
+        <span className="mx-2">|</span>
         <Link href="/">Accessibility</Link>
+        <span className="mx-2">|</span>
         <span>© 2026 CaoNgocAnhTuan ~ Thesis.</span>
       </div>
     </div>
