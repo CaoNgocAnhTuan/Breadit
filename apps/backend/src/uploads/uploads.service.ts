@@ -11,6 +11,14 @@ export type BufferedFile = {
   filename: string;
 };
 
+function tryExtractCloudinaryPublicId(url: string) {
+  // Example: https://res.cloudinary.com/<cloud>/image/upload/v123/breadit/abc.jpg
+  // We want: breadit/abc (no extension, no version segment)
+  const match = /\/upload\/(?:v\d+\/)?(.+?)(?:\.[a-zA-Z0-9]+)?$/.exec(url);
+  if (!match) return null;
+  return match[1];
+}
+
 function uploadToCloudinary(
   buffer: Buffer,
   options: UploadApiOptions,
@@ -50,6 +58,24 @@ export class UploadsService {
       return this.saveToCloudinary(file, imgType);
     }
     return this.saveToLocalDisk(file, imgType);
+  }
+
+  async deleteFile(pathOrUrl: string) {
+    if (!pathOrUrl) return;
+
+    if (this.useCloudinary) {
+      const publicId = tryExtractCloudinaryPublicId(pathOrUrl);
+      if (!publicId) return;
+      // Best-effort: try image + video resource types
+      await cloudinary.uploader.destroy(publicId, { resource_type: 'image' as const }).catch(() => null);
+      await cloudinary.uploader.destroy(publicId, { resource_type: 'video' as const }).catch(() => null);
+      return;
+    }
+
+    // Local disk: treat as filename or URL ending with filename
+    const filename = path.basename(pathOrUrl);
+    if (!filename) return;
+    await fs.unlink(path.join(this.uploadDir, filename)).catch(() => null);
   }
 
   private async saveToCloudinary(file: BufferedFile, imgType?: string): Promise<string> {

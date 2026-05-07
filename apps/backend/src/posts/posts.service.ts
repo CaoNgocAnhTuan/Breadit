@@ -19,10 +19,20 @@ export class PostsService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
+  private mentionInclude() {
+    return {
+      select: {
+        username: true,
+        user: { select: { id: true, username: true, displayName: true, img: true } },
+      },
+    } as const;
+  }
+
   private postInclude(userId?: string) {
     return {
       user: { select: { displayName: true, username: true, img: true } },
       media: true,
+      mentions: this.mentionInclude(),
       _count: { select: { likes: true, rePosts: true, comments: true } },
       likes: userId ? { where: { userId }, select: { id: true } } : (false as const),
       rePosts: userId ? { where: { userId }, select: { id: true } } : (false as const),
@@ -200,21 +210,41 @@ export class PostsService {
         );
       }
 
-      const mentions = [
+      const mentionUsernames = [
         ...new Set(
           [...body.desc.matchAll(/@([a-zA-Z0-9_]+)/g)].map((m) => m[1]),
         ),
       ];
-      if (mentions.length > 0) {
+      if (mentionUsernames.length > 0) {
+        const followingIds = (
+          await this.prisma.follow.findMany({
+            where: { followerId: userId },
+            select: { followingId: true },
+          })
+        ).map((f) => f.followingId);
+
         const mentionedUsers = await this.prisma.user.findMany({
-          where: { username: { in: mentions } },
-          select: { id: true },
+          where: {
+            username: { in: mentionUsernames },
+            id: { in: followingIds },
+          },
+          select: { id: true, username: true },
         });
-        void Promise.all(
-          mentionedUsers.map((u) =>
-            this.notificationsService.emit('MENTION', userId, u.id, post.id),
-          ),
-        );
+
+        if (mentionedUsers.length > 0) {
+          await this.prisma.mention.createMany({
+            data: mentionedUsers.map((u) => ({
+              postId: post.id,
+              userId: u.id,
+              username: u.username,
+            })),
+          });
+          void Promise.all(
+            mentionedUsers.map((u) =>
+              this.notificationsService.emit('MENTION', userId, u.id, post.id),
+            ),
+          );
+        }
       }
     }
 
@@ -246,6 +276,131 @@ export class PostsService {
     }
 
     return post;
+  }
+
+  async update(
+    postId: number,
+    userId: string,
+    body: { desc?: string; mediaIdsToRemove?: number[] },
+    files: BufferedFile[] = [],
+  ) {
+    const existing = await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: { media: true },
+    });
+    if (!existing || existing.deletedAt) throw new NotFoundException();
+    if (existing.userId !== userId) throw new ForbiddenException();
+
+    const mediaIdsToRemove = body.mediaIdsToRemove ?? [];
+    const mediaToRemove = mediaIdsToRemove.length
+      ? existing.media.filter((m) => mediaIdsToRemove.includes(m.id))
+      : [];
+
+    for (const m of mediaToRemove) {
+      await this.uploadsService.deleteFile(m.url);
+    }
+
+    const uploadedMedia: { url: string; type: string }[] = [];
+    for (const file of files) {
+      const url = await this.uploadsService.saveFile(file);
+      const type = this.uploadsService.isVideo(file) ? 'VIDEO' : 'IMAGE';
+      uploadedMedia.push({ url, type });
+    }
+
+    if (body.desc !== undefined) {
+      const tags = [
+        ...new Set(
+          [...body.desc.matchAll(/#([a-zA-Z0-9_]+)/g)].map((m) =>
+            m[1].toLowerCase(),
+          ),
+        ),
+      ];
+
+      const mentionUsernames = [
+        ...new Set(
+          [...body.desc.matchAll(/@([a-zA-Z0-9_]+)/g)].map((m) => m[1]),
+        ),
+      ];
+
+      await this.prisma.$transaction(async (tx) => {
+        if (mediaIdsToRemove.length) {
+          await tx.postMedia.deleteMany({
+            where: { id: { in: mediaIdsToRemove }, postId },
+          });
+        }
+
+        if (uploadedMedia.length) {
+          await tx.postMedia.createMany({
+            data: uploadedMedia.map((m) => ({ postId, url: m.url, type: m.type })),
+          });
+        }
+
+        await tx.post.update({
+          where: { id: postId },
+          data: { desc: body.desc },
+        });
+
+        await tx.postTag.deleteMany({ where: { postId } });
+        if (tags.length > 0) {
+          for (const tag of tags) {
+            const ht = await tx.hashtag.upsert({
+              where: { tag },
+              create: { tag },
+              update: {},
+            });
+            await tx.postTag.upsert({
+              where: { postId_hashtagId: { postId, hashtagId: ht.id } },
+              create: { postId, hashtagId: ht.id },
+              update: {},
+            });
+          }
+        }
+
+        await tx.mention.deleteMany({ where: { postId } });
+        if (mentionUsernames.length > 0) {
+          const followingIds = (
+            await tx.follow.findMany({
+              where: { followerId: userId },
+              select: { followingId: true },
+            })
+          ).map((f) => f.followingId);
+
+          const mentionedUsers = await tx.user.findMany({
+            where: {
+              username: { in: mentionUsernames },
+              id: { in: followingIds },
+            },
+            select: { id: true, username: true },
+          });
+
+          if (mentionedUsers.length > 0) {
+            await tx.mention.createMany({
+              data: mentionedUsers.map((u) => ({
+                postId,
+                userId: u.id,
+                username: u.username,
+              })),
+            });
+          }
+        }
+      });
+    } else {
+      await this.prisma.$transaction(async (tx) => {
+        if (mediaIdsToRemove.length) {
+          await tx.postMedia.deleteMany({
+            where: { id: { in: mediaIdsToRemove }, postId },
+          });
+        }
+
+        if (uploadedMedia.length) {
+          await tx.postMedia.createMany({
+            data: uploadedMedia.map((m) => ({ postId, url: m.url, type: m.type })),
+          });
+        }
+      });
+    }
+
+    return this.findOne(postId, userId);
   }
 
   async createReport(reporterId: string, postId: number, reason: string) {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "./Image";
 import NextImage from "next/image";
 import ImageEditor from "./ImageEditor";
+import MentionInput, { type MentionInputHandle } from "./MentionInput";
 import { useSession } from "@/providers/SessionProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiMultipart } from "@/lib/api";
@@ -22,7 +23,7 @@ const Share = ({ communityId }: { communityId?: number }) => {
   });
   const [error, setError] = useState<string | null>(null);
 
-  const descRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<MentionInputHandle>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const session = useSession();
@@ -34,7 +35,8 @@ const Share = ({ communityId }: { communityId?: number }) => {
   const mutation = useMutation({
     mutationFn: async () => {
       const formData = new FormData();
-      if (descRef.current?.value) formData.append("desc", descRef.current.value);
+      const descVal = descRef.current?.getValue();
+      if (descVal) formData.append("desc", descVal);
       formData.append("imgType", settings.type);
       if (settings.sensitive) formData.append("isSensitive", "true");
       if (communityId) formData.append("communityId", communityId.toString());
@@ -54,7 +56,7 @@ const Share = ({ communityId }: { communityId?: number }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      if (descRef.current) descRef.current.value = "";
+      if (descRef.current) descRef.current.setValue("");
       mediaList.forEach((m) => URL.revokeObjectURL(m.preview));
       setMediaList([]);
       setSettings({ type: "original", sensitive: false });
@@ -120,11 +122,11 @@ const Share = ({ communityId }: { communityId?: number }) => {
       </div>
       {/* OTHERS */}
       <div className="flex-1 flex flex-col gap-4">
-        <input
+        <MentionInput
           ref={descRef}
-          type="text"
+          variant="input"
           placeholder="What is happening?!"
-          className="bg-transparent outline-none placeholder:text-textGray text-xl"
+          className="bg-transparent outline-none placeholder:text-textGray text-xl w-full"
         />
         {/* PREVIEW MEDIA LIST */}
         {mediaList.length > 0 && (

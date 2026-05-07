@@ -3,11 +3,12 @@
 import Image from "./Image";
 import PostInfo from "./PostInfo";
 import PostInteractions from "./PostInteractions";
+import RichText from "./RichText";
 import Video from "./Video";
 import MediaViewer from "./MediaViewer";
 import Link from "next/link";
 import { useState } from "react";
-import { Post as PostType } from "@breadit/shared";
+import { Post as PostType, MentionEntity } from "@breadit/shared";
 import { format } from "timeago.js";
 
 type UserSummary = {
@@ -31,8 +32,9 @@ type Engagement = {
 export type PostWithDetails = PostType &
   Engagement & {
     user: UserSummary;
+    mentions?: MentionEntity[];
     community?: CommunitySummary;
-    rePost?: (PostType & Engagement & { user: UserSummary; community?: CommunitySummary }) | null;
+    rePost?: (PostType & Engagement & { user: UserSummary; mentions?: MentionEntity[]; community?: CommunitySummary }) | null;
   };
 
 const Post = ({
@@ -132,18 +134,33 @@ const Post = ({
                 {type !== "status" && (
                   <span className="text-textGray">
                     {format(originalPost.createdAt)}
+                    {new Date(originalPost.updatedAt).getTime() -
+                      new Date(originalPost.createdAt).getTime() >
+                      1000
+                      ? " (edited)"
+                      : ""}
                   </span>
                 )}
               </div>
             </Link>
-            <PostInfo postId={originalPost.id} postUserId={originalPost.userId} />
+            <PostInfo
+              postId={originalPost.id}
+              postUserId={originalPost.userId}
+              postDesc={originalPost.desc}
+              postMedia={originalPost.media}
+            />
           </div>
           {/* TEXT & MEDIA */}
           <Link
             href={`/${originalPost.user.username}/status/${originalPost.id}`}
           >
             <p className={`${type === "status" && "text-lg"}`}>
-              {originalPost.desc}
+              {originalPost.desc ? (
+                <RichText
+                  text={originalPost.desc}
+                  mentions={originalPost.mentions}
+                />
+              ) : null}
             </p>
           </Link>
           {originalPost.media && originalPost.media.length > 0 && (

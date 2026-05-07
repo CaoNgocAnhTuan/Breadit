@@ -17,6 +17,12 @@ export class UsersService {
     return {
       user: { select: { displayName: true, username: true, img: true } },
       media: true,
+      mentions: {
+        select: {
+          username: true,
+          user: { select: { id: true, username: true, displayName: true, img: true } },
+        },
+      },
       _count: { select: { likes: true, rePosts: true, comments: true } },
       likes: userId ? { where: { userId }, select: { id: true } } : (false as const),
       rePosts: userId ? { where: { userId }, select: { id: true } } : (false as const),
@@ -124,6 +130,31 @@ export class UsersService {
       this.prisma.comment.count({ where }),
     ]);
     return { posts: comments, hasMore: cursor * POST_LIMIT < total };
+  }
+
+  async searchFollowing(userId: string, q: string) {
+    const where: any = { followerId: userId };
+    if (q.trim()) {
+      where.following = {
+        OR: [
+          { username: { contains: q.trim(), mode: 'insensitive' } },
+          { displayName: { contains: q.trim(), mode: 'insensitive' } },
+        ],
+      };
+    }
+
+    const rows = await this.prisma.follow.findMany({
+      where,
+      select: {
+        following: {
+          select: { id: true, username: true, displayName: true, img: true },
+        },
+      },
+      take: 10,
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return rows.map((r) => r.following);
   }
 
   async getFollowers(username: string, cursor: number) {

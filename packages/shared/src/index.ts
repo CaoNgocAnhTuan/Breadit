@@ -44,10 +44,29 @@ export type PostMedia = {
   width: number | null;
 };
 
+export type CommentMedia = {
+  id: number;
+  url: string;
+  type: string;
+  height: number | null;
+  width: number | null;
+};
+
+export type MentionEntity = {
+  username: string;
+  user: {
+    id: string;
+    username: string;
+    displayName: string | null;
+    img: string | null;
+  };
+};
+
 export type Post = {
   id: number;
   desc: string | null;
   media: PostMedia[];
+  mentions?: MentionEntity[];
   isSensitive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -72,6 +91,7 @@ export type Comment = {
   userId: string;
   postId: number;
   parentCommentId: number | null;
+  media?: CommentMedia[];
   user: {
     username: string;
     displayName: string | null;
@@ -82,6 +102,7 @@ export type Comment = {
     likes: number;
   };
   likes?: { id: number }[];
+  mentions?: MentionEntity[];
   replies?: Comment[];
   post?: {
     id: number;

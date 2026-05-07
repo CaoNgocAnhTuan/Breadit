@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  Patch,
   Param,
   ParseIntPipe,
   PayloadTooLargeException,
@@ -102,6 +103,49 @@ export class PostsController {
     }
 
     return this.postsService.create(req.user!.id, body, bufferedFiles);
+  }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: FastifyRequest & { user?: { id: string } },
+  ) {
+    const body: { desc?: string; mediaIdsToRemove?: number[] } = {};
+    const bufferedFiles: { buffer: Buffer; mimetype: string; filename: string }[] = [];
+
+    try {
+      for await (const part of req.parts()) {
+        if (part.type === 'field') {
+          const val = part.value as string;
+          if (part.fieldname === 'desc') body.desc = val;
+          else if (part.fieldname === 'mediaIdsToRemove') {
+            const parsed = JSON.parse(val) as unknown;
+            if (Array.isArray(parsed)) {
+              body.mediaIdsToRemove = parsed
+                .map((x) => (typeof x === 'string' ? parseInt(x, 10) : x))
+                .filter((n) => typeof n === 'number' && !isNaN(n));
+            }
+          }
+        } else if (part.type === 'file') {
+          const buffer = await part.toBuffer();
+          bufferedFiles.push({
+            buffer,
+            mimetype: part.mimetype,
+            filename: part.filename,
+          });
+        }
+      }
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      if (code === 'FST_REQ_FILE_TOO_LARGE') {
+        throw new PayloadTooLargeException('File exceeds 500 MB limit');
+      }
+      throw new BadRequestException(`Malformed upload: ${(err as Error).message}`);
+    }
+
+    return this.postsService.update(id, req.user!.id, body, bufferedFiles);
   }
 
   @Post(':id/report')

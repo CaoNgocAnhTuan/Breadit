@@ -3,6 +3,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Post from "./Post";
+import RichText from "./RichText";
 import Link from "next/link";
 import Image from "./Image";
 import { format } from "timeago.js";
@@ -43,7 +44,9 @@ function ReplyThread({ comment }: { comment: any }) {
               <span className="text-textGray text-xs">{format(post.createdAt)}</span>
             </div>
             {post.desc && (
-              <p className="text-sm text-textGray line-clamp-2">{post.desc}</p>
+              <p className="text-sm text-textGray line-clamp-2">
+                <RichText text={post.desc} mentions={post.mentions} />
+              </p>
             )}
           </Link>
         </div>
@@ -76,7 +79,11 @@ function ReplyThread({ comment }: { comment: any }) {
             </div>
           </div>
           <Link href={post ? `/${post.user.username}/status/${post.id}` : "#"}>
-            {comment.body && <p className="mt-1 mb-2">{comment.body}</p>}
+            {comment.body && (
+              <p className="mt-1 mb-2">
+                <RichText text={comment.body} mentions={comment.mentions} />
+              </p>
+            )}
           </Link>
           <div className="flex items-center gap-6 text-textGray text-sm py-1">
             <span>{comment._count?.replies ?? 0} replies</span>

@@ -36,6 +36,12 @@ export class SearchService {
         },
         include: {
           user: { select: { displayName: true, username: true, img: true } },
+          mentions: {
+            select: {
+              username: true,
+              user: { select: { id: true, username: true, displayName: true, img: true } },
+            },
+          },
           _count: { select: { likes: true, rePosts: true, comments: true } },
           likes: userId ? { where: { userId }, select: { id: true } } : (false as const),
           rePosts: userId ? { where: { userId }, select: { id: true } } : (false as const),

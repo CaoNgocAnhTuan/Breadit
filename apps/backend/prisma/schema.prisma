@@ -56,6 +56,8 @@ model User {
   conversationMembers ConversationMember[]
   sentMessages        Message[]
 
+  mentions Mention[]
+
   communities  CommunityMember[]
   bannedFrom   CommunityBannedUser[]
 }
@@ -124,6 +126,8 @@ model Post {
   saves SavedPosts[]
 
   tags PostTag[]
+
+  mentions Mention[]
 
   notifications Notification[]
   reports       Report[]
@@ -364,8 +368,23 @@ model Comment {
   parentComment   Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
   replies         Comment[] @relation("CommentReplies")
 
+  media         CommentMedia[]
   likes         CommentLike[]
+  mentions      Mention[]
   notifications Notification[]
+}
+
+model CommentMedia {
+  id        Int      @id @default(autoincrement())
+  url       String
+  type      String   // 'IMAGE' | 'VIDEO' | 'FILE'
+  height    Int?
+  width     Int?
+
+  commentId Int
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
 
 model CommentLike {
@@ -379,4 +398,20 @@ model CommentLike {
   comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@unique([userId, commentId])
+}
+
+model Mention {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  postId    Int?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  commentId Int?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  userId    String
+  user      User @relation(fields: [userId], references: [id])
+
+  username  String
 }

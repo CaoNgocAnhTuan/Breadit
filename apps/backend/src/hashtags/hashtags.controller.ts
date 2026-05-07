@@ -11,6 +11,11 @@ type AuthedRequest = FastifyRequest & {
 export class HashtagsController {
   constructor(private readonly hashtagsService: HashtagsService) {}
 
+  @Get('trending')
+  getTrending() {
+    return this.hashtagsService.getTrending();
+  }
+
   @Get(':tag/posts')
   @UseGuards(OptionalJwtAuthGuard)
   getPostsByTag(

@@ -1,67 +1,49 @@
+"use client";
+
 import Link from "next/link";
-import Image from "./Image";
+import { useQuery } from "@tanstack/react-query";
+
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
+
+type TrendingTag = { tag: string; postCount: number };
+
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return String(n);
+}
 
 const PopularTags = () => {
+  const { data: tags = [] } = useQuery<TrendingTag[]>({
+    queryKey: ["trending-hashtags"],
+    queryFn: async () => {
+      const res = await fetch(`${BACKEND_URL}/api/hashtags/trending`, {
+        credentials: "include",
+      });
+      if (!res.ok) return [];
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (tags.length === 0) return null;
+
   return (
-    <div className="p-4 rounded-2xl border-[1px] border-borderGray flex flex-col gap-4">
-      <h1 className="text-xl font-bold text-textGrayLight">
-        {"What's"} Happening
-      </h1>
-      {/* TREND EVENT */}
-      <div className="flex gap-4">
-        <div className="relative w-20 h-20 rounded-xl overflow-hidden">
-          <Image
-            path="general/event.png"
-            alt="event"
-            w={120}
-            h={120}
-            tr={true}
-          />
-        </div>
-        <div className="flex-1">
-          <h2 className="font-bold text-textGrayLight">
-            Nadal v Federer Grand Slam
-          </h2>
-          <span className="text-sm text-textGray">Last Night</span>
-        </div>
-      </div>
-      {/* TOPICS */}
-      <div className="">
-        <div className="flex items-center justify-between">
-          <span className="text-textGray text-sm">Technology • Trending</span>
-          <Image path="icons/infoMore.svg" alt="info" w={16} h={16} />
-        </div>
-        <h2 className="text-textGrayLight font-bold">OpenAI</h2>
-        <span className="text-textGray text-sm">20K posts</span>
-      </div>
-      {/* TOPICS */}
-      <div className="">
-        <div className="flex items-center justify-between">
-          <span className="text-textGray text-sm">Technology • Trending</span>
-          <Image path="icons/infoMore.svg" alt="info" w={16} h={16} />
-        </div>
-        <h2 className="text-textGrayLight font-bold">OpenAI</h2>
-        <span className="text-textGray text-sm">20K posts</span>
-      </div>
-      {/* TOPICS */}
-      <div className="">
-        <div className="flex items-center justify-between">
-          <span className="text-textGray text-sm">Technology • Trending</span>
-          <Image path="icons/infoMore.svg" alt="info" w={16} h={16} />
-        </div>
-        <h2 className="text-textGrayLight font-bold">OpenAI</h2>
-        <span className="text-textGray text-sm">20K posts</span>
-      </div>
-      {/* TOPICS */}
-      <div className="">
-        <div className="flex items-center justify-between">
-          <span className="text-textGray text-sm">Technology • Trending</span>
-          <Image path="icons/infoMore.svg" alt="info" w={16} h={16} />
-        </div>
-        <h2 className="text-textGrayLight font-bold">OpenAI</h2>
-        <span className="text-textGray text-sm">20K posts</span>
-      </div>
-      <Link href="/" className="text-iconBlue">
+    <div className="p-4 rounded-2xl border-[1px] border-borderGray flex flex-col gap-3">
+      <h1 className="text-xl font-bold text-textGrayLight">Trending</h1>
+      {tags.map((t) => (
+        <Link
+          key={t.tag}
+          href={`/hashtag/${t.tag}`}
+          className="block hover:bg-white/5 -mx-2 px-2 py-1.5 rounded-lg transition-colors"
+        >
+          <h2 className="text-textGrayLight font-bold">#{t.tag}</h2>
+          <span className="text-textGray text-sm">
+            {formatCount(t.postCount)} posts
+          </span>
+        </Link>
+      ))}
+      <Link href="/search" className="text-iconBlue text-sm">
         Show More
       </Link>
     </div>

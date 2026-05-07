@@ -6,20 +6,26 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useSession } from "@/providers/SessionProvider";
 import Image from "./Image";
+import EditPostModal from "./EditPostModal";
 
 type PostPage = { posts: { id: number }[]; hasMore: boolean };
 
 const PostInfo = ({
   postId,
   postUserId,
+  postDesc,
+  postMedia,
 }: {
   postId: number;
   postUserId: string;
+  postDesc: string | null;
+  postMedia: { id: number; url: string; type: string }[];
 }) => {
   const [open, setOpen] = useState(false);
   const [reported, setReported] = useState(false);
   const [reportError, setReportError] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const session = useSession();
   const isOwner = session?.user?.id === postUserId;
@@ -213,6 +219,17 @@ const PostInfo = ({
               e.preventDefault();
               e.stopPropagation();
               setOpen(false);
+              setShowEditModal(true);
+            }}
+            className="w-full text-left px-4 py-3 text-textGray hover:bg-white/10 rounded-xl text-sm font-semibold"
+          >
+            Edit post
+          </button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setOpen(false);
               deleteMutation.mutate();
             }}
             disabled={deleteMutation.isPending}
@@ -221,6 +238,14 @@ const PostInfo = ({
             {deleteMutation.isPending ? "Deleting…" : "Delete post"}
           </button>
         </div>
+      )}
+      {showEditModal && (
+        <EditPostModal
+          postId={postId}
+          initialDesc={postDesc}
+          initialMedia={postMedia}
+          onClose={() => setShowEditModal(false)}
+        />
       )}
       {deleteError && (
         <p className="absolute right-0 top-10 text-xs text-red-400 bg-black border border-borderGray rounded px-2 py-1 z-20">

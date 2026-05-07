@@ -1,13 +1,16 @@
 "use client";
 
 import { useSession } from "@/providers/SessionProvider";
-import { api } from "@/lib/api";
+import { api, apiMultipart, apiMultipartWithMethod } from "@/lib/api";
 import Image from "./Image";
+import RichText from "./RichText";
+import MentionInput, { type MentionInputHandle } from "./MentionInput";
 import { Comment as CommentType } from "@breadit/shared";
-import { useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "timeago.js";
 import Link from "next/link";
+import Video from "./Video";
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
@@ -27,8 +30,21 @@ function CommentNode({
   const user = session?.user;
   const [collapsed, setCollapsed] = useState(false);
   const [showReply, setShowReply] = useState(false);
-  const replyRef = useRef<HTMLTextAreaElement>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const replyRef = useRef<MentionInputHandle>(null);
+  const editRef = useRef<MentionInputHandle>(null);
+  const [replyFiles, setReplyFiles] = useState<File[]>([]);
+  const [replyPreviews, setReplyPreviews] = useState<string[]>([]);
+  const [editFiles, setEditFiles] = useState<File[]>([]);
+  const [editPreviews, setEditPreviews] = useState<string[]>([]);
+  const [editExistingMedia, setEditExistingMedia] = useState(comment.media ?? []);
+  const [editRemovedMediaIds, setEditRemovedMediaIds] = useState<number[]>([]);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!isEditing) return;
+    editRef.current?.setValue(comment.body);
+  }, [isEditing, comment.body]);
 
   const [likeState, setLikeState] = useState({
     count: comment._count?.likes ?? 0,
@@ -36,16 +52,20 @@ function CommentNode({
   });
 
   const replyMutation = useMutation({
-    mutationFn: async (body: string) => {
-      const res = await api(`/api/posts/${postId}/comments`, {
-        method: "POST",
-        body: JSON.stringify({ body, parentCommentId: comment.id }),
-      });
+    mutationFn: async (body: string): Promise<unknown> => {
+      const fd = new FormData();
+      fd.append("body", body);
+      fd.append("parentCommentId", String(comment.id));
+      replyFiles.forEach((f) => fd.append("files", f));
+
+      const res = await apiMultipart(`/api/posts/${postId}/comments`, fd);
       if (!res.ok) throw new Error(String(res.status));
       return res.json();
     },
     onSuccess: () => {
-      if (replyRef.current) replyRef.current.value = "";
+      if (replyRef.current) replyRef.current.setValue("");
+      setReplyFiles([]);
+      setReplyPreviews([]);
       setShowReply(false);
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
     },
@@ -88,10 +108,62 @@ function CommentNode({
     },
   });
 
+  const editMutation = useMutation({
+    mutationFn: async () => {
+      const body = editRef.current?.getValue()?.trim() ?? "";
+      const fd = new FormData();
+      fd.append("body", body);
+      if (editRemovedMediaIds.length) {
+        fd.append("mediaIdsToRemove", JSON.stringify(editRemovedMediaIds));
+      }
+      editFiles.forEach((f) => fd.append("files", f));
+
+      const res = await apiMultipartWithMethod(`/api/comments/${comment.id}`, "PATCH", fd);
+      if (!res.ok) throw new Error(String(res.status));
+      return res.json();
+    },
+    onSuccess: () => {
+      setIsEditing(false);
+      setEditFiles([]);
+      setEditPreviews([]);
+      setEditRemovedMediaIds([]);
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+    },
+  });
+
   const handleSubmitReply = () => {
-    const body = replyRef.current?.value?.trim();
+    const body = replyRef.current?.getValue()?.trim();
     if (!body) return;
     replyMutation.mutate(body);
+  };
+
+  const handleReplyPickFiles = (files: FileList | null) => {
+    if (!files) return;
+    const picked = Array.from(files);
+    setReplyFiles((prev) => [...prev, ...picked]);
+    setReplyPreviews((prev) => [...prev, ...picked.map((f) => URL.createObjectURL(f))]);
+  };
+
+  const handleReplyRemoveNew = (idx: number) => {
+    setReplyFiles((prev) => prev.filter((_, i) => i !== idx));
+    setReplyPreviews((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleEditPickFiles = (files: FileList | null) => {
+    if (!files) return;
+    const picked = Array.from(files);
+    setEditFiles((prev) => [...prev, ...picked]);
+    setEditPreviews((prev) => [...prev, ...picked.map((f) => URL.createObjectURL(f))]);
+  };
+
+  const handleEditRemoveNew = (idx: number) => {
+    setEditFiles((prev) => prev.filter((_, i) => i !== idx));
+    setEditPreviews((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleEditRemoveExisting = (mediaId: number) => {
+    setEditRemovedMediaIds((prev) => (prev.includes(mediaId) ? prev : [...prev, mediaId]));
+    setEditExistingMedia((prev) => prev.filter((m) => m.id !== mediaId));
   };
 
   const replies = comment.replies ?? [];
@@ -168,13 +240,117 @@ function CommentNode({
             </span>
             <span className="text-textGray text-xs">
               · {format(comment.createdAt)}
+              {new Date(comment.updatedAt).getTime() -
+                new Date(comment.createdAt).getTime() >
+                1000
+                ? " (edited)"
+                : ""}
             </span>
           </div>
 
           {/* Body */}
-          <p className="text-[15px] mt-0.5 break-words whitespace-pre-wrap">
-            {comment.body}
-          </p>
+          {isEditing ? (
+            <div className="mt-2">
+              <MentionInput
+                ref={editRef}
+                rows={3}
+                className="w-full bg-transparent border border-borderGray rounded-lg p-2 text-sm outline-none focus:border-iconBlue resize-none"
+              />
+
+              {(editExistingMedia.length ?? 0) > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {editExistingMedia.map((m) => (
+                    <div key={m.id} className="relative w-20 h-20 rounded-lg overflow-hidden border border-borderGray">
+                      {m.type === "VIDEO" ? (
+                        <div className="w-full h-full bg-black flex items-center justify-center text-xs text-textGray">
+                          VIDEO
+                        </div>
+                      ) : (
+                        <Image path={m.url} alt="" fill className="object-cover" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleEditRemoveExisting(m.id)}
+                        className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-5 h-5 text-xs"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {editPreviews.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {editPreviews.map((src, i) => (
+                    <div key={src} className="relative w-20 h-20 rounded-lg overflow-hidden border border-borderGray">
+                      <img src={src} alt="" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => handleEditRemoveNew(i)}
+                        className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-5 h-5 text-xs"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 mt-2">
+                <label className="text-xs text-textGray hover:text-white px-3 py-1 cursor-pointer">
+                  Add media
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => handleEditPickFiles(e.target.files)}
+                  />
+                </label>
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                    setEditFiles([]);
+                    setEditPreviews([]);
+                    setEditRemovedMediaIds([]);
+                    setEditExistingMedia(comment.media ?? []);
+                  }}
+                  className="text-xs text-textGray hover:text-white px-3 py-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => editMutation.mutate()}
+                  disabled={editMutation.isPending}
+                  className="text-xs font-bold bg-white text-black rounded-full px-4 py-1.5 disabled:opacity-50"
+                >
+                  {editMutation.isPending ? "Saving..." : "Save"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-[15px] mt-0.5 break-words whitespace-pre-wrap">
+              <RichText text={comment.body} mentions={comment.mentions} />
+            </p>
+          )}
+
+          {/* Media */}
+          {(comment.media?.length ?? 0) > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {comment.media!.map((m) => (
+                <div key={m.id} className="overflow-hidden rounded-xl border border-borderGray">
+                  {m.type === "VIDEO" ? (
+                    <Video path={m.url} className="max-h-72 max-w-full" />
+                  ) : (
+                    <div className="relative w-[220px] h-[220px]">
+                      <Image path={m.url} alt="" fill className="object-cover" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex items-center gap-4 mt-1.5 text-textGray">
@@ -215,14 +391,25 @@ function CommentNode({
 
             {/* Delete (own comment) */}
             {user && user.id === comment.userId && (
-              <button
-                onClick={() => {
-                  if (confirm("Delete this comment?")) deleteMutation.mutate();
-                }}
-                className="text-xs hover:text-red-400 transition-colors"
-              >
-                Delete
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    setIsEditing(true);
+                    setEditExistingMedia(comment.media ?? []);
+                  }}
+                  className="text-xs hover:text-white transition-colors"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => {
+                    if (confirm("Delete this comment?")) deleteMutation.mutate();
+                  }}
+                  className="text-xs hover:text-red-400 transition-colors"
+                >
+                  Delete
+                </button>
+              </>
             )}
           </div>
 
@@ -239,14 +426,43 @@ function CommentNode({
                 />
               </div>
               <div className="flex-1">
-                <textarea
+                <MentionInput
                   ref={replyRef}
                   rows={2}
                   className="w-full bg-transparent border border-borderGray rounded-lg p-2 text-sm outline-none focus:border-iconBlue resize-none"
                   placeholder={`Reply to @${comment.user.username}...`}
                   autoFocus
                 />
+
+                {replyPreviews.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {replyPreviews.map((src, i) => (
+                      <div key={src} className="relative w-20 h-20 rounded-lg overflow-hidden border border-borderGray">
+                        {/* preview may be video or image; show as image thumbnail */}
+                        <img src={src} alt="" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleReplyRemoveNew(i)}
+                          className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-5 h-5 text-xs"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div className="flex justify-end gap-2 mt-1">
+                  <label className="text-xs text-textGray hover:text-white px-3 py-1 cursor-pointer">
+                    Add media
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => handleReplyPickFiles(e.target.files)}
+                    />
+                  </label>
                   <button
                     onClick={() => setShowReply(false)}
                     className="text-xs text-textGray hover:text-white px-3 py-1"
@@ -294,18 +510,91 @@ function CommentNode({
   );
 }
 
+type SortMode = "relevant" | "recent" | "top";
+
+const SORT_OPTIONS: { value: SortMode; label: string; desc: string }[] = [
+  { value: "relevant", label: "Relevant", desc: "Replies you're likely to care about most" },
+  { value: "recent", label: "Recent", desc: "The latest replies" },
+  { value: "top", label: "Top", desc: "Replies with the most likes" },
+];
+
+function SortDropdown({
+  sort,
+  onSort,
+}: {
+  sort: SortMode;
+  onSort: (s: SortMode) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const current = SORT_OPTIONS.find((o) => o.value === sort)!;
+
+  return (
+    <div className="flex items-center justify-between px-4 py-3 border-b border-borderGray">
+      <span className="text-sm text-textGray">Replies</span>
+      <div className="relative">
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex items-center gap-1.5 text-sm font-bold text-iconBlue hover:underline"
+        >
+          {current.label}
+          <svg width="14" height="14" viewBox="0 0 24 24" className="fill-iconBlue">
+            <path d="M3.543 8.96l1.414-1.42L12 14.59l7.043-7.05 1.414 1.42L12 17.41 3.543 8.96z" />
+          </svg>
+        </button>
+
+        {open && (
+          <>
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setOpen(false)}
+            />
+            <div className="absolute right-0 top-8 z-50 bg-black border border-borderGray rounded-2xl shadow-lg w-72 py-1 overflow-hidden">
+              <div className="px-4 py-3 border-b border-borderGray">
+                <h4 className="font-bold text-[15px]">Sort replies</h4>
+              </div>
+              {SORT_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => {
+                    onSort(opt.value);
+                    setOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-white/5 transition-colors flex items-start gap-3"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[15px] font-bold">{opt.label}</p>
+                    <p className="text-textGray text-[13px] mt-0.5">{opt.desc}</p>
+                  </div>
+                  {sort === opt.value && (
+                    <svg width="20" height="20" viewBox="0 0 24 24" className="fill-iconBlue flex-shrink-0 mt-0.5">
+                      <path d="M9.64 18.952l-5.55-4.861 1.317-1.504 3.951 3.459 8.459-10.948L19.4 6.32 9.64 18.952z" />
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const Comments = ({ postId }: { postId: number }) => {
   const session = useSession();
   const user = session?.user;
-  const commentRef = useRef<HTMLTextAreaElement>(null);
+  const commentRef = useRef<MentionInputHandle>(null);
+  const [commentFiles, setCommentFiles] = useState<File[]>([]);
+  const [commentPreviews, setCommentPreviews] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [sort, setSort] = useState<SortMode>("relevant");
   const queryClient = useQueryClient();
 
   const { data: comments = [], isLoading } = useQuery({
-    queryKey: ["comments", postId],
+    queryKey: ["comments", postId, sort],
     queryFn: async () => {
       const res = await fetch(
-        `${BACKEND_URL}/api/posts/${postId}/comments`,
+        `${BACKEND_URL}/api/posts/${postId}/comments?sort=${sort}`,
         { credentials: "include" }
       );
       if (!res.ok) throw new Error("Failed to load comments");
@@ -315,16 +604,19 @@ const Comments = ({ postId }: { postId: number }) => {
 
   const commentMutation = useMutation({
     mutationFn: async () => {
-      const body = commentRef.current?.value?.trim() ?? "";
+      const body = commentRef.current?.getValue()?.trim() ?? "";
       if (!body) throw new Error("empty");
-      const res = await api(`/api/posts/${postId}/comments`, {
-        method: "POST",
-        body: JSON.stringify({ body }),
-      });
+      const fd = new FormData();
+      fd.append("body", body);
+      commentFiles.forEach((f) => fd.append("files", f));
+
+      const res = await apiMultipart(`/api/posts/${postId}/comments`, fd);
       if (!res.ok) throw new Error(String(res.status));
     },
     onSuccess: () => {
-      if (commentRef.current) commentRef.current.value = "";
+      if (commentRef.current) commentRef.current.setValue("");
+      setCommentFiles([]);
+      setCommentPreviews([]);
       setError(null);
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
       queryClient.invalidateQueries({ queryKey: ["posts"] });
@@ -337,6 +629,18 @@ const Comments = ({ postId }: { postId: number }) => {
       else setError("Something went wrong!");
     },
   });
+
+  const handlePickCommentFiles = (files: FileList | null) => {
+    if (!files) return;
+    const picked = Array.from(files);
+    setCommentFiles((prev) => [...prev, ...picked]);
+    setCommentPreviews((prev) => [...prev, ...picked.map((f) => URL.createObjectURL(f))]);
+  };
+
+  const handleRemoveCommentNew = (idx: number) => {
+    setCommentFiles((prev) => prev.filter((_, i) => i !== idx));
+    setCommentPreviews((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   return (
     <div>
@@ -354,13 +658,39 @@ const Comments = ({ postId }: { postId: number }) => {
               />
             </div>
             <div className="flex-1">
-              <textarea
+              <MentionInput
                 ref={commentRef}
                 rows={2}
                 className="w-full bg-transparent outline-none p-2 text-[15px] resize-none border border-borderGray rounded-lg focus:border-iconBlue"
                 placeholder="What are your thoughts?"
               />
+              {commentPreviews.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {commentPreviews.map((src, i) => (
+                    <div key={src} className="relative w-20 h-20 rounded-lg overflow-hidden border border-borderGray">
+                      <img src={src} alt="" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCommentNew(i)}
+                        className="absolute top-1 right-1 bg-black/70 text-white rounded-full w-5 h-5 text-xs"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="flex justify-end mt-1">
+                <label className="mr-auto text-xs text-textGray hover:text-white px-2 py-1 cursor-pointer">
+                  Add media
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => handlePickCommentFiles(e.target.files)}
+                  />
+                </label>
                 <button
                   onClick={() => commentMutation.mutate()}
                   disabled={commentMutation.isPending}
@@ -378,6 +708,9 @@ const Comments = ({ postId }: { postId: number }) => {
           )}
         </div>
       )}
+
+      {/* Sort dropdown */}
+      <SortDropdown sort={sort} onSort={setSort} />
 
       {/* Comments list */}
       <div className="px-4 py-2">

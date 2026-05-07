@@ -58,6 +58,15 @@ export class UsersController {
     return this.usersService.updateProfile(req.user!.id, dto);
   }
 
+  @Get('me/following/search')
+  @UseGuards(JwtAuthGuard)
+  searchFollowing(
+    @Req() req: AuthedRequest,
+    @Query('q') q: string,
+  ) {
+    return this.usersService.searchFollowing(req.user!.id, q ?? '');
+  }
+
   @Get('recommendations')
   @UseGuards(JwtAuthGuard)
   getRecommendations(@Req() req: AuthedRequest) {
