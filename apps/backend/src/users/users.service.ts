@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { BlockService } from '../block/block.service';
+import { CacheService } from '../cache/cache.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 const POST_LIMIT = 3;
@@ -11,6 +13,8 @@ export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly blockService: BlockService,
+    private readonly cache: CacheService,
   ) {}
 
   private postInclude(userId?: string) {
@@ -44,18 +48,50 @@ export class UsersService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safe } = user;
 
-    const isBlocked = currentUserId
-      ? !!(await this.prisma.block.findFirst({
-          where: {
-            OR: [
-              { blockerId: currentUserId, blockedId: user.id },
-              { blockerId: user.id, blockedId: currentUserId },
-            ],
-          },
-        }))
-      : false;
+    if (currentUserId && user.id !== currentUserId) {
+      const flags = await this.blockService.getBlockFlags(currentUserId, user.id);
+      if (flags) {
+        return {
+          id: user.id,
+          username: user.username,
+          displayName: null,
+          email: null,
+          bio: null,
+          location: null,
+          job: null,
+          website: null,
+          img: null,
+          cover: null,
+          emailVerified: null,
+          role: safe.role,
+          banned: safe.banned,
+          createdAt: safe.createdAt,
+          updatedAt: safe.updatedAt,
+          profileRestricted: true,
+          blockedByYou: flags.blockedByViewer,
+          blockedYou: flags.blockedYou,
+          isBlocked: true,
+          followings: [],
+          _count: { followers: 0, followings: 0 },
+        };
+      }
+    }
 
-    return { ...safe, isBlocked };
+    const isBlocked = false;
+    return { ...safe, isBlocked, profileRestricted: false };
+  }
+
+  async listBlockedAccounts(blockerId: string) {
+    const rows = await this.prisma.block.findMany({
+      where: { blockerId },
+      select: {
+        blocked: {
+          select: { id: true, username: true, displayName: true, img: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return { users: rows.map((r) => r.blocked) };
   }
 
   async getPostsByTab(
@@ -65,6 +101,19 @@ export class UsersService {
     currentUserId?: string,
     q?: string,
   ) {
+    const profileUser = await this.prisma.user.findUnique({
+      where: { username },
+      select: { id: true },
+    });
+    if (
+      profileUser &&
+      currentUserId &&
+      profileUser.id !== currentUserId &&
+      (await this.blockService.isBlockedPair(currentUserId, profileUser.id))
+    ) {
+      throw new ForbiddenException('Profile content unavailable');
+    }
+
     if (tab === 'replies') {
       return this.getUserComments(username, cursor, currentUserId);
     }
@@ -173,7 +222,20 @@ export class UsersService {
     return rows.map((r) => r.following);
   }
 
-  async getFollowers(username: string, cursor: number) {
+  async getFollowers(username: string, cursor: number, viewerId?: string) {
+    const profileUser = await this.prisma.user.findUnique({
+      where: { username },
+      select: { id: true },
+    });
+    if (
+      profileUser &&
+      viewerId &&
+      profileUser.id !== viewerId &&
+      (await this.blockService.isBlockedPair(viewerId, profileUser.id))
+    ) {
+      return { users: [], hasMore: false };
+    }
+
     const rows = await this.prisma.follow.findMany({
       where: { following: { username } },
       select: {
@@ -189,7 +251,20 @@ export class UsersService {
     return { users: rows.map((r) => r.follower), hasMore: cursor * USER_LIMIT < total };
   }
 
-  async getFollowing(username: string, cursor: number) {
+  async getFollowing(username: string, cursor: number, viewerId?: string) {
+    const profileUser = await this.prisma.user.findUnique({
+      where: { username },
+      select: { id: true },
+    });
+    if (
+      profileUser &&
+      viewerId &&
+      profileUser.id !== viewerId &&
+      (await this.blockService.isBlockedPair(viewerId, profileUser.id))
+    ) {
+      return { users: [], hasMore: false };
+    }
+
     const rows = await this.prisma.follow.findMany({
       where: { follower: { username } },
       select: {
@@ -212,12 +287,22 @@ export class UsersService {
 
     if (existing) {
       await this.prisma.follow.delete({ where: { id: existing.id } });
+      // Following graph for this follower changed -> invalidate cached followees ids.
+      await this.cache.del('graph:follows', [followerId]);
+      // User view changed for both follower (feed/search) and followee (notifications).
+      await this.cache.incrNumber('v:user', [followerId]);
+      await this.cache.incrNumber('v:user', [followingId]);
       return { following: false };
     }
 
     await this.prisma.follow.create({
       data: { followerId, followingId, notify: notify ?? false },
     });
+    // Following graph for this follower changed -> invalidate cached followees ids.
+    await this.cache.del('graph:follows', [followerId]);
+    // User view changed for both follower (feed/search) and followee (notifications).
+    await this.cache.incrNumber('v:user', [followerId]);
+    await this.cache.incrNumber('v:user', [followingId]);
     void this.notificationsService.emit('FOLLOW', followerId, followingId);
     return { following: true };
   }
@@ -229,6 +314,11 @@ export class UsersService {
 
     if (existing) {
       await this.prisma.block.delete({ where: { id: existing.id } });
+      // Blocked peer lists changed for both directions.
+      await this.blockService.invalidateBlockedPeers(blockerId);
+      await this.blockService.invalidateBlockedPeers(blockedId);
+      await this.cache.incrNumber('v:user', [blockerId]);
+      await this.cache.incrNumber('v:user', [blockedId]);
       return { blocked: false };
     }
 
@@ -243,6 +333,15 @@ export class UsersService {
         },
       }),
     ]);
+
+    // Blocked peer lists changed for both directions.
+    await this.blockService.invalidateBlockedPeers(blockerId);
+    await this.blockService.invalidateBlockedPeers(blockedId);
+    // Blocking severs mutual follows, so cached followees ids for both users must be invalidated.
+    await this.cache.del('graph:follows', [blockerId]);
+    await this.cache.del('graph:follows', [blockedId]);
+    await this.cache.incrNumber('v:user', [blockerId]);
+    await this.cache.incrNumber('v:user', [blockedId]);
     return { blocked: true };
   }
 

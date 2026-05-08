@@ -169,12 +169,12 @@ const LeftBar = async () => {
                   tr={true}
                 />
               </div>
-              <div className="hidden xxl:flex flex-col">
+              <div className="hidden xxl:flex flex-col text-[15px] leading-tight">
                 <span className="font-bold">{user?.username}</span>
-                <span className="text-sm text-textGray">@{user?.username}</span>
+                <span className="text-[12px] text-textGray">@{user?.username}</span>
               </div>
             </div>
-            <Logout />
+            <Logout username={user.username} />
           </div>
         </>
       )}

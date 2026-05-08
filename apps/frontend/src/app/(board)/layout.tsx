@@ -22,8 +22,8 @@ export default async function BoardLayout({
       <div className="flex flex-col items-center justify-center h-screen gap-4 text-center px-4">
         <h1 className="text-3xl font-bold">Your account has been suspended.</h1>
         <p className="text-textGray">Contact support if you believe this is an error.</p>
-        <div className="mt-4 bg-iconBlue text-white px-6 py-2 rounded-full cursor-pointer hover:bg-opacity-90">
-          <Logout />
+        <div className="mt-6 flex justify-center">
+          <Logout username={session.user.username} />
         </div>
       </div>
     );

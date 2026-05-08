@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import ProfileTabs from "@/components/ProfileTabs";
 import UserActions from "@/components/UserActions";
 import EditProfileButton from "@/components/EditProfileButton";
 import MessageButton from "@/components/MessageButton";
@@ -27,6 +26,12 @@ export async function generateMetadata({
   const res = await serverFetch(`/api/users/${username}`);
   if (!res.ok) return {};
   const user = await res.json();
+  if (user.profileRestricted) {
+    return {
+      title: `@${username}`,
+      description: undefined,
+    };
+  }
   const name = user.displayName ?? username;
   const title = `${name} (@${username})`;
   const img = resolveImg(user.img);
@@ -55,103 +60,145 @@ const UserPage = async ({
   const res = await serverFetch(`/api/users/${username}`);
   if (!res.ok) return notFound();
   const user = await res.json();
+  const profileRestricted = !!user.profileRestricted;
+  const theyBlockedYou = user.blockedYou === true;
+  const youBlockedThem = user.blockedByYou === true;
+  const followings = Array.isArray(user.followings) ? user.followings : [];
 
   return (
     <div className="">
-      {/* PROFILE TITLE */}
       <div className="flex items-center gap-8 sticky top-0 backdrop-blur-md p-4 z-10 bg-[#00000084]">
         <Link href="/">
           <Image path="icons/back.svg" alt="back" w={24} h={24} />
         </Link>
-        <h1 className="font-bold text-lg">{user.displayName}</h1>
+        <h1 className="font-bold text-lg">
+          {profileRestricted ? `@${user.username}` : user.displayName ?? user.username}
+        </h1>
       </div>
-      {/* INFO */}
-      <div className="">
-        {/* COVER & AVATAR CONTAINER */}
-        <div className="relative w-full">
-          {/* COVER */}
-          <div className="w-full aspect-[3/1] relative">
-            <Image
-              path={user.cover || "general/noCover.png"}
-              alt=""
-              w={600}
-              h={200}
-              tr={true}
-            />
-          </div>
-          {/* AVATAR */}
-          <div className="relative w-1/5 aspect-square rounded-full overflow-hidden border-4 border-black bg-gray-300 absolute left-4 top-full -translate-y-1/2">
-            <Image
-              path={user.img || "general/noAvatar.png"}
-              alt=""
-              fill
-              className="object-cover object-center"
-              tr={true}
-            />
-          </div>
-        </div>
-        <div className="flex w-full items-center justify-end gap-2 p-2">
-          {userId && userId !== user.id && (
-            <MessageButton targetUserId={user.id} />
-          )}
-          {userId && userId === user.id ? (
-            <EditProfileButton user={session!.user} />
-          ) : userId && (
-            <UserActions
-              userId={user.id}
-              isFollowed={!!user.followings.length}
-              isBlocked={user.isBlocked ?? false}
-              username={username}
-            />
-          )}
-        </div>
-        {/* USER DETAILS */}
-        <div className="p-4 pt-0 flex flex-col gap-2" style={{ marginTop: '-5rem' }}>
-          {/* USERNAME & HANDLE */}
-          <div className="">
-            <h1 className="text-2xl font-bold">{user.displayName}</h1>
-            <span className="text-textGray text-sm">@{user.username}</span>
-          </div>
-          {user.bio && <p>{user.bio}</p>}
-          {/* JOB & LOCATION & DATE */}
-          <div className="flex gap-4 text-textGray text-[15px]">
-            {user.location && (
-              <div className="flex items-center gap-2">
-                <Image
-                  path="icons/userLocation.svg"
-                  alt="location"
-                  w={20}
-                  h={20}
-                />
-                <span>{user.location}</span>
-              </div>
+
+      {profileRestricted ? (
+        <div className="px-4 py-6 flex flex-col gap-4">
+          <p className="text-textGray text-sm leading-relaxed">
+            {youBlockedThem && !theyBlockedYou && (
+              <>You have blocked <span className="text-white font-semibold">@{user.username}</span>.</>
             )}
-            <div className="flex items-center gap-2">
-              <Image path="icons/date.svg" alt="date" w={20} h={20} />
-              <span>
-                Joined{" "}
-                {new Date(user.createdAt.toString()).toLocaleDateString(
-                  "en-US",
-                  { month: "long", year: "numeric" }
+            {theyBlockedYou && !youBlockedThem && (
+              <>You can’t view this profile because <span className="text-white font-semibold">@{user.username}</span> has blocked you.</>
+            )}
+            {youBlockedThem && theyBlockedYou && (
+              <>You’ve blocked each other. Unblock from your side to restore some actions.</>
+            )}
+          </p>
+          <p className="text-textGray text-xs">
+            Manage everyone you’ve blocked from{" "}
+            <Link href="/settings/blocked" className="text-iconBlue hover:underline">
+              Settings → Blocked accounts
+            </Link>
+            .
+          </p>
+          <div className="flex items-center gap-2 flex-wrap">
+            {userId && userId !== user.id && youBlockedThem && (
+              <UserActions
+                userId={user.id}
+                isFollowed={false}
+                youBlockedThem={youBlockedThem}
+                theyBlockedYou={theyBlockedYou}
+                username={username}
+              />
+            )}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="">
+            <div className="relative w-full">
+              <div className="w-full aspect-[3/1] relative">
+                <Image
+                  path={user.cover || "general/noCover.png"}
+                  alt=""
+                  w={600}
+                  h={200}
+                  tr={true}
+                />
+              </div>
+              <div className="relative w-1/5 aspect-square rounded-full overflow-hidden border-4 border-black bg-gray-300 absolute left-4 top-full -translate-y-1/2">
+                <Image
+                  path={user.img || "general/noAvatar.png"}
+                  alt=""
+                  fill
+                  className="object-cover object-center"
+                  tr={true}
+                />
+              </div>
+            </div>
+            <div className="flex w-full items-center justify-end gap-2 p-2">
+              {userId && userId !== user.id && (
+                <MessageButton targetUserId={user.id} />
+              )}
+              {userId && userId === user.id ? (
+                <EditProfileButton user={session!.user} />
+              ) : (
+                userId && (
+                  <UserActions
+                    userId={user.id}
+                    isFollowed={followings.length > 0}
+                    youBlockedThem={youBlockedThem}
+                    theyBlockedYou={theyBlockedYou}
+                    username={username}
+                  />
+                )
+              )}
+            </div>
+            <div className="p-4 pt-0 flex flex-col gap-2" style={{ marginTop: "-5rem" }}>
+              <div className="">
+                <h1 className="text-2xl font-bold">{user.displayName}</h1>
+                <span className="text-textGray text-sm">@{user.username}</span>
+              </div>
+              {user.bio && <p>{user.bio}</p>}
+              <div className="flex gap-4 text-textGray text-[15px]">
+                {user.location && (
+                  <div className="flex items-center gap-2">
+                    <Image
+                      path="icons/userLocation.svg"
+                      alt="location"
+                      w={20}
+                      h={20}
+                    />
+                    <span>{user.location}</span>
+                  </div>
                 )}
-              </span>
+                <div className="flex items-center gap-2">
+                  <Image path="icons/date.svg" alt="date" w={20} h={20} />
+                  <span>
+                    Joined{" "}
+                    {new Date(user.createdAt.toString()).toLocaleDateString(
+                      "en-US",
+                      { month: "long", year: "numeric" },
+                    )}
+                  </span>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <Link
+                  href={`/${username}/following`}
+                  className="flex items-center gap-2 hover:underline"
+                >
+                  <span className="font-bold">{user._count.followers}</span>
+                  <span className="text-textGray text-[15px]">Following</span>
+                </Link>
+                <Link
+                  href={`/${username}/followers`}
+                  className="flex items-center gap-2 hover:underline"
+                >
+                  <span className="font-bold">{user._count.followings}</span>
+                  <span className="text-textGray text-[15px]">Followers</span>
+                </Link>
+              </div>
             </div>
           </div>
-          {/* FOLLOWINGS & FOLLOWERS */}
-          <div className="flex gap-4">
-            <Link href={`/${username}/following`} className="flex items-center gap-2 hover:underline">
-              <span className="font-bold">{user._count.followers}</span>
-              <span className="text-textGray text-[15px]">Following</span>
-            </Link>
-            <Link href={`/${username}/followers`} className="flex items-center gap-2 hover:underline">
-              <span className="font-bold">{user._count.followings}</span>
-              <span className="text-textGray text-[15px]">Followers</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-      {/* PROFILE TABS */}
-      <ProfilePostSearch username={username} />
+          <ProfilePostSearch username={username} />
+        </>
+      )}
     </div>
   );
 };

@@ -11,8 +11,20 @@ type SearchUser = {
 
 type SearchHashtag = { id: number; tag: string };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SearchResults = { posts: any[]; users: SearchUser[]; hashtags: SearchHashtag[] };
+type SearchCommunity = { id: number; name: string; slug: string; img: string | null };
+
+type SearchPost = {
+  id: number;
+  desc: string | null;
+  user: { username: string };
+};
+
+type SearchResults = {
+  posts: SearchPost[];
+  users: SearchUser[];
+  hashtags: SearchHashtag[];
+  communities: SearchCommunity[];
+};
 
 export default async function SearchPage({
   searchParams,
@@ -22,7 +34,7 @@ export default async function SearchPage({
   const { q } = await searchParams;
   const query = q?.trim() ?? "";
 
-  let results: SearchResults = { posts: [], users: [], hashtags: [] };
+  let results: SearchResults = { posts: [], users: [], hashtags: [], communities: [] };
 
   if (query) {
     const res = await serverFetch(`/api/search?q=${encodeURIComponent(query)}`);
@@ -32,6 +44,7 @@ export default async function SearchPage({
   const hasResults =
     results.users.length > 0 ||
     results.hashtags.length > 0 ||
+    results.communities.length > 0 ||
     results.posts.length > 0;
 
   return (
@@ -87,6 +100,33 @@ export default async function SearchPage({
               className="block px-4 py-3 hover:bg-white/5 font-semibold"
             >
               #{h.tag}
+            </Link>
+          ))}
+        </section>
+      )}
+
+      {results.communities.length > 0 && (
+        <section className="border-b border-borderGray">
+          <p className="px-4 pt-4 pb-2 font-bold text-sm text-textGray uppercase tracking-wide">Communities</p>
+          {results.communities.map((c) => (
+            <Link
+              key={c.id}
+              href={`/c/${c.slug}`}
+              className="flex items-center gap-3 px-4 py-3 hover:bg-white/5"
+            >
+              <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-iconBlue/20">
+                <Image
+                  path={c.img || "general/noAvatar.png"}
+                  alt={c.name}
+                  fill
+                  className="object-cover object-center"
+                  tr
+                />
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold leading-tight truncate">{c.name}</p>
+                <p className="text-textGray text-sm truncate">c/{c.slug}</p>
+              </div>
             </Link>
           ))}
         </section>

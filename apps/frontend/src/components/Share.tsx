@@ -10,6 +10,8 @@ import { useSession } from "@/providers/SessionProvider";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiMultipart } from "@/lib/api";
 
+const MAX_ATTACHMENTS = 10;
+
 const Share = ({ communityId }: { communityId?: number }) => {
   const [mediaList, setMediaList] = useState<{ file: File; preview: string }[]>([]);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -70,6 +72,8 @@ const Share = ({ communityId }: { communityId?: number }) => {
         setError("Please verify your email before posting.");
       } else if (err.message.startsWith("413")) {
         setError("File too large (max 500 MB).");
+      } else if (err.message.includes("FST_REQ_FILES_LIMIT") || err.message.includes("files limit")) {
+        setError(`Too many files (max ${MAX_ATTACHMENTS}).`);
       } else if (err.name === "AbortError") {
         setError("Upload timed out. Try a smaller file or check your connection.");
       } else {
@@ -92,11 +96,26 @@ const Share = ({ communityId }: { communityId?: number }) => {
 
   const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files).map((file) => ({
+      const selected = Array.from(e.target.files);
+      const remainingSlots = MAX_ATTACHMENTS - mediaList.length;
+      if (remainingSlots <= 0) {
+        setError(`You can attach up to ${MAX_ATTACHMENTS} files.`);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+
+      if (selected.length > remainingSlots) {
+        setError(`You can attach up to ${MAX_ATTACHMENTS} files.`);
+      } else {
+        setError(null);
+      }
+
+      const newFiles = selected.slice(0, remainingSlots).map((file) => ({
         file,
         preview: URL.createObjectURL(file),
       }));
       setMediaList((prev) => [...prev, ...newFiles]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 

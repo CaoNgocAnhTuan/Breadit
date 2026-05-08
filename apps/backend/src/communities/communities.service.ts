@@ -2,6 +2,7 @@ import { Injectable, ConflictException, NotFoundException, ForbiddenException } 
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
+import { CacheService } from '../cache/cache.service';
 import { CreateCommunityDto, UpdateCommunityDto } from './dto/community.dto';
 import { CommunityRole } from '@prisma/client';
 
@@ -11,6 +12,7 @@ export class CommunitiesService {
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
     private readonly uploadsService: UploadsService,
+    private readonly cache: CacheService,
   ) {}
 
   async create(userId: string, dto: CreateCommunityDto) {
@@ -140,12 +142,18 @@ export class CommunitiesService {
       await this.prisma.communityMember.delete({
         where: { userId_communityId: { userId, communityId } },
       });
+      // Community membership graph changed.
+      await this.cache.del('graph:communities', [userId]);
+      await this.cache.incrNumber('v:user', [userId]);
       return { joined: false };
     }
 
     await this.prisma.communityMember.create({
       data: { userId, communityId, role: CommunityRole.MEMBER },
     });
+    // Community membership graph changed.
+    await this.cache.del('graph:communities', [userId]);
+    await this.cache.incrNumber('v:user', [userId]);
     return { joined: true };
   }
 

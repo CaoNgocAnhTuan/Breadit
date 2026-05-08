@@ -6,10 +6,14 @@ import {
 } from '@nestjs/common';
 import { CommunityRole } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { BlockService } from '../block/block.service';
+import { CacheService } from '../cache/cache.service';
 import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
 import { NotificationsService } from '../notifications/notifications.service';
 
 const LIMIT = 3;
+const FOLLOW_GRAPH_TTL_SECONDS = 300;
+const COMMUNITIES_GRAPH_TTL_SECONDS = 300;
 
 @Injectable()
 export class PostsService {
@@ -17,6 +21,8 @@ export class PostsService {
     private readonly prisma: PrismaService,
     private readonly uploadsService: UploadsService,
     private readonly notificationsService: NotificationsService,
+    private readonly blockService: BlockService,
+    private readonly cache: CacheService,
   ) {}
 
   private mentionInclude() {
@@ -40,17 +46,54 @@ export class PostsService {
     } as const;
   }
 
+  private async getFolloweesIds(userId: string): Promise<string[]> {
+    return this.cache.getOrSetJson(
+      'graph:follows',
+      [userId],
+      FOLLOW_GRAPH_TTL_SECONDS,
+      async () => {
+        const followees = await this.prisma.follow.findMany({
+          where: { followerId: userId },
+          select: { followingId: true },
+        });
+        return followees.map((f) => f.followingId);
+      },
+    );
+  }
+
+  private async getCommunityIds(userId: string): Promise<number[]> {
+    return this.cache.getOrSetJson(
+      'graph:communities',
+      [userId],
+      COMMUNITIES_GRAPH_TTL_SECONDS,
+      async () => {
+        const memberships = await this.prisma.communityMember.findMany({
+          where: { userId },
+          select: { communityId: true },
+        });
+        return memberships.map((m) => m.communityId);
+      },
+    );
+  }
+
   async findAll(cursor: number, userParam?: string, userId?: string, feed?: string, communityId?: number) {
-    let blockedIds: string[] = [];
-    if (userId) {
-      const rows = await this.prisma.block.findMany({
-        where: { OR: [{ blockerId: userId }, { blockedId: userId }] },
-        select: { blockerId: true, blockedId: true },
-      });
-      blockedIds = rows
-        .flatMap((r) => [r.blockerId, r.blockedId])
-        .filter((id) => id !== userId);
-    }
+    const viewerKey = userId ?? 'guest';
+    const version = userId ? await this.cache.getNumber('v:user', [userId], 0) : 0;
+    const modeKey =
+      communityId != null
+        ? 'community'
+        : userParam && userParam !== 'undefined'
+          ? 'profile'
+          : feed ?? 'home';
+    const ttlSeconds = 10;
+
+    const cached = await this.cache.getJson<{ posts: unknown[]; hasMore: boolean; nextCursor: number | null }>(
+      'feed',
+      [viewerKey, modeKey, userParam ?? '', communityId ?? 0, cursor, version],
+    );
+    if (cached) return cached;
+
+    const blockedIds = userId ? [...(await this.blockService.getAllBlockedPeerIds(userId))] : [];
 
     let whereCondition: any;
     let orderBy: object | object[] = { createdAt: 'desc' };
@@ -73,11 +116,7 @@ export class PostsService {
       orderBy = [{ likes: { _count: 'desc' } }, { createdAt: 'desc' }];
     } else if (feed === 'following' && userId) {
       // Following feed: posts from followed users only (not self)
-      const followees = await this.prisma.follow.findMany({
-        where: { followerId: userId },
-        select: { followingId: true },
-      });
-      const followingIds = followees.map((f) => f.followingId);
+      const followingIds = await this.getFolloweesIds(userId);
 
       whereCondition = {
         parentPostId: null,
@@ -90,11 +129,7 @@ export class PostsService {
       };
     } else if (feed === 'communities' && userId) {
       // Communities feed: posts from all communities user is a member of
-      const memberships = await this.prisma.communityMember.findMany({
-        where: { userId },
-        select: { communityId: true },
-      });
-      const communityIds = memberships.map((m) => m.communityId);
+      const communityIds = await this.getCommunityIds(userId);
 
       whereCondition = {
         parentPostId: null,
@@ -106,16 +141,13 @@ export class PostsService {
     } else if (userParam && userParam !== 'undefined') {
       whereCondition = { parentPostId: null, userId: userParam, deletedAt: null, communityId: null };
     } else if (userId) {
-      const followees = await this.prisma.follow.findMany({
-        where: { followerId: userId },
-        select: { followingId: true },
-      });
+      const followees = await this.getFolloweesIds(userId);
       whereCondition = {
         parentPostId: null,
         deletedAt: null,
         communityId: null,
         userId: {
-          in: [userId, ...followees.map((f) => f.followingId)],
+          in: [userId, ...followees],
           ...(blockedIds.length ? { notIn: blockedIds } : {}),
         },
       };
@@ -143,19 +175,36 @@ export class PostsService {
 
     const totalPosts = await this.prisma.post.count({ where: whereCondition });
     const hasMore = cursor * LIMIT < totalPosts;
+    const nextCursor = hasMore ? cursor + 1 : null;
 
-    return { posts, hasMore };
+    const result = { posts, hasMore, nextCursor };
+    await this.cache.setJson(
+      'feed',
+      [viewerKey, modeKey, userParam ?? '', communityId ?? 0, cursor, version],
+      result,
+      ttlSeconds,
+    );
+    return result;
   }
 
   async findOne(postId: number, userId?: string) {
     const include = this.postInclude(userId);
-    return this.prisma.post.findFirst({
+    const post = await this.prisma.post.findFirst({
       where: { id: postId, deletedAt: null },
       include: {
         ...include,
         community: { select: { name: true, slug: true } },
       },
     });
+    if (
+      post &&
+      userId &&
+      post.userId !== userId &&
+      (await this.blockService.isBlockedPair(userId, post.userId))
+    ) {
+      return null;
+    }
+    return post;
   }
 
   async create(

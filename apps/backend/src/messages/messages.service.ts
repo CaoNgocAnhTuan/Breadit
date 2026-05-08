@@ -3,8 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { BlockService } from '../block/block.service';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { PrismaService } from '../prisma/prisma.service';
+import { CacheService } from '../cache/cache.service';
 import { CreateConversationDto, CreateMessageDto } from './dto/create-message.dto';
 
 const MEMBER_SELECT = {
@@ -19,11 +21,15 @@ export class MessagesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly gateway: NotificationsGateway,
+    private readonly blockService: BlockService,
+    private readonly cache: CacheService,
   ) {}
 
   async searchConversations(userId: string, q: string) {
     const term = (q ?? '').trim();
     if (!term) return { users: [], messages: [] };
+
+    const blockedPeers = await this.blockService.getAllBlockedPeerIds(userId);
 
     const memberships = await this.prisma.conversationMember.findMany({
       where: { userId },
@@ -69,36 +75,60 @@ export class MessagesService {
       }),
     ]);
 
-    const users = userRows.map((r) => ({
-      conversationId: r.conversationId,
-      otherMember: r.user,
-    }));
+    const users = userRows
+      .filter((r) => !blockedPeers.has(r.user.id))
+      .map((r) => ({
+        conversationId: r.conversationId,
+        otherMember: r.user,
+      }));
 
-    const messages = messageRows.map((m) => {
-      const otherMember =
-        m.conversation.members.find((mem) => mem.userId !== userId)?.user ??
-        { id: '', username: '[deleted]', displayName: null, img: null };
+    const messages = messageRows
+      .filter((m) => {
+        const otherMember =
+          m.conversation.members.find((mem) => mem.userId !== userId)?.user ??
+          null;
+        return otherMember && !blockedPeers.has(otherMember.id);
+      })
+      .map((m) => {
+        const otherMember =
+          m.conversation.members.find((mem) => mem.userId !== userId)?.user ??
+          { id: '', username: '[deleted]', displayName: null, img: null };
 
-      return {
-        conversationId: m.conversationId,
-        otherMember,
-        message: {
-          id: m.id,
-          body: m.body,
-          mediaUrl: m.mediaUrl,
-          senderId: m.senderId,
-          createdAt: m.createdAt,
-        },
-      };
-    });
+        return {
+          conversationId: m.conversationId,
+          otherMember,
+          message: {
+            id: m.id,
+            body: m.body,
+            mediaUrl: m.mediaUrl,
+            senderId: m.senderId,
+            createdAt: m.createdAt,
+          },
+        };
+      });
 
     return { users, messages };
   }
 
   async getConversations(userId: string, cursor?: number) {
+    const blockedPeers = await this.blockService.getAllBlockedPeerIds(userId);
+
     const where: Record<string, unknown> = {
       members: { some: { userId } },
     };
+
+    if (blockedPeers.size > 0) {
+      const peerList = [...blockedPeers];
+      const blockedMemberRows = await this.prisma.conversationMember.findMany({
+        where: { userId: { in: peerList } },
+        select: { conversationId: true },
+      });
+      const excludeIds = [...new Set(blockedMemberRows.map((r) => r.conversationId))];
+      if (excludeIds.length) {
+        where['id'] = { notIn: excludeIds };
+      }
+    }
+
     if (cursor) {
       const pivot = await this.prisma.conversation.findUnique({
         where: { id: cursor },
@@ -124,13 +154,19 @@ export class MessagesService {
         const myMember = conv.members.find((m) => m.userId === userId)!;
         const otherMember = conv.members.find((m) => m.userId !== userId);
 
-        const unreadCount = await this.prisma.message.count({
-          where: {
-            conversationId: conv.id,
-            senderId: { not: userId },
-            createdAt: { gt: myMember.lastReadAt },
-          },
-        });
+        const cachedUnread = await this.cache.getJson<number>('dm:unreadCount', [conv.id, userId]);
+        const unreadCount =
+          cachedUnread ?? (await this.prisma.message.count({
+            where: {
+              conversationId: conv.id,
+              senderId: { not: userId },
+              createdAt: { gt: myMember.lastReadAt },
+            },
+          }));
+
+        if (cachedUnread === null) {
+          await this.cache.setJson('dm:unreadCount', [conv.id, userId], unreadCount, 60);
+        }
 
         const lastMsg = conv.messages[0] ?? null;
 
@@ -168,6 +204,8 @@ export class MessagesService {
       throw new ForbiddenException('Cannot message yourself');
     }
 
+    await this.blockService.assertNotBlockedPair(userId, targetUserId);
+
     const existing = await this.prisma.conversation.findFirst({
       where: {
         AND: [
@@ -189,6 +227,7 @@ export class MessagesService {
 
   async getConversationById(conversationId: number, userId: string) {
     await this.assertMember(conversationId, userId);
+    await this.assertConversationNotBlocked(conversationId, userId);
     const conv = await this.prisma.conversation.findUnique({
       where: { id: conversationId },
       include: { members: { include: { user: { select: MEMBER_SELECT } } } },
@@ -211,6 +250,7 @@ export class MessagesService {
 
   async getMessages(conversationId: number, userId: string, cursor?: number) {
     await this.assertMember(conversationId, userId);
+    await this.assertConversationNotBlocked(conversationId, userId);
 
     const messages = await this.prisma.message.findMany({
       where: {
@@ -238,6 +278,7 @@ export class MessagesService {
     dto: CreateMessageDto,
   ) {
     await this.assertMember(conversationId, senderId);
+    await this.assertConversationNotBlocked(conversationId, senderId);
 
     if (!dto.body && !dto.mediaUrl) {
       throw new ForbiddenException('Message must have body or media');
@@ -275,16 +316,25 @@ export class MessagesService {
         .emit('newMessage', { conversationId, message, sender: senderUser });
     }
 
+    // Receiver unread count changed due to new message.
+    if (otherMember) {
+      await this.cache.del('dm:unreadCount', [conversationId, otherMember.userId]);
+    }
+
     return message;
   }
 
   async markRead(conversationId: number, userId: string) {
     await this.assertMember(conversationId, userId);
+    await this.assertConversationNotBlocked(conversationId, userId);
 
     await this.prisma.conversationMember.update({
       where: { conversationId_userId: { conversationId, userId } },
       data: { lastReadAt: new Date() },
     });
+
+    // Reader unread count for this conversation becomes 0.
+    await this.cache.del('dm:unreadCount', [conversationId, userId]);
 
     const otherMember = await this.prisma.conversationMember.findFirst({
       where: { conversationId, userId: { not: userId } },
@@ -299,8 +349,23 @@ export class MessagesService {
   }
 
   async getUnreadCount(userId: string) {
+    const blockedPeers = await this.blockService.getAllBlockedPeerIds(userId);
+    let excludeConvIds: number[] = [];
+    if (blockedPeers.size > 0) {
+      const rows = await this.prisma.conversationMember.findMany({
+        where: { userId: { in: [...blockedPeers] } },
+        select: { conversationId: true },
+      });
+      excludeConvIds = [...new Set(rows.map((r) => r.conversationId))];
+    }
+
     const members = await this.prisma.conversationMember.findMany({
-      where: { userId },
+      where: {
+        userId,
+        ...(excludeConvIds.length > 0
+          ? { conversationId: { notIn: excludeConvIds } }
+          : {}),
+      },
       select: { conversationId: true, lastReadAt: true },
     });
 
@@ -318,6 +383,14 @@ export class MessagesService {
     }
 
     return { count };
+  }
+
+  private async assertConversationNotBlocked(conversationId: number, userId: string) {
+    const other = await this.prisma.conversationMember.findFirst({
+      where: { conversationId, userId: { not: userId } },
+      select: { userId: true },
+    });
+    if (other) await this.blockService.assertNotBlockedPair(userId, other.userId);
   }
 
   private async assertMember(conversationId: number, userId: string) {

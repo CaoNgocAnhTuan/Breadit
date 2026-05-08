@@ -50,6 +50,8 @@ export class HashtagsService {
     const posts = await this.prisma.post.findMany({
       where: {
         deletedAt: null,
+        parentPostId: null,
+        communityId: null,
         tags: { some: { hashtag: { tag: normalized } } },
       },
       include: { rePost: { include }, ...include },
@@ -60,9 +62,13 @@ export class HashtagsService {
     const total = await this.prisma.post.count({
       where: {
         deletedAt: null,
+        parentPostId: null,
+        communityId: null,
         tags: { some: { hashtag: { tag: normalized } } },
       },
     });
-    return { posts, hasMore: cursor * LIMIT < total, tag: normalized };
+    const hasMore = cursor * LIMIT < total;
+    const nextCursor = hasMore ? cursor + 1 : null;
+    return { posts, hasMore, nextCursor, tag: normalized };
   }
 }

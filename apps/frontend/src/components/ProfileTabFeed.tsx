@@ -116,6 +116,10 @@ const ProfileTabFeed = ({
         `${BACKEND_URL}/api/users/${username}/posts?${params.toString()}`,
         { credentials: "include" }
       );
+      if (res.status === 403) {
+        return { posts: [], hasMore: false, forbidden: true };
+      }
+      if (!res.ok) throw new Error("Failed to load profile posts");
       return res.json();
     },
     initialPageParam: 1,
@@ -125,6 +129,16 @@ const ProfileTabFeed = ({
 
   if (error) return <p className="p-8 text-center text-textGray">Something went wrong.</p>;
   if (status === "pending") return <p className="p-8 text-center text-textGray">Loading...</p>;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const forbidden = data?.pages?.some((page: any) => page.forbidden);
+  if (forbidden) {
+    return (
+      <p className="p-8 text-center text-textGray">
+        Profile content isn&apos;t available.
+      </p>
+    );
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const allPosts = data?.pages?.flatMap((page: any) => page.posts) ?? [];

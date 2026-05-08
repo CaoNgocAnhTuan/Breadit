@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import { AuthModule } from './auth/auth.module';
 import { CommunitiesModule } from './communities/communities.module';
 import { HashtagsModule } from './hashtags/hashtags.module';
@@ -17,13 +18,21 @@ import { UploadsModule } from './uploads/uploads.module';
 import { UsersModule } from './users/users.module';
 import { AdminModule } from './admin/admin.module';
 import { CommentsModule } from './comments/comments.module';
+import { CacheModule } from './cache/cache.module';
+import Redis from 'ioredis';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 120 }]),
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 60000, limit: 120 }],
+      storage: new ThrottlerStorageRedisService(
+        new Redis(process.env.REDIS_URL ?? 'redis://redis:6379'),
+      ),
+    }),
     PrismaModule,
     RedisModule,
+    CacheModule,
     AuthModule,
     HealthModule,
     PostsModule,

@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { NotificationType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsGateway } from './notifications.gateway';
+import { BlockService } from '../block/block.service';
+import { CacheService } from '../cache/cache.service';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly gateway: NotificationsGateway,
+    private readonly blockService: BlockService,
+    private readonly cache: CacheService,
   ) {}
 
   async emit(
@@ -42,13 +46,16 @@ export class NotificationsService {
     const PAGE_SIZE = 20;
     const skip = (cursor - 1) * PAGE_SIZE;
 
-    const blockRows = await this.prisma.block.findMany({
-      where: { OR: [{ blockerId: userId }, { blockedId: userId }] },
-      select: { blockerId: true, blockedId: true },
-    });
-    const blockedIds = blockRows
-      .flatMap((r) => [r.blockerId, r.blockedId])
-      .filter((id) => id !== userId);
+    const version = await this.cache.getNumber('v:user', [userId], 0);
+    const ttlSeconds = 10;
+    const cached = await this.cache.getJson<{
+      items: unknown[];
+      nextCursor: number | null;
+      total: number;
+    }>('notifications', [userId, cursor, unread, version]);
+    if (cached) return cached;
+
+    const blockedIds = [...(await this.blockService.getAllBlockedPeerIds(userId))];
 
     const where = {
       recipientId: userId,
@@ -70,11 +77,13 @@ export class NotificationsService {
       this.prisma.notification.count({ where }),
     ]);
 
-    return {
+    const result = {
       items,
       nextCursor: skip + items.length < total ? cursor + 1 : null,
       total,
     };
+    await this.cache.setJson('notifications', [userId, cursor, unread, version], result, ttlSeconds);
+    return result;
   }
 
   async markRead(userId: string, notifId: number) {
@@ -82,6 +91,7 @@ export class NotificationsService {
       where: { id: notifId, recipientId: userId },
       data: { readAt: new Date() },
     });
+    await this.cache.incrNumber('v:user', [userId]);
     return { ok: true };
   }
 
@@ -90,6 +100,7 @@ export class NotificationsService {
       where: { recipientId: userId, readAt: null },
       data: { readAt: new Date() },
     });
+    await this.cache.incrNumber('v:user', [userId]);
     return { count: result.count };
   }
 }

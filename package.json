@@ -10,6 +10,7 @@
     "lint":      "npm run lint -w @breadit/frontend",
     "typecheck": "npm run typecheck -w @breadit/frontend",
     "dev:reset": "npm run dev:reset -w @breadit/frontend",
+    "dataset:humans": "powershell -ExecutionPolicy Bypass -File scripts/dataset-humans.ps1",
     "prepare":   "husky"
   },
   "lint-staged": {

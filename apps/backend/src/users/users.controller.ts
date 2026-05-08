@@ -82,6 +82,12 @@ export class UsersController {
     return this.usersService.getConnectUsers(req.user!.id, parseInt(cursor ?? '1', 10));
   }
 
+  @Get('me/blocked')
+  @UseGuards(JwtAuthGuard, BannedUserGuard)
+  listBlocked(@Req() req: AuthedRequest) {
+    return this.usersService.listBlockedAccounts(req.user!.id);
+  }
+
   @Get(':username/posts')
   @UseGuards(OptionalJwtAuthGuard)
   getProfilePosts(
@@ -101,19 +107,31 @@ export class UsersController {
   }
 
   @Get(':username/followers')
+  @UseGuards(OptionalJwtAuthGuard)
   getFollowers(
     @Param('username') username: string,
     @Query('cursor') cursor: string,
+    @Req() req: AuthedRequest,
   ) {
-    return this.usersService.getFollowers(username, parseInt(cursor ?? '1', 10));
+    return this.usersService.getFollowers(
+      username,
+      parseInt(cursor ?? '1', 10),
+      req.user?.id,
+    );
   }
 
   @Get(':username/following')
+  @UseGuards(OptionalJwtAuthGuard)
   getFollowing(
     @Param('username') username: string,
     @Query('cursor') cursor: string,
+    @Req() req: AuthedRequest,
   ) {
-    return this.usersService.getFollowing(username, parseInt(cursor ?? '1', 10));
+    return this.usersService.getFollowing(
+      username,
+      parseInt(cursor ?? '1', 10),
+      req.user?.id,
+    );
   }
 
   @Get('me/saved')

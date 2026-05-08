@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import FollowButton from "./FollowButton";
 import Image from "./Image";
 import { api } from "@/lib/api";
@@ -9,27 +10,36 @@ import { api } from "@/lib/api";
 const UserActions = ({
   userId,
   isFollowed,
-  isBlocked,
+  youBlockedThem,
+  theyBlockedYou,
   username,
 }: {
   userId: string;
   isFollowed: boolean;
-  isBlocked: boolean;
+  youBlockedThem: boolean;
+  theyBlockedYou: boolean;
   username: string;
 }) => {
-  const [blocked, setBlocked] = useState(isBlocked);
+  const [youBlocked, setYouBlocked] = useState(youBlockedThem);
   const [menuOpen, setMenuOpen] = useState(false);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const blockMutation = useMutation({
     mutationFn: () =>
       api(`/api/users/${userId}/block`, { method: "POST" }),
-    onMutate: () => setBlocked((b) => !b),
+    onMutate: () => setYouBlocked((b) => !b),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["profile-posts"] });
+      router.refresh();
     },
-    onError: () => setBlocked((b) => !b),
+    onError: () => setYouBlocked((b) => !b),
   });
+
+  if (theyBlockedYou && !youBlocked) {
+    return null;
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -50,12 +60,12 @@ const UserActions = ({
               disabled={blockMutation.isPending}
               className="w-full text-left px-4 py-3 text-red-400 hover:bg-white/10 rounded-xl text-sm font-semibold disabled:opacity-50"
             >
-              {blocked ? `Unblock @${username}` : `Block @${username}`}
+              {youBlocked ? `Unblock @${username}` : `Block @${username}`}
             </button>
           </div>
         )}
       </div>
-      {!blocked && (
+      {!youBlocked && (
         <FollowButton
           userId={userId}
           isFollowed={isFollowed}

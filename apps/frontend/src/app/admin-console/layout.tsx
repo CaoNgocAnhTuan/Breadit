@@ -37,7 +37,7 @@ export default async function AdminLayout({
             Back to App
           </Link>
           <div className="flex justify-center p-3">
-            <Logout />
+            <Logout username={session.user.username} />
           </div>
         </div>
       </div>

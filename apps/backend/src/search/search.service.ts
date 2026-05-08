@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { BlockService } from '../block/block.service';
+import { CacheService } from '../cache/cache.service';
 
 const RESULT_LIMIT = 5;
 
 @Injectable()
 export class SearchService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly blockService: BlockService,
+    private readonly cache: CacheService,
+  ) {}
 
   async search(q: string, userId?: string) {
     if (!q || q.trim().length === 0) {
@@ -13,17 +19,20 @@ export class SearchService {
     }
 
     const term = q.trim();
+    const viewerKey = userId ?? 'guest';
+    const normalized = term.toLowerCase();
+    const version = userId ? await this.cache.getNumber('v:user', [userId], 0) : 0;
+    const ttlSeconds = 10;
 
-    let blockedIds: string[] = [];
-    if (userId) {
-      const rows = await this.prisma.block.findMany({
-        where: { OR: [{ blockerId: userId }, { blockedId: userId }] },
-        select: { blockerId: true, blockedId: true },
-      });
-      blockedIds = rows
-        .flatMap((r) => [r.blockerId, r.blockedId])
-        .filter((id) => id !== userId);
-    }
+    const cached = await this.cache.getJson<{
+      posts: unknown[];
+      users: unknown[];
+      hashtags: unknown[];
+      communities: unknown[];
+    }>('search', [viewerKey, normalized, version]);
+    if (cached) return cached;
+
+    const blockedIds = userId ? [...(await this.blockService.getAllBlockedPeerIds(userId))] : [];
 
     const [posts, users, hashtags, communities] = await Promise.all([
       this.prisma.post.findMany({
@@ -63,7 +72,7 @@ export class SearchService {
         take: RESULT_LIMIT,
       }),
       this.prisma.hashtag.findMany({
-        where: { tag: { contains: term.toLowerCase(), mode: 'insensitive' } },
+        where: { tag: { contains: normalized, mode: 'insensitive' } },
         select: { id: true, tag: true },
         take: RESULT_LIMIT,
       }),
@@ -79,6 +88,8 @@ export class SearchService {
       }),
     ]);
 
-    return { posts, users, hashtags, communities };
+    const result = { posts, users, hashtags, communities };
+    await this.cache.setJson('search', [viewerKey, normalized, version], result, ttlSeconds);
+    return result;
   }
 }
