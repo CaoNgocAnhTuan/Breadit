@@ -160,7 +160,9 @@ export class UsersService {
       orderBy: { createdAt: 'desc' },
     });
     const total = await this.prisma.post.count({ where: whereCondition });
-    return { posts, hasMore: cursor * POST_LIMIT < total };
+    const hasMore = cursor * POST_LIMIT < total;
+    const nextCursor = hasMore ? cursor + 1 : null;
+    return { posts, hasMore, nextCursor };
   }
 
   private async getUserComments(
@@ -194,7 +196,9 @@ export class UsersService {
       }),
       this.prisma.comment.count({ where }),
     ]);
-    return { posts: comments, hasMore: cursor * POST_LIMIT < total };
+    const hasMore = cursor * POST_LIMIT < total;
+    const nextCursor = hasMore ? cursor + 1 : null;
+    return { posts: comments, hasMore, nextCursor };
   }
 
   async searchFollowing(userId: string, q: string) {

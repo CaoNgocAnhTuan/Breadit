@@ -1,15 +1,16 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { type InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Post, { PostWithDetails } from "./Post";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
 
-type PostPage = { posts: PostWithDetails[]; hasMore: boolean };
+type PostPage = { posts: PostWithDetails[]; hasMore: boolean; nextCursor?: number | string | null };
+type PostFeedData = InfiniteData<PostPage, number | string>;
 
 const fetchPosts = async (
-  pageParam: number,
+  pageParam: number | string,
   userProfileId?: string,
   feed?: string,
   communityId?: number
@@ -35,23 +36,28 @@ const InfiniteFeed = ({
   communityId?: number;
   initialData?: PostPage;
 }) => {
-  const { data, error, hasNextPage, fetchNextPage } = useInfiniteQuery({
+  const { data, error, hasNextPage, fetchNextPage } = useInfiniteQuery<
+    PostPage,
+    Error,
+    PostFeedData,
+    (string | number)[],
+    number | string
+  >({
     queryKey: ["posts", userProfileId ?? "", feed ?? "", communityId ?? ""],
     queryFn: ({ pageParam }) =>
-      fetchPosts(pageParam as number, userProfileId, feed, communityId),
+      fetchPosts(pageParam as number | string, userProfileId, feed, communityId),
     initialPageParam: 1,
     initialData: initialData
       ? { pages: [initialData], pageParams: [1] }
       : undefined,
     refetchOnMount: true,
-    getNextPageParam: (lastPage, pages) =>
-      lastPage.hasMore ? pages.length + 1 : undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 
   if (error) return "Something went wrong!";
   if (!data) return "Loading...";
 
-  const allPosts = data.pages.flatMap((page) => page.posts);
+  const allPosts = data.pages.flatMap((page: PostPage) => page.posts);
 
   return (
     <InfiniteScroll
@@ -61,7 +67,7 @@ const InfiniteFeed = ({
       loader={<h1>Posts are loading...</h1>}
       endMessage={<h1>All posts loaded!</h1>}
     >
-      {allPosts.map((post) => (
+      {allPosts.map((post: PostWithDetails) => (
         <Post key={post.id} post={post} />
       ))}
     </InfiniteScroll>

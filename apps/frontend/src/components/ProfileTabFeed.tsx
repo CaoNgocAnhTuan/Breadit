@@ -1,6 +1,6 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { type InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Post from "./Post";
 import RichText from "./RichText";
@@ -9,6 +9,14 @@ import Image from "./Image";
 import { format } from "timeago.js";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
+
+type ProfileTabPage = {
+  posts: unknown[];
+  hasMore: boolean;
+  nextCursor?: number | string | null;
+  forbidden?: boolean;
+};
+type ProfileTabData = InfiniteData<ProfileTabPage, number | string>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function ReplyThread({ comment }: { comment: any }) {
@@ -104,7 +112,13 @@ const ProfileTabFeed = ({
   tab: string;
   query: string;
 }) => {
-  const { data, error, status, hasNextPage, fetchNextPage } = useInfiniteQuery({
+  const { data, error, isPending, hasNextPage, fetchNextPage } = useInfiniteQuery<
+    ProfileTabPage,
+    Error,
+    ProfileTabData,
+    string[],
+    number | string
+  >({
     queryKey: ["profile-posts", username, tab, query],
     queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
@@ -123,12 +137,12 @@ const ProfileTabFeed = ({
       return res.json();
     },
     initialPageParam: 1,
-    getNextPageParam: (lastPage, pages) =>
-      lastPage.hasMore ? pages.length + 1 : undefined,
+    getNextPageParam: (lastPage) =>
+      lastPage.nextCursor ?? undefined,
   });
 
   if (error) return <p className="p-8 text-center text-textGray">Something went wrong.</p>;
-  if (status === "pending") return <p className="p-8 text-center text-textGray">Loading...</p>;
+  if (isPending) return <p className="p-8 text-center text-textGray">Loading...</p>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const forbidden = data?.pages?.some((page: any) => page.forbidden);

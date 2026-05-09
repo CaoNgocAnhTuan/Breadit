@@ -9,7 +9,7 @@ const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type PostPage = { posts: any[]; hasMore: boolean; tag: string };
+type PostPage = { posts: any[]; hasMore: boolean; tag: string; nextCursor?: number | string | null };
 
 const HashtagPage = ({ params }: { params: Promise<{ tag: string }> }) => {
   const { tag } = use(params);
@@ -19,14 +19,13 @@ const HashtagPage = ({ params }: { params: Promise<{ tag: string }> }) => {
       queryKey: ["hashtag", tag],
       queryFn: async ({ pageParam = 1 }) => {
         const res = await fetch(
-          `${BACKEND_URL}/api/hashtags/${tag}/posts?cursor=${pageParam}`,
+          `${BACKEND_URL}/api/hashtags/${tag}/posts?cursor=${encodeURIComponent(String(pageParam))}`,
           { credentials: "include" }
         );
         return res.json();
       },
       initialPageParam: 1,
-      getNextPageParam: (lastPage, pages) =>
-        lastPage.hasMore ? pages.length + 1 : undefined,
+      getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     });
 
   const allPosts = data?.pages.flatMap((p) => p.posts) ?? [];

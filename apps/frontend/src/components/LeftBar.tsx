@@ -71,7 +71,7 @@ const LeftBar = async () => {
           className="p-2 rounded-full hover:bg-[#181818] flex items-center gap-3"
         >
           <Image path="icons/logo.svg" alt="logo" w={30} h={30} />
-          <span className="hidden xxl:inline font-bold tracking-tight">Breadit</span>
+          <span style={{ color:'#D9A46F.' }} className="hidden xxl:inline font-bold tracking-tight">Breadit</span>
         </Link>
         {/* MENU LIST */}
         <div className="flex flex-col gap-4">

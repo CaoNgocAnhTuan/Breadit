@@ -26,6 +26,22 @@ type AuthedRequest = FastifyRequest & {
   user?: { id: string; username: string };
 };
 
+function mapMultipartUploadError(err: unknown): { status: 'payload_too_large' | 'bad_request'; message: string } {
+  const e = err as { code?: string; message?: string };
+  const code = e?.code;
+  const message = String(e?.message ?? '');
+
+  if (code === 'FST_REQ_FILE_TOO_LARGE') {
+    return { status: 'payload_too_large', message: 'File exceeds 500 MB limit' };
+  }
+
+  if (code === 'FST_REQ_FILES_LIMIT' || /files limit/i.test(message)) {
+    return { status: 'bad_request', message: 'Too many files (max 10).' };
+  }
+
+  return { status: 'bad_request', message: `Malformed upload: ${message}` };
+}
+
 @Controller('api')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
@@ -69,11 +85,9 @@ export class CommentsController {
         }
       }
     } catch (err) {
-      const code = (err as { code?: string }).code;
-      if (code === 'FST_REQ_FILE_TOO_LARGE') {
-        throw new PayloadTooLargeException('File exceeds 500 MB limit');
-      }
-      throw new BadRequestException(`Malformed upload: ${(err as Error).message}`);
+      const mapped = mapMultipartUploadError(err);
+      if (mapped.status === 'payload_too_large') throw new PayloadTooLargeException(mapped.message);
+      throw new BadRequestException(mapped.message);
     }
 
     if (body.body == null) throw new BadRequestException('Missing body');
@@ -129,11 +143,9 @@ export class CommentsController {
         }
       }
     } catch (err) {
-      const code = (err as { code?: string }).code;
-      if (code === 'FST_REQ_FILE_TOO_LARGE') {
-        throw new PayloadTooLargeException('File exceeds 500 MB limit');
-      }
-      throw new BadRequestException(`Malformed upload: ${(err as Error).message}`);
+      const mapped = mapMultipartUploadError(err);
+      if (mapped.status === 'payload_too_large') throw new PayloadTooLargeException(mapped.message);
+      throw new BadRequestException(mapped.message);
     }
 
     return this.commentsService.update(id, req.user!.id, body, bufferedFiles);
