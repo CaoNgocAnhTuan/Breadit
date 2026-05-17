@@ -1,0 +1,53 @@
+@startuml UC-10 Administrative Moderation
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+' === PART 1: BAN / UNBAN SYSTEM USER ===
+|System Admin|
+start
+:Click Ban / Unban on user profile;
+
+|System|
+if (Has Admin permissions?) then (no)
+  :Deny access;
+  stop
+else (yes)
+endif
+if (Target user is Admin?) then (yes)
+  :Deny action (Cannot ban another Admin);
+  stop
+else (no)
+endif
+:Update user access status;
+:Display updated user status;
+
+' === PART 2: MODERATE REPORTS ===
+|System Admin|
+:Review user report;
+if (Action == Dismiss?) then (yes)
+  :Select Dismiss;
+else (no)
+  :Select Delete Post;
+endif
+
+|System|
+if (Has Admin permissions?) then (no)
+  :Deny access;
+  stop
+else (yes)
+endif
+if (Action == Delete Post?) then (yes)
+  :Remove reported post\nfrom system;
+else (no)
+endif
+:Mark report as resolved;
+:Remove report from active list;
+
+stop
+
+@enduml

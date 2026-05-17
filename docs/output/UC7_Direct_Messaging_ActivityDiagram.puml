@@ -1,0 +1,55 @@
+@startuml UC-7 Direct Messaging
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+' === PART 1: START A CONVERSATION ===
+|User|
+start
+:Open a user profile\nand click Message;
+
+|System|
+if (Blocked relationship exists?) then (yes)
+  :Deny access;
+  stop
+else (no)
+endif
+if (Conversation already exists?) then (yes)
+  :Open existing conversation;
+else (no)
+  :Create new conversation thread;
+endif
+
+' === PART 2: SEND A MESSAGE ===
+|User|
+:Type and send a message;
+
+|System|
+if (Is a member of conversation?) then (no)
+  :Deny access;
+  stop
+else (yes)
+endif
+:Save message;
+:Send real-time notification\nto recipient;
+:Display sent message;
+
+|User|
+:Recipient receives message instantly;
+
+' === PART 3: MARK AS READ ===
+|User|
+:Open conversation;
+
+|System|
+:Mark unread messages as read;
+:Notify sender that message was read;
+:Clear unread badge;
+
+stop
+
+@enduml

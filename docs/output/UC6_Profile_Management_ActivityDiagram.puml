@@ -1,0 +1,41 @@
+@startuml UC-6 Profile Management
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+' === PART 1: VIEW PROFILE ===
+|User|
+start
+:Visit a user profile;
+
+|System|
+if (Block relationship exists?) then (yes)
+  :Display restricted profile\n(no bio, no follower count);
+else (no)
+  :Display full profile data;
+endif
+
+' === PART 2: VIEW PROFILE TABS ===
+|User|
+:Switch profile tab\n(Posts / Replies / Media / Likes);
+
+|System|
+:Retrieve selected content;
+:Display tab content;
+
+' === PART 3: EDIT PROFILE ===
+|User|
+:Edit profile info\n(display name, bio, avatar, etc.);
+:Click Save;
+
+|System|
+:Apply changes to profile;
+:Display updated profile;
+
+stop
+
+@enduml

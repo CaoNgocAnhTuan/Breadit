@@ -1,0 +1,273 @@
+// ============================================
+// ENUMS
+// ============================================
+
+Enum Role {
+  USER
+  ADMIN
+}
+
+Enum NotificationType {
+  REPLY
+  LIKE
+  FOLLOW
+  MENTION
+  COMMUNITY_POST
+  COMMUNITY_NEW_POST
+}
+
+Enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+
+Enum CommunityRole {
+  MEMBER
+  MOD
+  OWNER
+}
+
+// ============================================
+// TABLES
+// ============================================
+
+Table User {
+  id String [pk]
+  email String [unique]
+  username String [unique]
+  password String [note: 'nullable']
+  emailVerified DateTime [note: 'nullable']
+  displayName String [note: 'nullable']
+  bio String [note: 'nullable']
+  role Role
+  banned Boolean
+  createdAt DateTime
+}
+
+Table VerificationToken {
+  identifier String [pk]
+  token String [pk]
+  expires DateTime
+}
+
+Table Follow {
+  id Int [pk]
+  followerId String
+  followingId String
+  notify Boolean
+  createdAt DateTime
+}
+
+Table Block {
+  id Int [pk]
+  blockerId String
+  blockedId String
+  createdAt DateTime
+}
+
+Table Post {
+  id Int [pk]
+  userId String
+  rePostId Int [note: 'nullable']
+  parentPostId Int [note: 'nullable']
+  communityId Int [note: 'nullable']
+  desc String [note: 'nullable']
+  isSensitive Boolean
+  isApproved Boolean
+  createdAt DateTime
+  deletedAt DateTime [note: 'nullable']
+}
+
+Table PostMedia {
+  id Int [pk]
+  postId Int
+  url String
+  type String
+  createdAt DateTime
+}
+
+Table Hashtag {
+  id Int [pk]
+  tag String [unique]
+  createdAt DateTime
+}
+
+Table PostTag {
+  postId Int [pk]
+  hashtagId Int [pk]
+}
+
+Table Comment {
+  id Int [pk]
+  userId String
+  postId Int
+  parentCommentId Int [note: 'nullable']
+  body String
+  createdAt DateTime
+  deletedAt DateTime [note: 'nullable']
+}
+
+Table CommentMedia {
+  id Int [pk]
+  commentId Int
+  url String
+  type String
+  createdAt DateTime
+}
+
+Table Like {
+  id Int [pk]
+  userId String
+  postId Int
+  createdAt DateTime
+}
+
+Table SavedPosts {
+  id Int [pk]
+  userId String
+  postId Int
+  createdAt DateTime
+}
+
+Table CommentLike {
+  id Int [pk]
+  userId String
+  commentId Int
+  createdAt DateTime
+}
+
+Table Mention {
+  id Int [pk]
+  userId String
+  postId Int [note: 'nullable']
+  commentId Int [note: 'nullable']
+  username String
+  createdAt DateTime
+}
+
+Table Notification {
+  id Int [pk]
+  recipientId String
+  actorId String
+  postId Int [note: 'nullable']
+  commentId Int [note: 'nullable']
+  type NotificationType
+  readAt DateTime [note: 'nullable']
+  createdAt DateTime
+}
+
+Table Conversation {
+  id Int [pk]
+  createdAt DateTime
+  updatedAt DateTime
+}
+
+Table ConversationMember {
+  conversationId Int [pk]
+  userId String [pk]
+  lastReadAt DateTime
+}
+
+Table Message {
+  id Int [pk]
+  conversationId Int
+  senderId String
+  body String [note: 'nullable']
+  mediaUrl String [note: 'nullable']
+  createdAt DateTime
+}
+
+Table Community {
+  id Int [pk]
+  slug String [unique]
+  name String
+  description String [note: 'nullable']
+  createdAt DateTime
+}
+
+Table CommunityMember {
+  id Int [pk]
+  userId String
+  communityId Int
+  role CommunityRole
+  createdAt DateTime
+}
+
+Table CommunityRule {
+  id Int [pk]
+  communityId Int
+  title String
+  createdAt DateTime
+}
+
+Table CommunityBannedUser {
+  id Int [pk]
+  userId String
+  communityId Int
+  createdAt DateTime
+}
+
+Table Report {
+  id Int [pk]
+  reporterId String
+  postId Int
+  reason String
+  status ReportStatus
+  createdAt DateTime
+}
+
+// ============================================
+// RELATIONSHIPS
+// ============================================
+
+// User relations
+Ref: User.id < Post.userId
+Ref: User.id < Comment.userId
+Ref: User.id < Like.userId
+Ref: User.id < SavedPosts.userId
+Ref: User.id < CommentLike.userId
+Ref: User.id < Follow.followerId
+Ref: User.id < Follow.followingId
+Ref: User.id < Block.blockerId
+Ref: User.id < Block.blockedId
+Ref: User.id < Notification.recipientId
+Ref: User.id < Notification.actorId
+Ref: User.id < Report.reporterId
+Ref: User.id < ConversationMember.userId
+Ref: User.id < Message.senderId
+Ref: User.id < CommunityMember.userId
+Ref: User.id < CommunityBannedUser.userId
+Ref: User.id < Mention.userId
+
+// Post relations
+Ref: Post.id < PostMedia.postId
+Ref: Post.id < Comment.postId
+Ref: Post.id < Like.postId
+Ref: Post.id < SavedPosts.postId
+Ref: Post.id < PostTag.postId
+Ref: Post.id < Notification.postId
+Ref: Post.id < Report.postId
+Ref: Post.id < Mention.postId
+Ref: Post.id - Post.rePostId
+Ref: Post.id - Post.parentPostId
+Ref: Community.id < Post.communityId
+
+// Comment relations
+Ref: Comment.id < CommentMedia.commentId
+Ref: Comment.id < CommentLike.commentId
+Ref: Comment.id < Mention.commentId
+Ref: Comment.id < Notification.commentId
+Ref: Comment.id - Comment.parentCommentId
+
+// Hashtag relations
+Ref: Hashtag.id < PostTag.hashtagId
+
+// Messaging relations
+Ref: Conversation.id < ConversationMember.conversationId
+Ref: Conversation.id < Message.conversationId
+
+// Community relations
+Ref: Community.id < CommunityMember.communityId
+Ref: Community.id < CommunityRule.communityId
+Ref: Community.id < CommunityBannedUser.communityId

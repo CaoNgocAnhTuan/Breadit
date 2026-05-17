@@ -1,0 +1,64 @@
+@startuml UC-4 Post Interaction
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+' === PART 1: LIKE / UNLIKE ===
+|User|
+start
+:Click Like on a post;
+
+|System|
+if (Already liked?) then (yes)
+  :Remove like;
+else (no)
+  :Add like;
+  :Notify post owner;
+endif
+:Update like count on screen;
+
+' === PART 2: COMMENT ===
+|User|
+:Write a comment;
+
+|System|
+:Save comment;
+:Notify post owner;
+:Display comment in thread;
+
+' === PART 3: REPOST ===
+|User|
+:Click Repost;
+
+|System|
+if (Has quote text?) then (yes)
+  :Create quote-repost;
+else (no)
+  if (Already reposted?) then (yes)
+    :Remove repost;
+  else (no)
+    :Create plain repost;
+  endif
+endif
+:Notify post owner;
+:Update repost count;
+
+' === PART 4: BOOKMARK ===
+|User|
+:Click Bookmark;
+
+|System|
+if (Already saved?) then (yes)
+  :Remove bookmark;
+else (no)
+  :Save post to bookmarks;
+endif
+:Update bookmark button;
+
+stop
+
+@enduml

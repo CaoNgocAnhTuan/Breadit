@@ -1,0 +1,55 @@
+@startuml UC-3 Post Management
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+' === PART 1: CREATE POST ===
+|User|
+start
+:Write post content\n(text, optional media);
+:Click Post;
+
+|System|
+if (Is Authenticated?) then (no)
+  :Deny access;
+  stop
+else (yes)
+endif
+:Process media files;
+:Save post content;
+:Identify hashtags & mention notifications;
+:Display new post in feed;
+
+' === PART 2: EDIT POST ===
+|User|
+:Edit post text or media;
+
+|System|
+if (Is post owner?) then (no)
+  :Deny access;
+  stop
+else (yes)
+endif
+:Apply updates to post;
+:Display updated post;
+
+' === PART 3: DELETE POST ===
+|User|
+:Delete post;
+
+|System|
+if (Is post owner?) then (no)
+  :Deny access;
+  stop
+else (yes)
+endif
+:Remove post from system;
+:Remove post from feeds;
+
+stop
+
+@enduml

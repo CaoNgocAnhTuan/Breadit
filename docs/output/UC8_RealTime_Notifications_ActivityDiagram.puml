@@ -1,0 +1,40 @@
+@startuml UC-8 Real-time Notifications
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+' === PART 1: RECEIVE NOTIFICATION ===
+|System|
+start
+:Action triggers notification\n(Like, Reply, Follow, etc.);
+if (Actor is Recipient?) then (yes)
+  stop
+else (no)
+endif
+:Save Notification;
+:Send real-time update\nto recipient's device;
+:Show unread notification badge;
+
+' === PART 2: VIEW NOTIFICATIONS ===
+|User|
+:Open Notifications tab;
+
+|System|
+:Retrieve recent notifications;
+:Display notifications list;
+
+' === PART 3: MARK AS READ ===
+|User|
+:Click on a notification\nor "Mark all as read";
+
+|System|
+:Mark selected notifications as read;
+:Clear unread notification badge;
+
+stop
+
+@enduml

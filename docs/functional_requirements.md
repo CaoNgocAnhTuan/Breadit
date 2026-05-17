@@ -1,127 +1,163 @@
-# Functional Requirements — Breadit (X Clone)
+# Functional Requirements — Breadit (Social Network)
 
-This document describes how the **Breadit** codebase behaves today (NestJS + Next.js monorepo). Wording follows the original use-case IDs where they still apply.
+This document outlines the core functional requirements of the Breadit platform, seamlessly merging thesis-ready structured tables with the underlying technical implementations of the NestJS + Next.js monorepo.
 
 ## 1. Actors and Roles
 
 | Role | Description |
 | :--- | :--- |
-| **Guest** | Unauthenticated visitor. Can view public content but cannot interact. |
+| **Guest** | Unauthenticated visitor. Can view public feeds and profiles but cannot interact. |
 | **User** | Authenticated user with a verified email. Can create content, interact, and message. |
 | **Community Moderator** | A User with elevated permissions within a specific community (Mod/Owner). |
-| **Admin** | Site-wide administrator (`User.role = ADMIN`) with access to the Admin Console and global moderation. |
+| **Admin** | Site-wide administrator (`User.role = ADMIN`) with access to global moderation. |
 
 ---
 
-## 2. Authentication & Account Management
+## 1.4.1.1 Authentication & Account Verification
 
-- **UC-AUTH-01: Registration:** Users sign up with a unique username, email, and password (`POST /api/auth/register`).
-- **UC-AUTH-02: Email Verification:** New accounts verify via a **6-digit code / OTP** sent by email (`POST /api/auth/verify`, resend with rate limits). Unverified users cannot post (guarded routes).
-- **UC-AUTH-03: Login/Logout:** Session is an **HTTP-only JWT cookie** named `breadit_session` (not NextAuth).
-- **UC-AUTH-04: Password Recovery:** Forgot-password + reset flow via email with time-limited token (see `AuthService`).
-- **UC-AUTH-05: Account Security:** Auth mutations use `@nestjs/throttler` (e.g. **10 requests per 60s** for register/login/verify; tighter limits on forgot/reset/resend). A global throttle also applies to other routes.
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-AUTH-01** | The system shall allow users to register an account using a unique username, email, and password. | Must | Sign Up, Log In |
+| **FR-AUTH-02** | The system shall implement secure password hashing (e.g., bcrypt) before storing credentials. | Must | Sign Up, Log In |
+| **FR-AUTH-03** | The system shall send a 6-digit verification code (OTP) to the user's email to verify account ownership. | Must | Verify Email |
+| **FR-AUTH-04** | The system shall authenticate users and issue a secure httpOnly JWT session cookie named `breadit_session`. | Must | Sign Up, Log In |
+| **FR-AUTH-05** | The system shall provide a "Forgot Password" feature allowing users to reset their credentials securely. | Should | Reset Password |
 
----
-
-## 3. User Profile Management
-
-- **UC-PROF-01: Profile Customization:** Users can edit display name, bio, location, job, and website (`PATCH` user profile). Field max lengths are enforced in DTOs (not all 255 — e.g. bio up to 160).
-- **UC-PROF-02: Media Branding:** Avatar and cover image supported (URLs/paths from upload flow).
-- **UC-PROF-03: Profile Views:** Own or others’ profiles; tabs for **Posts, Replies, Media, Likes** (non-community posts for several tabs). Optional in-tab search on posts where implemented.
-- **UC-PROF-04: Theme Preference:** **Not implemented.** The app uses a fixed dark-oriented UI; there is no persisted Light / Dark / System toggle in `User` or the frontend layout.
+**Technical Implementation Notes:**
+- Registration uses `POST /api/auth/register` with `bcrypt` (10 salt rounds).
+- Email verification enforces OTP. Unverified users are blocked from guarded routes via Guards.
+- Auth mutations are protected by `@nestjs/throttler` (e.g., 10 requests per 60s).
 
 ---
 
-## 4. Content Creation & Discovery
+## 1.4.1.2 Feeds & Discovery
 
-- **UC-POST-01: Create Post:** Text description up to **255 characters** (`Post.desc` / `VarChar(255)`).
-- **UC-POST-02: Multi-media Attachments:** Multiple files per post (images and video). **Cloudinary** is used when `CLOUDINARY_CLOUD_NAME` (and keys) are set; otherwise media is stored on **local disk** (`UPLOAD_DIR`) with processing via **sharp** where applicable. There is **no hard “max 10 files” check** in the API or `Share` composer today — only practical limits (e.g. upload size).
-- **UC-POST-03: Hashtags:** `#tokens` are parsed and linked to hashtag records for discovery and hashtag pages.
-- **UC-POST-04: Mentions:** `@username` is parsed; **mention rows and notifications are created only for users the author already follows** (mentions in posts and comments use this filter). Not “any username on the platform.”
-- **UC-POST-05: Feed Discovery (home):**
-    - **For you (default):** Posts from **the current user and accounts they follow** (non-community root posts), chronological.
-    - **Explore (`?feed=explore`):** Root posts **excluding community posts**, ordered primarily by **like count** (trending), then recency.
-    - **Following (`?feed=following`):** Only posts from followed accounts (not including own posts in that filter).
-    - **Communities (`?feed=communities`):** Aggregated approved posts from communities the user is a member of.
-    - **Hashtag feed (`/hashtag/[tag]`):** Root posts with that tag **excluding community posts** (pagination separate from home).
-- **UC-POST-06: Search:** `GET /api/search?q=` runs **parallel** queries for posts, users, hashtags, and **communities**. Post hits are **non-community** root posts matching description text. The **header search dropdown** (`Search.tsx`) surfaces **People, Communities, Hashtags, and Posts**. The **full-page** route `/search` currently lists **People, Hashtags, and Posts** only (communities omitted there).
-    - **Full-page `/search`** shows **People, Communities, Hashtags, and Posts** (aligned with the header dropdown).
-- **UC-POST-07: Deletion:** Authors can **soft-delete** their posts (`deletedAt`), hiding them from feeds and lookups that respect deletion.
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-DISC-01** | The system shall generate a chronologically sorted home feed consisting of posts from followed users. | Must | View Public Feed |
+| **FR-DISC-02** | The system shall provide an explore feed sorted by like count (trending), excluding community posts. | Must | View Public Feed |
+| **FR-DISC-03** | The system shall provide dedicated feeds for specific hashtags and communities. | Must | View Public Feed |
+| **FR-DISC-04** | The system shall perform case-insensitive global searches across posts, users, hashtags, and communities. | Must | Search Content |
+| **FR-DISC-05** | The system shall debounce search input from the UI and provide a live dropdown of results. | Should | Search Content |
 
----
-
-## 5. Social Interactions
-
-### Blocking policy (authenticated viewer)
-
-If viewer **A** and profile **B** have **any** block row (either direction), and **A is logged in**:
-
-| Surface | Behavior |
-| :--- | :--- |
-| `GET /api/users/:username` | **`profileRestricted: true`** plus `blockedByYou` / `blockedYou`; **no** full bio, avatar, cover, or follower counts (privacy shell). |
-| `GET /api/posts/:id` (single post) | Returns **null / 404** when the viewer is blocked with the post author (same as timeline). **Guests** still see public posts. |
-| Followers / following (`GET .../followers`, `.../following`) | **Empty list** for that viewer (with session cookie). |
-| DMs | **Cannot** create/open thread or send/mark read while blocked; blocked 1:1 threads are **omitted** from conversation list, search, and unread totals. |
-
-**Guests** (no cookie) still see **full** public profiles — block checks apply only when `OptionalJwt` / JWT identifies the viewer.
-
-**Unblock:** `POST /api/users/:id/block` toggles. Users you have blocked are listed at **`GET /api/users/me/blocked`** and in the UI under **Settings → Blocked accounts**.
+**Technical Implementation Notes:**
+- **Feeds:** All feeds implement cursor-based pagination for high performance.
+- **Search API:** `GET /api/search?q=` runs parallel queries using Prisma (`Promise.all`).
+- **Caching:** Search results are cached using a Redis-backed `CacheService` to reduce database load.
 
 ---
 
-- **UC-INT-01: Like/Unlike:** Supported on posts (and comment likes where implemented).
-- **UC-INT-02: Reposting:** Plain repost and quote-repost supported via post/repost model.
-- **UC-INT-03: Bookmarking:** Save posts to a private bookmarks list.
-- **UC-INT-04: Threaded Comments:** Replies to posts with optional threading and media.
-- **UC-INT-05: Follow Graph:** Follow/unfollow, followers and following lists. The `Follow.notify` flag exists in the **database and API**, but there is **no frontend toggle** and **no logic** that uses it to push “new post” alerts — only the usual interaction notifications (e.g. follow event).
-- **UC-INT-06: Safety — Blocking:** As in the table above: **bidirectional** wall for feeds/search/notifications (existing), plus **restricted profile API**, **no timeline**, **no DM**, **blocked-account settings**, and **severed mutual follows** on create block.
+## 1.4.1.3 Post Management
+
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-POST-01** | The system shall allow authenticated users to create text posts with a limit of 255 characters. | Must | Create Post |
+| **FR-POST-02** | The system shall allow users to attach multi-media files managed via Cloudinary or local Sharp processing. | Must | Create Post |
+| **FR-POST-03** | The system shall automatically parse and index hashtags (#tokens) included in the post text. | Must | Create Post |
+| **FR-POST-04** | The system shall allow users to edit the text of their previously published posts or comments. | Should | Edit/Delete Post |
+| **FR-POST-05** | The system shall allow users to soft-delete their own posts, effectively hiding them from all feeds. | Must | Edit/Delete Post |
+
+**Technical Implementation Notes:**
+- Post description limit is strongly enforced (`VarChar(255)`).
+- Media uses **Cloudinary** (if keys provided) or falls back to local disk.
+- Deletion uses a **soft-delete** strategy (`deletedAt`), maintaining referential integrity.
 
 ---
 
-## 6. Real-time Notifications
+## 1.4.1.4 Post Interaction
 
-- **UC-NOTI-01: Notification Types (persisted):** Align with Prisma `NotificationType`: **LIKE, REPLY, REPOST, FOLLOW, MENTION**, **COMMUNITY_MOD_ADDED, COMMUNITY_POST** (e.g. member post pending approval), **COMMUNITY_NEW_POST** (approved community post to members), **REPORT** (admin/report pipeline).
-- **UC-NOTI-02: Persistence:** Stored in DB with `readAt` for unread/read state.
-- **UC-NOTI-03: Real-time Delivery:** **Socket.IO** gateway validates `breadit_session` on connect; broadcasts use a **Redis adapter** for multi-instance scaling.
-- **UC-NOTI-04: Bulk Actions:** `PATCH` to mark all notifications read.
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-INT-01** | The system shall allow users to like or unlike posts and comments to express agreement. | Must | Interact with Post |
+| **FR-INT-02** | The system shall allow users to reply to existing posts, creating a threaded comment structure. | Must | Threaded Comments |
+| **FR-INT-03** | The system shall allow users to perform plain reposts or quote-reposts to their own profile feed. | Must | Interact with Post |
+| **FR-INT-04** | The system shall allow users to privately save posts to a bookmark list for later reading. | Should | Interact with Post |
 
----
-
-## 7. Direct Messaging (DMs)
-
-- **UC-MSG-01: 1:1 Messaging:** Real-time-capable private conversations between users. **Blocked pairs** cannot open or continue DMs (see §5 blocking table).
-- **UC-MSG-02: Conversation Management:** Conversation list with previews and unread counts.
-- **UC-MSG-03: Media Support:** Images/video in threads; lightbox-style viewing where implemented in the client.
+**Technical Implementation Notes:**
+- Reposting is supported natively via a self-referential post model in Prisma.
 
 ---
 
-## 8. Communities (Groups)
+## 1.4.1.5 User Relationship Management
 
-- **UC-COMM-01: Community Lifecycle:** Create communities with slug, name, description; browse and join flows.
-- **UC-COMM-02: Roles & Permissions:** Owner / Moderator / Member; staff can manage rules, membership, and bans.
-- **UC-COMM-03: Moderation Queue:** Non-staff posts can require approval; staff get **COMMUNITY_POST** notifications; members get **COMMUNITY_NEW_POST** when approved auto-posts go out.
-- **UC-COMM-04: Rules Engine:** Staff-defined rules stored and shown on community about pages.
-- **UC-COMM-05: Member Bans:** Banned users cannot participate in that community.
-- **UC-COMM-06: Feed Privacy:** Community posts are **omitted from the main Explore feed and from global post search** (`communityId` must be null there). **Hashtag feeds do not currently filter out community posts** — a tagged community post can still appear on `/hashtag/:tag`.
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-REL-01** | The system shall allow users to follow or unfollow other accounts to customize their home timeline. | Must | Follow/Unfollow |
+| **FR-REL-02** | The system shall allow users to explicitly mention followed users using the @username syntax. | Should | Create Post, Comments |
+| **FR-REL-03** | The system shall allow users to block accounts bidirectionally, restricting profile access and messaging. | Must | Block/Unblock |
 
----
-
-## 9. Admin Console
-
-- **UC-ADMN-01: User Management:** List/search users; global **ban/unban**.
-- **UC-ADMN-02: Report Handling:** Queue for reported posts — dismiss or take action (e.g. delete content / close report) per `AdminService` routes.
-- **UC-ADMN-03: Real-time Alerts:** Admins can receive **REPORT** notifications when content is reported.
+**Technical Implementation Notes:**
+- **Bidirectional Blocking:** A block strictly severs mutual follows. Blocked users receive `profileRestricted: true` on API calls and return 404s for posts to ensure strict privacy.
+- Mentions (`@username`) trigger notifications ONLY if the author follows the mentioned user.
 
 ---
 
-## 10. System Requirements (Functional Context)
+## 1.4.1.6 Profile Management
 
-- **Scalability:** Socket.IO uses the **Redis** adapter (`@socket.io/redis-adapter`) when `REDIS_URL` is available.
-- **Performance:** Debounced search in the UI; **cursor/page-based pagination** on feeds; media via Cloudinary or static files from the API.
-- **Reliability:** Frontend error boundaries where present; NestJS **exception filter** for consistent HTTP errors.
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-PROF-01** | The system shall allow users to view profiles with dedicated tabs for Posts, Replies, Media, and Likes. | Must | Manage Profile |
+| **FR-PROF-02** | The system shall allow users to update personal info, including bio (up to 160 chars), location, and website. | Must | Manage Profile |
+| **FR-PROF-03** | The system shall allow users to upload and crop custom images for their avatar and cover photo. | Should | Manage Profile |
+
+**Technical Implementation Notes:**
+- Field max lengths are enforced directly in NestJS DTOs via `class-validator`.
 
 ---
 
-## Document history
+## 1.4.1.7 Direct Messaging
 
-- **As of 2026-05 (blocking):** Stricter block — restricted profile payload, 403 profile posts, DM guard, `GET /api/users/me/blocked`, Settings UI; bidirectional policy table in §5.
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-MSG-01** | The system shall allow users to establish 1:1 real-time direct messaging threads with database persistence. | Must | Send Direct Message |
+| **FR-MSG-02** | The system shall allow users to attach images and videos securely within direct message conversations. | Should | Send Direct Message |
+| **FR-MSG-03** | The system shall maintain and update unread message badge counts dynamically. | Must | Send Direct Message |
+
+**Technical Implementation Notes:**
+- Blocked pairs cannot open or continue DMs, nor will their history appear in unread totals.
+
+---
+
+## 1.4.1.8 Real-time Notifications
+
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-NOTI-01** | The system shall dispatch real-time Socket.IO alerts for likes, replies, reposts, mentions, and follows. | Must | View Notifications |
+| **FR-NOTI-02** | The system shall securely store notifications in the database to track unread and read states over time. | Must | View Notifications |
+| **FR-NOTI-03** | The system shall scale real-time broadcasting across multiple instances using a Redis adapter. | Must | View Notifications |
+
+**Technical Implementation Notes:**
+- Notifications persist in the database with a `readAt` timestamp.
+- **Socket.IO gateway** strictly validates the `breadit_session` cookie on connection.
+
+---
+
+## 1.4.1.9 Community Management
+
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-COMM-01** | The system shall allow users to create communities and automatically inherit the Owner/Moderator role. | Must | Create Community |
+| **FR-COMM-02** | The system shall allow users to browse existing communities and explicitly join or leave them. | Must | Join/Leave Community |
+| **FR-COMM-03** | The system shall allow community moderators to define and display specific rules for their community. | Must | Manage Community |
+| **FR-COMM-04** | The system shall allow members to submit posts within a community, entering a moderation queue if required. | Must | Create Post |
+| **FR-COMM-05** | The system shall allow moderators to approve/reject pending posts and ban users from the community. | Must | Manage Community |
+
+**Technical Implementation Notes:**
+- Community posts are intentionally omitted from the main Explore feed and global post search to maintain context.
+- Pending posts enter a moderation queue, triggering `COMMUNITY_POST` notifications for staff.
+- Approved auto-posts trigger `COMMUNITY_NEW_POST` notifications to members.
+
+---
+
+## 1.4.1.10 Administrative Moderation
+
+| ID | Requirement Description | Priority | Related Use Case(s) |
+| :--- | :--- | :--- | :--- |
+| **FR-MOD-01** | The system shall provide a global admin console to view and search a list of all registered users. | Must | Manage Users |
+| **FR-MOD-02** | The system shall allow administrators to temporarily or permanently ban users from the platform. | Must | Manage Users |
+| **FR-MOD-03** | The system shall maintain a queue of user-reported posts and push real-time REPORT alerts to admins. | Must | Handle Reports |
+| **FR-MOD-04** | The system shall allow administrators to permanently delete reported content or dismiss invalid reports. | Must | Moderate Content |
+
+**Technical Implementation Notes:**
+- Admins receive real-time `REPORT` notifications over WebSockets.
+- Reported posts enter a dedicated queue handled by `AdminService` routes.

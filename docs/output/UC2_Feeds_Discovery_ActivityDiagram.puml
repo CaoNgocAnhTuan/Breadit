@@ -1,0 +1,48 @@
+@startuml UC-2 Feeds & Discovery
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+' === PART 1: VIEW FEED ===
+|User|
+start
+:Open home feed;
+
+|System|
+if (Is Authenticated?) then (yes)
+  :Display personalized feed\n(posts from followed users);
+else (no)
+  :Display public feed\n(latest posts);
+endif
+:Render feed on screen;
+:Load more posts as user scrolls;
+
+' === PART 2: VIEW EXPLORE ===
+|User|
+:Open Explore tab;
+
+|System|
+:Rank posts by engagement\n(likes, comments, reposts & age);
+:Display trending posts;
+
+' === PART 3: SEARCH ===
+|User|
+:Type in search bar;
+
+|System|
+:Search across posts, users,\nhashtags & communities;
+:Display live search results;
+
+|User|
+:Select a search result;
+
+|System|
+:Navigate to result detail page;
+
+stop
+
+@enduml

@@ -1,0 +1,188 @@
+// Sơ đồ ERD cho Breadit trên Eraser.io
+// Dán toàn bộ nội dung này vào ô Code (Diagram as code) bên trái của Eraser.io
+
+direction right
+
+// 1. USERS & CORE
+User [icon: user]
+  id string pk
+  email string
+  username string
+  role string
+  banned boolean
+  createdAt datetime
+
+VerificationToken [icon: key]
+  identifier string pk
+  token string pk
+
+Follow [icon: users]
+  id int pk
+  followerId string
+  followingId string
+
+Block [icon: shield-off]
+  id int pk
+  blockerId string
+  blockedId string
+
+// 2. CONTENT & POSTS
+Post [icon: file-text]
+  id int pk
+  userId string
+  rePostId int
+  parentPostId int
+  communityId int
+  desc string
+  isSensitive boolean
+  isApproved boolean
+
+PostMedia [icon: image]
+  id int pk
+  postId int
+  url string
+  type string
+
+Hashtag [icon: hash]
+  id int pk
+  tag string
+
+PostTag [icon: tag]
+  postId int pk
+  hashtagId int pk
+
+// 3. COMMENTS
+Comment [icon: message-square]
+  id int pk
+  userId string
+  postId int
+  parentCommentId int
+  body string
+
+CommentMedia [icon: image]
+  id int pk
+  commentId int
+  url string
+
+// 4. INTERACTIONS
+Like [icon: heart]
+  id int pk
+  userId string
+  postId int
+
+SavedPosts [icon: bookmark]
+  id int pk
+  userId string
+  postId int
+
+CommentLike [icon: heart]
+  id int pk
+  userId string
+  commentId int
+
+Mention [icon: at-sign]
+  id int pk
+  userId string
+  postId int
+  commentId int
+
+Notification [icon: bell]
+  id int pk
+  recipientId string
+  actorId string
+  postId int
+  commentId int
+  type string
+
+// 5. MESSAGING
+Conversation [icon: message-circle]
+  id int pk
+  createdAt datetime
+
+ConversationMember [icon: user-check]
+  conversationId int pk
+  userId string pk
+
+Message [icon: send]
+  id int pk
+  conversationId int
+  senderId string
+
+// 6. COMMUNITIES
+Community [icon: globe]
+  id int pk
+  slug string
+  name string
+
+CommunityMember [icon: user]
+  id int pk
+  userId string
+  communityId int
+  role string
+
+CommunityRule [icon: list]
+  id int pk
+  communityId int
+  title string
+
+CommunityBannedUser [icon: user-x]
+  id int pk
+  userId string
+  communityId int
+
+// 7. MODERATION
+Report [icon: flag]
+  id int pk
+  reporterId string
+  postId int
+  reason string
+  status string
+
+// ==============================
+// RELATIONSHIPS
+// ==============================
+
+// User
+User < Follow
+User < Block
+User < Post
+User < Comment
+User < Like
+User < SavedPosts
+User < CommentLike
+User < Mention
+User < Notification
+User < Report
+User < ConversationMember
+User < Message
+User < CommunityMember
+User < CommunityBannedUser
+
+// Content
+Post < PostMedia
+Post < Comment
+Post < Like
+Post < SavedPosts
+Post < Mention
+Post < Notification
+Post < Report
+Post - Post
+Hashtag < PostTag
+Post < PostTag
+
+// Comments
+Comment < CommentMedia
+Comment < CommentLike
+Comment < Mention
+Comment < Notification
+Comment - Comment
+
+// Messaging
+Conversation < ConversationMember
+Conversation < Message
+
+// Communities
+Community < Post
+Community < CommunityMember
+Community < CommunityRule
+Community < CommunityBannedUser

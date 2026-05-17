@@ -1,0 +1,297 @@
+@startuml ERD_Breadit
+
+' Cấu hình chung cho Crow's foot
+hide circle
+skinparam linetype ortho
+skinparam EntityBackgroundColor #f0f4ff
+skinparam EntityBorderColor #4a6cf7
+skinparam EntityFontSize 16
+skinparam ArrowColor #4a6cf7
+skinparam ArrowThickness 1.5
+skinparam nodesep 80
+skinparam ranksep 100
+left to right direction
+
+' ─── AUTH & USER ─────────────────────────
+package "Users & Core" <<Rectangle>> {
+entity "User" as User {
+  * id : String [PK]
+  --
+  email : String [UK]
+  username : String [UK]
+  password : String?
+  emailVerified : DateTime?
+  displayName : String?
+  bio : String?
+  role : Role
+  banned : Boolean
+  createdAt : DateTime
+}
+
+entity "VerificationToken" as VerificationToken {
+  * identifier : String [PK]
+  * token : String [PK]
+  --
+  expires : DateTime
+}
+
+entity "Follow" as Follow {
+  * id : Int [PK]
+  --
+  followerId : String [FK]
+  followingId : String [FK]
+  notify : Boolean
+  createdAt : DateTime
+}
+
+entity "Block" as Block {
+  * id : Int [PK]
+  --
+  blockerId : String [FK]
+  blockedId : String [FK]
+  createdAt : DateTime
+}
+}
+
+' ─── POST & CONTENT ──────────────────────
+package "Posts & Content" <<Rectangle>> {
+entity "Post" as Post {
+  * id : Int [PK]
+  --
+  userId : String [FK]
+  rePostId : Int? [FK]
+  parentPostId : Int? [FK]
+  communityId : Int? [FK]
+  desc : String?
+  isSensitive : Boolean
+  isApproved : Boolean
+  createdAt : DateTime
+  deletedAt : DateTime?
+}
+
+entity "PostMedia" as PostMedia {
+  * id : Int [PK]
+  --
+  postId : Int [FK]
+  url : String
+  type : String
+  createdAt : DateTime
+}
+
+entity "Hashtag" as Hashtag {
+  * id : Int [PK]
+  --
+  tag : String [UK]
+  createdAt : DateTime
+}
+
+entity "PostTag" as PostTag {
+  * postId : Int [PK, FK]
+  * hashtagId : Int [PK, FK]
+}
+}
+
+' ─── COMMENTS ────────────────────────────
+package "Comments" <<Rectangle>> {
+entity "Comment" as Comment {
+  * id : Int [PK]
+  --
+  userId : String [FK]
+  postId : Int [FK]
+  parentCommentId : Int? [FK]
+  body : String
+  createdAt : DateTime
+  deletedAt : DateTime?
+}
+
+entity "CommentMedia" as CommentMedia {
+  * id : Int [PK]
+  --
+  commentId : Int [FK]
+  url : String
+  type : String
+  createdAt : DateTime
+}
+}
+
+' ─── INTERACTIONS ────────────────────────
+package "Interactions & Mentions" <<Rectangle>> {
+entity "Like" as Like {
+  * id : Int [PK]
+  --
+  userId : String [FK]
+  postId : Int [FK]
+  createdAt : DateTime
+}
+
+entity "SavedPosts" as SavedPosts {
+  * id : Int [PK]
+  --
+  userId : String [FK]
+  postId : Int [FK]
+  createdAt : DateTime
+}
+
+entity "CommentLike" as CommentLike {
+  * id : Int [PK]
+  --
+  userId : String [FK]
+  commentId : Int [FK]
+  createdAt : DateTime
+}
+
+entity "Mention" as Mention {
+  * id : Int [PK]
+  --
+  userId : String [FK]
+  postId : Int? [FK]
+  commentId : Int? [FK]
+  username : String
+  createdAt : DateTime
+}
+
+entity "Notification" as Notification {
+  * id : Int [PK]
+  --
+  recipientId : String [FK]
+  actorId : String [FK]
+  postId : Int? [FK]
+  commentId : Int? [FK]
+  type : NotificationType
+  readAt : DateTime?
+  createdAt : DateTime
+}
+}
+
+' ─── MESSAGING (DM) ──────────────────────
+package "Direct Messaging" <<Rectangle>> {
+entity "Conversation" as Conversation {
+  * id : Int [PK]
+  --
+  createdAt : DateTime
+  updatedAt : DateTime
+}
+
+entity "ConversationMember" as ConversationMember {
+  * conversationId : Int [PK, FK]
+  * userId : String [PK, FK]
+  --
+  lastReadAt : DateTime
+}
+
+entity "Message" as Message {
+  * id : Int [PK]
+  --
+  conversationId : Int [FK]
+  senderId : String [FK]
+  body : String?
+  mediaUrl : String?
+  createdAt : DateTime
+}
+}
+
+' ─── COMMUNITY ───────────────────────────
+package "Communities" <<Rectangle>> {
+entity "Community" as Community {
+  * id : Int [PK]
+  --
+  slug : String [UK]
+  name : String
+  description : String?
+  createdAt : DateTime
+}
+
+entity "CommunityMember" as CommunityMember {
+  * id : Int [PK]
+  --
+  userId : String [FK]
+  communityId : Int [FK]
+  role : CommunityRole
+  createdAt : DateTime
+}
+
+entity "CommunityRule" as CommunityRule {
+  * id : Int [PK]
+  --
+  communityId : Int [FK]
+  title : String
+  createdAt : DateTime
+}
+
+entity "CommunityBannedUser" as CommunityBannedUser {
+  * id : Int [PK]
+  --
+  userId : String [FK]
+  communityId : Int [FK]
+  createdAt : DateTime
+}
+}
+
+' ─── ADMIN & MODERATION ──────────────────
+package "Moderation" <<Rectangle>> {
+entity "Report" as Report {
+  * id : Int [PK]
+  --
+  reporterId : String [FK]
+  postId : Int [FK]
+  reason : String
+  status : ReportStatus
+  createdAt : DateTime
+}
+}
+
+' =========================================================
+' QUAN HỆ (RELATIONSHIPS) - Crow's foot notation
+' =========================================================
+
+' User relations
+User ||--o{ Post : "creates"
+User ||--o{ Comment : "writes"
+User ||--o{ Like : "gives"
+User ||--o{ SavedPosts : "bookmarks"
+User ||--o{ CommentLike : "gives"
+User ||--o{ Follow : "follows"
+User ||--o{ Follow : "followed by"
+User ||--o{ Block : "blocks"
+User ||--o{ Notification : "receives"
+User ||--o{ Notification : "triggers"
+User ||--o{ Report : "files"
+User ||--o{ ConversationMember : "participates"
+User ||--o{ Message : "sends"
+User ||--o{ CommunityMember : "joins"
+User ||--o{ CommunityBannedUser : "banned from"
+User ||--o{ Mention : "mentioned in"
+
+' Post relations
+Post ||--o{ PostMedia : "has"
+Post ||--o{ Comment : "has comments"
+Post ||--o{ Like : "receives"
+Post ||--o{ SavedPosts : "bookmarked in"
+Post ||--o{ PostTag : "tagged with"
+Post ||--o{ Notification : "referenced by"
+Post ||--o{ Report : "reported via"
+Post ||--o{ Mention : "has mentions"
+Post }o--o| Post : "repost of"
+Post }o--o| Post : "reply to"
+Post }o--o| Community : "posted in"
+
+' Comment relations
+Comment ||--o{ CommentMedia : "has"
+Comment ||--o{ CommentLike : "receives"
+Comment ||--o{ Mention : "has mentions"
+Comment ||--o{ Notification : "referenced by"
+Comment }o--o| Comment : "reply to"
+
+' Hashtag relations
+Hashtag ||--o{ PostTag : "used in"
+
+' Messaging relations
+Conversation ||--o{ ConversationMember : "has members"
+Conversation ||--o{ Message : "contains"
+
+' Community relations
+Community ||--o{ CommunityMember : "has members"
+Community ||--o{ CommunityRule : "has rules"
+Community ||--o{ CommunityBannedUser : "bans"
+
+@enduml

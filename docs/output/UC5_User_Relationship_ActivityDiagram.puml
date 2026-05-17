@@ -1,0 +1,45 @@
+@startuml UC-5 User Relationship
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+' === PART 1: FOLLOW / UNFOLLOW ===
+|User|
+start
+:Click Follow on a profile;
+
+|System|
+if (Blocked by target user?) then (yes)
+  :Deny action;
+  stop
+else (no)
+endif
+
+if (Already following?) then (yes)
+  :Remove follow;
+else (no)
+  :Add follow;
+  :Notify target user;
+endif
+:Update Follow button;
+
+' === PART 2: BLOCK / UNBLOCK ===
+|User|
+:Click Block on a profile;
+
+|System|
+if (Already blocked?) then (yes)
+  :Remove block;
+else (no)
+  :Create block;
+  :Remove all follows\nbetween both users;
+endif
+:Update profile visibility\n(restrict access if blocked);
+
+stop
+
+@enduml

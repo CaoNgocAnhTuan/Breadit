@@ -1,0 +1,50 @@
+@startuml UC-1 Authentication & Account Verification
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+|User|
+start
+:Fill registration form\n(username, email, password);
+
+|System|
+if (Email or username\nalready taken?) then (yes)
+  :Show error message;
+  stop
+else (no)
+endif
+:Create account securely;
+:Send 6-digit OTP to email;
+:Show success message;
+
+|User|
+:Enter OTP code;
+
+|System|
+if (Code invalid\nor expired?) then (yes)
+  :Show error message;
+  stop
+else (no)
+endif
+:Mark account as verified;
+:Show success message;
+
+|User|
+:Enter email & password;
+
+|System|
+if (Credentials incorrect?) then (yes)
+  :Show error message;
+  stop
+else (no)
+endif
+:Log user in securely;
+:Redirect to home feed;
+
+stop
+
+@enduml

@@ -1,0 +1,71 @@
+@startuml UC-9 Community Management
+
+skinparam ActivityBackgroundColor #f0f4ff
+skinparam ActivityBorderColor #4a6cf7
+skinparam ArrowColor #4a6cf7
+skinparam SwimlaneBorderColor #4a6cf7
+skinparam ActivityFontSize 20
+skinparam ActivityFontStyle bold
+
+' === PART 1: JOIN / LEAVE COMMUNITY ===
+|User|
+start
+:Click Join / Leave on community page;
+
+|System|
+if (Banned from community?) then (yes)
+  :Deny access;
+  stop
+else (no)
+endif
+if (Already a member?) then (yes)
+  if (Is Owner?) then (yes)
+    :Deny action (Owner cannot leave);
+    stop
+  else (no)
+    :Remove membership;
+  endif
+else (no)
+  :Add membership;
+endif
+:Update Join/Leave button;
+
+' === PART 2: MODERATE POSTS ===
+|User (Moderator)|
+:Review pending post\n(Approve or Remove);
+
+|System|
+if (Has moderator permissions?) then (no)
+  :Deny access;
+  stop
+else (yes)
+endif
+if (Action == Approve?) then (yes)
+  :Publish post to community;
+  :Notify community members;
+else (no)
+  :Remove post;
+endif
+
+' === PART 3: BAN USER ===
+|User (Moderator)|
+:Ban user from community;
+
+|System|
+if (Has moderator permissions?) then (no)
+  :Deny access;
+  stop
+else (yes)
+endif
+if (Target is Owner?) then (yes)
+  :Deny action (Cannot ban owner);
+  stop
+else (no)
+endif
+:Remove target's membership;
+:Add user to banned list;
+:Update member list;
+
+stop
+
+@enduml
