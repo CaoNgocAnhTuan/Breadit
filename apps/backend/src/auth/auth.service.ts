@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { RedisService } from '../redis/redis.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
@@ -20,7 +21,7 @@ function getJwtSecret() {
 }
 
 async function signJwt(payload: Record<string, unknown>): Promise<string> {
-  return new SignJWT(payload)
+  return new SignJWT({ ...payload, jti: crypto.randomUUID() })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('30d')
@@ -31,6 +32,9 @@ export async function verifyJwt(token: string) {
   const { payload } = await jwtVerify(token, getJwtSecret());
   return payload;
 }
+
+/** Redis key for token blacklist entries */
+export const BLACKLIST_PREFIX = 'auth:blacklist';
 
 function setSessionCookie(reply: FastifyReply, token: string) {
   reply.setCookie('breadit_session', token, {
@@ -49,7 +53,10 @@ function clearSessionCookie(reply: FastifyReply) {
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
+  ) {}
 
   private createTransporter() {
     return nodemailer.createTransport({
@@ -215,7 +222,24 @@ export class AuthService {
     };
   }
 
-  logout(reply: FastifyReply) {
+  async logout(reply: FastifyReply, token?: string) {
+    // Blacklist the current token in Redis so it cannot be reused
+    // even if someone copied the cookie before logout
+    if (token) {
+      try {
+        const payload = await verifyJwt(token);
+        const jti = payload['jti'] as string | undefined;
+        const exp = payload.exp as number | undefined;
+        if (jti && exp) {
+          const ttl = exp - Math.floor(Date.now() / 1000);
+          if (ttl > 0) {
+            await this.redis.set(`${BLACKLIST_PREFIX}:${jti}`, '1', 'EX', ttl);
+          }
+        }
+      } catch {
+        // token already invalid — nothing to blacklist
+      }
+    }
     clearSessionCookie(reply);
     return { ok: true };
   }

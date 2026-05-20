@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { socket } from "../socket";
 import { useSession } from "@/providers/SessionProvider";
+import { api } from "@/lib/api";
 
 export default function Socket() {
   const [isConnected, setIsConnected] = useState(false);
@@ -10,6 +12,7 @@ export default function Socket() {
 
   const session = useSession();
   const user = session?.user;
+  const router = useRouter();
 
   useEffect(() => {
     if (socket.connected) {
@@ -33,16 +36,27 @@ export default function Socket() {
       setTransport("N/A");
     }
 
+    // Fired by the backend when an Admin bans this user's account.
+    // Immediately log out and redirect so the user can't continue acting.
+    async function onAccountBanned() {
+      await api("/api/auth/logout", { method: "POST" });
+      router.push("/sign-in?banned=true");
+      router.refresh();
+    }
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
+    socket.on("accountBanned", onAccountBanned);
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
+      socket.off("accountBanned", onAccountBanned);
     };
-  }, [user]);
+  }, [user, router]);
 
   return (
     <span></span>
   );
 }
+

@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsGateway: NotificationsGateway,
+  ) {}
 
   async getUsers(cursor: number, q?: string) {
     const LIMIT = 20;
@@ -40,13 +44,24 @@ export class AdminService {
   }
 
   async setBanStatus(id: string, banned: boolean) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true, username: true },
+    });
     if (!user) throw new NotFoundException();
 
     await this.prisma.user.update({
       where: { id },
       data: { banned },
     });
+
+    // Emit real-time event so the banned user's browser reacts immediately
+    // The client socket joins a room keyed by username (see Socket.tsx → "newUser" event)
+    if (banned) {
+      this.notificationsGateway.server
+        .to(user.username)
+        .emit('accountBanned');
+    }
 
     return { ok: true };
   }

@@ -11,6 +11,7 @@ function SignInForm() {
   const searchParams = useSearchParams();
   const verified = searchParams.get("verified");
   const reset = searchParams.get("reset");
+  const banned = searchParams.get("banned");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -42,6 +43,11 @@ function SignInForm() {
       {reset && (
         <p className="text-green-400 text-sm w-72">
           Password reset! Please sign in with your new password.
+        </p>
+      )}
+      {banned && (
+        <p className="text-red-400 text-sm w-72 font-semibold">
+          Your account has been suspended. Please contact support.
         </p>
       )}
       <form onSubmit={onSubmit} className="flex flex-col gap-4">

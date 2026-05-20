@@ -41,8 +41,12 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(200)
-  logout(@Res({ passthrough: true }) reply: FastifyReply) {
-    return this.auth.logout(reply);
+  logout(
+    @Req() req: FastifyRequest,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ) {
+    const token = req.cookies?.['breadit_session'];
+    return this.auth.logout(reply, token);
   }
 
   @Get('me')
