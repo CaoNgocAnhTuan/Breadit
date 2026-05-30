@@ -19,7 +19,7 @@ if (-not (Test-Path $DatasetFile)) {
   throw "Dataset file not found: $DatasetFile"
 }
 
-Write-Host "Importing dataset $DatasetFile into $UserName@$HostName:$Port/$Database"
+Write-Host "Importing dataset $DatasetFile into $UserName@${HostName}:${Port}/$Database"
 
 $env:PGPASSWORD = $Password
 

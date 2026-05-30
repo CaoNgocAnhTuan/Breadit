@@ -424,6 +424,39 @@ Identifier UC-13
 
 ---
 
+### USE CASE UC-71:
+
+Name: Edit Own Post
+Identifier UC-71
+
+**Inputs:**
+1. Post ID
+2. Any combination of: updated `desc` (≤ 255 characters), new media files to add, `mediaIdsToRemove` (array of existing media IDs to delete)
+
+**Output:**
+1. Post updated in-place; feed reflects new content
+
+**Basic Course**
+
+| Actor: User | System |
+|---|---|
+| 1. User clicks "Edit" in the post dropdown, modifies the text or media, and saves | |
+| | 2.1. `JwtAuthGuard`, `BannedUserGuard`, and `EmailVerifiedGuard` validate the user |
+| | 2.2. System fetches the post and confirms `userId` matches the current user (returns 403 if not) |
+| | 2.3. System processes any new media files (same upload pipeline as UC-09) |
+| | 2.4. System removes media rows whose IDs are listed in `mediaIdsToRemove` |
+| | 2.5. System updates `Post.desc` if provided |
+| | 2.6. System returns the updated post; frontend invalidates the post cache |
+
+**Precondition**
+1. User owns the post; post is not deleted
+2. User is authenticated, email-verified, and not banned
+
+**Post condition**
+1. Post content and/or media updated; changes visible in all feeds immediately
+
+---
+
 ### 14. USE CASE UC-14:
 
 Name: Report Post
@@ -506,14 +539,14 @@ Identifier UC-16
 | Actor: User | System |
 |---|---|
 | 1. User clicks the bookmark icon on a post | |
-| | 2.1. `JwtAuthGuard` validates the user |
+| | 2.1. `JwtAuthGuard`, `BannedUserGuard`, and `EmailVerifiedGuard` validate the user |
 | | 2.2. System checks for an existing `SavedPosts` row |
 | | 2.3. If found: deletes the row; returns `{ saved: false }` |
 | | 2.4. If not found: creates the row; returns `{ saved: true }` |
 | | 2.5. Frontend updates the bookmark button state |
 
 **Precondition**
-1. User is authenticated; post exists
+1. User is authenticated, email-verified, and not banned; post exists
 
 **Post condition**
 1. `SavedPosts` row exists or is removed; post appears in or is removed from `/bookmarks`
@@ -671,6 +704,35 @@ Identifier UC-21
 
 **Post condition**
 1. Block exists or is removed; follow relationships deleted on block; blocked user filtered everywhere
+
+---
+
+### USE CASE UC-72:
+
+Name: View Blocked Accounts
+Identifier UC-72
+
+**Inputs:**
+1. (none; uses session)
+
+**Output:**
+1. List of users the current user has blocked
+
+**Basic Course**
+
+| Actor: User | System |
+|---|---|
+| 1. User navigates to account settings or the blocked list page | |
+| | 2.1. `JwtAuthGuard` and `BannedUserGuard` validate the user |
+| | 2.2. System queries all `Block` rows where `blockerId = userId`; joins blocked user details |
+| | 2.3. Returns the list of blocked users (id, username, displayName, avatar) |
+| | 2.4. Frontend renders the blocked accounts list with Unblock buttons |
+
+**Precondition**
+1. User is authenticated and not banned
+
+**Post condition**
+1. User can review and unblock individual accounts from the list
 
 ---
 
@@ -842,23 +904,24 @@ Identifier UC-27
 1. Pagination cursor
 
 **Output:**
-1. Paginated feed of trending top-level posts ranked by like count
+1. Paginated feed of trending top-level posts ranked by a time-decay engagement score
 
 **Basic Course**
 
 | Actor: User | System |
 |---|---|
 | 1. User clicks the "Explore" tab on the homepage (`/?feed=explore`) | |
-| | 2.1. System filters: `parentPostId = null`, `communityId = null`, `deletedAt = null`; excludes blocked users |
-| | 2.2. System orders by **likes DESC, then createdAt DESC** |
-| | 2.3. System paginates and returns `{ posts, hasMore }` |
-| | 2.4. Frontend renders trending posts |
+| | 2.1. System filters: `parentPostId = null`, `communityId = null`, `deletedAt = null`; excludes blocked users; looks back at posts from the last 7 days (up to 400 candidates) |
+| | 2.2. System scores each post using `computeExploreScoreFixed(likes, comments, reposts, ageHours)` — a time-decay formula that weights engagement against how old the post is |
+| | 2.3. System applies author-diversity ranking via `applyExploreDiversity()` (max 3 posts per author per page) to prevent any single user from flooding the feed |
+| | 2.4. System paginates the ranked list and returns `{ posts, hasMore, nextCursor }` |
+| | 2.5. Frontend renders trending posts |
 
 **Precondition**
 1. Posts exist in the system
 
 **Post condition**
-1. User sees globally trending content
+1. User sees globally trending content ranked by engagement quality, not just raw like count
 
 ---
 
@@ -2144,6 +2207,37 @@ Identifier UC-69
 
 ---
 
+### 70. USE CASE UC-70:
+
+Name: Search Conversations
+Identifier UC-70
+
+**Inputs:**
+1. Search query string (`q`)
+
+**Output:**
+1. List of conversations whose other member's username or display name matches the query
+
+**Basic Course**
+
+| Actor: User | System |
+|---|---|
+| 1. User types in the search input inside the `/messages` sidebar | |
+| | 2.1. `JwtAuthGuard` validates the user |
+| | 2.2. Frontend calls `GET /api/conversations/search?q=<term>` |
+| | 2.3. System queries `Conversation` where user is a `ConversationMember`; filters by the other member's `username` or `displayName` ILIKE `q` |
+| | 2.4. Returns matching conversations with `otherMember`, `lastMessage`, and `unreadCount` |
+| | 2.5. Frontend renders the filtered conversation list in real-time |
+
+**Precondition**
+1. User is authenticated
+2. Query string is at least 1 character
+
+**Post condition**
+1. User can navigate to the matching conversation from the search result
+
+---
+
 ## Summary Table
 
 | UC | Name | Domain |
@@ -2217,3 +2311,6 @@ Identifier UC-69
 | UC-67 | View Post Permalink (Guest) | Guest Access |
 | UC-68 | View Public Profile (Guest) | Guest Access |
 | UC-69 | Search (Guest) | Guest Access |
+| UC-70 | Search Conversations | Messaging |
+| UC-71 | Edit Own Post | Posts |
+| UC-72 | View Blocked Accounts | Social Graph |

@@ -1,0 +1,109 @@
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#EFF6FF',
+    'primaryTextColor': '#1E2937',
+    'primaryBorderColor': '#93C5FD',
+    'lineColor': '#64748B',
+    'secondaryColor': '#F1F5F9',
+    'tertiaryColor': '#F8FAFC',
+    'background': '#FFFFFF',
+    'mainBkg': '#F8FAFC',
+    'nodeBorder': '#CBD5E1',
+    'titleColor': '#1E2937',
+    'edgeLabelBackground': '#F1F5F9',
+    'actorBkg': '#FFFFFF',
+    'actorBorder': '#93C5FD',
+    'actorTextColor': '#1E2937',
+    'actorLineColor': '#64748B',
+    'signalColor': '#334155',
+    'signalTextColor': '#1E2937',
+    'labelBoxBkgColor': '#F1F5F9',
+    'labelBoxBorderColor': '#CBD5E1',
+    'loopLimitBkgColor': '#F1F5F9',
+    'noteBkgColor': '#FEF9C3',
+    'noteBorderColor': '#FACC15',
+    'noteTextColor': '#854D0E',
+    'activationBorderColor': '#3B82F6',
+    'activationBkgColor': '#DBEAFE',
+    'sequenceNumberColor': '#1E40AF'
+  },
+  'themeCSS': "
+    .actor { rx: 8; ry: 8; }
+    .actor-man circle, .actor-man line { stroke: #3B82F6 !important; }
+    text.actor > tspan { fill: #1E2937 !important; font-weight: 600; font-size: 13px; }
+    .messageText { fill: #334155 !important; font-size: 12px; }
+    .labelText, .labelText > tspan { fill: #1E2937 !important; font-size: 11px; }
+    .loopText, .loopText > tspan { fill: #475569 !important; font-size: 11px; }
+    .note { rx: 6; ry: 6; }
+    .noteText > tspan { font-size: 11px; }
+    .activation0 { fill: #DBEAFE !important; stroke: #3B82F6 !important; }
+  "
+}}%%
+sequenceDiagram
+    autonumber
+    actor       User as User
+    participant FE    as Frontend<br/>(Next.js)
+    participant BE    as Backend<br/>(NestJS)
+    participant DB    as Database
+
+    %% ── Phase 1: Create Specialized Community ──────────────────────
+    rect rgb(224, 242, 254)
+        Note over User,DB: Phase 1 — Create Specialized Community
+
+        User ->>+ FE : Enter Name, Slug, Description, and click "Create Community"
+        FE ->>+ BE : POST /api/communities { name, slug, description }
+        Note over BE : JwtAuthGuard + EmailVerifiedGuard
+
+        BE ->>+ DB : Query if community slug already exists (prisma.community.findUnique)
+        DB -->>- BE : Existing community record or null
+
+        BE ->>+ DB : Create community record with owner membership (prisma.community.create)
+        DB -->>- BE : Created community record
+
+        BE -->>- FE : 201 Created — Community JSON
+        FE ->> FE : Redirect to /c/[slug]
+        FE -->>- User : Render new community dashboard
+    end
+
+    %% ── Phase 2: Join / Leave Community ────────────────────────────
+    rect rgb(236, 253, 245)
+        Note over User,DB: Phase 2 — Join / Leave Community
+
+        User ->>+ FE : Click Join / Leave button
+        FE ->>+ BE : POST /api/communities/:id/join
+        Note over BE : JwtAuthGuard + BannedUserGuard
+
+        BE ->>+ DB : Query if user is banned (prisma.communityBannedUser.findUnique)
+        DB -->>- BE : Banned status or null
+
+        BE ->>+ DB : Query existing membership (prisma.communityMember.findUnique)
+        DB -->>- BE : Membership record or null
+
+        BE ->>+ DB : Create membership (join) OR delete membership (leave)
+        DB -->>- BE : Mutation success
+
+        BE ->> BE : Invalidate cache (communities graph, user views)
+        BE -->>- FE : 200 OK — { joined: boolean }
+        FE ->> FE : router.refresh() (server component updates)
+        FE -->>- User : Toggle button text (Join/Leave) & update member count
+    end
+
+    %% ── Phase 3: Manage Rules & Members (e.g. Add Rule) ───────────
+     rect rgb(255, 247, 237)
+        Note over User,DB: Phase 3 — Manage Rules & Members (e.g. Add Rule)
+
+        User ->>+ FE : Enter rule title/description, click "Add Rule"
+        FE ->>+ BE : POST /api/communities/:id/rules { title, description }
+        Note over BE : JwtAuthGuard + BannedUserGuard
+
+        BE ->>+ DB : Check if user is Owner/Mod (prisma.communityMember.findUnique)
+        DB -->>- BE : Member record (role: OWNER or MOD)
+
+        BE ->>+ DB : Create rule record (prisma.communityRule.create)
+        DB -->>- BE : Created rule record
+
+        BE -->>- FE : 201 Created
+        FE ->> FE : router.refresh() (re-fetch rules list)
+        FE -->>- User : Show new rule in rules list
+    end

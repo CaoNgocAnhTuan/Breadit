@@ -1,0 +1,113 @@
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#EFF6FF',
+    'primaryTextColor': '#1E2937',
+    'primaryBorderColor': '#93C5FD',
+    'lineColor': '#64748B',
+    'secondaryColor': '#F1F5F9',
+    'tertiaryColor': '#F8FAFC',
+    'background': '#FFFFFF',
+    'mainBkg': '#F8FAFC',
+    'nodeBorder': '#CBD5E1',
+    'titleColor': '#1E2937',
+    'edgeLabelBackground': '#F1F5F9',
+    'actorBkg': '#FFFFFF',
+    'actorBorder': '#93C5FD',
+    'actorTextColor': '#1E2937',
+    'actorLineColor': '#64748B',
+    'signalColor': '#334155',
+    'signalTextColor': '#1E2937',
+    'labelBoxBkgColor': '#F1F5F9',
+    'labelBoxBorderColor': '#CBD5E1',
+    'loopLimitBkgColor': '#F1F5F9',
+    'noteBkgColor': '#FEF9C3',
+    'noteBorderColor': '#FACC15',
+    'noteTextColor': '#854D0E',
+    'activationBorderColor': '#3B82F6',
+    'activationBkgColor': '#DBEAFE',
+    'sequenceNumberColor': '#1E40AF'
+  },
+  'themeCSS': "
+    .actor { rx: 8; ry: 8; }
+    .actor-man circle, .actor-man line { stroke: #3B82F6 !important; }
+    text.actor > tspan { fill: #1E2937 !important; font-weight: 600; font-size: 13px; }
+    .messageText { fill: #334155 !important; font-size: 12px; }
+    .labelText, .labelText > tspan { fill: #1E2937 !important; font-size: 11px; }
+    .loopText, .loopText > tspan { fill: #475569 !important; font-size: 11px; }
+    .note { rx: 6; ry: 6; }
+    .noteText > tspan { font-size: 11px; }
+    .activation0 { fill: #DBEAFE !important; stroke: #3B82F6 !important; }
+  "
+}}%%
+sequenceDiagram
+    autonumber
+    actor       User as User
+    participant FE    as Frontend<br/>(Next.js)
+    participant BE    as Backend<br/>(NestJS)
+    participant DB    as Database
+
+    %% ── Phase 1: Create Post ───────────────────────────────────────
+    rect rgb(224, 242, 254)
+        Note over User,DB: Phase 1 — Create Post
+
+        User ->>+ FE : Enter content, attach media (optional), click "Post"
+        FE ->>+ BE : POST /api/posts (multipart/form-data)<br/>{ desc, imgType, isSensitive?, file[] }
+        Note over BE : JwtAuthGuard + EmailVerifiedGuard
+
+        alt Has attached files
+            BE ->> BE : Upload files to Cloudinary → get Secure URLs
+        end
+
+        BE ->>+ DB : post.create({ desc, userId, media[], isSensitive })
+        DB -->>- BE : Post record
+
+        BE ->> DB : Parse #hashtags → upsert Hashtag + PostTag<br/>Parse @mentions → mention.createMany + emit MENTION notification
+
+        BE -->>- FE : 201 Created — { post }
+        FE -->>- User: Post appears on feed
+    end
+
+    %% ── Phase 2: Edit Post ─────────────────────────────────────────
+    rect rgb(236, 253, 245)
+        Note over User,DB: Phase 2 — Edit Post
+
+        User ->>+ FE : Click "Edit post" → EditPostModal opens
+        User ->> FE : Edit content / media → click "Save"
+        FE ->>+ BE : PATCH /api/posts/{id} (multipart/form-data)<br/>{ desc, mediaIdsToRemove?, file[]? }
+        Note over BE : JwtAuthGuard + BannedUserGuard + EmailVerifiedGuard
+
+        BE ->>+ DB : post.findUnique({ id }) — check ownership
+        DB -->>- BE : Post record
+
+        alt Not found or not owner
+            BE -->> FE : 404 / 403
+            FE -->> User: Show error
+        else Valid
+            BE ->> BE : Delete old media from Cloudinary (if any)<br/>Upload new media to Cloudinary (if any)
+            BE ->> DB : postMedia.deleteMany / createMany<br/>post.update({ desc })<br/>Update hashtags & mentions
+            BE -->>- FE : 200 OK — { post }
+            FE -->>- User: Post shows "(edited)"
+        end
+    end
+
+    %% ── Phase 3: Delete Post ───────────────────────────────────────
+    rect rgb(255, 247, 237)
+        Note over User,DB: Phase 3 — Delete Post
+
+        User ->>+ FE : Click "Delete post" on dropdown
+        FE ->>+ BE : DELETE /api/posts/{id}
+        Note over BE : JwtAuthGuard + BannedUserGuard
+
+        BE ->>+ DB : post.findUnique({ id }) — check ownership
+        DB -->>- BE : Post record
+
+        alt Not found or not owner
+            BE -->> FE : 404 / 403
+            FE -->> User: Show error (revert optimistic update)
+        else Valid
+            BE ->> DB : post.update({ deletedAt: now() }) — soft delete
+            BE -->>- FE : 200 OK — { success: true }
+            FE -->>- User: Post disappears from feed
+        end
+    end

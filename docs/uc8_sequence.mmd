@@ -1,0 +1,135 @@
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#F8FAFC',
+    'primaryTextColor': '#0F172A',
+    'primaryBorderColor': '#94A3B8',
+    'lineColor': '#64748B',
+    'secondaryColor': '#F1F5F9',
+    'tertiaryColor': '#FFFFFF',
+    'background': '#FFFFFF',
+    'mainBkg': '#FFFFFF',
+    'nodeBorder': '#CBD5E1',
+    'titleColor': '#0F172A',
+    'edgeLabelBackground': '#FFFFFF',
+    'actorBkg': '#FFFFFF',
+    'actorBorder': '#64748B',
+    'actorTextColor': '#0F172A',
+    'actorLineColor': '#64748B',
+    'signalColor': '#334155',
+    'signalTextColor': '#0F172A',
+    'labelBoxBkgColor': '#F8FAFC',
+    'labelBoxBorderColor': '#CBD5E1',
+    'loopLimitBkgColor': '#F8FAFC',
+    'noteBkgColor': '#FEFCE8',
+    'noteBorderColor': '#EAB308',
+    'noteTextColor': '#713F12',
+    'activationBorderColor': '#2563EB',
+    'activationBkgColor': '#DBEAFE',
+    'sequenceNumberColor': '#1D4ED8'
+  },
+  'themeCSS': "
+    .actor {
+      rx: 8;
+      ry: 8;
+    }
+
+    text.actor > tspan {
+      fill: #0F172A !important;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .messageText {
+      fill: #1E293B !important;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .note {
+      rx: 6;
+      ry: 6;
+    }
+
+    .noteText {
+      font-size: 12px !important;
+      fill: #713F12 !important;
+    }
+
+    .activation0 {
+      fill: #DBEAFE !important;
+      stroke: #2563EB !important;
+    }
+
+    .labelText {
+      font-weight: 600;
+      fill: #0F172A !important;
+    }
+  "
+}}%%
+
+sequenceDiagram
+    autonumber
+
+    actor UserA as Actor (User A)
+    participant FE_A as Actor FE
+    participant BE as Backend (NestJS)
+    participant Cache as Redis Cache
+    participant DB as Database
+    participant FE_R as Recipient FE
+    actor UserR as Recipient (User R)
+
+    rect rgb(248,250,252)
+        Note over UserR,BE: Phase 1 - Connection and Gateway Setup
+
+        UserR ->>+ FE_R : Open App / Sign in
+        FE_R ->>+ BE : Connect Socket.io client
+        Note over BE : Verify JWT from breadit_session cookie
+        BE ->> BE : Accept authenticated socket
+        BE -->>- FE_R : Socket connected
+
+        FE_R ->>+ BE : emit newUser(usernameR)
+        BE ->> BE : Join private room usernameR
+        BE -->>- FE_R : Room joined successfully
+    end
+
+    rect rgb(240,249,255)
+        Note over UserA,UserR: Phase 2 - Social Interaction Alerts
+
+        UserA ->>+ FE_A : Follow / Like / Reply to UserR
+        FE_A ->>+ BE : POST /api/...
+        Note over BE : Validate guard and process action
+
+        BE ->>+ DB : Save interaction + notification
+        DB -->>- BE : Notification persisted
+
+        BE ->>+ DB : Query recipient username
+        DB -->>- BE : Return usernameR
+
+        BE -) FE_R : emit getNotification
+        BE -->>- FE_A : 201 Created
+        FE_A -->>- UserA : Action successful
+        FE_R -->> UserR : Update unread badge
+    end
+
+    rect rgb(255, 247, 237)
+        Note over UserA,UserR: Phase 3 - Direct Message Alert
+
+        UserA ->>+ FE_A : Send DM to UserR
+        FE_A ->>+ BE : POST /messages
+        Note over BE : Validate member and block state
+
+        BE ->>+ DB : Save message + update conversation
+        DB -->>- BE : Message saved
+
+        BE ->>+ DB : Fetch sender and recipient info
+        DB -->>- BE : User data returned
+
+        BE -) FE_R : emit newMessage
+        BE ->>+ Cache : Invalidate unread cache
+        Cache -->>- BE : Cache cleared
+
+        BE -->>- FE_A : 201 Created
+        FE_A -->>- UserA : Message delivered
+        FE_R -->> UserR : Render new message
+    end

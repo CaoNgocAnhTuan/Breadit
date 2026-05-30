@@ -1,0 +1,91 @@
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#EFF6FF',
+    'primaryTextColor': '#1E2937',
+    'primaryBorderColor': '#93C5FD',
+    'lineColor': '#64748B',
+    'secondaryColor': '#F1F5F9',
+    'tertiaryColor': '#F8FAFC',
+    'background': '#FFFFFF',
+    'mainBkg': '#F8FAFC',
+    'nodeBorder': '#CBD5E1',
+    'titleColor': '#1E2937',
+    'edgeLabelBackground': '#F1F5F9',
+    'actorBkg': '#FFFFFF',
+    'actorBorder': '#93C5FD',
+    'actorTextColor': '#1E2937',
+    'actorLineColor': '#64748B',
+    'signalColor': '#334155',
+    'signalTextColor': '#1E2937',
+    'labelBoxBkgColor': '#F1F5F9',
+    'labelBoxBorderColor': '#CBD5E1',
+    'loopLimitBkgColor': '#F1F5F9',
+    'noteBkgColor': '#FEF9C3',
+    'noteBorderColor': '#FACC15',
+    'noteTextColor': '#854D0E',
+    'activationBorderColor': '#3B82F6',
+    'activationBkgColor': '#DBEAFE',
+    'sequenceNumberColor': '#1E40AF'
+  },
+  'themeCSS': "
+    .actor { rx: 8; ry: 8; }
+    .actor-man circle, .actor-man line { stroke: #3B82F6 !important; }
+    text.actor > tspan { fill: #1E2937 !important; font-weight: 600; font-size: 13px; }
+    .messageText { fill: #334155 !important; font-size: 12px; }
+    .labelText, .labelText > tspan { fill: #1E2937 !important; font-size: 11px; }
+    .loopText, .loopText > tspan { fill: #475569 !important; font-size: 11px; }
+    .note { rx: 6; ry: 6; }
+    .noteText > tspan { font-size: 11px; }
+    .activation0 { fill: #DBEAFE !important; stroke: #3B82F6 !important; }
+  "
+}}%%
+sequenceDiagram
+    autonumber
+    actor       User as User
+    participant FE    as Frontend<br/>(Next.js)
+    participant BE    as Backend<br/>(NestJS)
+    participant DB    as Database
+
+    %% ── Phase 1: Follow / Unfollow Profile ─────────────────────────
+    rect rgb(224, 242, 254)
+        Note over User,DB: Phase 1 — Follow / Unfollow Profile
+
+        User ->>+ FE : Click Follow / Unfollow button
+        FE ->>+ BE : POST /api/users/:id/follow
+        Note over BE : JwtAuthGuard + BannedUserGuard (optimistic UI update)
+
+        BE ->>+ DB : Query existing follow relation (prisma.follow.findFirst)
+        DB -->>- BE : Follow record or null
+
+        BE ->>+ DB : Create or delete follow record in Database
+        DB -->>- BE : Mutation success (toggle follow state)
+
+        BE ->> BE : Invalidate cache (follows graph, user stats)
+        BE -) BE : notificationsService.emit('FOLLOW') (if followed)
+
+        BE -->>- FE : 200 OK — { following: boolean }
+        FE ->> FE : router.refresh()
+        FE -->>- User : Update follow button & follower count
+    end
+
+    %% ── Phase 2: Block / Unblock User ──────────────────────────────
+    rect rgb(236, 253, 245)
+        Note over User,DB: Phase 2 — Block / Unblock User
+
+        User ->>+ FE : Click Block / Unblock in profile dropdown
+        FE ->>+ BE : POST /api/users/:id/block
+        Note over BE : JwtAuthGuard + BannedUserGuard (optimistic UI update)
+
+        BE ->>+ DB : Query existing block status (prisma.block.findFirst)
+        DB -->>- BE : Block record or null
+
+        BE ->>+ DB : Toggle block record (create block + remove mutual follows OR delete block)
+        DB -->>- BE : Toggle status (blocked: boolean)
+
+        BE ->> BE : Invalidate cache (blocked users, follows graph, user stats)
+
+        BE -->>- FE : 200 OK — { blocked: boolean }
+        FE ->> FE : Invalidate queries ["posts", "profile-posts"] + router.refresh()
+        FE -->>- User : Update block status, refresh profile & feed visibility
+    end
