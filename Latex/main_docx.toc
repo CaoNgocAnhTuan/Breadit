@@ -1,0 +1,164 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Acknowledgements}{iii}{chapter*.1}%
+\contentsline {chapter}{List of Tables}{viii}{chapter*.1}%
+\contentsline {chapter}{List of Figures}{x}{chapter*.1}%
+\contentsline {chapter}{Abstract}{xi}{chapter*.2}%
+\contentsline {chapter}{\numberline {1}INTRODUCTION}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Background:}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Problem Statement:}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Research Contributions:}{1}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Objectives:}{2}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Vision Statement:}{2}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Stakeholders}{2}{subsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.4.3}Users}{3}{subsection.1.4.3}%
+\contentsline {subsection}{\numberline {1.4.4}Risks}{4}{subsection.1.4.4}%
+\contentsline {subsection}{\numberline {1.4.5}Feature List (Prioritized)}{5}{subsection.1.4.5}%
+\contentsline {section}{\numberline {1.5}Requirements:}{6}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}Functional -- Requirements:}{6}{subsection.1.5.1}%
+\contentsline {subsubsection}{Authentication \& Account Management:}{6}{subsubsection*.3}%
+\contentsline {subsubsection}{Feeds \& Discovery:}{7}{subsubsection*.4}%
+\contentsline {subsubsection}{Post Management:}{8}{subsubsection*.5}%
+\contentsline {subsubsection}{Post Interaction:}{9}{subsubsection*.6}%
+\contentsline {subsubsection}{User Relationship Management:}{10}{subsubsection*.7}%
+\contentsline {subsubsection}{Profile Management:}{11}{subsubsection*.8}%
+\contentsline {subsubsection}{Direct Messaging:}{12}{subsubsection*.9}%
+\contentsline {subsubsection}{Real-time Notifications:}{12}{subsubsection*.10}%
+\contentsline {subsubsection}{Community Management:}{13}{subsubsection*.11}%
+\contentsline {subsubsection}{Administrative Moderation:}{14}{subsubsection*.12}%
+\contentsline {subsection}{\numberline {1.5.2}Non -- Functional Requirements:}{15}{subsection.1.5.2}%
+\contentsline {section}{\numberline {1.6}Assumption and Solution:}{18}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Structure of Pre - Thesis:}{19}{section.1.7}%
+\contentsline {chapter}{\numberline {2}LITERATURE REVIEW}{20}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Overview of Social Networking Platform Architectures}{20}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Frontend Development Technologies}{21}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Overview of Frontend Frameworks}{21}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Rationale for Choosing Next.js:}{21}{subsection.2.2.2}%
+\contentsline {section}{\numberline {2.3}Backend Development Technologies}{21}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Overview of Backend Languages}{21}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Rationale for Choosing Nest.js:}{22}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Database Technologies for Social Networking Platform Applications}{22}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}Overview of Traditional Databases}{22}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Rationale for Choosing PostgreSQL and Redis:}{22}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}Web Curation and Social Feed Ranking Algorithms}{23}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Threaded Discussion Curation and Comment Sorting}{24}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Real-Time Web Communication Protocols}{24}{section.2.7}%
+\contentsline {section}{\numberline {2.8}Content Trending Systems in Social Platforms}{25}{section.2.8}%
+\contentsline {section}{\numberline {2.9}Comparative Analysis of Existing Social Media Platforms}{26}{section.2.9}%
+\contentsline {chapter}{\numberline {3}METHODOLOGY}{27}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Overview:}{27}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Development Process:}{27}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Architecture Design:}{27}{subsection.3.2.1}%
+\contentsline {subsubsection}{Summary Use Case:}{29}{subsubsection*.13}%
+\contentsline {subsubsection}{Use Cases:}{32}{subsubsection*.14}%
+\contentsline {subsubsection}{Activity Diagram:}{33}{subsubsection*.15}%
+\contentsline {subsubsection}{Entity Relationship Diagram:}{43}{subsubsection*.16}%
+\contentsline {subsubsection}{Class Diagram:}{58}{subsubsection*.17}%
+\contentsline {subsubsection}{Sequence Diagram}{66}{subsubsection*.18}%
+\contentsline {section}{\numberline {3.3}User Requirement Analysis:}{76}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}User Interface Design:}{76}{subsection.3.3.1}%
+\contentsline {section}{\numberline {3.4}Technology Summary:}{77}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Front -- end:}{78}{subsection.3.4.1}%
+\contentsline {subsubsection}{Technology Used: Next.js}{78}{subsubsection*.19}%
+\contentsline {subsubsection}{Architectural Role}{78}{subsubsection*.20}%
+\contentsline {subsubsection}{Key Mechanisms and Features Applied}{78}{subsubsection*.21}%
+\contentsline {subsubsection}{Justification}{79}{subsubsection*.22}%
+\contentsline {subsection}{\numberline {3.4.2}Back -- end:}{79}{subsection.3.4.2}%
+\contentsline {subsubsection}{Technology Used: NestJS (TypeScript) + Fastify}{79}{subsubsection*.23}%
+\contentsline {subsubsection}{Architectural Role}{79}{subsubsection*.24}%
+\contentsline {subsubsection}{Key Mechanisms and Features Applied}{80}{subsubsection*.25}%
+\contentsline {subsubsection}{Justification}{81}{subsubsection*.26}%
+\contentsline {subsection}{\numberline {3.4.3}Database:}{81}{subsection.3.4.3}%
+\contentsline {subsubsection}{Relational Database: PostgreSQL}{81}{subsubsection*.27}%
+\contentsline {subsection}{\numberline {3.4.4}Deployment}{82}{subsection.3.4.4}%
+\contentsline {subsubsection}{Workflow}{83}{subsubsection*.28}%
+\contentsline {subsubsection}{Networking and Security}{84}{subsubsection*.29}%
+\contentsline {subsubsection}{Compute and Scalability}{84}{subsubsection*.30}%
+\contentsline {subsubsection}{Database Service}{85}{subsubsection*.31}%
+\contentsline {chapter}{\numberline {4}IMPLEMENTATION}{86}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Project Structure Overview:}{86}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Backend Implementation}{87}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Database Models}{88}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Module 1: Authentication \& Account Verification}{89}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Module 2: Feeds \& Discovery}{91}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}Module 3: Post Management}{92}{subsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.2.5}Module 4: Post Interaction}{94}{subsection.4.2.5}%
+\contentsline {subsection}{\numberline {4.2.6}Module 5: User Relationship Management}{95}{subsection.4.2.6}%
+\contentsline {subsection}{\numberline {4.2.7}Module 6: Profile Management}{96}{subsection.4.2.7}%
+\contentsline {subsection}{\numberline {4.2.8}Module 7: Direct Messaging}{98}{subsection.4.2.8}%
+\contentsline {subsection}{\numberline {4.2.9}Module 8: Real-time Notifications}{100}{subsection.4.2.9}%
+\contentsline {subsection}{\numberline {4.2.10}Module 9: Community Management}{101}{subsection.4.2.10}%
+\contentsline {subsection}{\numberline {4.2.11}Module 10: Administrative Moderation}{102}{subsection.4.2.11}%
+\contentsline {section}{\numberline {4.3}Frontend Implementation}{103}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Authentication \& Onboarding Flow (/sign-up, /sign-in, /verify)}{104}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Main Feed \& Discovery Page (/ - Home \& Explore Feed)}{106}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Direct Messaging \& Chat Interface (/messages)}{107}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}User Profile Page (/[username])}{109}{subsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Community Page (/c/[slug])}{111}{subsection.4.3.5}%
+\contentsline {subsection}{\numberline {4.3.6}Administrative Console (/admin-console)}{113}{subsection.4.3.6}%
+\contentsline {chapter}{\numberline {5}TEST CASES}{115}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Detailed Cases:}{115}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Authentication \& Account Verification}{115}{subsection.5.1.1}%
+\contentsline {subsubsection}{Test Case \#: UC01}{115}{subsubsection*.32}%
+\contentsline {subsubsection}{Test Case \#: UC04}{116}{subsubsection*.33}%
+\contentsline {subsection}{\numberline {5.1.2}Feeds \& Discovery}{117}{subsection.5.1.2}%
+\contentsline {subsubsection}{Test Case \#: UC26}{117}{subsubsection*.34}%
+\contentsline {subsubsection}{Test Case \#: UC27}{118}{subsubsection*.35}%
+\contentsline {subsubsection}{Test Case \#: UC30}{119}{subsubsection*.36}%
+\contentsline {subsection}{\numberline {5.1.3}Post Management}{121}{subsection.5.1.3}%
+\contentsline {subsubsection}{Test Case \#: UC08}{121}{subsubsection*.37}%
+\contentsline {subsubsection}{Test Case \#: UC09}{122}{subsubsection*.38}%
+\contentsline {subsection}{\numberline {5.1.4}Post Interaction}{123}{subsection.5.1.4}%
+\contentsline {subsubsection}{Test Case \#: UC15}{123}{subsubsection*.39}%
+\contentsline {subsubsection}{Test Case \#: UC10}{124}{subsubsection*.40}%
+\contentsline {subsection}{\numberline {5.1.5}User Relationship Management}{125}{subsection.5.1.5}%
+\contentsline {subsubsection}{Test Case \#: UC18}{126}{subsubsection*.41}%
+\contentsline {subsubsection}{Test Case \#: UC21}{127}{subsubsection*.42}%
+\contentsline {subsection}{\numberline {5.1.6}Profile Management}{128}{subsection.5.1.6}%
+\contentsline {subsubsection}{Test Case \#: UC22}{128}{subsubsection*.43}%
+\contentsline {subsection}{\numberline {5.1.7}Direct Messaging}{129}{subsection.5.1.7}%
+\contentsline {subsubsection}{Test Case \#: UC40}{129}{subsubsection*.44}%
+\contentsline {subsubsection}{Test Case \#: UC43}{130}{subsubsection*.45}%
+\contentsline {subsection}{\numberline {5.1.8}Real-time Notifications}{131}{subsection.5.1.8}%
+\contentsline {subsubsection}{Test Case \#: UC37}{132}{subsubsection*.46}%
+\contentsline {subsection}{\numberline {5.1.9}Community Management}{133}{subsection.5.1.9}%
+\contentsline {subsubsection}{Test Case \#: UC51}{133}{subsubsection*.47}%
+\contentsline {subsection}{\numberline {5.1.10}Administrative Moderation}{134}{subsection.5.1.10}%
+\contentsline {subsubsection}{Test Case \#: UC62}{134}{subsubsection*.48}%
+\contentsline {subsubsection}{Test Case \#: UC65}{135}{subsubsection*.49}%
+\contentsline {section}{\numberline {5.2}Evaluation:}{136}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Performance:}{136}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Scalability:}{137}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Usability:}{137}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.2.4}Real-Time Performance: WebSocket Notification Latency:}{139}{subsection.5.2.4}%
+\contentsline {subsection}{\numberline {5.2.5}Content Discovery Algorithm:}{139}{subsection.5.2.5}%
+\contentsline {chapter}{\numberline {6}DEMONSTRATION}{141}{chapter.6}%
+\contentsline {section}{\numberline {6.1}User -- Features:}{141}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Home Page:}{141}{subsection.6.1.1}%
+\contentsline {subsection}{\numberline {6.1.2}Sign Up Page}{142}{subsection.6.1.2}%
+\contentsline {subsection}{\numberline {6.1.3}Sign In Page}{142}{subsection.6.1.3}%
+\contentsline {subsection}{\numberline {6.1.4}Forgot Password Page}{143}{subsection.6.1.4}%
+\contentsline {subsection}{\numberline {6.1.5}User Profile Page}{144}{subsection.6.1.5}%
+\contentsline {subsection}{\numberline {6.1.6}Search Page}{145}{subsection.6.1.6}%
+\contentsline {subsection}{\numberline {6.1.7}Message Page}{146}{subsection.6.1.7}%
+\contentsline {subsection}{\numberline {6.1.8}Bookmarks Page}{147}{subsection.6.1.8}%
+\contentsline {subsection}{\numberline {6.1.9}Notifications Page}{147}{subsection.6.1.9}%
+\contentsline {subsection}{\numberline {6.1.10}Blocked accounts Page}{148}{subsection.6.1.10}%
+\contentsline {subsection}{\numberline {6.1.11}Communities Page}{148}{subsection.6.1.11}%
+\contentsline {subsection}{\numberline {6.1.12}Connect Page}{149}{subsection.6.1.12}%
+\contentsline {subsection}{\numberline {6.1.13}Community feeds Page}{150}{subsection.6.1.13}%
+\contentsline {subsection}{\numberline {6.1.14}Community rules Page}{151}{subsection.6.1.14}%
+\contentsline {subsection}{\numberline {6.1.15}Thread comments Page}{152}{subsection.6.1.15}%
+\contentsline {section}{\numberline {6.2}Administrative Features}{153}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Admin Overview Page}{153}{subsection.6.2.1}%
+\contentsline {chapter}{\numberline {7}CONCLUSION \& FUTURE WORKS}{154}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Achievement of Research Contributions and Goals}{154}{section.7.1}%
+\contentsline {section}{\numberline {7.2}System Limitations}{155}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Future Works}{156}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Multi-Platform Integration}{156}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Trending and Recommendation Module Upgrade}{156}{subsection.7.3.2}%
+\contentsline {subsection}{\numberline {7.3.3}Enhanced AI Capabilities}{157}{subsection.7.3.3}%
+\contentsline {subsection}{\numberline {7.3.4}Public API and Integration}{157}{subsection.7.3.4}%
+\contentsline {subsection}{\numberline {7.3.5}Performance Optimization}{158}{subsection.7.3.5}%
+\contentsline {subsection}{\numberline {7.3.6}Security Enhancements}{158}{subsection.7.3.6}%
+\contentsline {chapter}{References}{159}{chapter*.50}%
+\contentsline {chapter}{APPENDIX}{161}{appendix*.51}%

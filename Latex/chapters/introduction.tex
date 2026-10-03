@@ -1,0 +1,519 @@
+
+\section{Background:}
+
+The exponential growth of user-generated content on modern social networking platforms has introduced "information noise," making it increasingly difficult for users to identify relevant discussions and communities within vast, continuous data streams. This challenge necessitates the development of interaction-based, time-aware content discovery systems capable of surfacing high-quality, recent content without relying on opaque algorithmic curation.
+
+Breadit addresses this gap as a hybrid social networking platform that combines community-based sub-breadits with a transparent linear time-decay heuristic ranking algorithm, scoring posts by engagement signals (likes, comments, reposts) and enforcing author-diversity filtering to prevent content monopolization. By coupling this deterministic discovery engine with full-duplex real-time communication via Socket.IO, the platform delivers structured, community-centric social interactions within a low-latency architecture.
+
+\section{Problem Statement:}
+
+In contemporary social media, massive content volume creates information noise. Studies empirically link this overload to statistically significant increases in emotional exhaustion and systematic information avoidance behavior (Gupta, Bodhi, \& Pandey, 2024; Stamenkovi{'c} \& Aleksi{'c}, 2025). Furthermore, platforms like Meta and X prioritize engagement-centric algorithmic feeds, delaying post visibility and disrupting conversational context (Guess et al., 2023). Existing flat-reply architectures also lack structured thread organization, causing contextual fragmentation during multi-user discussions (Kwak et al., 2010). Consequently, a clear demand exists for a hybrid platform that integrates threaded discussions for structured context alongside WebSockets to deliver real-time updates and transparent heuristic content discovery.
+
+\section{Research Contributions:}
+
+C1. Hybrid social networking architecture: Breadit unifies Reddit-style community-based threaded discussions with Twitter-style microblogging into a single platform. Users engage in structured, multi-level comment threads within dedicated sub-breadit communities while maintaining a global personal timeline - a combination that existing platforms provide only in isolation. This directly addresses the contextual fragmentation caused by flat-reply architectures on current microblogging platforms.
+
+C2. Transparent, deterministic Explore feed algorithm: Rather than opaque engagement-centric ranking, Breadit implements an auditable linear time-decay heuristic:
+
+    	\textbf{Score = (Likes $\times$ 1) + (Comments $\times$ 2) + (Reposts $\times$ 3) $-$ (}\textbf{AgeHours}\textbf{ $\times$ 0.25)}
+
+Combined with a greedy author-diversity filter --- capping each author at a maximum of 3 posts per Explore page within a 7-day candidate window --- this algorithm surfaces relevant, recent content while actively preventing content monopolization, without relying on non-interpretable machine learning models.
+
+C3. Real-time social interaction layer: Breadit delivers instant private messaging and push notifications (likes, replies, follows, mentions) without page reload via Socket.IO WebSocket connections. This enables immediate, bidirectional social feedback loops across all platform interactions, fulfilling the core thesis requirement of real-time updates in a community-driven social context.
+
+\section{Objectives:}
+
+\subsection{Vision Statement:}
+
+For online users and community creators who wish to experience social networking in a more effective manner, there is Breadit which represents a one-stop platform which can serve as a link between the large pool of information available and personalized discovery. Unlike social networks which bombard the user with large amounts of irrelevant information and delayed responses, the solution involves a real time synchronization process and a discovery engine based on user interaction. The result of this combination includes an interactive and secure social environment for its users.
+
+\subsection{Stakeholders}
+
+The development of the Breadit platform involves several key stakeholders, ranging from academic supervisors to the technical development team and active social participants.
+
+\begin{longtable}{|p{0.3\linewidth}|p{0.3\linewidth}|p{0.3\linewidth}|}
+\caption{List of Project Stakeholders and Their Responsibilities} \label{tab:1} \\
+\hline
+\textbf{Name} & \textbf{Role} & \textbf{Responsibilities} \\
+\hline
+\endfirsthead
+\multicolumn{3}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{Name} & \textbf{Role} & \textbf{Responsibilities} \\
+\hline
+\endhead
+\hline \multicolumn{3}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+MSc. Nguyen Trung Nghia & Project Supervisor & Provides academic guidance, reviews technical architecture, and approves the project scope and deliverables. \\
+\hline
+Cao Ngoc Anh Tuan & Student & Designs system architecture, implements Frontend/Backend, and executes testing. \\
+\hline
+Thesis Committee & Evaluators & Reviews the pre-thesis and final thesis, providing feedback on system quality and research depth. \\
+\hline
+Authenticated User & Platform Users & Browse feeds, interact with posts, participate in communities, and use real-time direct messaging and live notifications. \\
+\hline
+System Admin & Platform Administrator & Manage report queues, moderate violating content, and handle user lifecycle. \\
+\hline
+\end{longtable}
+
+
+\subsection{Users}
+
+\begin{longtable}{|p{0.45\linewidth}|p{0.45\linewidth}|}
+\caption{Primary User Groups and Their Key Needs} \label{tab:2} \\
+\hline
+\textbf{User Group} & \textbf{Primary Needs / Goals} \\
+\hline
+\endfirsthead
+\multicolumn{2}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{User Group} & \textbf{Primary Needs / Goals} \\
+\hline
+\endhead
+\hline \multicolumn{2}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+Guest (Unauthenticated) & Browse public feeds, view poster-links and user profiles, search for content/hashtags, and smoothly sign up/log in to interact. \\
+\hline
+Authenticated User & Publish posts with multimedia, engage with others (likes, comments, reposts), follow users, manage profile, use real-time direct messaging, and receive live notifications. \\
+\hline
+\end{longtable}
+
+
+\subsection{Risks}
+
+\begin{longtable}{|p{0.18\linewidth}|p{0.18\linewidth}|p{0.18\linewidth}|p{0.18\linewidth}|p{0.18\linewidth}|}
+\caption{Top Risks} \label{tab:3} \\
+\hline
+\textbf{ID} & \textbf{Risk} & \textbf{Owner} & \textbf{Mitigation} & \textbf{Trigger} \\
+\hline
+\endfirsthead
+\multicolumn{5}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Risk} & \textbf{Owner} & \textbf{Mitigation} & \textbf{Trigger} \\
+\hline
+\endhead
+\hline \multicolumn{5}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+1 & Real-time Connection Instability & Developer & Implement robust reconnect logic using Socket.IO and utilize Redis adapter for scalable Pub/Sub across instances. & Users fail to receive live notifications or direct messages in real-time. \\
+\hline
+2 & Media Upload Handling Failures & Developer & Configure efficient multipart parsing in Fastify and integrate Cloudinary as a robust media CDN. & Errors or timeouts during post creation when uploading multiple high-resolution images/videos. \\
+\hline
+3 & Scalability \& Client State Desync & Frontend Lead & Utilize TanStack Query for robust client-side state management and implement cursor-based pagination for infinite feeds. & Feed stutters, UI freezes, or out-of-sync data when scrolling through massive timelines. \\
+\hline
+4 & Data Privacy \& Security & System Admin & Implement JWT for session management and hash passwords (bcrypt). & Unauthorized access to user profiles, private direct messages, or session hijacking. \\
+\hline
+5 & Database Query Performance & Backend Lead & Optimize Prisma ORM queries using precise include/select structures to prevent N+1 issues when fetching nested comments and likes. & Slow server response times when fetching complex user timelines or deeply nested threads. \\
+\hline
+\end{longtable}
+
+
+\subsection{Feature List (Prioritized)}
+
+The features are prioritized using the MoSCoW method (Must have, should have, could have, Won't have) to ensure the MVP (Minimum Viable Product)
+
+\begin{longtable}{|p{0.3\linewidth}|p{0.3\linewidth}|p{0.3\linewidth}|}
+\caption{Feature Backlog (MoSCoW)} \label{tab:4} \\
+\hline
+\textbf{Feature} & \textbf{Priority (M/S/C/W)} & \textbf{Notes} \\
+\hline
+\endfirsthead
+\multicolumn{3}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{Feature} & \textbf{Priority (M/S/C/W)} & \textbf{Notes} \\
+\hline
+\endhead
+\hline \multicolumn{3}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+User Authentication (Login/Register) & M & Secure access using JWT/OAuth. \\
+\hline
+Timeline Feeds \& Discovery & M & Cursor-paginated home and explore feeds with infinite scrolling. \\
+\hline
+Post Creation \& Media Upload & M & Text posts, hashtags, mentions, and Cloudinary media integration. \\
+\hline
+Social Graph \& Interactions & M & Core engagement: following users, liking, replying, and reposting/quote-reposting. \\
+\hline
+Real-time Notifications and Chatting & M & Live system alerts (likes, replies, mentions, message) powered by Socket.IO and Redis. \\
+\hline
+AI-based Content Recommendation & S & Personalized feed suggestions based on interaction history to enhance user engagement (Planned for future refinement) \\
+\hline
+Admin Monitor Tools & C & System-wide moderation panel to manage users/groups, approve content, configure settings, and monitor analytics. \\
+\hline
+Native Mobile Application & W & Out of scope for this web-based thesis. \\
+\hline
+\end{longtable}
+
+
+\section{Requirements:}
+
+\subsection{Functional -- Requirements:}
+
+\subsubsection{Authentication \& Account Management:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Authentication and Account Management} \label{tab:5} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-AUTH-01 & Users sign up with a unique username, email, and password & Must & Sign up/ Login \\
+\hline
+FR-AUTH-02 & The system shall implement secure password hashing (e.g., bcrypt) before storing credentials. & Must & Sign up/ Login \\
+\hline
+FR-AUTH-03 & The system shall send a 6-digit verification code (OTP) to the user's email to verify account ownership. & Must & Send verification \\
+\hline
+FR-AUTH-04 & The system shall authenticate users and issue a secure httpOnly JWT session cookie named breadit\_session. & Must & Sign up/ Login \\
+\hline
+FR-AUTH-05 & The system should provide a "Forgot Password" feature allowing users to reset their credentials securely. & Should & Reset password \\
+\hline
+\end{longtable}
+
+
+\subsubsection{Feeds \& Discovery:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Feeds \& Discovery} \label{tab:6} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-DISC-01 & The system shall generate a chronologically sorted home feed consisting of posts from followed users. & Must & View Public Feed \\
+\hline
+FR-DISC-02 & The system shall provide an explore feed sorted by like count (trending), excluding community posts. & Must & View Public Feed \\
+\hline
+FR-DISC-03 & The system should provide dedicated feed for specific hashtags and communities. & Must & View Public Feed \\
+\hline
+FR-DISC-04 & The system shall perform case-insensitive global searches across posts, users, hashtags, and communities. & Must & Search Content \\
+\hline
+FR-DISC-05 & The system shall debounce search input from the UI and provide a live dropdown of results. & Should & Search Content \\
+\hline
+\end{longtable}
+
+
+\subsubsection{Post Management:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Post Management} \label{tab:7} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-POST-01 & The system shall allow authenticated users to create text posts with a limit of 255 characters. & Must & Create post \\
+\hline
+FR-POST-02 & The system shall allow users to attach multi-media files managed via Cloudinary or local Sharp processing. & Must & Add media \\
+\hline
+FR-POST-03 & The system shall automatically parse, and index hashtags (\#tokens) included in the post text. & Must & Add hashtag \\
+\hline
+FR-POST-04 & The system allows users to edit the text of their previously published posts or comments. & Should & Edit post/comment \\
+\hline
+FR-POST-05 & The system shall allow users to softly delete their own posts, effectively hiding them from all feeds. & Must & Delete/ report post \\
+\hline
+\end{longtable}
+
+
+\subsubsection{Post Interaction:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Post Interaction} \label{tab:8} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-INT-01 & The system shall allow users to like or unlike posts and comments to express agreement. & Must & Like/Unlike \\
+\hline
+FR-INT-02 & The system shall allow users to reply to existing posts, creating a threaded comment. & Must & Comment/ Reply \\
+\hline
+FR-INT-03 & The system allows users to perform plain reports or quote-reposts to their own profile feed. & Must & Repost \\
+\hline
+FR-INT-04 & The system shall allow users to privately save posts to a bookmark list. & Should & Save posts \\
+\hline
+\end{longtable}
+
+
+\subsubsection{User Relationship Management:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{User Relationship Management} \label{tab:9} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-REL-01 & The system shall allow users to follow or unfollow other accounts. & Must & Follow/unfollow user \\
+\hline
+FR-REL-02 & The system shall allow users to explicitly mention followed users using the @username syntax. & Should & Create post, Comment/ Reply \\
+\hline
+FR-REL-03 & The system shall allow users to block accounts bidirectionally, restricting profile access and direct messaging. & Must & Block/unblock user \\
+\hline
+\end{longtable}
+
+
+\subsubsection{Profile Management:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Profile Management} \label{tab:10} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-PROF-01 & The system shall allow users to view profiles with dedicated tabs for Posts, Replies, Media, and Likes. & Must & Edit/ view profile \\
+\hline
+FR-PROF-02 & The system shall allow users to update personal info, including bio (up to 160 chars), location, and website. & Must & Edit/ view profile \\
+\hline
+FR-PROF-03 & The system allows users to upload and crop custom images for their avatar and cover photo. & Should & Edit/ view profile \\
+\hline
+\end{longtable}
+
+
+\subsubsection{Direct Messaging:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Direct Messaging} \label{tab:11} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-MSG-01 & The system shall allow users to establish 1:1 real-time direct messaging thread with database persistence. & Must & Send Direct Message \\
+\hline
+FR-MSG-02 & The system shall allow users to attach images and videos securely within direct message conversations. & Should & Send Direct Message \\
+\hline
+FR-MSG-03 & The system shall maintain and update unread message badge counts dynamically. & Must & Send Direct Message \\
+\hline
+\end{longtable}
+
+
+\subsubsection{Real-time Notifications:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Real-time Notifications} \label{tab:12} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-NOTI-01 & The system shall dispatch real-time Socket.IO alerts for likes, replies, reposts, mentions, and follows. & Must & View Notifications \\
+\hline
+FR-NOTI-02 & The system shall securely store notifications in the database to track unread and read states over time. & Must & View Notifications \\
+\hline
+FR-NOTI-03 & The system shall scale real-time broadcasting across multiple instances using a Redis adapter. & Must & View Notifications \\
+\hline
+\end{longtable}
+
+
+\subsubsection{Community Management:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Community Management} \label{tab:13} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-COMM-01 & The system shall allow users to create communities and automatically inherit the Owner/Moderator role. & Must & Create Community \\
+\hline
+FR-COMM-02 & The system shall allow users to browse existing communities and explicitly join or leave them. & Must & Join/Leave Community \\
+\hline
+FR-COMM-03 & The system shall allow community moderators to define and display specific rules for their community. & Must & Manage Community \\
+\hline
+FR-COMM-04 & The system shall allow members to submit posts within a community, entering a moderation queue if required. & Must & Create Post \\
+\hline
+FR-COMM-05 & The system shall allow moderators to approve/reject pending posts and ban users from the community. & Must & Manage Community \\
+\hline
+\end{longtable}
+
+
+\subsubsection{Administrative Moderation:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Administrative Moderation} \label{tab:14} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Requirement Description} & \textbf{Priority} & \textbf{Related Use Case(s)} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+FR-MOD-01 & The system should provide a global admin console to view and search a list of all registered users. & Must & Manage Users \\
+\hline
+FR-MOD-02 & The system shall allow administrators to temporarily or permanently ban users from the platform. & Must & Manage Users \\
+\hline
+FR-MOD-03 & The system shall maintain a queue of user-reported posts and push real-time REPORT alerts to admins. & Must & Handle Reports \\
+\hline
+FR-MOD-04 & The system shall allow administrators to permanently delete reported content or dismiss invalid reports. & Must & Moderate Content \\
+\hline
+\end{longtable}
+
+
+\subsection{Non -- Functional Requirements:}
+
+\begin{longtable}{|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|p{0.225\linewidth}|}
+\caption{Non-Functional Requirements} \label{tab:15} \\
+\hline
+\textbf{ID} & \textbf{Category} & \textbf{Requirement Description} & \textbf{Importance Level} \\
+\hline
+\endfirsthead
+\multicolumn{4}{l}{\textit{(Continued from previous page)}} \\
+\hline
+\textbf{ID} & \textbf{Category} & \textbf{Requirement Description} & \textbf{Importance Level} \\
+\hline
+\endhead
+\hline \multicolumn{4}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+NFR-SEC-01 & Security & The system secure API endpoints using HTTP-only JSON Web Tokens (JWT) to mitigate Cross-Site Scripting (XSS) risks. & High \\
+\hline
+NFR-SEC-02 & Security & User passwords must be securely hashed using the bcrypt algorithm with at least 10 salt rounds before database storage. & High \\
+\hline
+NFR-PERF-01 & Performance & The system must utilize Redis for server-side caching of high-traffic queries (search results) to reduce database load. & High \\
+\hline
+NFR-PERF-02 & Performance & Feed endpoints must implement cursor-based pagination to guarantee fast and consistent response times regardless of data volume. & High \\
+\hline
+NFR-SCA-01 & Scalability & Real-time WebSocket connections (Socket.IO) must use a Redis adapter to allow seamless horizontal scaling across multiple server instances. & High \\
+\hline
+NFR-SCA-02 & Scalability & The system must enforce API rate limiting using a Redis-backed throttler. & High \\
+\hline
+NFR-REL-01 & Reliability & The backend must employ global Exception Filters to ensure that all API errors return to a consistent, secure, and standardized JSON response. & High \\
+\hline
+NFR-USE-01 & Usability & The frontend must utilize Next.js Server-Side Rendering (SSR) to ensure optimal Search Engine Optimization (SEO) and fast initial page loads. & High \\
+\hline
+NFR-USE-02 & Usability & The user interface must implement seamless Infinite Scrolling for social feeds, leveraging TanStack Query to fetch data without page reloads. & Medium \\
+\hline
+NFR-MAINT-01 & Maintainability & The project enforces Strict TypeScript typing and be structured as a Monorepo to ensure long-term stability and code sharing. & Medium \\
+\hline
+\end{longtable}
+
+
+\section{Assumption and Solution:}
+
+Key Assumptions:
+\begin{itemize}
+  \item Breadit social networking platform assumes the following conditions:
+  \item The target users have a stable Internet connection, know how to use micro-blogging (like, retweet, follow other people, start threads.
+  \item Data Availability: Enough structured interaction data (like, retweets, comments, hashtags) needed for recommendations and trends algorithm.
+  \item User engagement: People will generate content, join communities, interact with others in real time.
+  \item Infrastructure: Node.js support for NestJS, Next.js, PostgreSQL, and Redis for real-time capabilities.
+  \item Security \& Privacy: Enough self-moderation and admin control to keep everything safe, Authentication via HTTP-only JWT, data protection, blocklist.
+\end{itemize}
+
+ Solution:
+\begin{itemize}
+  \item Breadit will provide a quick and interactive micro-blogging platform focused on user interests, real-time communication, and intelligent recommendation.
+  \item Trends \& Recommendations: A chronological follow-feed and Explore/Trending module for viral and personalized content based on user engagement (likes, replies, retweets).
+  \item Real-time Communication: WebSocket-based (Socket.IO) instant direct messaging with real-time typing and notifications without page refresh.
+  \item Media and interactions: Multi-media attachment capabilities (using Cloudinary/Sharp) as well as hashtag parsing and thread-based discussions.
+  \item Seamless UX: Next.js frontend with Optimistic UI pattern and cursor-based pagination.
+  \item Safety Features: Bidirectional blocking, community queueing system
+  \item Scalability: A modular monorepo backend allowing for future development of AI-powered content curation or search engine.
+\end{itemize}
+
+\section{Structure of Pre - Thesis:}
+
+The pre -- thesis is structured into seven consecutive chapters:
+
+\textbf{Chapter 1}: Introduction: Sets up the research context, clarifies the problem statement, outlines objectives and scope, and presents the proposed social networking solution.
+
+\textbf{Chapter 2}: Literature Review: Discusses existing studies and established solutions in social networking and real-time communication systems, highlighting key technological strategies.
+
+\textbf{Chapter 3}: Methodology: Details of the research approach, including system requirements analysis, UML system design, and technical architecture planning.
+
+\textbf{Chapter 4}: Implementation: Documents the development process and details the implementation of core functionalities (e.g., real-time messaging, content trending/recommendation algorithms).
+
+\textbf{Chapter 5}: Test Cases: Presents the testing strategies used to validate system functionalities, performance, and security measures.
+
+\textbf{Chapter 6}: Demonstration: Provides an overview of the deployed platform, highlighting real-time user interactions, intelligent post trending/recommendations, and overall usability.
+
+\textbf{Chapter }\textbf{7}: Conclusion and Future Work: Synthesizes findings, evaluates the system against stated objectives, acknowledges limitations, and proposes directions for future development.
+
+This structured progression ensures comprehensive coverage from conceptual foundations through technical implementation to critical evaluation.

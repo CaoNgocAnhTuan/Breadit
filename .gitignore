@@ -51,3 +51,5 @@ next-env.d.ts
 !/public/uploads/.gitkeep
 apps/frontend/public/uploads/*
 !apps/frontend/public/uploads/.gitkeep
+
+/Latex/docx/

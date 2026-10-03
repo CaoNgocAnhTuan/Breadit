@@ -25,7 +25,7 @@ import Redis from 'ioredis';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ThrottlerModule.forRoot({
-      throttlers: [{ ttl: 60000, limit: 120 }],
+      throttlers: [{ ttl: 60000, limit: 1000 }],
       storage: new ThrottlerStorageRedisService(
         new Redis(process.env.REDIS_URL ?? 'redis://redis:6379'),
       ),

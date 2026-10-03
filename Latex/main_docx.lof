@@ -1,0 +1,93 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1}{\ignorespaces High-level architecture diagram}}{29}{figure.3.1}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Summary Goal Use Case}}{31}{figure.3.2}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Authentication \& Account Management}}{33}{figure.3.3}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Feeds and Discovery}}{34}{figure.3.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Post Management}}{35}{figure.3.5}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Post Interaction}}{36}{figure.3.6}%
+\contentsline {figure}{\numberline {7}{\ignorespaces User Relationship Management}}{37}{figure.3.7}%
+\contentsline {figure}{\numberline {8}{\ignorespaces User Profile Management}}{38}{figure.3.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Direct Messaging}}{39}{figure.3.9}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Real-time Notifications}}{40}{figure.3.10}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Community Management}}{41}{figure.3.11}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Administrative Moderation}}{42}{figure.3.12}%
+\contentsline {figure}{\numberline {13}{\ignorespaces Entity Relationship Diagram}}{43}{figure.3.13}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Identity \& Access -- Related Tables}}{44}{figure.3.14}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Content -- Related Tables}}{46}{figure.3.15}%
+\contentsline {figure}{\numberline {16}{\ignorespaces Social Engagement -- Related Tables}}{49}{figure.3.16}%
+\contentsline {figure}{\numberline {17}{\ignorespaces Community \& Moderation - Related Tables}}{52}{figure.3.17}%
+\contentsline {figure}{\numberline {18}{\ignorespaces Communication -- Related Tables}}{54}{figure.3.18}%
+\contentsline {figure}{\numberline {19}{\ignorespaces Class Diagram}}{58}{figure.3.19}%
+\contentsline {figure}{\numberline {20}{\ignorespaces Authentication \& Account Management Diagram}}{67}{figure.3.20}%
+\contentsline {figure}{\numberline {21}{\ignorespaces Feeds and Discovery Diagram}}{68}{figure.3.21}%
+\contentsline {figure}{\numberline {22}{\ignorespaces Post Management Diagram}}{69}{figure.3.22}%
+\contentsline {figure}{\numberline {23}{\ignorespaces Post Interaction Diagram}}{70}{figure.3.23}%
+\contentsline {figure}{\numberline {24}{\ignorespaces User Relationship Management Diagram}}{71}{figure.3.24}%
+\contentsline {figure}{\numberline {25}{\ignorespaces User Profile Management Diagram}}{72}{figure.3.25}%
+\contentsline {figure}{\numberline {26}{\ignorespaces Direct Messaging Diagram}}{73}{figure.3.26}%
+\contentsline {figure}{\numberline {27}{\ignorespaces Real-time Notifications Diagram}}{74}{figure.3.27}%
+\contentsline {figure}{\numberline {28}{\ignorespaces Community Management Diagram}}{75}{figure.3.28}%
+\contentsline {figure}{\numberline {29}{\ignorespaces Administrative Moderation Diagram}}{76}{figure.3.29}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {30}{\ignorespaces Project Structure}}{87}{figure.4.30}%
+\contentsline {figure}{\numberline {31}{\ignorespaces Code Snippet -- SiteUser Model Definition}}{89}{figure.4.31}%
+\contentsline {figure}{\numberline {32}{\ignorespaces Code Snippet -- Authentication \& Account Verification}}{90}{figure.4.32}%
+\contentsline {figure}{\numberline {33}{\ignorespaces Code Snippet -- Authentication \& Account Verification}}{91}{figure.4.33}%
+\contentsline {figure}{\numberline {34}{\ignorespaces Code Snippet -- Feed \& Discovery}}{92}{figure.4.34}%
+\contentsline {figure}{\numberline {35}{\ignorespaces Code Snippet -- Feed \& Discovery}}{92}{figure.4.35}%
+\contentsline {figure}{\numberline {36}{\ignorespaces Code Snippet -- Post Management}}{93}{figure.4.36}%
+\contentsline {figure}{\numberline {37}{\ignorespaces Code Snippet -- Post Management}}{94}{figure.4.37}%
+\contentsline {figure}{\numberline {38}{\ignorespaces Code Snippet -- Post Interaction}}{94}{figure.4.38}%
+\contentsline {figure}{\numberline {39}{\ignorespaces Code Snippet -- Post Interaction}}{95}{figure.4.39}%
+\contentsline {figure}{\numberline {40}{\ignorespaces Code Snippet -- User Relationship Management}}{96}{figure.4.40}%
+\contentsline {figure}{\numberline {41}{\ignorespaces Code Snippet -- User Relationship Management}}{96}{figure.4.41}%
+\contentsline {figure}{\numberline {42}{\ignorespaces Code Snippet -- Profile Management}}{97}{figure.4.42}%
+\contentsline {figure}{\numberline {43}{\ignorespaces Code Snippet -- Profile Management}}{98}{figure.4.43}%
+\contentsline {figure}{\numberline {44}{\ignorespaces Code Snippet -- Direct Messaging}}{99}{figure.4.44}%
+\contentsline {figure}{\numberline {45}{\ignorespaces Code Snippet -- Direct Messaging}}{100}{figure.4.45}%
+\contentsline {figure}{\numberline {46}{\ignorespaces Code Snippet -- Real-time Nofications}}{100}{figure.4.46}%
+\contentsline {figure}{\numberline {47}{\ignorespaces Code Snippet -- Real-time Nofications}}{101}{figure.4.47}%
+\contentsline {figure}{\numberline {48}{\ignorespaces Code Snippet -- Community Management}}{102}{figure.4.48}%
+\contentsline {figure}{\numberline {49}{\ignorespaces Code Snippet -- Community Management}}{102}{figure.4.49}%
+\contentsline {figure}{\numberline {50}{\ignorespaces Code Snippet -- Administrative Moderation}}{103}{figure.4.50}%
+\contentsline {figure}{\numberline {51}{\ignorespaces Code Snippet -- Administrative Moderation}}{103}{figure.4.51}%
+\contentsline {figure}{\numberline {52}{\ignorespaces Code Snippet -- Sign-Up Page}}{104}{figure.4.52}%
+\contentsline {figure}{\numberline {53}{\ignorespaces Code Snippet -- Sign-In Page}}{105}{figure.4.53}%
+\contentsline {figure}{\numberline {54}{\ignorespaces Code Snippet -- Verify Page}}{105}{figure.4.54}%
+\contentsline {figure}{\numberline {55}{\ignorespaces Code Snippet -- Feed Routing Layout}}{106}{figure.4.55}%
+\contentsline {figure}{\numberline {56}{\ignorespaces Code Snippet -- Main Home Page}}{107}{figure.4.56}%
+\contentsline {figure}{\numberline {57}{\ignorespaces Code Snippet -- Messages Layout}}{108}{figure.4.57}%
+\contentsline {figure}{\numberline {58}{\ignorespaces Code Snippet -- Real-time Message Thread}}{108}{figure.4.58}%
+\contentsline {figure}{\numberline {59}{\ignorespaces Code Snippet -- Typing Indicator Hook}}{109}{figure.4.59}%
+\contentsline {figure}{\numberline {60}{\ignorespaces Code Snippet -- Server-Side Profile Page}}{110}{figure.4.60}%
+\contentsline {figure}{\numberline {61}{\ignorespaces Code Snippet -- Profile Tab Switching}}{110}{figure.4.61}%
+\contentsline {figure}{\numberline {62}{\ignorespaces Code Snippet -- Profile Feed Fetcher}}{111}{figure.4.62}%
+\contentsline {figure}{\numberline {63}{\ignorespaces Code Snippet -- Community Server Component}}{112}{figure.4.63}%
+\contentsline {figure}{\numberline {64}{\ignorespaces Code Snippet -- Join / Leave State}}{113}{figure.4.64}%
+\contentsline {figure}{\numberline {65}{\ignorespaces Code Snippet -- Moderator Pending Posts Queue}}{113}{figure.4.65}%
+\contentsline {figure}{\numberline {66}{\ignorespaces Code Snippet -- Administrative Layout}}{114}{figure.4.66}%
+\contentsline {figure}{\numberline {67}{\ignorespaces Code Snippet -- Banning Dashboard}}{114}{figure.4.67}%
+\contentsline {figure}{\numberline {68}{\ignorespaces Code Snippet -- Report Queue}}{114}{figure.4.68}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {69}{\ignorespaces Home Page}}{141}{figure.6.69}%
+\contentsline {figure}{\numberline {70}{\ignorespaces Sign Up Page}}{142}{figure.6.70}%
+\contentsline {figure}{\numberline {71}{\ignorespaces Sign In Page}}{142}{figure.6.71}%
+\contentsline {figure}{\numberline {72}{\ignorespaces Forgot Password Page}}{143}{figure.6.72}%
+\contentsline {figure}{\numberline {73}{\ignorespaces User Profile Page - Information Display}}{144}{figure.6.73}%
+\contentsline {figure}{\numberline {74}{\ignorespaces Search Page}}{145}{figure.6.74}%
+\contentsline {figure}{\numberline {75}{\ignorespaces Message Page}}{146}{figure.6.75}%
+\contentsline {figure}{\numberline {76}{\ignorespaces Bookmarks Page}}{147}{figure.6.76}%
+\contentsline {figure}{\numberline {77}{\ignorespaces Notifications Page}}{147}{figure.6.77}%
+\contentsline {figure}{\numberline {78}{\ignorespaces Blocked accounts Page}}{148}{figure.6.78}%
+\contentsline {figure}{\numberline {79}{\ignorespaces Communities Page}}{148}{figure.6.79}%
+\contentsline {figure}{\numberline {80}{\ignorespaces Connect Page}}{149}{figure.6.80}%
+\contentsline {figure}{\numberline {81}{\ignorespaces Community feeds Page}}{150}{figure.6.81}%
+\contentsline {figure}{\numberline {82}{\ignorespaces Community rules Page}}{151}{figure.6.82}%
+\contentsline {figure}{\numberline {83}{\ignorespaces Thread comments Page}}{152}{figure.6.83}%
+\contentsline {figure}{\numberline {84}{\ignorespaces Admin Overview - Dashboard Access}}{153}{figure.6.84}%
+\contentsline {figure}{\numberline {85}{\ignorespaces Admin Overview -- Report Content}}{153}{figure.6.85}%
+\addvspace {10\p@ }

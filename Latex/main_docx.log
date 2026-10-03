@@ -1,0 +1,6030 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.13)  13 JUN 2026 16:35
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**d:/Fork/Breadit/Latex/main_docx.tex
+(d:/Fork/Breadit/Latex/main_docx.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+(C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/base\report.cls
+Document Class: report 2025/01/22 v1.4n Standard LaTeX document class
+(C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/base\size12.clo
+File: size12.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count275
+\c@chapter=\count276
+\c@section=\count277
+\c@subsection=\count278
+\c@subsubsection=\count279
+\c@paragraph=\count280
+\c@subparagraph=\count281
+\c@figure=\count282
+\c@table=\count283
+\abovecaptionskip=\skip49
+\belowcaptionskip=\skip50
+\bibindent=\dimen148
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
+Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/base\inputenc.sty
+Package: inputenc 2024/02/08 v1.3d Input encoding file
+\inpenc@prehook=\toks17
+\inpenc@posthook=\toks18
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.sty
+Package: babel 2025/12/11 v25.17 The multilingual framework for LuaLaTeX, pdfLaTeX and XeLaTeX
+\babel@savecnt=\count284
+LaTeX Encoding Info:    Redeclaring text command \ij (encoding OT1) on input line 2068.
+LaTeX Encoding Info:    Redeclaring text command \IJ (encoding OT1) on input line 2070.
+LaTeX Encoding Info:    Redeclaring text command \ij (encoding T1) on input line 2072.
+LaTeX Encoding Info:    Redeclaring text command \IJ (encoding T1) on input line 2073.
+LaTeX Encoding Info:    Ignoring declaration for text command \ij (encoding ?) on input line 2074.
+LaTeX Encoding Info:    Ignoring declaration for text command \IJ (encoding ?) on input line 2076.
+LaTeX Encoding Info:    Ignoring declaration for text command \SS (encoding ?) on input line 2101.
+\U@D=\dimen149
+\l@unhyphenated=\language79
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/babel\txtbabel.def)
+\bbl@readstream=\read2
+\bbl@dirlevel=\count285
+Package babel Info: Configuration files are deprecated, as
+(babel)             they can break document portability.
+(babel)             Reported on input line 4196.
+
+*************************************
+* Local config file bblopts.cfg used
+*
+(C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/arabi\bblopts.cfg
+File: bblopts.cfg 2005/09/08 v0.1 add Arabic and Farsi to "declared" options of babel
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/babel/locale/en\babel-english.tex)
+Package babel Info: Importing font and identification data for english
+(babel)             from babel-en.ini. Reported on input line 4320.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/babel-english\english.ldf
+Language: english 2017/06/06 v3.3r English support from the babel system
+Package babel Info: Hyphen rules for 'canadian' set to \l@english
+(babel)             (\language0). Reported on input line 102.
+Package babel Info: Hyphen rules for 'australian' set to \l@ukenglish
+(babel)             (\language73). Reported on input line 105.
+Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
+(babel)             (\language73). Reported on input line 108.
+)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
+Package: amsmath 2025/07/09 v2.17z AMS math features
+\@mathmargin=\skip51
+
+For additional information on amsmath, use the `?' option.
+(C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext.sty
+Package: amstext 2024/11/17 v2.01 AMS text
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks19
+\ex@=\dimen150
+)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen151
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
+Package: amsopn 2022/04/08 v2.04 operator names
+)
+\inf@bad=\count286
+LaTeX Info: Redefining \frac on input line 233.
+\uproot@=\count287
+\leftroot@=\count288
+LaTeX Info: Redefining \overline on input line 398.
+LaTeX Info: Redefining \colon on input line 409.
+\classnum@=\count289
+\DOTSCASE@=\count290
+LaTeX Info: Redefining \ldots on input line 495.
+LaTeX Info: Redefining \dots on input line 498.
+LaTeX Info: Redefining \cdots on input line 619.
+\Mathstrutbox@=\box53
+\strutbox@=\box54
+LaTeX Info: Redefining \big on input line 721.
+LaTeX Info: Redefining \Big on input line 722.
+LaTeX Info: Redefining \bigg on input line 723.
+LaTeX Info: Redefining \Bigg on input line 724.
+\big@size=\dimen152
+LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
+\macc@depth=\count291
+LaTeX Info: Redefining \bmod on input line 904.
+LaTeX Info: Redefining \pmod on input line 909.
+LaTeX Info: Redefining \smash on input line 939.
+LaTeX Info: Redefining \relbar on input line 969.
+LaTeX Info: Redefining \Relbar on input line 970.
+\c@MaxMatrixCols=\count292
+\dotsspace@=\muskip17
+\c@parentequation=\count293
+\dspbrk@lvl=\count294
+\tag@help=\toks20
+\row@=\count295
+\column@=\count296
+\maxfields@=\count297
+\andhelp@=\toks21
+\eqnshift@=\dimen153
+\alignsep@=\dimen154
+\tagshift@=\dimen155
+\tagwidth@=\dimen156
+\totwidth@=\dimen157
+\lineht@=\dimen158
+\@envbody=\toks22
+\multlinegap=\skip52
+\multlinetaggap=\skip53
+\mathdisplay@stack=\toks23
+LaTeX Info: Redefining \[ on input line 2950.
+LaTeX Info: Redefining \] on input line 2951.
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\pifont.sty
+Package: pifont 2020/03/25 PSNFSS-v9.3 Pi font support (SPQR) 
+LaTeX Font Info:    Trying to load font information for U+pzd on input line 63.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\upzd.fd
+File: upzd.fd 2001/06/04 font definitions for U/pzd.
+)
+LaTeX Font Info:    Trying to load font information for U+psy on input line 64.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\upsy.fd
+File: upsy.fd 2001/06/04 font definitions for U/psy.
+)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/multirow\multirow.sty
+Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
+\multirow@colwidth=\skip54
+\multirow@cntb=\count298
+\multirow@dima=\skip55
+\bigstrutjot=\dimen159
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen160
+\lightrulewidth=\dimen161
+\cmidrulewidth=\dimen162
+\belowrulesep=\dimen163
+\belowbottomsep=\dimen164
+\aboverulesep=\dimen165
+\abovetopsep=\dimen166
+\cmidrulesep=\dimen167
+\cmidrulekern=\dimen168
+\defaultaddspace=\dimen169
+\@cmidla=\count299
+\@cmidlb=\count300
+\@aboverulesep=\dimen170
+\@belowrulesep=\dimen171
+\@thisruleclass=\count301
+\@lastruleclass=\count302
+\@thisrulewidth=\dimen172
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/tools\longtable.sty
+Package: longtable 2025-10-13 v4.24 Multi-page Table package (DPC)
+\LTleft=\skip56
+\LTright=\skip57
+\LTpre=\skip58
+\LTpost=\skip59
+\LTchunksize=\count303
+\LTcapwidth=\dimen173
+\LT@head=\box55
+\LT@firsthead=\box56
+\LT@foot=\box57
+\LT@lastfoot=\box58
+\LT@gbox=\box59
+\LT@cols=\count304
+\LT@rows=\count305
+\c@LT@tables=\count306
+\c@LT@chunks=\count307
+\LT@p@ftn=\toks24
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/tools\tabularx.sty
+Package: tabularx 2023/12/11 v2.12a `tabularx' package (DPC)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty
+Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
+\col@sep=\dimen174
+\ar@mcellbox=\box60
+\extrarowheight=\dimen175
+\NC@list=\toks25
+\extratabsurround=\skip60
+\backup@length=\skip61
+\ar@cellbox=\box61
+)
+\TX@col@width=\dimen176
+\TX@old@table=\dimen177
+\TX@old@col=\dimen178
+\TX@target=\dimen179
+\TX@delta=\dimen180
+\TX@cols=\count308
+\TX@ftn=\toks26
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks27
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
+Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 106.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen181
+\Gin@req@width=\dimen182
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tikz.sty (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgf.sty (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfrcs.sty (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil-common.tex
+\pgfutil@everybye=\toks28
+\pgfutil@tempdima=\dimen183
+\pgfutil@tempdimb=\dimen184
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfutil-latex.def
+\pgfutil@abb=\box62
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrcs.code.tex (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf\pgf.revision.tex)
+Package: pgfrcs 2025-08-29 v3.1.11a (3.1.11a)
+))
+Package: pgf 2025-08-29 v3.1.11a (3.1.11a)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/basiclayer\pgfcore.sty (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\pgfsys.sty (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsys.code.tex
+Package: pgfsys 2025-08-29 v3.1.11a (3.1.11a)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks29
+\pgfkeys@temptoks=\toks30
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeyslibraryfiltered.code.tex
+\pgfkeys@tmptoks=\toks31
+))
+\pgf@x=\dimen185
+\pgf@y=\dimen186
+\pgf@xa=\dimen187
+\pgf@ya=\dimen188
+\pgf@xb=\dimen189
+\pgf@yb=\dimen190
+\pgf@xc=\dimen191
+\pgf@yc=\dimen192
+\pgf@xd=\dimen193
+\pgf@yd=\dimen194
+\w@pgf@writea=\write3
+\r@pgf@reada=\read3
+\c@pgf@counta=\count309
+\c@pgf@countb=\count310
+\c@pgf@countc=\count311
+\c@pgf@countd=\count312
+\t@pgf@toka=\toks32
+\t@pgf@tokb=\toks33
+\t@pgf@tokc=\toks34
+\pgf@sys@id@count=\count313
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf.cfg
+File: pgf.cfg 2025-08-29 v3.1.11a (3.1.11a)
+)
+Driver file for pgf: pgfsys-pdftex.def
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsys-pdftex.def
+File: pgfsys-pdftex.def 2025-08-29 v3.1.11a (3.1.11a)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsys-common-pdf.def
+File: pgfsys-common-pdf.def 2025-08-29 v3.1.11a (3.1.11a)
+))) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsyssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfsyssoftpath@smallbuffer@items=\count314
+\pgfsyssoftpath@bigbuffer@items=\count315
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfsysprotocol.code.tex
+File: pgfsysprotocol.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.sty
+Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 274.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathcolor.ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1349.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1353.
+Package xcolor Info: Model `RGB' extended on input line 1365.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1367.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcore.code.tex
+Package: pgfcore 2025-08-29 v3.1.11a (3.1.11a)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code.tex (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathutil.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathparser.code.tex
+\pgfmath@dimen=\dimen195
+\pgfmath@count=\count316
+\pgfmath@box=\box63
+\pgfmath@toks=\toks35
+\pgfmath@stack@operand=\toks36
+\pgfmath@stack@operation=\toks37
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.basic.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.trigonometric.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.random.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.comparison.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.base.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.round.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.misc.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfunctions.integerarithmetics.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathcalc.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count317
+)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.code.tex) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepoints.code.tex
+File: pgfcorepoints.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@picminx=\dimen196
+\pgf@picmaxx=\dimen197
+\pgf@picminy=\dimen198
+\pgf@picmaxy=\dimen199
+\pgf@pathminx=\dimen256
+\pgf@pathmaxx=\dimen257
+\pgf@pathminy=\dimen258
+\pgf@pathmaxy=\dimen259
+\pgf@xx=\dimen260
+\pgf@xy=\dimen261
+\pgf@yx=\dimen262
+\pgf@yy=\dimen263
+\pgf@zx=\dimen264
+\pgf@zy=\dimen265
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@path@lastx=\dimen266
+\pgf@path@lasty=\dimen267
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathusage.code.tex
+File: pgfcorepathusage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@shorten@end@additional=\dimen268
+\pgf@shorten@start@additional=\dimen269
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorescopes.code.tex
+File: pgfcorescopes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfpic=\box64
+\pgf@hbox=\box65
+\pgf@layerbox@main=\box66
+\pgf@picture@serial@count=\count318
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoregraphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgflinewidth=\dimen270
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoretransformations.code.tex
+File: pgfcoretransformations.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@pt@x=\dimen271
+\pgf@pt@y=\dimen272
+\pgf@pt@temp=\dimen273
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorequick.code.tex
+File: pgfcorequick.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreobjects.code.tex
+File: pgfcoreobjects.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepathprocessing.code.tex
+File: pgfcorepathprocessing.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorearrows.code.tex
+File: pgfcorearrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfarrowsep=\dimen274
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreshade.code.tex
+File: pgfcoreshade.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@max=\dimen275
+\pgf@sys@shading@range@num=\count319
+\pgf@shadingcount=\count320
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreimage.code.tex
+File: pgfcoreimage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoreexternal.code.tex
+File: pgfcoreexternal.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfexternal@startupbox=\box67
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorelayers.code.tex
+File: pgfcorelayers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcoretransparency.code.tex
+File: pgfcoretransparency.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorepatterns.code.tex
+File: pgfcorepatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfcorerdf.code.tex
+File: pgfcorerdf.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+))) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmoduleshapes.code.tex
+File: pgfmoduleshapes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfnodeparttextbox=\box68
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmoduleplot.code.tex
+File: pgfmoduleplot.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfcomp-version-0-65.sty
+Package: pgfcomp-version-0-65 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@nodesepstart=\dimen276
+\pgf@nodesepend=\dimen277
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfcomp-version-1-18.sty
+Package: pgfcomp-version-1-18 2025-08-29 v3.1.11a (3.1.11a)
+)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgffor.sty (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/utilities\pgfkeys.sty (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfkeys.code.tex)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/pgf/math\pgfmath.sty (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.code.tex)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgffor.code.tex
+Package: pgffor 2025-08-29 v3.1.11a (3.1.11a)
+\pgffor@iter=\dimen278
+\pgffor@skip=\dimen279
+\pgffor@stack=\toks38
+\pgffor@toks=\toks39
+)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz\tikz.code.tex
+Package: tikz 2025-08-29 v3.1.11a (3.1.11a)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflibraryplothandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@plot@mark@count=\count321
+\pgfplotmarksize=\dimen280
+)
+\tikz@lastx=\dimen281
+\tikz@lasty=\dimen282
+\tikz@lastxsaved=\dimen283
+\tikz@lastysaved=\dimen284
+\tikz@lastmovetox=\dimen285
+\tikz@lastmovetoy=\dimen286
+\tikzleveldistance=\dimen287
+\tikzsiblingdistance=\dimen288
+\tikz@figbox=\box69
+\tikz@figbox@bg=\box70
+\tikz@tempbox=\box71
+\tikz@tempbox@bg=\box72
+\tikztreelevel=\count322
+\tikznumberofchildren=\count323
+\tikznumberofcurrentchild=\count324
+\tikz@fig@count=\count325
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodulematrix.code.tex
+File: pgfmodulematrix.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfmatrixcurrentrow=\count326
+\pgfmatrixcurrentcolumn=\count327
+\pgf@matrix@numberofcolumns=\count328
+)
+\tikz@expandcount=\count329
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+))) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/tikz/libraries\tikzlibrarycalc.code.tex
+File: tikzlibrarycalc.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count330
+\float@exts=\toks40
+\float@box=\box73
+\@float@everytoks=\toks41
+\@floatcapt=\box74
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
+Package: geometry 2026/03/07 v6.0 Page Geometry
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/iftex\ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.sty
+Package: iftex 2024/12/12 v1.0g TeX engine tests
+))
+\Gm@cnth=\count331
+\Gm@cntv=\count332
+\c@Gm@tempcnt=\count333
+\Gm@bindingoffset=\dimen289
+\Gm@wd@mp=\dimen290
+\Gm@odd@mp=\dimen291
+\Gm@even@mp=\dimen292
+\Gm@layoutwidth=\dimen293
+\Gm@layoutheight=\dimen294
+\Gm@layouthoffset=\dimen295
+\Gm@layoutvoffset=\dimen296
+\Gm@dimlist=\toks42
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.cfg)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/fancyhdr\fancyhdr.sty
+Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
+\f@nch@headwidth=\skip62
+\f@nch@offset@elh=\skip63
+\f@nch@offset@erh=\skip64
+\f@nch@offset@olh=\skip65
+\f@nch@offset@orh=\skip66
+\f@nch@offset@elf=\skip67
+\f@nch@offset@erf=\skip68
+\f@nch@offset@olf=\skip69
+\f@nch@offset@orf=\skip70
+\f@nch@height=\skip71
+\f@nch@footalignment=\skip72
+\f@nch@widthL=\skip73
+\f@nch@widthC=\skip74
+\f@nch@widthR=\skip75
+\@temptokenb=\toks43
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/titlesec\titlesec.sty
+Package: titlesec 2025/01/04 v2.17 Sectioning titles
+\ttl@box=\box75
+\beforetitleunit=\skip76
+\aftertitleunit=\skip77
+\ttl@plus=\dimen297
+\ttl@minus=\dimen298
+\ttl@toksa=\toks44
+\titlewidth=\dimen299
+\titlewidthlast=\dimen300
+\titlewidthfirst=\dimen301
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/tools\indentfirst.sty
+Package: indentfirst 2023/07/02 v1.03 Indent first paragraph (DPC)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/setspace\setspace.sty
+Package: setspace 2022/12/04 v6.7b set line spacing
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/enumitem\enumitem.sty
+Package: enumitem 2025/02/06 v3.11 Customized lists
+\labelindent=\skip78
+\enit@outerparindent=\dimen302
+\enit@toks=\toks45
+\enit@inbox=\box76
+\enit@count@id=\count334
+\enitdp@description=\count335
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/algorithms\algorithm.sty
+Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating environment
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
+Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
+)
+\@float@every@algorithm=\toks46
+\c@algorithm=\count336
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algpseudocode.sty
+Package: algpseudocode 
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algorithmicx.sty
+Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
+
+Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
+\c@ALG@line=\count337
+\c@ALG@rem=\count338
+\c@ALG@nested=\count339
+\ALG@tlm=\skip79
+\ALG@thistlm=\skip80
+\c@ALG@Lnr=\count340
+\c@ALG@blocknr=\count341
+\c@ALG@storecount=\count342
+\c@ALG@tmpcounter=\count343
+\ALG@tmplength=\skip81
+)
+Document Style - pseudocode environments for use with the `algorithmicx' style
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
+\Urlmuskip=\muskip18
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
+\lst@mode=\count344
+\lst@gtempboxa=\box77
+\lst@token=\toks47
+\lst@length=\count345
+\lst@currlwidth=\dimen303
+\lst@column=\count346
+\lst@pos=\count347
+\lst@lostspace=\dimen304
+\lst@width=\dimen305
+\lst@newlines=\count348
+\lst@lineno=\count349
+\lst@maxwidth=\dimen306
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstpatch.sty
+File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
+File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
+\c@lstnumber=\count350
+\lst@skipnumbers=\count351
+\lst@framebox=\box78
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
+File: listings.cfg 2025/11/14 1.11b listings configuration
+))
+Package: listings 2025/11/14 1.11b (Carsten Heinz)
+
+==> First Aid for listings.sty no longer applied!
+    Expected:
+        2024/09/23 1.10c (Carsten Heinz)
+    but found:
+        2025/11/14 1.11b (Carsten Heinz)
+    so I'm assuming it got fixed.
+(C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
+Package: hyperref 2025-07-12 v7.01o Hypertext links for LaTeX
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvsetkeys.sty
+Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty
+Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
+Package: nameref 2025-06-21 v2.57 Cross-referencing by name of section
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestring\gettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
+))
+\c@section@level=\count352
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
+Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count353
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\stringenc.sty
+Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO)
+)
+\@linkdim=\dimen307
+\Hy@linkcounter=\count354
+\Hy@pagecounter=\count355
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
+File: pd1enc.def 2025-07-12 v7.01o Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+\Hy@SavedSpaceFactor=\count356
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
+File: puenc.def 2025-07-12 v7.01o Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+Package hyperref Info: Hyper figures OFF on input line 4195.
+Package hyperref Info: Link nesting OFF on input line 4200.
+Package hyperref Info: Hyper index ON on input line 4203.
+Package hyperref Info: Plain pages OFF on input line 4210.
+Package hyperref Info: Backreferencing OFF on input line 4215.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4462.
+\c@Hy@tempcnt=\count357
+LaTeX Info: Redefining \url on input line 4801.
+\XeTeXLinkMargin=\dimen308
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
+))
+\Fld@menulength=\count358
+\Field@Width=\dimen309
+\Fld@charsize=\dimen310
+Package hyperref Info: Hyper figures OFF on input line 6078.
+Package hyperref Info: Link nesting OFF on input line 6083.
+Package hyperref Info: Hyper index ON on input line 6086.
+Package hyperref Info: backreferencing OFF on input line 6093.
+Package hyperref Info: Link coloring OFF on input line 6098.
+Package hyperref Info: Link coloring with OCG OFF on input line 6103.
+Package hyperref Info: PDF/A mode OFF on input line 6108.
+\Hy@abspage=\count359
+\c@Item=\count360
+\c@Hfootnote=\count361
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
+File: hpdftex.def 2025-07-12 v7.01o Hyperref driver for pdfTeX
+\Fld@listcount=\count362
+\c@bookmark@seq@number=\count363
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfilecheck.sty
+Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter\uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 284.
+)
+\Hy@SectionHShift=\skip82
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/chngcntr\chngcntr.sty
+Package: chngcntr 2018/04/09 v1.1a change counter resetting
+Package chngcntr Info: \counterwithout already defined.
+(chngcntr)             Quitting chngcntr on input line 21.
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/tocloft\tocloft.sty
+Package: tocloft 2017/08/31 v2.3i parameterised ToC, etc., typesetting
+Package tocloft Info: The document has chapter divisions on input line 51.
+\cftparskip=\skip83
+\cftbeforetoctitleskip=\skip84
+\cftaftertoctitleskip=\skip85
+\cftbeforepartskip=\skip86
+\cftpartnumwidth=\skip87
+\cftpartindent=\skip88
+\cftbeforechapskip=\skip89
+\cftchapindent=\skip90
+\cftchapnumwidth=\skip91
+\cftbeforesecskip=\skip92
+\cftsecindent=\skip93
+\cftsecnumwidth=\skip94
+\cftbeforesubsecskip=\skip95
+\cftsubsecindent=\skip96
+\cftsubsecnumwidth=\skip97
+\cftbeforesubsubsecskip=\skip98
+\cftsubsubsecindent=\skip99
+\cftsubsubsecnumwidth=\skip100
+\cftbeforeparaskip=\skip101
+\cftparaindent=\skip102
+\cftparanumwidth=\skip103
+\cftbeforesubparaskip=\skip104
+\cftsubparaindent=\skip105
+\cftsubparanumwidth=\skip106
+\cftbeforeloftitleskip=\skip107
+\cftafterloftitleskip=\skip108
+\cftbeforefigskip=\skip109
+\cftfigindent=\skip110
+\cftfignumwidth=\skip111
+\c@lofdepth=\count364
+\c@lotdepth=\count365
+\cftbeforelottitleskip=\skip112
+\cftafterlottitleskip=\skip113
+\cftbeforetabskip=\skip114
+\cfttabindent=\skip115
+\cfttabnumwidth=\skip116
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
+File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count366
+) (main_docx.aux)
+\openout1 = `main_docx.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 141.
+LaTeX Font Info:    ... okay on input line 141.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 141.
+LaTeX Font Info:    ... okay on input line 141.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 141.
+LaTeX Font Info:    ... okay on input line 141.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 141.
+LaTeX Font Info:    ... okay on input line 141.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 141.
+LaTeX Font Info:    ... okay on input line 141.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 141.
+LaTeX Font Info:    ... okay on input line 141.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 141.
+LaTeX Font Info:    ... okay on input line 141.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 141.
+LaTeX Font Info:    ... okay on input line 141.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 141.
+LaTeX Font Info:    ... okay on input line 141.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count367
+\scratchdimen=\dimen311
+\scratchbox=\box79
+\nofMPsegments=\count368
+\nofMParguments=\count369
+\everyMPshowfont=\toks48
+\MPscratchCnt=\count370
+\MPscratchDim=\dimen312
+\MPnumerator=\count371
+\makeMPintoPDFobject=\count372
+\everyMPtoPDFconversion=\toks49
+) (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
+))
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* bindingoffset: 14.22636pt
+* modes: twoside 
+* h-part:(L,W,R)=(85.35826pt, 441.01775pt, 56.9055pt)
+* v-part:(T,H,B)=(71.13188pt, 717.00946pt, 56.9055pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=441.01775pt
+* \textheight=717.00946pt
+* \oddsidemargin=27.31464pt
+* \evensidemargin=-15.36449pt
+* \topmargin=-38.1381pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=12.0pt
+* \footskip=30.0pt
+* \marginparwidth=95.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidetrue
+* \@mparswitchtrue
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+\c@lstlisting=\count373
+Package hyperref Info: Link coloring OFF on input line 141.
+(main_docx.out) (main_docx.out)
+\@outlinefile=\write4
+\openout4 = `main_docx.out'.
+
+*geometry* verbose mode - [ newgeometry ] result:
+* driver: pdftex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: twoside 
+* h-part:(L,W,R)=(71.13188pt, 455.24411pt, 71.13188pt)
+* v-part:(T,H,B)=(71.13188pt, 702.78308pt, 71.13188pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=455.24411pt
+* \textheight=702.78308pt
+* \oddsidemargin=-1.1381pt
+* \evensidemargin=-1.1381pt
+* \topmargin=-38.1381pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=12.0pt
+* \footskip=30.0pt
+* \marginparwidth=95.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidetrue
+* \@mparswitchtrue
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+<images/IU.png, id=468, 965.0454pt x 978.5358pt>
+File: images/IU.png Graphic file (type png)
+<use images/IU.png>
+Package pdftex.def Info: images/IU.png  used on input line 167.
+(pdftex.def)             Requested size: 136.57462pt x 138.47226pt.
+ [1
+
+
+{C:/Users/anhtu/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./images/IU.png>]
+LaTeX Font Info:    Trying to load font information for U+msa on input line 196.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 196.
+ (C:\Users\anhtu\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) [2] (chapters/acknowledgement.tex) [3
+
+
+] (main_docx.toc [4] [5])
+\tf@toc=\write5
+\openout5 = `main_docx.toc'.
+
+ [6] (main_docx.lot [7])
+\tf@lot=\write6
+\openout6 = `main_docx.lot'.
+
+ [8] (main_docx.lof [9])
+\tf@lof=\write7
+\openout7 = `main_docx.lof'.
+
+ [10] (chapters/abstract.tex) [11
+
+]
+Chapter 1.
+(chapters/introduction.tex
+Overfull \hbox (16.54448pt too wide) in paragraph at lines 14--15
+[]\T1/cmr/m/n/12 C1. Hy-brid so-cial net-work-ing ar-chi-tec-ture: Brea-dit uni-fies Reddit-style community-
+ []
+
+[1
+
+]
+Underfull \hbox (badness 4353) in paragraph at lines 49--49
+[]|\T1/cmr/m/n/12 MSc. Nguyen Trung
+ []
+
+
+Underfull \hbox (badness 3396) in paragraph at lines 51--52
+\T1/cmr/m/n/12 ture, im-ple-ments Fron-
+ []
+
+
+Underfull \hbox (badness 1092) in paragraph at lines 51--52
+\T1/cmr/m/n/12 tend/Backend, and ex-e-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--54
+[]|\T1/cmr/m/n/12 Reviews the pre-thesis
+ []
+
+
+Underfull \hbox (badness 1184) in paragraph at lines 53--54
+\T1/cmr/m/n/12 ing feed-back on sys-tem
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--54
+\T1/cmr/m/n/12 qual-ity and re-search
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--56
+[]|\T1/cmr/m/n/12 Browse feeds, in-ter-act
+ []
+
+
+Underfull \hbox (badness 5091) in paragraph at lines 55--56
+\T1/cmr/m/n/12 with posts, par-tic-i-pate
+ []
+
+
+Underfull \hbox (badness 5726) in paragraph at lines 57--58
+[]|\T1/cmr/m/n/12 Manage re-port queues,
+ []
+
+
+Underfull \hbox (badness 1796) in paragraph at lines 57--58
+\T1/cmr/m/n/12 mod-er-ate vi-o-lat-ing con-
+ []
+
+[2]
+Underfull \hbox (badness 3579) in paragraph at lines 79--80
+[]|\T1/cmr/m/n/12 Browse pub-lic feeds, view poster-
+ []
+
+
+Underfull \hbox (badness 2359) in paragraph at lines 79--80
+\T1/cmr/m/n/12 links and user pro-files, search for
+ []
+
+chapters/introduction.tex:83: ignored error: Infinite glue shrinkage found in box being split [3]
+Overfull \hbox (18.28201pt too wide) in alignment at lines 88--93
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 93--98
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 98--100
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 100--102
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 8189) in paragraph at lines 103--103
+\T1/cmr/m/n/12 nec-tion In-sta-
+ []
+
+
+Underfull \hbox (badness 3312) in paragraph at lines 103--103
+[]|\T1/cmr/m/n/12 Implement ro-
+ []
+
+
+Underfull \hbox (badness 1028) in paragraph at lines 103--103
+\T1/cmr/m/n/12 bust re-con-nect
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--103
+\T1/cmr/m/n/12 logic us-ing
+ []
+
+
+Underfull \hbox (badness 3861) in paragraph at lines 103--103
+\T1/cmr/m/n/12 Socket.IO and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--103
+\T1/cmr/m/n/12 uti-lize Re-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--103
+\T1/cmr/m/n/12 dis adapter
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--103
+\T1/cmr/m/n/12 for scal-able
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--103
+\T1/cmr/m/n/12 Pub/Sub
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--103
+\T1/cmr/m/n/12 across in-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--104
+[]|\T1/cmr/m/n/12 Users fail to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--104
+\T1/cmr/m/n/12 re-ceive live
+ []
+
+
+Underfull \hbox (badness 4454) in paragraph at lines 105--105
+[]|\T1/cmr/m/n/12 Media Up-load
+ []
+
+
+Underfull \hbox (badness 2600) in paragraph at lines 105--105
+\T1/cmr/m/n/12 Han-dling Fail-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+[]|\T1/cmr/m/n/12 Configure
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+\T1/cmr/m/n/12 ef-fi-cient mul-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+\T1/cmr/m/n/12 ti-part pars-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+\T1/cmr/m/n/12 in Fas-tify
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+\T1/cmr/m/n/12 and in-te-grate
+ []
+
+
+Underfull \hbox (badness 6445) in paragraph at lines 105--105
+\T1/cmr/m/n/12 Cloud-i-nary as
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--106
+\T1/cmr/m/n/12 outs dur-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--106
+\T1/cmr/m/n/12 post cre-ation
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--106
+\T1/cmr/m/n/12 when up-load-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--106
+\T1/cmr/m/n/12 ing mul-ti-ple
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--106
+\T1/cmr/m/n/12 high-resolution
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
+[]|\T1/cmr/m/n/12 Scalability &
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
+\T1/cmr/m/n/12 Client State
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
+[]|\T1/cmr/m/n/12 Utilize
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
+\T1/cmr/m/n/12 TanStack
+ []
+
+
+Underfull \hbox (badness 2529) in paragraph at lines 107--107
+\T1/cmr/m/n/12 Query for ro-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
+\T1/cmr/m/n/12 state man-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
+\T1/cmr/m/n/12 age-ment and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
+\T1/cmr/m/n/12 im-ple-ment
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
+\T1/cmr/m/n/12 cursor-based
+ []
+
+
+Underfull \hbox (badness 5105) in paragraph at lines 107--107
+\T1/cmr/m/n/12 pag-i-na-tion for
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--108
+[]|\T1/cmr/m/n/12 Feed stut-ters,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--108
+\T1/cmr/m/n/12 UI freezes,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--108
+\T1/cmr/m/n/12 or out-of-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--108
+\T1/cmr/m/n/12 sync data
+ []
+
+
+Underfull \hbox (badness 3199) in paragraph at lines 107--108
+\T1/cmr/m/n/12 when scrolling
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--108
+\T1/cmr/m/n/12 through mas-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--109
+[]|\T1/cmr/m/n/12 Implement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--109
+\T1/cmr/m/n/12 JWT for
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--109
+\T1/cmr/m/n/12 ses-sion man-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--109
+\T1/cmr/m/n/12 age-ment and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--110
+[]|\T1/cmr/m/n/12 Unauthorized
+ []
+
+
+Underfull \hbox (badness 1360) in paragraph at lines 109--110
+\T1/cmr/m/n/12 ac-cess to user
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--110
+\T1/cmr/m/n/12 pro-files, pri-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--110
+\T1/cmr/m/n/12 vate di-rect
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--110
+\T1/cmr/m/n/12 mes-sages, or
+ []
+
+
+Underfull \hbox (badness 3514) in paragraph at lines 109--110
+\T1/cmr/m/n/12 ses-sion hi-jack-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+[]|\T1/cmr/m/n/12 Database
+ []
+
+
+Underfull \hbox (badness 7907) in paragraph at lines 111--111
+\T1/cmr/m/n/12 Query Per-for-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+[]|\T1/cmr/m/n/12 Optimize
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+\T1/cmr/m/n/12 Prisma ORM
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+\T1/cmr/m/n/12 queries us-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+\T1/cmr/m/n/12 pre-cise in-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+\T1/cmr/m/n/12 clude/select
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+\T1/cmr/m/n/12 struc-tures to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+\T1/cmr/m/n/12 pre-vent N+1
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+\T1/cmr/m/n/12 is-sues when
+ []
+
+
+Underfull \hbox (badness 1917) in paragraph at lines 111--111
+\T1/cmr/m/n/12 com-ments and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--112
+[]|\T1/cmr/m/n/12 Slow server
+ []
+
+
+Underfull \hbox (badness 1178) in paragraph at lines 111--112
+\T1/cmr/m/n/12 re-sponse times
+ []
+
+
+Underfull \hbox (badness 7451) in paragraph at lines 111--112
+\T1/cmr/m/n/12 when fetch-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--112
+\T1/cmr/m/n/12 com-plex user
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--112
+\T1/cmr/m/n/12 time-lines or
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--112
+\T1/cmr/m/n/12 deeply nested
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 102--113
+ [] [] [] [] [] 
+ []
+
+chapters/introduction.tex:113: ignored error: Infinite glue shrinkage found in box being split [4]
+Underfull \hbox (badness 10000) in paragraph at lines 135--136
+[]|\T1/cmr/m/n/12 Secure ac-cess us-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 137--138
+[]|\T1/cmr/m/n/12 Cursor-paginated home
+ []
+
+
+Underfull \hbox (badness 2302) in paragraph at lines 137--138
+\T1/cmr/m/n/12 and ex-plore feeds with
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 139--140
+[]|\T1/cmr/m/n/12 Text posts, hash-tags,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--143
+[]|\T1/cmr/m/n/12 Real-time No-ti-fi-ca-tions
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--144
+[]|\T1/cmr/m/n/12 Live sys-tem alerts
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--144
+\T1/cmr/m/n/12 (likes, replies, men-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 147--148
+[]|\T1/cmr/m/n/12 System-wide mod-er-a-
+ []
+
+
+Underfull \hbox (badness 6252) in paragraph at lines 147--148
+\T1/cmr/m/n/12 tion panel to man-age
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 147--148
+\T1/cmr/m/n/12 users/groups, ap-prove
+ []
+
+
+Underfull \hbox (badness 7613) in paragraph at lines 147--148
+\T1/cmr/m/n/12 con-tent, con-fig-ure set-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 147--148
+\T1/cmr/m/n/12 tings, and mon-i-tor
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 149--149
+[]|\T1/cmr/m/n/12 Native Mo-bile Ap-pli-ca-
+ []
+
+[5]
+Underfull \hbox (badness 10000) in paragraph at lines 163--163
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 163--164
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 160--165
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 168--168
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 168--169
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 165--170
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 170--172
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 172--174
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 4981) in paragraph at lines 175--175
+\T1/cmr/m/n/12 email, and pass-
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 177--177
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 177--177
+\T1/cmr/m/n/12 im-ple-ment se-cure
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 177--177
+\T1/cmr/m/n/12 pass-word hash-
+ []
+
+
+Underfull \hbox (badness 1910) in paragraph at lines 177--177
+\T1/cmr/m/n/12 ing (e.g., bcrypt)
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 177--177
+\T1/cmr/m/n/12 be-fore stor-ing
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 179--179
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 179--179
+\T1/cmr/m/n/12 send a 6-digit
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 179--179
+\T1/cmr/m/n/12 ver-i-fi-ca-tion code
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 179--179
+\T1/cmr/m/n/12 (OTP) to the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 179--179
+\T1/cmr/m/n/12 user's email to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 179--179
+\T1/cmr/m/n/12 ver-ify ac-count
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 181--181
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 3019) in paragraph at lines 181--181
+\T1/cmr/m/n/12 au-then-ti-cate users
+ []
+
+
+Underfull \hbox (badness 2790) in paragraph at lines 183--183
+\T1/cmr/m/n/12 Pass-word" fea-ture
+ []
+
+
+Underfull \hbox (badness 3895) in paragraph at lines 183--183
+\T1/cmr/m/n/12 al-low-ing users to
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 174--185
+ [] [] [] [] 
+ []
+
+[6]
+Underfull \hbox (badness 10000) in paragraph at lines 193--193
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 193--194
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 190--195
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 198--198
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 198--199
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 195--200
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 200--202
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 202--204
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 205--205
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 205--205
+\T1/cmr/m/n/12 log-i-cally sorted
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 207--207
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 207--207
+\T1/cmr/m/n/12 feed sorted by
+ []
+
+
+Underfull \hbox (badness 1424) in paragraph at lines 207--207
+\T1/cmr/m/n/12 like count (trend-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 207--207
+\T1/cmr/m/n/12 ing), ex-clud-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 209--209
+\T1/cmr/m/n/12 pro-vide ded-i-cated
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 209--209
+\T1/cmr/m/n/12 feed for spe-cific
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 209--209
+\T1/cmr/m/n/12 hash-tags and
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 211--211
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
+\T1/cmr/m/n/12 per-form case-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
+\T1/cmr/m/n/12 insensitive global
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
+\T1/cmr/m/n/12 searches across
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
+\T1/cmr/m/n/12 posts, users,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 211--211
+\T1/cmr/m/n/12 hash-tags, and
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 213--213
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 213--213
+\T1/cmr/m/n/12 de-bounce search
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 213--213
+\T1/cmr/m/n/12 in-put from the
+ []
+
+
+Underfull \hbox (badness 4013) in paragraph at lines 213--213
+\T1/cmr/m/n/12 live drop-down of
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 204--215
+ [] [] [] [] 
+ []
+
+[7]
+Underfull \hbox (badness 10000) in paragraph at lines 223--223
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 223--224
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 220--225
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 228--228
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 228--229
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 225--230
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 230--232
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 232--234
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 235--235
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 237--237
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 237--237
+\T1/cmr/m/n/12 al-low users to
+ []
+
+
+Underfull \hbox (badness 2057) in paragraph at lines 237--237
+\T1/cmr/m/n/12 files man-aged via
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 239--239
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 239--239
+\T1/cmr/m/n/12 au-to-mat-i-cally
+ []
+
+
+Underfull \hbox (badness 3668) in paragraph at lines 239--239
+\T1/cmr/m/n/12 parse, and in-dex
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 239--239
+\T1/cmr/m/n/12 in-cluded in the
+ []
+
+
+Underfull \hbox (badness 1859) in paragraph at lines 241--241
+\T1/cmr/m/n/12 users to edit the
+ []
+
+
+Underfull \hbox (badness 1102) in paragraph at lines 241--241
+\T1/cmr/m/n/12 text of their pre-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 241--241
+\T1/cmr/m/n/12 vi-ously pub-lished
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 241--242
+[]|\T1/cmr/m/n/12 Edit
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 243--243
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 7704) in paragraph at lines 243--243
+\T1/cmr/m/n/12 delete their own
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 243--243
+\T1/cmr/m/n/12 posts, ef-fec-tively
+ []
+
+
+Underfull \hbox (badness 1424) in paragraph at lines 243--243
+\T1/cmr/m/n/12 hid-ing them from
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 234--245
+ [] [] [] [] 
+ []
+
+[8]
+Underfull \hbox (badness 10000) in paragraph at lines 253--253
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 253--254
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 250--255
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 258--258
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 258--259
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 255--260
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 260--262
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 262--264
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 265--265
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 4886) in paragraph at lines 265--265
+\T1/cmr/m/n/12 com-ments to ex-
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 267--267
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 2582) in paragraph at lines 267--267
+\T1/cmr/m/n/12 to ex-ist-ing posts,
+ []
+
+
+Underfull \hbox (badness 5519) in paragraph at lines 269--269
+\T1/cmr/m/n/12 users to per-form
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 269--269
+\T1/cmr/m/n/12 plain re-ports or
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 269--269
+\T1/cmr/m/n/12 quote-reposts to
+ []
+
+
+Underfull \hbox (badness 5302) in paragraph at lines 269--269
+\T1/cmr/m/n/12 their own pro-file
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 271--271
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 264--273
+ [] [] [] [] 
+ []
+
+[9]
+Underfull \hbox (badness 10000) in paragraph at lines 281--281
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 281--282
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 278--283
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 286--286
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 286--287
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 283--288
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 288--290
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 290--292
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 293--293
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 293--293
+\T1/cmr/m/n/12 al-low users to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 293--294
+[]|\T1/cmr/m/n/12 Follow/unfollow
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 295--295
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 295--295
+\T1/cmr/m/n/12 al-low users to
+ []
+
+
+Underfull \hbox (badness 4341) in paragraph at lines 295--295
+\T1/cmr/m/n/12 ex-plic-itly men-tion
+ []
+
+
+Underfull \hbox (badness 1337) in paragraph at lines 295--295
+\T1/cmr/m/n/12 fol-lowed users us-
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 297--297
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 297--297
+\T1/cmr/m/n/12 ac-counts bidi-rec-
+ []
+
+
+Underfull \hbox (badness 1515) in paragraph at lines 297--297
+\T1/cmr/m/n/12 pro-file ac-cess and
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 292--299
+ [] [] [] [] 
+ []
+
+chapters/introduction.tex:299: ignored error: Infinite glue shrinkage found in box being split [10]
+Underfull \hbox (badness 10000) in paragraph at lines 307--307
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 307--308
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 304--309
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 312--312
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 312--313
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 309--314
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 314--316
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 316--318
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 319--319
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 319--319
+\T1/cmr/m/n/12 al-low users to
+ []
+
+
+Underfull \hbox (badness 1122) in paragraph at lines 319--319
+\T1/cmr/m/n/12 view pro-files with
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 319--319
+\T1/cmr/m/n/12 Posts, Replies,
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 321--321
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 2293) in paragraph at lines 321--321
+\T1/cmr/m/n/12 in-clud-ing bio (up
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 318--325
+ [] [] [] [] 
+ []
+
+chapters/introduction.tex:325: ignored error: Infinite glue shrinkage found in box being split [11]
+Underfull \hbox (badness 10000) in paragraph at lines 333--333
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 333--334
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 330--335
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 338--338
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 338--339
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 335--340
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 340--342
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 342--344
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 345--345
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 345--345
+\T1/cmr/m/n/12 al-low users to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 345--345
+\T1/cmr/m/n/12 es-tab-lish 1:1
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 345--345
+\T1/cmr/m/n/12 real-time di-rect
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 345--345
+\T1/cmr/m/n/12 mes-sag-ing thread
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 345--345
+\T1/cmr/m/n/12 with database
+ []
+
+
+Underfull \hbox (badness 1789) in paragraph at lines 345--346
+[]|\T1/cmr/m/n/12 Send Di-rect Mes-
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 347--347
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 347--347
+\T1/cmr/m/n/12 al-low users to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 347--347
+\T1/cmr/m/n/12 videos se-curely
+ []
+
+
+Underfull \hbox (badness 1789) in paragraph at lines 347--348
+[]|\T1/cmr/m/n/12 Send Di-rect Mes-
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 349--349
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 1735) in paragraph at lines 349--349
+\T1/cmr/m/n/12 main-tain and up-
+ []
+
+
+Underfull \hbox (badness 1874) in paragraph at lines 349--349
+\T1/cmr/m/n/12 date un-read mes-
+ []
+
+
+Underfull \hbox (badness 1789) in paragraph at lines 349--350
+[]|\T1/cmr/m/n/12 Send Di-rect Mes-
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 344--351
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 359--359
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 359--360
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 356--361
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 364--364
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 364--365
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 361--366
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 366--368
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 368--370
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 371--371
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 4217) in paragraph at lines 371--371
+\T1/cmr/m/n/12 dis-patch real-time
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 371--371
+\T1/cmr/m/n/12 Socket.IO alerts
+ []
+
+
+Underfull \hbox (badness 4686) in paragraph at lines 371--371
+\T1/cmr/m/n/12 for likes, replies,
+ []
+
+
+Underfull \hbox (badness 1755) in paragraph at lines 371--371
+\T1/cmr/m/n/12 re-posts, men-tions,
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 373--373
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 1365) in paragraph at lines 373--373
+\T1/cmr/m/n/12 se-curely store no-
+ []
+
+
+Underfull \hbox (badness 5592) in paragraph at lines 373--373
+\T1/cmr/m/n/12 ti-fi-ca-tions in the
+ []
+
+
+Underfull \hbox (badness 1546) in paragraph at lines 373--373
+\T1/cmr/m/n/12 database to track
+ []
+
+
+Underfull \hbox (badness 5667) in paragraph at lines 373--373
+\T1/cmr/m/n/12 un-read and read
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 375--375
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 375--375
+\T1/cmr/m/n/12 scale real-time
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 375--375
+\T1/cmr/m/n/12 broad-cast-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 375--375
+\T1/cmr/m/n/12 across mul-ti-ple
+ []
+
+
+Underfull \hbox (badness 3049) in paragraph at lines 375--375
+\T1/cmr/m/n/12 in-stances us-ing a
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 370--377
+ [] [] [] [] 
+ []
+
+[12]
+Underfull \hbox (badness 10000) in paragraph at lines 385--385
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 385--386
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 382--387
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 390--390
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 390--391
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 387--392
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 392--394
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 394--396
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 397--397
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 397--397
+\T1/cmr/m/n/12 al-low users to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 397--397
+\T1/cmr/m/n/12 and au-to-mat-i-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 397--397
+\T1/cmr/m/n/12 cally in-herit the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 397--397
+\T1/cmr/m/n/12 Owner/Moderator
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 399--399
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 399--399
+\T1/cmr/m/n/12 al-low users to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 399--399
+\T1/cmr/m/n/12 browse ex-ist-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 399--399
+\T1/cmr/m/n/12 com-mu-ni-ties and
+ []
+
+
+Underfull \hbox (badness 5302) in paragraph at lines 399--399
+\T1/cmr/m/n/12 ex-plic-itly join or
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 399--400
+[]|\T1/cmr/m/n/12 Join/Leave Com-
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 401--401
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 401--401
+\T1/cmr/m/n/12 al-low com-mu-nity
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 401--401
+\T1/cmr/m/n/12 mod-er-a-tors to
+ []
+
+
+Underfull \hbox (badness 7099) in paragraph at lines 401--401
+\T1/cmr/m/n/12 spe-cific rules for
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 401--402
+[]|\T1/cmr/m/n/12 Manage Com-mu-
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 403--403
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 403--403
+\T1/cmr/m/n/12 al-low mem-bers
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 403--403
+\T1/cmr/m/n/12 to sub-mit posts
+ []
+
+
+Underfull \hbox (badness 2951) in paragraph at lines 403--403
+\T1/cmr/m/n/12 within a com-mu-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 403--403
+\T1/cmr/m/n/12 nity, en-ter-ing a
+ []
+
+
+Underfull \hbox (badness 4995) in paragraph at lines 403--403
+\T1/cmr/m/n/12 mod-er-a-tion queue
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 405--405
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 405--405
+\T1/cmr/m/n/12 al-low mod-er-a-tors
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 405--405
+\T1/cmr/m/n/12 to ap-prove/reject
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 405--406
+[]|\T1/cmr/m/n/12 Manage Com-mu-
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 396--407
+ [] [] [] [] 
+ []
+
+chapters/introduction.tex:407: ignored error: Infinite glue shrinkage found in box being split [13]
+Underfull \hbox (badness 10000) in paragraph at lines 415--415
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 415--416
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 412--417
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 420--420
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 420--421
+[]|\T1/cmr/bx/n/12 Related Use
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 417--422
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 422--424
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 424--426
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 429--429
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 429--429
+\T1/cmr/m/n/12 al-low ad-min-is-tra-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 429--429
+\T1/cmr/m/n/12 or per-ma-nently
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 431--431
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 3291) in paragraph at lines 433--433
+[]|\T1/cmr/m/n/12 The sys-tem shall
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+\T1/cmr/m/n/12 al-low ad-min-is-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+\T1/cmr/m/n/12 tra-tors to per-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+\T1/cmr/m/n/12 ma-nently delete
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
+\T1/cmr/m/n/12 re-ported con-tent
+ []
+
+
+Underfull \hbox (badness 1803) in paragraph at lines 433--433
+\T1/cmr/m/n/12 or dis-miss in-valid
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 426--435
+ [] [] [] [] 
+ []
+
+[14]
+Underfull \hbox (badness 10000) in paragraph at lines 443--443
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 443--444
+[]|\T1/cmr/bx/n/12 Importance
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 440--445
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 448--448
+[]|\T1/cmr/bx/n/12 Requirement
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 448--449
+[]|\T1/cmr/bx/n/12 Importance
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 445--450
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 450--452
+ [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 452--454
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 455--455
+\T1/cmr/m/n/12 API end-points
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 455--455
+\T1/cmr/m/n/12 us-ing HTTP-only
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 455--455
+\T1/cmr/m/n/12 JSON Web To-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 455--455
+\T1/cmr/m/n/12 kens (JWT) to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 455--455
+\T1/cmr/m/n/12 Script-ing (XSS)
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 457--457
+[]|\T1/cmr/m/n/12 User pass-words
+ []
+
+
+Underfull \hbox (badness 3895) in paragraph at lines 457--457
+\T1/cmr/m/n/12 must be se-curely
+ []
+
+
+Underfull \hbox (badness 3612) in paragraph at lines 457--457
+\T1/cmr/m/n/12 hashed us-ing the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 457--457
+\T1/cmr/m/n/12 bcrypt al-go-rithm
+ []
+
+
+Underfull \hbox (badness 3323) in paragraph at lines 457--457
+\T1/cmr/m/n/12 with at least 10
+ []
+
+
+Underfull \hbox (badness 2173) in paragraph at lines 459--459
+[]|\T1/cmr/m/n/12 The sys-tem must
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 459--459
+\T1/cmr/m/n/12 uti-lize Re-dis for
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 459--459
+\T1/cmr/m/n/12 of high-traffic
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 459--459
+\T1/cmr/m/n/12 queries (search
+ []
+
+
+Underfull \hbox (badness 1515) in paragraph at lines 459--459
+\T1/cmr/m/n/12 re-sults) to re-duce
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 461--461
+[]|\T1/cmr/m/n/12 Feed end-points
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 461--461
+\T1/cmr/m/n/12 must im-ple-ment
+ []
+
+
+Underfull \hbox (badness 2564) in paragraph at lines 461--461
+\T1/cmr/m/n/12 cursor-based pag-i-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 461--461
+\T1/cmr/m/n/12 re-sponse times
+ []
+
+
+Underfull \hbox (badness 1097) in paragraph at lines 461--461
+\T1/cmr/m/n/12 re-gard-less of data
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 463--463
+[]|\T1/cmr/m/n/12 Real-time Web-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 463--463
+\T1/cmr/m/n/12 (Socket.IO) must
+ []
+
+
+Underfull \hbox (badness 2368) in paragraph at lines 463--463
+\T1/cmr/m/n/12 to al-low seam-less
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 463--463
+\T1/cmr/m/n/12 hor-i-zon-tal scal-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 463--463
+\T1/cmr/m/n/12 across mul-ti-ple
+ []
+
+
+Underfull \hbox (badness 2173) in paragraph at lines 465--465
+[]|\T1/cmr/m/n/12 The sys-tem must
+ []
+
+
+Underfull \hbox (badness 4479) in paragraph at lines 465--465
+\T1/cmr/m/n/12 en-force API rate
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 465--465
+\T1/cmr/m/n/12 lim-it-ing us-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 465--465
+\T1/cmr/m/n/12 a Redis-backed
+ []
+
+
+Underfull \hbox (badness 1968) in paragraph at lines 467--467
+\T1/cmr/m/n/12 cep-tion Fil-ters to
+ []
+
+
+Underfull \hbox (badness 2035) in paragraph at lines 467--467
+\T1/cmr/m/n/12 con-sis-tent, se-cure,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 467--467
+\T1/cmr/m/n/12 and stan-dard-ized
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 469--469
+\T1/cmr/m/n/12 uti-lize Next.js
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 469--469
+\T1/cmr/m/n/12 Server-Side Ren-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 469--469
+\T1/cmr/m/n/12 der-ing (SSR) to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 469--469
+\T1/cmr/m/n/12 en-sure op-ti-mal
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 469--469
+\T1/cmr/m/n/12 ti-miza-tion (SEO)
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 469--469
+\T1/cmr/m/n/12 and fast ini-tial
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 471--471
+\T1/cmr/m/n/12 must im-ple-ment
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 471--471
+\T1/cmr/m/n/12 seam-less In-fi-nite
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 471--471
+\T1/cmr/m/n/12 feeds, lever-ag-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 473--473
+[]|\T1/cmr/m/n/12 The project en-
+ []
+
+
+Underfull \hbox (badness 1281) in paragraph at lines 473--473
+\T1/cmr/m/n/12 Script typ-ing and
+ []
+
+
+Underfull \hbox (badness 6675) in paragraph at lines 473--473
+\T1/cmr/m/n/12 be struc-tured as
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 473--473
+\T1/cmr/m/n/12 a Monorepo to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 473--473
+\T1/cmr/m/n/12 en-sure long-term
+ []
+
+
+Overfull \hbox (5.90892pt too wide) in alignment at lines 454--475
+ [] [] [] [] 
+ []
+
+[15]
+chapters/introduction.tex:475: ignored error: Infinite glue shrinkage found in box being split [16]
+chapters/introduction.tex:475: ignored error: Infinite glue shrinkage found in box being split [17]
+Overfull \hbox (0.42023pt too wide) in paragraph at lines 493--494
+\T1/cmr/m/n/12 mod-ule for vi-ral and per-son-al-ized con-tent based on user en-gage-ment (likes, replies,
+ []
+
+[18]
+Overfull \hbox (29.7143pt too wide) in paragraph at lines 495--496
+[]\T1/cmr/m/n/12 Media and in-ter-ac-tions: Multi-media at-tach-ment ca-pa-bil-i-ties (us-ing Cloud-i-nary/Sharp)
+ []
+
+) [19]
+Chapter 2.
+(chapters/literature_review.tex
+Overfull \hbox (2.23524pt too wide) in paragraph at lines 10--11
+\T1/cmr/m/n/12 greSQL as the per-sis-tent re-la-tional source of truth with Re-dis as an in-memory database.
+ []
+
+[20
+
+] [21]
+Overfull \hbox (5.94801pt too wide) in paragraph at lines 61--61
+|[]\T1/cmr/bx/n/17.28 Database Tech-nolo-gies for So-cial Net-work-ing Plat-
+ []
+
+[22]
+Overfull \hbox (10.48647pt too wide) in paragraph at lines 81--81
+|[]\T1/cmr/bx/n/17.28 Web Cu-ra-tion and So-cial Feed Rank-ing Al-go-rithms| 
+ []
+
+
+Overfull \hbox (7.85728pt too wide) in paragraph at lines 99--99
+|[]\T1/cmr/bx/n/17.28 Threaded Dis-cus-sion Cu-ra-tion and Com-ment Sort-
+ []
+
+[23] [24] [25]
+<images/image3.png, id=1027, 676.02562pt x 221.32687pt>
+File: images/image3.png Graphic file (type png)
+<use images/image3.png>
+Package pdftex.def Info: images/image3.png  used on input line 156.
+(pdftex.def)             Requested size: 405.74228pt x 132.83766pt.
+) [26 <./images/image3.png>]
+Chapter 3.
+(chapters/methodology.tex
+Underfull \hbox (badness 10000) in paragraph at lines 15--15
+[]|\T1/cmr/bx/n/12 Modular Mono-lith
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 20--20
+[]|\T1/cmr/bx/n/12 Modular Mono-lith
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 27--28
+[]|\T1/cmr/m/n/12 Each ser-vice re-quires
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 27--28
+\T1/cmr/m/n/12 in-de-pen-dent or-ches-tra-
+ []
+
+
+Underfull \hbox (badness 4518) in paragraph at lines 27--28
+\T1/cmr/m/n/12 tion (Docker Com-pose,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--30
+[]|\T1/cmr/m/n/12 Network calls
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--30
+\T1/cmr/m/n/12 (REST/gRPC), in-tro-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 31--31
+[]|\T1/cmr/m/n/12 Single shared Prisma
+ []
+
+
+Underfull \hbox (badness 1014) in paragraph at lines 31--32
+\T1/cmr/m/n/12 own database, re-quir-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 31--32
+\T1/cmr/m/n/12 dis-tributed trans-ac-tion
+ []
+
+
+Underfull \hbox (badness 6542) in paragraph at lines 33--33
+[]|\T1/cmr/m/n/12 Low - suit-able for a
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+\T1/cmr/m/n/12 single-developer pre-
+ []
+
+
+Underfull \hbox (badness 2707) in paragraph at lines 33--34
+[]|\T1/cmr/m/n/12 High - re-quires ser-vice
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
+[]|\T1/cmr/m/n/12 Module bound-ary en-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
+[]|\T1/cmr/m/n/12 NestJS mod-ule en-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
+\T1/cmr/m/n/12 cap-su-la-tion pre-vents
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+[]|\T1/cmr/m/n/12 Horizontal scal-ing via
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+\T1/cmr/m/n/12 load bal-ancer; Re-dis
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--38
+[]|\T1/cmr/m/n/12 Fine-grained per-service
+ []
+
+chapters/methodology.tex:39: ignored error: Infinite glue shrinkage found in box being split [27
+
+]
+<images/image4.png, id=1038, 417.195pt x 412.2675pt>
+File: images/image4.png Graphic file (type png)
+<use images/image4.png>
+Package pdftex.def Info: images/image4.png  used on input line 43.
+(pdftex.def)             Requested size: 405.74178pt x 400.94954pt.
+ [28] [29 <./images/image4.png>]
+<images/image5.png, id=1052, 287.766pt x 557.793pt>
+File: images/image5.png Graphic file (type png)
+<use images/image5.png>
+Package pdftex.def Info: images/image5.png  used on input line 65.
+(pdftex.def)             Requested size: 303.34438pt x 587.98944pt.
+ [30] [31 <./images/image5.png>]
+Overfull \hbox (0.41188pt too wide) in paragraph at lines 98--99
+[]\T1/cmr/m/n/12 Moderate Con-tent: Ad-min-is-tra-tors can delete in-ap-pro-pri-ate posts plat-form guide-
+ []
+
+<images/image6.png, id=1071, 736.7525pt x 1362.08875pt>
+File: images/image6.png Graphic file (type png)
+<use images/image6.png>
+Package pdftex.def Info: images/image6.png  used on input line 106.
+(pdftex.def)             Requested size: 318.02277pt x 587.95218pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--109
+
+ []
+
+[32]
+<images/image7.png, id=1099, 922.44624pt x 1021.8175pt>
+File: images/image7.png Graphic file (type png)
+<use images/image7.png>
+Package pdftex.def Info: images/image7.png  used on input line 114.
+(pdftex.def)             Requested size: 405.73685pt x 449.44518pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--117
+
+ []
+
+[33 <./images/image6.png>]
+<images/image8.png, id=1106, 841.1425pt x 1451.4225pt>
+File: images/image8.png Graphic file (type png)
+<use images/image8.png>
+Package pdftex.def Info: images/image8.png  used on input line 122.
+(pdftex.def)             Requested size: 340.73785pt x 587.95578pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 119--125
+
+ []
+
+[34 <./images/image7.png>]
+<images/image9.png, id=1112, 1051.93pt x 1334.9875pt>
+File: images/image9.png Graphic file (type png)
+<use images/image9.png>
+Package pdftex.def Info: images/image9.png  used on input line 130.
+(pdftex.def)             Requested size: 405.74068pt x 514.919pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 127--133
+
+ []
+
+[35 <./images/image8.png>]
+<images/image10.png, id=1118, 821.0675pt x 989.6975pt>
+File: images/image10.png Graphic file (type png)
+<use images/image10.png>
+Package pdftex.def Info: images/image10.png  used on input line 138.
+(pdftex.def)             Requested size: 405.73434pt x 489.06364pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 135--141
+
+ []
+
+[36 <./images/image9.png>]
+<images/image11.png, id=1124, 1089.06876pt x 832.10875pt>
+File: images/image11.png Graphic file (type png)
+<use images/image11.png>
+Package pdftex.def Info: images/image11.png  used on input line 146.
+(pdftex.def)             Requested size: 405.7243pt x 309.9958pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--149
+
+ []
+
+[37 <./images/image10.png>]
+<images/image12.png, id=1130, 1244.65pt x 1295.84125pt>
+File: images/image12.png Graphic file (type png)
+<use images/image12.png>
+Package pdftex.def Info: images/image12.png  used on input line 154.
+(pdftex.def)             Requested size: 405.74092pt x 422.42865pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 151--157
+
+ []
+
+[38 <./images/image11.png>]
+<images/image13.png, id=1137, 762.85pt x 887.315pt>
+File: images/image13.png Graphic file (type png)
+<use images/image13.png>
+Package pdftex.def Info: images/image13.png  used on input line 162.
+(pdftex.def)             Requested size: 405.72867pt x 471.92651pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 159--165
+
+ []
+
+[39 <./images/image12.png>]
+<images/image14.png, id=1143, 1758.57pt x 1713.40125pt>
+File: images/image14.png Graphic file (type png)
+<use images/image14.png>
+Package pdftex.def Info: images/image14.png  used on input line 170.
+(pdftex.def)             Requested size: 405.72377pt x 395.30278pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 167--173
+
+ []
+
+[40 <./images/image13.png>]
+<images/image15.png, id=1149, 1045.9075pt x 1355.0625pt>
+File: images/image15.png Graphic file (type png)
+<use images/image15.png>
+Package pdftex.def Info: images/image15.png  used on input line 178.
+(pdftex.def)             Requested size: 405.73183pt x 525.66025pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 175--181
+
+ []
+
+[41 <./images/image14.png>]
+<images/image17.png, id=1155, 471.069pt x 389.9295pt>
+File: images/image17.png Graphic file (type png)
+<use images/image17.png>
+Package pdftex.def Info: images/image17.png  used on input line 186.
+(pdftex.def)             Requested size: 405.7368pt x 335.85046pt.
+ [42 <./images/image15.png>]
+<images/image18.png, id=1161, 278.54062pt x 443.40656pt>
+File: images/image18.png Graphic file (type png)
+<use images/image18.png>
+Package pdftex.def Info: images/image18.png  used on input line 199.
+(pdftex.def)             Requested size: 369.36632pt x 587.99126pt.
+ [43 <./images/image17.png>]
+Underfull \hbox (badness 1546) in paragraph at lines 207--207
+[]|\TS1/cmr/bx/n/12 ˆ\T1/cmr/bx/n/12 User De-scrip-tion: Core en-tity
+ []
+
+
+Underfull \hbox (badness 1337) in paragraph at lines 207--207
+\T1/cmr/bx/n/12 count, stor-ing iden-tity, pro-file,
+ []
+
+
+Underfull \hbox (badness 4634) in paragraph at lines 207--207
+\T1/cmr/bx/n/12 and system-level ac-cess state.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 207--208
+[]|\TS1/cmr/bx/n/12 ˆ\T1/cmr/bx/n/12 VerificationToken De-scrip-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 207--208
+\T1/cmr/m/n/12 expires (Date-Time) - Ex-pi-ra-tion
+ []
+
+
+Underfull \hbox (badness 1910) in paragraph at lines 207--208
+\T1/cmr/m/n/12 One-to-Many with nearly all other
+ []
+
+
+Underfull \hbox (badness 1546) in paragraph at lines 212--212
+[]|\TS1/cmr/bx/n/12 ˆ\T1/cmr/bx/n/12 User De-scrip-tion: Core en-tity
+ []
+
+
+Underfull \hbox (badness 1337) in paragraph at lines 212--212
+\T1/cmr/bx/n/12 count, stor-ing iden-tity, pro-file,
+ []
+
+
+Underfull \hbox (badness 4634) in paragraph at lines 212--212
+\T1/cmr/bx/n/12 and system-level ac-cess state.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 212--213
+[]|\TS1/cmr/bx/n/12 ˆ\T1/cmr/bx/n/12 VerificationToken De-scrip-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 212--213
+\T1/cmr/m/n/12 expires (Date-Time) - Ex-pi-ra-tion
+ []
+
+
+Underfull \hbox (badness 1910) in paragraph at lines 212--213
+\T1/cmr/m/n/12 One-to-Many with nearly all other
+ []
+
+[44 <./images/image18.png>]
+<images/image19.png, id=1175, 447.92343pt x 603.75563pt>
+File: images/image19.png Graphic file (type png)
+<use images/image19.png>
+Package pdftex.def Info: images/image19.png  used on input line 226.
+(pdftex.def)             Requested size: 405.74507pt x 546.90346pt.
+ [45]
+Underfull \hbox (badness 1755) in paragraph at lines 234--235
+[]|\TS1/cmr/bx/n/12 ˆ\T1/cmr/bx/n/12 PostMedia De-scrip-tion: Stores
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 234--235
+\T1/cmr/m/n/12 url (String) CDN path (Cloud-i-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 234--235
+\T1/cmr/m/n/12 Many-to-One with Post (Cas-cade
+ []
+
+
+Underfull \hbox (badness 1755) in paragraph at lines 239--240
+[]|\TS1/cmr/bx/n/12 ˆ\T1/cmr/bx/n/12 PostMedia De-scrip-tion: Stores
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 239--240
+\T1/cmr/m/n/12 url (String) CDN path (Cloud-i-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 239--240
+\T1/cmr/m/n/12 Many-to-One with Post (Cas-cade
+ []
+
+
+Underfull \hbox (badness 2285) in paragraph at lines 246--246
+[]|\TS1/cmr/m/n/12 ˆ\T1/cmr/m/n/12 Comment De-scrip-tion: Stores user
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 246--246
+\T1/cmr/m/n/12 url (String) CDN path (Cloud-i-
+ []
+
+
+Underfull \hbox (badness 5331) in paragraph at lines 246--246
+\T1/cmr/m/n/12 One-to-Many with Com-ment-Media,
+ []
+
+
+Underfull \hbox (badness 1466) in paragraph at lines 248--248
+\T1/cmr/m/n/12 tag (String, unique) Low-er-case tag
+ []
+
+
+Underfull \hbox (badness 1286) in paragraph at lines 248--249
+\T1/cmr/m/n/12 ated/updated au-to-mat-i-cally when a
+ []
+
+[46 <./images/image19.png>]
+chapters/methodology.tex:250: ignored error: Infinite glue shrinkage found in box being split [47]
+<images/image20.png, id=1190, 436.63126pt x 545.03625pt>
+File: images/image20.png Graphic file (type png)
+<use images/image20.png>
+Package pdftex.def Info: images/image20.png  used on input line 257.
+(pdftex.def)             Requested size: 405.7364pt x 506.47098pt.
+ [48]
+Underfull \hbox (badness 2269) in paragraph at lines 265--265
+\T1/cmr/bx/n/12 cial graph edge. De-ter-mines
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 265--266
+[]|\TS1/cmr/bx/n/12 ˆ\T1/cmr/bx/n/12 Block De-scrip-tion: Mu-tual
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 265--266
+\T1/cmr/bx/n/12 black-list be-tween two users.
+ []
+
+
+Underfull \hbox (badness 3049) in paragraph at lines 265--266
+\T1/cmr/bx/n/12 i-cally re-moves ex-ist-ing fol-lows
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 265--266
+\T1/cmr/m/n/12 Unique con-straint on [block-erId,
+ []
+
+
+Underfull \hbox (badness 2269) in paragraph at lines 270--270
+\T1/cmr/bx/n/12 cial graph edge. De-ter-mines
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 270--271
+[]|\TS1/cmr/bx/n/12 ˆ\T1/cmr/bx/n/12 Block De-scrip-tion: Mu-tual
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 270--271
+\T1/cmr/bx/n/12 black-list be-tween two users.
+ []
+
+
+Underfull \hbox (badness 3049) in paragraph at lines 270--271
+\T1/cmr/bx/n/12 i-cally re-moves ex-ist-ing fol-lows
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 270--271
+\T1/cmr/m/n/12 Unique con-straint on [block-erId,
+ []
+
+
+Underfull \hbox (badness 2762) in paragraph at lines 277--278
+\T1/cmr/m/n/12 Many-to-One with User, Com-ment
+ []
+
+[49 <./images/image20.png>]
+chapters/methodology.tex:281: ignored error: Infinite glue shrinkage found in box being split [50]
+<images/image21.png, id=1206, 600.74437pt x 379.4175pt>
+File: images/image21.png Graphic file (type png)
+<use images/image21.png>
+Package pdftex.def Info: images/image21.png  used on input line 288.
+(pdftex.def)             Requested size: 405.75078pt x 256.26364pt.
+ [51]
+Underfull \hbox (badness 5563) in paragraph at lines 296--296
+\T1/cmr/m/n/12 One-to-Many with Post, Mem-ber,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 296--297
+[]|\T1/cmr/bx/n/12 CommunityMember De-scrip-
+ []
+
+
+Underfull \hbox (badness 1783) in paragraph at lines 296--297
+\T1/cmr/bx/n/12 can join a spe-cific com-mu-nity
+ []
+
+
+Underfull \hbox (badness 1735) in paragraph at lines 296--297
+\T1/cmr/m/n/12 role (Enum: MEM-BER | MOD |
+ []
+
+
+Underfull \hbox (badness 1286) in paragraph at lines 296--297
+\T1/cmr/m/n/12 Unique con-straint on [userId, com-
+ []
+
+
+Underfull \hbox (badness 5771) in paragraph at lines 296--297
+\T1/cmr/m/n/12 mu-ni-tyId] one role per user per
+ []
+
+
+Underfull \hbox (badness 5563) in paragraph at lines 301--301
+\T1/cmr/m/n/12 One-to-Many with Post, Mem-ber,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 301--302
+[]|\T1/cmr/bx/n/12 CommunityMember De-scrip-
+ []
+
+
+Underfull \hbox (badness 1783) in paragraph at lines 301--302
+\T1/cmr/bx/n/12 can join a spe-cific com-mu-nity
+ []
+
+
+Underfull \hbox (badness 1735) in paragraph at lines 301--302
+\T1/cmr/m/n/12 role (Enum: MEM-BER | MOD |
+ []
+
+
+Underfull \hbox (badness 1286) in paragraph at lines 301--302
+\T1/cmr/m/n/12 Unique con-straint on [userId, com-
+ []
+
+
+Underfull \hbox (badness 5771) in paragraph at lines 301--302
+\T1/cmr/m/n/12 mu-ni-tyId] one role per user per
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 308--309
+[]|\TS1/cmr/m/n/12 ˆ\T1/cmr/m/n/12 CommunityBannedUser De-scrip-
+ []
+
+[52 <./images/image21.png>]
+<images/image22.png, id=1217, 603.75563pt x 517.18219pt>
+File: images/image22.png Graphic file (type png)
+<use images/image22.png>
+Package pdftex.def Info: images/image22.png  used on input line 317.
+(pdftex.def)             Requested size: 405.73022pt x 347.55196pt.
+ [53]
+Underfull \hbox (badness 1337) in paragraph at lines 325--326
+\T1/cmr/m/n/12 Description: Junc-tion ta-ble link-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 325--326
+\T1/cmr/m/n/12 par-tic-i-pant's last-read times-tamp,
+ []
+
+
+Underfull \hbox (badness 3375) in paragraph at lines 325--326
+\T1/cmr/m/n/12 which pow-ers the un-read mes-sage
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 325--326
+\T1/cmr/m/n/12 lastReadAt (Date-Time, de-fault:
+ []
+
+
+Underfull \hbox (badness 1337) in paragraph at lines 330--331
+\T1/cmr/m/n/12 Description: Junc-tion ta-ble link-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 330--331
+\T1/cmr/m/n/12 par-tic-i-pant's last-read times-tamp,
+ []
+
+
+Underfull \hbox (badness 3375) in paragraph at lines 330--331
+\T1/cmr/m/n/12 which pow-ers the un-read mes-sage
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 330--331
+\T1/cmr/m/n/12 lastReadAt (Date-Time, de-fault:
+ []
+
+
+Underfull \hbox (badness 1205) in paragraph at lines 337--338
+\T1/cmr/m/n/12 Description: System-generated alert
+ []
+
+
+Underfull \hbox (badness 1688) in paragraph at lines 337--338
+\T1/cmr/m/n/12 de-liv-ered to a re-cip-i-ent user when
+ []
+
+
+Underfull \hbox (badness 2027) in paragraph at lines 337--338
+\T1/cmr/m/n/12 POST | FOL-LOW | MEN-TION |
+ []
+
+
+Underfull \hbox (badness 6725) in paragraph at lines 337--338
+\T1/cmr/m/n/12 COM-MU-NITY_POST | COM-MU-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 337--338
+\T1/cmr/m/n/12 NITY_NEW_POST | COM-MU-
+ []
+
+
+Underfull \hbox (badness 1831) in paragraph at lines 339--339
+\T1/cmr/m/n/12 reason (String) Re-port rea-son text
+ []
+
+
+Underfull \hbox (badness 3168) in paragraph at lines 339--339
+\T1/cmr/m/n/12 Many-to-One with User (re-porter),
+ []
+
+[54 <./images/image22.png>]
+chapters/methodology.tex:341: ignored error: Infinite glue shrinkage found in box being split [55]
+chapters/methodology.tex:341: ignored error: Infinite glue shrinkage found in box being split [56]
+<images/image23.png, id=1236, 1855.27414pt x 2581.07143pt>
+File: images/image23.png Graphic file (type png)
+<use images/image23.png>
+Package pdftex.def Info: images/image23.png  used on input line 347.
+(pdftex.def)             Requested size: 405.72699pt x 564.45045pt.
+ [57]
+Underfull \hbox (badness 3271) in paragraph at lines 360--360
+\T1/cmr/m/n/12 toggleBlock(): Blocks or un-blocks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 360--360
+\T1/cmr/m/n/12 Composition -> Ac-count (one-to-
+ []
+
+
+Underfull \hbox (badness 1097) in paragraph at lines 360--361
+\T1/cmr/m/n/12 Description: Stores single-use OTP
+ []
+
+
+Underfull \hbox (badness 3271) in paragraph at lines 365--365
+\T1/cmr/m/n/12 toggleBlock(): Blocks or un-blocks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 365--365
+\T1/cmr/m/n/12 Composition -> Ac-count (one-to-
+ []
+
+
+Underfull \hbox (badness 1097) in paragraph at lines 365--366
+\T1/cmr/m/n/12 Description: Stores single-use OTP
+ []
+
+[58 <./images/image23.png>]
+Underfull \hbox (badness 1297) in paragraph at lines 381--381
+\T1/cmr/m/n/12 Composition -> Post-Media (one-to-
+ []
+
+
+Underfull \hbox (badness 3000) in paragraph at lines 381--381
+\T1/cmr/m/n/12 Composition -> Com-ment (one-to-
+ []
+
+
+Underfull \hbox (badness 1297) in paragraph at lines 386--386
+\T1/cmr/m/n/12 Composition -> Post-Media (one-to-
+ []
+
+
+Underfull \hbox (badness 3000) in paragraph at lines 386--386
+\T1/cmr/m/n/12 Composition -> Com-ment (one-to-
+ []
+
+[59]
+chapters/methodology.tex:397: ignored error: Infinite glue shrinkage found in box being split [60]
+Underfull \hbox (badness 2253) in paragraph at lines 406--406
+\T1/cmr/m/n/12 Description: Di-rected so-cial graph
+ []
+
+
+Underfull \hbox (badness 2253) in paragraph at lines 411--411
+\T1/cmr/m/n/12 Description: Di-rected so-cial graph
+ []
+
+[61] [62]
+Underfull \hbox (badness 1783) in paragraph at lines 431--431
+\T1/cmr/m/n/12 banUser(): Bans a user from the
+ []
+
+
+Underfull \hbox (badness 1275) in paragraph at lines 431--431
+\T1/cmr/m/n/12 moderatePost(): Ap-proves/rejects a
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 431--431
+\T1/cmr/m/n/12 Composition-> Com-mu-ni-ty-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 431--432
+\T1/cmr/m/n/12 Description: Man-ages com-mu-nity
+ []
+
+
+Underfull \hbox (badness 1783) in paragraph at lines 436--436
+\T1/cmr/m/n/12 banUser(): Bans a user from the
+ []
+
+
+Underfull \hbox (badness 1275) in paragraph at lines 436--436
+\T1/cmr/m/n/12 moderatePost(): Ap-proves/rejects a
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 436--436
+\T1/cmr/m/n/12 Composition-> Com-mu-ni-ty-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 436--437
+\T1/cmr/m/n/12 Description: Man-ages com-mu-nity
+ []
+
+[63] [64]
+Underfull \hbox (badness 4899) in paragraph at lines 454--454
+\T1/cmr/m/n/12 getConversations(): Re-trieves user
+ []
+
+
+Underfull \hbox (badness 1077) in paragraph at lines 454--454
+\T1/cmr/m/n/12 findOrCreate(): Finds or cre-ates a
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 454--454
+\T1/cmr/m/n/12 Composition -> Mes-sage (one-to-
+ []
+
+
+Underfull \hbox (badness 4899) in paragraph at lines 459--459
+\T1/cmr/m/n/12 getConversations(): Re-trieves user
+ []
+
+
+Underfull \hbox (badness 1077) in paragraph at lines 459--459
+\T1/cmr/m/n/12 findOrCreate(): Finds or cre-ates a
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 459--459
+\T1/cmr/m/n/12 Composition -> Mes-sage (one-to-
+ []
+
+chapters/methodology.tex:470: ignored error: Infinite glue shrinkage found in box being split [65] [66]
+<images/image25.png, id=1286, 361.0215pt x 537.7545pt>
+File: images/image25.png Graphic file (type png)
+<use images/image25.png>
+Package pdftex.def Info: images/image25.png  used on input line 480.
+(pdftex.def)             Requested size: 394.72305pt x 587.95421pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 477--483
+
+ []
+
+<images/image26.png, id=1287, 398.142pt x 543.0105pt>
+File: images/image26.png Graphic file (type png)
+<use images/image26.png>
+Package pdftex.def Info: images/image26.png  used on input line 488.
+(pdftex.def)             Requested size: 405.7471pt x 553.38281pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 485--491
+
+ []
+
+[67 <./images/image25.png>]
+<images/image27.png, id=1293, 405.6975pt x 544.3245pt>
+File: images/image27.png Graphic file (type png)
+<use images/image27.png>
+Package pdftex.def Info: images/image27.png  used on input line 496.
+(pdftex.def)             Requested size: 405.73982pt x 544.3813pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 493--499
+
+ []
+
+[68 <./images/image26.png>]
+<images/image28.png, id=1300, 434.277pt x 539.397pt>
+File: images/image28.png Graphic file (type png)
+<use images/image28.png>
+Package pdftex.def Info: images/image28.png  used on input line 504.
+(pdftex.def)             Requested size: 405.75536pt x 503.9715pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 501--507
+
+ []
+
+[69 <./images/image27.png>]
+<images/image29.png, id=1306, 433.9485pt x 378.7605pt>
+File: images/image29.png Graphic file (type png)
+<use images/image29.png>
+Package pdftex.def Info: images/image29.png  used on input line 512.
+(pdftex.def)             Requested size: 405.73978pt x 354.13927pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 509--515
+
+ []
+
+[70 <./images/image28.png>]
+<images/image30.png, id=1312, 433.9485pt x 441.8325pt>
+File: images/image30.png Graphic file (type png)
+<use images/image30.png>
+Package pdftex.def Info: images/image30.png  used on input line 520.
+(pdftex.def)             Requested size: 405.73978pt x 413.1113pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 517--523
+
+ []
+
+[71 <./images/image29.png>]
+<images/image31.png, id=1318, 435.2625pt x 431.3205pt>
+File: images/image31.png Graphic file (type png)
+<use images/image31.png>
+Package pdftex.def Info: images/image31.png  used on input line 528.
+(pdftex.def)             Requested size: 405.73967pt x 402.06506pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 525--531
+
+ []
+
+[72 <./images/image30.png>]
+<images/image32.png, id=1324, 433.9485pt x 516.0735pt>
+File: images/image32.png Graphic file (type png)
+<use images/image32.png>
+Package pdftex.def Info: images/image32.png  used on input line 536.
+(pdftex.def)             Requested size: 405.73978pt x 482.52628pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 533--539
+
+ []
+
+[73 <./images/image31.png>]
+<images/image33.png, id=1330, 434.277pt x 487.494pt>
+File: images/image33.png Graphic file (type png)
+<use images/image33.png>
+Package pdftex.def Info: images/image33.png  used on input line 544.
+(pdftex.def)             Requested size: 405.75536pt x 455.47726pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 541--547
+
+ []
+
+[74 <./images/image32.png>]
+<images/image34.png, id=1337, 434.934pt x 534.141pt>
+File: images/image34.png Graphic file (type png)
+<use images/image34.png>
+Package pdftex.def Info: images/image34.png  used on input line 552.
+(pdftex.def)             Requested size: 405.75865pt x 498.31085pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 549--555
+
+ []
+
+[75 <./images/image33.png>] [76 <./images/image34.png>]
+Overfull \hbox (0.73691pt too wide) in paragraph at lines 575--576
+[]\T1/cmr/m/n/12 Content Mod-er-a-tion (/admin-console/reports): A real-time queue of flagged posts
+ []
+
+[77]
+Underfull \hbox (badness 10000) in paragraph at lines 602--603
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 610--611
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 618--619
+
+ []
+
+[78]
+Underfull \hbox (badness 10000) in paragraph at lines 626--627
+
+ []
+
+[79]
+Underfull \hbox (badness 10000) in paragraph at lines 655--656
+
+ []
+
+
+Overfull \hbox (1.06862pt too wide) in paragraph at lines 661--662
+[]\T1/cmr/m/n/12 Low-overhead file stream-ing and me-dia up-loads (Fas-tify's mul-ti-part per-for-mance). 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 664--665
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 672--673
+
+ []
+
+
+Overfull \hbox (36.67534pt too wide) in paragraph at lines 676--677
+[]\T1/cmr/m/n/12 Exposes struc-tured REST-ful end-points (POST /api/auth/register, GET /api/posts/feed 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 681--682
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 683--684
+
+ []
+
+[80]
+Underfull \hbox (badness 10000) in paragraph at lines 707--708
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 716--718
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 723--725
+
+ []
+
+[81]
+<images/image35.png, id=1378, 434.277pt x 374.8185pt>
+File: images/image35.png Graphic file (type png)
+<use images/image35.png>
+Package pdftex.def Info: images/image35.png  used on input line 745.
+(pdftex.def)             Requested size: 405.75536pt x 350.20187pt.
+ [82]
+Underfull \hbox (badness 10000) in paragraph at lines 748--750
+
+ []
+
+
+Overfull \hbox (50.92447pt too wide) in paragraph at lines 751--753
+[]\T1/cmr/m/n/12 Build Pipeline: Ver-cel de-tects mod-i-fi-ca-tions within the fron-tend di-rec-tory (apps/frontend/).
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 759--761
+
+ []
+
+
+Overfull \hbox (1.81705pt too wide) in paragraph at lines 762--764
+[]\T1/cmr/m/n/12 Docker Build: Ren-der iden-ti-fies changes in the back-end di-rec-tory (apps/backend/)
+ []
+
+[83 <./images/image35.png>] [84]) [85]
+Chapter 4.
+(chapters/implementation.tex
+<images/image36.png, id=1400, 270.25969pt x 515.67656pt>
+File: images/image36.png Graphic file (type png)
+<use images/image36.png>
+Package pdftex.def Info: images/image36.png  used on input line 7.
+(pdftex.def)             Requested size: 308.1652pt x 588.00328pt.
+ [86
+
+] [87 <./images/image36.png>]
+<images/image37.png, id=1411, 444.91219pt x 690.32906pt>
+File: images/image37.png Graphic file (type png)
+<use images/image37.png>
+Package pdftex.def Info: images/image37.png  used on input line 21.
+(pdftex.def)             Requested size: 378.93748pt x 587.96223pt.
+ [88]
+<images/image38.png, id=1416, 329.73187pt x 368.1253pt>
+File: images/image38.png Graphic file (type png)
+<use images/image38.png>
+Package pdftex.def Info: images/image38.png  used on input line 31.
+(pdftex.def)             Requested size: 405.7489pt x 452.99365pt.
+ [89 <./images/image37.png>]
+<images/image39.png, id=1422, 658.71094pt x 432.86719pt>
+File: images/image39.png Graphic file (type png)
+<use images/image39.png>
+Package pdftex.def Info: images/image39.png  used on input line 39.
+(pdftex.def)             Requested size: 405.74306pt x 266.63115pt.
+ [90 <./images/image38.png>]
+<images/image40.png, id=1428, 338.01282pt x 219.82124pt>
+File: images/image40.png Graphic file (type png)
+<use images/image40.png>
+Package pdftex.def Info: images/image40.png  used on input line 49.
+(pdftex.def)             Requested size: 405.74744pt x 263.87137pt.
+ [91 <./images/image39.png>]
+<images/image41.png, id=1434, 663.98062pt x 295.1025pt>
+File: images/image41.png Graphic file (type png)
+<use images/image41.png>
+Package pdftex.def Info: images/image41.png  used on input line 57.
+(pdftex.def)             Requested size: 405.73679pt x 180.32745pt.
+<images/image42.png, id=1435, 582.67688pt x 635.37375pt>
+File: images/image42.png Graphic file (type png)
+<use images/image42.png>
+Package pdftex.def Info: images/image42.png  used on input line 67.
+(pdftex.def)             Requested size: 405.74611pt x 442.44148pt.
+ [92 <./images/image40.png> <./images/image41.png>]
+<images/image43.png, id=1443, 481.04718pt x 264.99pt>
+File: images/image43.png Graphic file (type png)
+<use images/image43.png>
+Package pdftex.def Info: images/image43.png  used on input line 75.
+(pdftex.def)             Requested size: 405.7431pt x 223.50793pt.
+ [93 <./images/image42.png>]
+<images/image44.png, id=1449, 412.54124pt x 118.94438pt>
+File: images/image44.png Graphic file (type png)
+<use images/image44.png>
+Package pdftex.def Info: images/image44.png  used on input line 85.
+(pdftex.def)             Requested size: 405.74178pt x 116.98393pt.
+<images/image45.png, id=1450, 465.23813pt x 563.10374pt>
+File: images/image45.png Graphic file (type png)
+<use images/image45.png>
+Package pdftex.def Info: images/image45.png  used on input line 93.
+(pdftex.def)             Requested size: 405.74776pt x 491.09923pt.
+ [94 <./images/image43.png> <./images/image44.png>]
+<images/image46.png, id=1457, 421.575pt x 79.79813pt>
+File: images/image46.png Graphic file (type png)
+<use images/image46.png>
+Package pdftex.def Info: images/image46.png  used on input line 103.
+(pdftex.def)             Requested size: 405.74306pt x 76.80135pt.
+ [95 <./images/image45.png>]
+<images/image47.png, id=1463, 556.32843pt x 318.43968pt>
+File: images/image47.png Graphic file (type png)
+<use images/image47.png>
+Package pdftex.def Info: images/image47.png  used on input line 110.
+(pdftex.def)             Requested size: 405.74287pt x 232.24524pt.
+<images/image48.png, id=1464, 362.10281pt x 117.43875pt>
+File: images/image48.png Graphic file (type png)
+<use images/image48.png>
+Package pdftex.def Info: images/image48.png  used on input line 114.
+(pdftex.def)             Requested size: 405.74022pt x 131.5914pt.
+<images/image49.png, id=1465, 341.02406pt x 220.57407pt>
+File: images/image49.png Graphic file (type png)
+<use images/image49.png>
+Package pdftex.def Info: images/image49.png  used on input line 124.
+(pdftex.def)             Requested size: 405.76122pt x 262.446pt.
+ [96 <./images/image46.png> <./images/image47.png> <./images/image48.png>]
+<images/image50.png, id=1473, 467.49657pt x 366.61969pt>
+File: images/image50.png Graphic file (type png)
+<use images/image50.png>
+Package pdftex.def Info: images/image50.png  used on input line 131.
+(pdftex.def)             Requested size: 405.75572pt x 318.20134pt.
+<images/image51.png, id=1474, 502.87875pt x 335.00156pt>
+File: images/image51.png Graphic file (type png)
+<use images/image51.png>
+Package pdftex.def Info: images/image51.png  used on input line 134.
+(pdftex.def)             Requested size: 405.7335pt x 270.28653pt.
+ [97 <./images/image49.png> <./images/image50.png>]
+<images/image52.png, id=1481, 418.56375pt x 220.57407pt>
+File: images/image52.png Graphic file (type png)
+<use images/image52.png>
+Package pdftex.def Info: images/image52.png  used on input line 138.
+(pdftex.def)             Requested size: 405.7317pt x 213.81184pt.
+<images/image53.png, id=1482, 387.69844pt x 136.25906pt>
+File: images/image53.png Graphic file (type png)
+<use images/image53.png>
+Package pdftex.def Info: images/image53.png  used on input line 148.
+(pdftex.def)             Requested size: 405.74065pt x 142.6001pt.
+
+Overfull \hbox (8.14787pt too wide) in paragraph at lines 145--151
+[]\T1/cmr/bx/n/12 Controller (API Routes): \T1/cmr/m/n/12 Rout-ing end-point for mes-sage dis-patch-ing. Guarded
+ []
+
+[98 <./images/image51.png> <./images/image52.png>]
+<images/image54.png, id=1490, 465.23813pt x 380.17032pt>
+File: images/image54.png Graphic file (type png)
+<use images/image54.png>
+Package pdftex.def Info: images/image54.png  used on input line 155.
+(pdftex.def)             Requested size: 405.74776pt x 331.55763pt.
+<images/image55.png, id=1491, 490.83376pt x 319.1925pt>
+File: images/image55.png Graphic file (type png)
+<use images/image55.png>
+Package pdftex.def Info: images/image55.png  used on input line 159.
+(pdftex.def)             Requested size: 405.75171pt x 263.86307pt.
+ [99 <./images/image53.png> <./images/image54.png>]
+<images/image56.png, id=1498, 287.57437pt x 164.11313pt>
+File: images/image56.png Graphic file (type png)
+<use images/image56.png>
+Package pdftex.def Info: images/image56.png  used on input line 169.
+(pdftex.def)             Requested size: 405.74759pt x 231.55228pt.
+<images/image57.png, id=1499, 508.90125pt x 548.80031pt>
+File: images/image57.png Graphic file (type png)
+<use images/image57.png>
+Package pdftex.def Info: images/image57.png  used on input line 177.
+(pdftex.def)             Requested size: 405.75488pt x 437.567pt.
+ [100 <./images/image55.png> <./images/image56.png>]
+<images/image58.png, id=1506, 520.19344pt x 134.75343pt>
+File: images/image58.png Graphic file (type png)
+<use images/image58.png>
+Package pdftex.def Info: images/image58.png  used on input line 187.
+(pdftex.def)             Requested size: 405.73337pt x 105.10313pt.
+ [101 <./images/image57.png>]
+<images/image59.png, id=1512, 632.3625pt x 416.30531pt>
+File: images/image59.png Graphic file (type png)
+<use images/image59.png>
+Package pdftex.def Info: images/image59.png  used on input line 195.
+(pdftex.def)             Requested size: 405.74307pt x 267.11418pt.
+
+Overfull \hbox (13.86133pt too wide) in paragraph at lines 192--198
+\T1/cmr/m/n/12 NITY_NEW_POST) dis-patched con-cur-rently to all com-mu-nity mem-bers via Promise.all. 
+ []
+
+<images/image60.png, id=1513, 360.59718pt x 63.98906pt>
+File: images/image60.png Graphic file (type png)
+<use images/image60.png>
+Package pdftex.def Info: images/image60.png  used on input line 205.
+(pdftex.def)             Requested size: 405.73686pt x 71.9992pt.
+[102 <./images/image58.png> <./images/image59.png>]
+<images/image61.png, id=1520, 419.31656pt x 278.54062pt>
+File: images/image61.png Graphic file (type png)
+<use images/image61.png>
+Package pdftex.def Info: images/image61.png  used on input line 213.
+(pdftex.def)             Requested size: 405.73204pt x 269.51678pt.
+ [103 <./images/image60.png> <./images/image61.png>]
+<images/image62.png, id=1527, 408.77719pt x 191.9672pt>
+File: images/image62.png Graphic file (type png)
+<use images/image62.png>
+Package pdftex.def Info: images/image62.png  used on input line 230.
+(pdftex.def)             Requested size: 405.75726pt x 190.549pt.
+<images/image64.png, id=1528, 504.38437pt x 275.52937pt>
+File: images/image64.png Graphic file (type png)
+<use images/image64.png>
+Package pdftex.def Info: images/image64.png  used on input line 236.
+(pdftex.def)             Requested size: 405.73996pt x 221.643pt.
+<images/image65.png, id=1529, 350.05782pt x 290.58563pt>
+File: images/image65.png Graphic file (type png)
+<use images/image65.png>
+Package pdftex.def Info: images/image65.png  used on input line 242.
+(pdftex.def)             Requested size: 405.76286pt x 336.82683pt.
+ [104 <./images/image62.png>] [105 <./images/image64.png> <./images/image65.png>]
+<images/image66.png, id=1542, 508.90125pt x 248.42813pt>
+File: images/image66.png Graphic file (type png)
+<use images/image66.png>
+Package pdftex.def Info: images/image66.png  used on input line 255.
+(pdftex.def)             Requested size: 405.75488pt x 198.0756pt.
+<images/image67.png, id=1543, 476.53032pt x 387.69844pt>
+File: images/image67.png Graphic file (type png)
+<use images/image67.png>
+Package pdftex.def Info: images/image67.png  used on input line 260.
+(pdftex.def)             Requested size: 405.758pt x 330.11905pt.
+ [106 <./images/image66.png>]
+<images/image68.png, id=1549, 398.23781pt x 244.66406pt>
+File: images/image68.png Graphic file (type png)
+<use images/image68.png>
+Package pdftex.def Info: images/image68.png  used on input line 264.
+(pdftex.def)             Requested size: 405.75359pt x 249.2815pt.
+ [107 <./images/image67.png> <./images/image68.png>]
+<images/image69.png, id=1556, 585.68813pt x 286.82156pt>
+File: images/image69.png Graphic file (type png)
+<use images/image69.png>
+Package pdftex.def Info: images/image69.png  used on input line 277.
+(pdftex.def)             Requested size: 405.75175pt x 198.70361pt.
+<images/image70.png, id=1557, 523.20468pt x 303.38344pt>
+File: images/image70.png Graphic file (type png)
+<use images/image70.png>
+Package pdftex.def Info: images/image70.png  used on input line 283.
+(pdftex.def)             Requested size: 405.74289pt x 235.27249pt.
+<images/image71.png, id=1558, 463.7325pt x 578.91281pt>
+File: images/image71.png Graphic file (type png)
+<use images/image71.png>
+Package pdftex.def Info: images/image71.png  used on input line 289.
+(pdftex.def)             Requested size: 405.7437pt x 506.52097pt.
+ [108 <./images/image69.png> <./images/image70.png>]
+Overfull \hbox (43.51805pt too wide) in paragraph at lines 298--299
+\T1/cmr/m/n/12 and ini-ti-ates a HTTP re-quest tar-get-ing /api/users/${username}/posts?tab=${activeTab}
+ []
+
+[109 <./images/image71.png>]
+<images/image72.png, id=1570, 672.26157pt x 492.33937pt>
+File: images/image72.png Graphic file (type png)
+<use images/image72.png>
+Package pdftex.def Info: images/image72.png  used on input line 302.
+(pdftex.def)             Requested size: 405.73987pt x 297.14879pt.
+<images/image73.png, id=1571, 613.54219pt x 258.9675pt>
+File: images/image73.png Graphic file (type png)
+<use images/image73.png>
+Package pdftex.def Info: images/image73.png  used on input line 308.
+(pdftex.def)             Requested size: 405.73486pt x 171.25493pt.
+<images/image74.png, id=1572, 575.90157pt x 319.94531pt>
+File: images/image74.png Graphic file (type png)
+<use images/image74.png>
+Package pdftex.def Info: images/image74.png  used on input line 314.
+(pdftex.def)             Requested size: 405.74704pt x 225.41501pt.
+ [110 <./images/image72.png> <./images/image73.png>]
+Overfull \hbox (0.15901pt too wide) in paragraph at lines 323--324
+\T1/cmr/m/n/12 fetch pend-ing com-mu-nity posts from /api/communities/${id}/posts/pending and
+ []
+
+<images/image75.png, id=1580, 565.36218pt x 529.98pt>
+File: images/image75.png Graphic file (type png)
+<use images/image75.png>
+Package pdftex.def Info: images/image75.png  used on input line 327.
+(pdftex.def)             Requested size: 405.74057pt x 380.348pt.
+<images/image76.png, id=1581, 514.17094pt x 388.45125pt>
+File: images/image76.png Graphic file (type png)
+<use images/image76.png>
+Package pdftex.def Info: images/image76.png  used on input line 333.
+(pdftex.def)             Requested size: 405.7434pt x 306.53526pt.
+[111 <./images/image74.png>]
+<images/image77.png, id=1587, 473.51906pt x 146.04562pt>
+File: images/image77.png Graphic file (type png)
+<use images/image77.png>
+Package pdftex.def Info: images/image77.png  used on input line 339.
+(pdftex.def)             Requested size: 405.74448pt x 125.14215pt.
+ [112 <./images/image75.png>] [113 <./images/image76.png> <./images/image77.png>]
+<images/image78.png, id=1599, 658.71094pt x 303.38344pt>
+File: images/image78.png Graphic file (type png)
+<use images/image78.png>
+Package pdftex.def Info: images/image78.png  used on input line 352.
+(pdftex.def)             Requested size: 405.74306pt x 186.87366pt.
+<images/image79.png, id=1600, 512.66531pt x 86.57344pt>
+File: images/image79.png Graphic file (type png)
+<use images/image79.png>
+Package pdftex.def Info: images/image79.png  used on input line 358.
+(pdftex.def)             Requested size: 405.73648pt x 68.51642pt.
+<images/image80.png, id=1601, 509.65407pt x 187.45032pt>
+File: images/image80.png Graphic file (type png)
+<use images/image80.png>
+Package pdftex.def Info: images/image80.png  used on input line 364.
+(pdftex.def)             Requested size: 405.7563pt x 149.2368pt.
+) [114 <./images/image78.png> <./images/image79.png> <./images/image80.png>]
+Chapter 5.
+(chapters/test_cases.tex
+Underfull \hbox (badness 10000) in paragraph at lines 38--38
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 35--40
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 43--43
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 40--45
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 45--47
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 47--49
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 50--50
+[]|\T1/cmr/m/n/12 Submit reg-is-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 50--50
+[]|\T1/cmr/m/n/12 Calls reg-is-ter
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 52--52
+[]|\T1/cmr/m/n/12 System val-i-
+ []
+
+
+Underfull \hbox (badness 1917) in paragraph at lines 52--52
+[]|\T1/cmr/m/n/12 Checks for-mat
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 52--52
+\T1/cmr/m/n/12 and pass-word
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 54--54
+[]|\T1/cmr/m/n/12 System checks
+ []
+
+
+Underfull \hbox (badness 1776) in paragraph at lines 56--56
+[]|\T1/cmr/m/n/12 System hashes
+ []
+
+
+Underfull \hbox (badness 1776) in paragraph at lines 56--56
+\T1/cmr/m/n/12 pass-words and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 56--56
+\T1/cmr/m/n/12 saves users
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 56--56
+[]|\T1/cmr/m/n/12 bcrypt (10
+ []
+
+
+Underfull \hbox (badness 1389) in paragraph at lines 56--56
+\T1/cmr/m/n/12 rounds); saves
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 56--57
+[]|\T1/cmr/m/n/12 Bcrypt 10
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 58--58
+[]|\T1/cmr/m/n/12 System sends
+ []
+
+
+Underfull \hbox (badness 3919) in paragraph at lines 58--58
+\T1/cmr/m/n/12 OTP & redi-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 58--58
+[]|\T1/cmr/m/n/12 Stores to-ken,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 58--58
+\T1/cmr/m/n/12 sends email,
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 49--60
+ [] [] [] [] [] 
+ []
+
+[115
+
+] [116]
+Underfull \hbox (badness 10000) in paragraph at lines 89--89
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 86--91
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 94--94
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 91--96
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 96--98
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 98--100
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 1460) in paragraph at lines 103--103
+[]|\T1/cmr/m/n/12 Finds user by
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+[]|\T1/cmr/m/n/12 System com-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+[]|\T1/cmr/m/n/12 Compares
+ []
+
+
+Underfull \hbox (badness 4967) in paragraph at lines 107--107
+[]|\T1/cmr/m/n/12 System gen-er-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 107--107
+[]|\T1/cmr/m/n/12 Creates to-ken
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--109
+[]|\T1/cmr/m/n/12 System sets
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--109
+[]|\T1/cmr/m/n/12 Sets brea-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--109
+\T1/cmr/m/n/12 dit_session
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--110
+[]|\T1/cmr/m/n/12 httpOnly
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+[]|\T1/cmr/m/n/12 System redi-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--111
+[]|\T1/cmr/m/n/12 Redirects to
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 100--113
+ [] [] [] [] [] 
+ []
+
+[117]
+Underfull \hbox (badness 10000) in paragraph at lines 147--147
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 144--149
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 152--152
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 149--154
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 154--156
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 156--158
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 161--161
+[]|\T1/cmr/m/n/12 System val-i-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 161--161
+[]|\T1/cmr/m/n/12 OptionalJwt
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 161--161
+\T1/cmr/m/n/12 AuthGuard
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 163--163
+[]|\T1/cmr/m/n/12 System fil-ters
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 163--163
+[]|\T1/cmr/m/n/12 Queries
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 163--163
+\T1/cmr/m/n/12 posts from
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 165--165
+[]|\T1/cmr/m/n/12 System sorts
+ []
+
+
+Underfull \hbox (badness 3199) in paragraph at lines 165--165
+[]|\T1/cmr/m/n/12 Orders cre-ate-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 167--167
+[]|\T1/cmr/m/n/12 Frontend dis-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 167--167
+[]|\T1/cmr/m/n/12 Renders post
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 158--169
+ [] [] [] [] [] 
+ []
+
+[118]
+Underfull \hbox (badness 10000) in paragraph at lines 198--198
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 195--200
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 203--203
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 200--205
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 205--207
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 207--209
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 210--210
+[]|\T1/cmr/m/n/12 Click "Ex-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 210--210
+[]|\T1/cmr/m/n/12 Calls ex-plore
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 212--212
+[]|\T1/cmr/m/n/12 System fil-ters
+ []
+
+
+Underfull \hbox (badness 7064) in paragraph at lines 212--212
+[]|\T1/cmr/m/n/12 Gets top-level
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 212--213
+[]|\T1/cmr/m/n/12 Last 7 days
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 214--214
+[]|\T1/cmr/m/n/12 System com-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 214--214
+[]|\T1/cmr/m/n/12 Calculates
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 214--214
+\T1/cmr/m/n/12 time-decay
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 216--216
+[]|\T1/cmr/m/n/12 Restricts to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 216--216
+\T1/cmr/m/n/12 max 3 posts
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 216--217
+[]|\T1/cmr/m/n/12 Max 3
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 218--218
+[]|\T1/cmr/m/n/12 System pag-i-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 220--220
+[]|\T1/cmr/m/n/12 Frontend dis-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 220--220
+[]|\T1/cmr/m/n/12 Renders ex-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 220--220
+\T1/cmr/m/n/12 plore feed;
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 209--222
+ [] [] [] [] [] 
+ []
+
+[119]
+Underfull \hbox (badness 10000) in paragraph at lines 251--251
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 248--253
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 256--256
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 253--258
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 258--260
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 260--262
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 263--263
+[]|\T1/cmr/m/n/12 Calls search
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 265--265
+[]|\T1/cmr/m/n/12 System checks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 265--265
+[]|\T1/cmr/m/n/12 OptionalJwt
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 265--265
+\T1/cmr/m/n/12 AuthGuard
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 265--265
+\T1/cmr/m/n/12 runs (guests
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 267--267
+[]|\T1/cmr/m/n/12 System runs
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 267--267
+[]|\T1/cmr/m/n/12 Runs par-al-lel
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 267--267
+\T1/cmr/m/n/12 queries on
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 267--267
+\T1/cmr/m/n/12 posts, users,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 267--268
+[]|\T1/cmr/m/n/12 Parallel
+ []
+
+
+Underfull \hbox (badness 1231) in paragraph at lines 269--269
+[]|\T1/cmr/m/n/12 System groups
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 271--271
+[]|\T1/cmr/m/n/12 System pag-i-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 273--273
+[]|\T1/cmr/m/n/12 Frontend ren-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 273--273
+[]|\T1/cmr/m/n/12 Displays lists;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 273--273
+\T1/cmr/m/n/12 nav-i-gates on
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 262--275
+ [] [] [] [] [] 
+ []
+
+[120]
+Underfull \hbox (badness 10000) in paragraph at lines 307--307
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 304--309
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 312--312
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 309--314
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 314--316
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 316--318
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 321--321
+[]|\T1/cmr/m/n/12 System checks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 321--321
+[]|\T1/cmr/m/n/12 Validates
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 323--323
+[]|\T1/cmr/m/n/12 Guards check
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 323--323
+\T1/cmr/m/n/12 ses-sion and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 325--325
+[]|\T1/cmr/m/n/12 Saves Post
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 325--325
+\T1/cmr/m/n/12 record to
+ []
+
+
+Underfull \hbox (badness 4699) in paragraph at lines 327--327
+[]|\T1/cmr/m/n/12 System parses
+ []
+
+
+Underfull \hbox (badness 4846) in paragraph at lines 327--327
+[]|\T1/cmr/m/n/12 Creates Hash-
+ []
+
+
+Underfull \hbox (badness 1490) in paragraph at lines 327--327
+\T1/cmr/m/n/12 tag and Post-
+ []
+
+
+Underfull \hbox (badness 4699) in paragraph at lines 329--329
+[]|\T1/cmr/m/n/12 System parses
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 329--329
+[]|\T1/cmr/m/n/12 Sends
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 329--329
+\T1/cmr/m/n/12 Socket.IO
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 331--331
+[]|\T1/cmr/m/n/12 Frontend up-
+ []
+
+
+Underfull \hbox (badness 6047) in paragraph at lines 331--331
+[]|\T1/cmr/m/n/12 Prepends new
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 318--333
+ [] [] [] [] [] 
+ []
+
+chapters/test_cases.tex:333: ignored error: Infinite glue shrinkage found in box being split [121]
+Underfull \hbox (badness 10000) in paragraph at lines 364--364
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 361--366
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 369--369
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 366--371
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 371--373
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 373--375
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 378--378
+[]|\T1/cmr/m/n/12 System val-i-
+ []
+
+
+Underfull \hbox (badness 4608) in paragraph at lines 380--380
+\T1/cmr/m/n/12 i-nary or falls
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 382--382
+[]|\T1/cmr/m/n/12 Saves Post
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 382--382
+\T1/cmr/m/n/12 record to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 382--383
+[]|\T1/cmr/m/n/12 Association
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 384--384
+[]|\T1/cmr/m/n/12 Links me-dia
+ []
+
+
+Underfull \hbox (badness 1189) in paragraph at lines 384--384
+\T1/cmr/m/n/12 URLs to Post
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 386--386
+[]|\T1/cmr/m/n/12 Frontend ren-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 386--386
+[]|\T1/cmr/m/n/12 Displays post
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 386--386
+\T1/cmr/m/n/12 with me-dia
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 375--388
+ [] [] [] [] [] 
+ []
+
+chapters/test_cases.tex:388: ignored error: Infinite glue shrinkage found in box being split [122] [123]
+Underfull \hbox (badness 10000) in paragraph at lines 422--422
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 419--424
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 427--427
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 424--429
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 429--431
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 431--433
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 436--436
+[]|\T1/cmr/m/n/12 Checks auth,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 436--436
+\T1/cmr/m/n/12 ver-i-fi-ca-tion,
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 438--438
+[]|\T1/cmr/m/n/12 System checks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
+[]|\T1/cmr/m/n/12 Queries Like
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 438--438
+\T1/cmr/m/n/12 ta-ble for
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 440--440
+[]|\T1/cmr/m/n/12 Deletes (un-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 442--442
+[]|\T1/cmr/m/n/12 System sends
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 442--442
+[]|\T1/cmr/m/n/12 Emits
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 442--442
+\T1/cmr/m/n/12 Socket.IO
+ []
+
+
+Underfull \hbox (badness 4441) in paragraph at lines 442--442
+\T1/cmr/m/n/12 no-ti-fi-ca-tion to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 442--443
+[]|\T1/cmr/m/n/12 Notify post
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 444--444
+[]|\T1/cmr/m/n/12 Frontend up-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 444--444
+[]|\T1/cmr/m/n/12 Toggles heart
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 433--446
+ [] [] [] [] [] 
+ []
+
+[124]
+Underfull \hbox (badness 10000) in paragraph at lines 475--475
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 472--477
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 480--480
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 477--482
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 482--484
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 484--486
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 489--489
+[]|\T1/cmr/m/n/12 System saves
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 489--489
+[]|\T1/cmr/m/n/12 Creates re-ply
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 489--490
+[]|\T1/cmr/m/n/12 Link par-ent
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 491--491
+[]|\T1/cmr/m/n/12 System sends
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 491--491
+[]|\T1/cmr/m/n/12 Emits
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 491--491
+\T1/cmr/m/n/12 Socket.IO
+ []
+
+
+Underfull \hbox (badness 4441) in paragraph at lines 491--491
+\T1/cmr/m/n/12 no-ti-fi-ca-tion to
+ []
+
+
+Underfull \hbox (badness 4699) in paragraph at lines 493--493
+[]|\T1/cmr/m/n/12 System parses
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 493--493
+[]|\T1/cmr/m/n/12 Dispatches
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 493--493
+\T1/cmr/m/n/12 no-ti-fi-ca-tions
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 493--493
+\T1/cmr/m/n/12 to men-tioned
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 495--495
+[]|\T1/cmr/m/n/12 Frontend ap-
+ []
+
+
+Underfull \hbox (badness 3907) in paragraph at lines 495--495
+[]|\T1/cmr/m/n/12 Displays re-ply
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 495--495
+\T1/cmr/m/n/12 in com-ment
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 486--497
+ [] [] [] [] [] 
+ []
+
+[125]
+Underfull \hbox (badness 10000) in paragraph at lines 531--531
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 528--533
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 536--536
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 533--538
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 538--540
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 540--542
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 1205) in paragraph at lines 543--543
+[]|\T1/cmr/m/n/12 Click "Fol-low"
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 543--543
+[]|\T1/cmr/m/n/12 Calls fol-low
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 545--545
+[]|\T1/cmr/m/n/12 Guards check
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 547--547
+[]|\T1/cmr/m/n/12 System checks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 549--549
+[]|\T1/cmr/m/n/12 Inserts fol-low
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 551--551
+[]|\T1/cmr/m/n/12 System sends
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 551--551
+[]|\T1/cmr/m/n/12 Emits
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 551--551
+\T1/cmr/m/n/12 Socket.IO
+ []
+
+
+Underfull \hbox (badness 4441) in paragraph at lines 551--551
+\T1/cmr/m/n/12 no-ti-fi-ca-tion to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 551--552
+[]|\T1/cmr/m/n/12 Real-time fol-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 553--553
+[]|\T1/cmr/m/n/12 Home feed
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 553--553
+[]|\T1/cmr/m/n/12 Home feed
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 542--555
+ [] [] [] [] [] 
+ []
+
+[126]
+Underfull \hbox (badness 10000) in paragraph at lines 584--584
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 581--586
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 589--589
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 586--591
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 591--593
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 593--595
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 1490) in paragraph at lines 596--596
+[]|\T1/cmr/m/n/12 Select "Block"
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 598--598
+[]|\T1/cmr/m/n/12 Guards check
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 600--600
+[]|\T1/cmr/m/n/12 System checks
+ []
+
+
+Underfull \hbox (badness 6859) in paragraph at lines 600--600
+[]|\T1/cmr/m/n/12 Queries Block
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 602--602
+[]|\T1/cmr/m/n/12 Inserts block
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 604--604
+[]|\T1/cmr/m/n/12 System re-
+ []
+
+
+Underfull \hbox (badness 4144) in paragraph at lines 604--605
+[]|\T1/cmr/m/n/12 Delete mu-tual
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 606--606
+[]|\T1/cmr/m/n/12 System fil-ters
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 606--606
+[]|\T1/cmr/m/n/12 Bidirectionally
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 606--606
+\T1/cmr/m/n/12 fil-ters posts
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 595--608
+ [] [] [] [] [] 
+ []
+
+[127]
+Underfull \hbox (badness 10000) in paragraph at lines 643--643
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 640--645
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 648--648
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 645--650
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 650--652
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 652--654
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 655--655
+[]|\T1/cmr/m/n/12 Navigate to
+ []
+
+
+Underfull \hbox (badness 1389) in paragraph at lines 657--657
+[]|\T1/cmr/m/n/12 Calls user de-
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 659--659
+[]|\T1/cmr/m/n/12 System checks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 659--659
+[]|\T1/cmr/m/n/12 Queries
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 659--659
+\T1/cmr/m/n/12 database for
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 661--661
+[]|\T1/cmr/m/n/12 System re-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 661--661
+[]|\T1/cmr/m/n/12 Returns ba-sic
+ []
+
+
+Underfull \hbox (badness 1418) in paragraph at lines 661--661
+\T1/cmr/m/n/12 de-tails only if
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 661--662
+[]|\T1/cmr/m/n/12 Restrict post
+ []
+
+
+Underfull \hbox (badness 6300) in paragraph at lines 663--663
+\T1/cmr/m/n/12 fields, counts,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 665--665
+[]|\T1/cmr/m/n/12 Frontend dis-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 665--665
+[]|\T1/cmr/m/n/12 Renders
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 665--665
+\T1/cmr/m/n/12 header, ac-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 665--665
+\T1/cmr/m/n/12 tions, and
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 654--667
+ [] [] [] [] [] 
+ []
+
+chapters/test_cases.tex:667: ignored error: Infinite glue shrinkage found in box being split [128]
+Underfull \hbox (badness 10000) in paragraph at lines 700--700
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 697--702
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 705--705
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 702--707
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 707--709
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 709--711
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 4846) in paragraph at lines 712--712
+[]|\T1/cmr/m/n/12 Click Mes-sage
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 714--714
+[]|\T1/cmr/m/n/12 Guards check
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 714--714
+\T1/cmr/m/n/12 ses-sion and
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 716--716
+[]|\T1/cmr/m/n/12 System checks
+ []
+
+
+Underfull \hbox (badness 7099) in paragraph at lines 716--716
+[]|\T1/cmr/m/n/12 Confirms user
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 718--718
+[]|\T1/cmr/m/n/12 System
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 718--718
+\T1/cmr/m/n/12 searches con-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 718--718
+[]|\T1/cmr/m/n/12 Queries
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 718--718
+\T1/cmr/m/n/12 database for
+ []
+
+
+Underfull \hbox (badness 2103) in paragraph at lines 720--720
+[]|\T1/cmr/m/n/12 Returns meta-
+ []
+
+
+Underfull \hbox (badness 2818) in paragraph at lines 722--722
+[]|\T1/cmr/m/n/12 Atomically in-
+ []
+
+
+Underfull \hbox (badness 1178) in paragraph at lines 722--722
+\T1/cmr/m/n/12 serts con-ver-sa-
+ []
+
+
+Underfull \hbox (badness 2591) in paragraph at lines 724--724
+[]|\T1/cmr/m/n/12 Frontend redi-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 724--724
+[]|\T1/cmr/m/n/12 Navigates to
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 724--725
+[]|\T1/cmr/m/n/12 Redirect to
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 711--726
+ [] [] [] [] [] 
+ []
+
+[129] [130]
+Underfull \hbox (badness 10000) in paragraph at lines 755--755
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 752--757
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 760--760
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 757--762
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 762--764
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 764--766
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 6284) in paragraph at lines 767--767
+[]|\T1/cmr/m/n/12 Type mes-sage
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 767--767
+[]|\T1/cmr/m/n/12 Inputs text
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 769--769
+[]|\T1/cmr/m/n/12 Frontend ap-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 769--769
+[]|\T1/cmr/m/n/12 Renders mes-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 769--769
+\T1/cmr/m/n/12 sage in-stantly
+ []
+
+
+Underfull \hbox (badness 3098) in paragraph at lines 771--771
+[]|\T1/cmr/m/n/12 System checks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 771--771
+[]|\T1/cmr/m/n/12 Guards check
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 771--771
+\T1/cmr/m/n/12 auth, ver-i-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 771--771
+\T1/cmr/m/n/12 fi-ca-tion, &
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 773--773
+[]|\T1/cmr/m/n/12 System saves
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 775--775
+[]|\T1/cmr/m/n/12 System sends
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 775--776
+[]|\T1/cmr/m/n/12 Socket.IO
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 777--777
+[]|\T1/cmr/m/n/12 System up-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 777--777
+\T1/cmr/m/n/12 dates ac-tiv-ity
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 777--777
+[]|\T1/cmr/m/n/12 Refreshes
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 777--777
+\T1/cmr/m/n/12 Con-ver-sa-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 777--777
+\T1/cmr/m/n/12 tion.updatedAt
+ []
+
+
+Underfull \hbox (badness 4505) in paragraph at lines 779--779
+[]|\T1/cmr/m/n/12 Returns saved
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 766--781
+ [] [] [] [] [] 
+ []
+
+[131]
+Underfull \hbox (badness 10000) in paragraph at lines 814--814
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 811--816
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 819--819
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 816--821
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 821--823
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 823--825
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 5817) in paragraph at lines 826--826
+[]|\T1/cmr/m/n/12 Click no-ti-fi-ca-
+ []
+
+
+Underfull \hbox (badness 7273) in paragraph at lines 826--826
+[]|\T1/cmr/m/n/12 Calls no-ti-fi-ca-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 828--828
+[]|\T1/cmr/m/n/12 System val-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 828--828
+\T1/cmr/m/n/12 i-dates user
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 828--828
+[]|\T1/cmr/m/n/12 JwtAuthGuard
+ []
+
+
+Underfull \hbox (badness 2726) in paragraph at lines 828--828
+\T1/cmr/m/n/12 checks cre-den-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 830--830
+[]|\T1/cmr/m/n/12 Fetches user
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 830--830
+\T1/cmr/m/n/12 no-ti-fi-ca-tions
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 832--832
+[]|\T1/cmr/m/n/12 System sorts
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 834--834
+\T1/cmr/m/n/12 fron-tend ren-
+ []
+
+
+Underfull \hbox (badness 5817) in paragraph at lines 836--836
+[]|\T1/cmr/m/n/12 Click no-ti-fi-ca-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 836--836
+\T1/cmr/m/n/12 marks record;
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 825--838
+ [] [] [] [] [] 
+ []
+
+[132]
+Underfull \hbox (badness 10000) in paragraph at lines 872--872
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 869--874
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 877--877
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 874--879
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 879--881
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 881--883
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 884--884
+[]|\T1/cmr/m/n/12 Moderator
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 884--884
+\T1/cmr/m/n/12 clicks Ap-
+ []
+
+
+Underfull \hbox (badness 1571) in paragraph at lines 886--886
+[]|\T1/cmr/m/n/12 Checks if role
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 886--887
+[]|\T1/cmr/m/n/12 Verify
+ []
+
+
+Overfull \hbox (1.68907pt too wide) in paragraph at lines 886--887
+\T1/cmr/m/n/12 OWNER/MOD
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 888--888
+[]|\T1/cmr/m/n/12 System up-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 888--888
+[]|\T1/cmr/m/n/12 Sets is-Ap-
+ []
+
+
+Underfull \hbox (badness 6284) in paragraph at lines 888--888
+\T1/cmr/m/n/12 or soft-deletes
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 890--890
+[]|\T1/cmr/m/n/12 System sends
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 890--890
+[]|\T1/cmr/m/n/12 Emits
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 890--890
+\T1/cmr/m/n/12 COM-MU-
+ []
+
+
+Overfull \hbox (30.23486pt too wide) in paragraph at lines 890--890
+\T1/cmr/m/n/12 NITY_NEW_POST
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 892--892
+[]|\T1/cmr/m/n/12 Removes post
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 892--892
+\T1/cmr/m/n/12 from queue;
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 883--894
+ [] [] [] [] [] 
+ []
+
+chapters/test_cases.tex:894: ignored error: Infinite glue shrinkage found in box being split [133]
+Underfull \hbox (badness 10000) in paragraph at lines 919--919
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 916--921
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 924--924
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 921--926
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 926--928
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 928--930
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 931--931
+[]|\T1/cmr/m/n/12 Admin clicks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 931--931
+[]|\T1/cmr/m/n/12 Calls ad-min
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 931--931
+\T1/cmr/m/n/12 ban/unban
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 933--933
+[]|\T1/cmr/m/n/12 Guards ver-ify
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 935--935
+[]|\T1/cmr/m/n/12 System up-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 935--935
+[]|\T1/cmr/m/n/12 Toggles
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 935--935
+\T1/cmr/m/n/12 User.banned
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 937--937
+[]|\T1/cmr/m/n/12 Returns ok
+ []
+
+
+Underfull \hbox (badness 6316) in paragraph at lines 937--937
+\T1/cmr/m/n/12 re-sponse; up-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 939--939
+[]|\T1/cmr/m/n/12 System re-
+ []
+
+
+Overfull \hbox (15.55243pt too wide) in paragraph at lines 939--939
+[]|\T1/cmr/m/n/12 BannedUserGuard
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 939--939
+\T1/cmr/m/n/12 blocks write
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 939--940
+[]|\T1/cmr/m/n/12 Revoke write
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 941--941
+[]|\T1/cmr/m/n/12 Displays sus-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 930--943
+ [] [] [] [] [] 
+ []
+
+chapters/test_cases.tex:943: ignored error: Infinite glue shrinkage found in box being split [134]
+Underfull \hbox (badness 10000) in paragraph at lines 973--973
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 970--975
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 978--978
+[]|\T1/cmr/bx/n/12 System Re-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 975--980
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 980--982
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 982--984
+ [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 985--985
+[]|\T1/cmr/m/n/12 Admin clicks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 985--985
+[]|\T1/cmr/m/n/12 Calls delete
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 985--985
+\T1/cmr/m/n/12 re-ported post
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 987--987
+[]|\T1/cmr/m/n/12 Guards ver-ify
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 989--989
+[]|\T1/cmr/m/n/12 System soft-
+ []
+
+
+Underfull \hbox (badness 1584) in paragraph at lines 989--989
+[]|\T1/cmr/m/n/12 Sets delete-dAt
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 989--989
+\T1/cmr/m/n/12 = now() in
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 991--991
+[]|\T1/cmr/m/n/12 System closes
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 991--991
+[]|\T1/cmr/m/n/12 Sets Re-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 991--991
+\T1/cmr/m/n/12 port.status =
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 993--993
+[]|\T1/cmr/m/n/12 Frontend up-
+ []
+
+
+Overfull \hbox (18.28201pt too wide) in alignment at lines 984--995
+ [] [] [] [] [] 
+ []
+
+[135]
+<images/image81.png, id=1715, 523.9575pt x 74.52844pt>
+File: images/image81.png Graphic file (type png)
+<use images/image81.png>
+Package pdftex.def Info: images/image81.png  used on input line 1013.
+(pdftex.def)             Requested size: 405.74307pt x 57.71344pt.
+
+Overfull \hbox (67.56871pt too wide) in paragraph at lines 1020--1021
+[]\T1/cmr/bx/n/12 Verification method: Quan-ti-ta-tive --- k6 load test \T1/cmr/m/n/12 (\T1/cmtt/m/n/12 docs/planning/k6_perf_test.js\T1/cmr/m/n/12 ) 
+ []
+
+<images/image82.png, id=1716, 617.30624pt x 544.28343pt>
+File: images/image82.png Graphic file (type png)
+<use images/image82.png>
+Package pdftex.def Info: images/image82.png  used on input line 1024.
+(pdftex.def)             Requested size: 405.74673pt x 357.74986pt.
+[136 <./images/image81.png>]
+<images/image83.png, id=1723, 432.86719pt x 65.49469pt>
+File: images/image83.png Graphic file (type png)
+<use images/image83.png>
+Package pdftex.def Info: images/image83.png  used on input line 1037.
+(pdftex.def)             Requested size: 405.75253pt x 61.3921pt.
+<images/image84.png, id=1724, 578.91281pt x 721.94719pt>
+File: images/image84.png Graphic file (type png)
+<use images/image84.png>
+Package pdftex.def Info: images/image84.png  used on input line 1046.
+(pdftex.def)             Requested size: 405.73088pt x 505.97649pt.
+ [137 <./images/image82.png> <./images/image83.png>]
+Overfull \hbox (5.52863pt too wide) in paragraph at lines 1049--1049
+|[]\T1/cmr/bx/n/14.4 Real-Time Per-for-mance: Web-Socket No-ti-fi-ca-tion La-tency:| 
+ []
+
+<images/image85.png, id=1731, 362.85562pt x 432.86719pt>
+File: images/image85.png Graphic file (type png)
+<use images/image85.png>
+Package pdftex.def Info: images/image85.png  used on input line 1051.
+(pdftex.def)             Requested size: 405.74773pt x 484.03514pt.
+[138 <./images/image84.png>] [139 <./images/image85.png>]
+<images/image86.png, id=1742, 704.6325pt x 259.7203pt>
+File: images/image86.png Graphic file (type png)
+<use images/image86.png>
+Package pdftex.def Info: images/image86.png  used on input line 1062.
+(pdftex.def)             Requested size: 405.7304pt x 149.54805pt.
+) [140 <./images/image86.png>]
+Chapter 6.
+(chapters/demonstration.tex
+<images/image87.png, id=1749, 944.02687pt x 712.91344pt>
+File: images/image87.png Graphic file (type png)
+<use images/image87.png>
+Package pdftex.def Info: images/image87.png  used on input line 7.
+(pdftex.def)             Requested size: 405.73637pt x 306.40538pt.
+<images/image88.png, id=1750, 1175.89313pt x 703.12688pt>
+File: images/image88.png Graphic file (type png)
+<use images/image88.png>
+Package pdftex.def Info: images/image88.png  used on input line 15.
+(pdftex.def)             Requested size: 405.7374pt x 242.61122pt.
+ [141
+
+ <./images/image87.png>]
+<images/image89.png, id=1756, 1094.58937pt x 704.6325pt>
+File: images/image89.png Graphic file (type png)
+<use images/image89.png>
+Package pdftex.def Info: images/image89.png  used on input line 23.
+(pdftex.def)             Requested size: 405.74332pt x 261.19377pt.
+<images/image90.png, id=1757, 573.64313pt x 657.2053pt>
+File: images/image90.png Graphic file (type png)
+<use images/image90.png>
+Package pdftex.def Info: images/image90.png  used on input line 31.
+(pdftex.def)             Requested size: 405.74017pt x 464.84404pt.
+ [142 <./images/image88.png> <./images/image89.png>]
+<images/image91.png, id=1764, 455.45157pt x 599.23875pt>
+File: images/image91.png Graphic file (type png)
+<use images/image91.png>
+Package pdftex.def Info: images/image91.png  used on input line 39.
+(pdftex.def)             Requested size: 405.74675pt x 533.842pt.
+ [143 <./images/image90.png>]
+<images/image92.png, id=1770, 286.06876pt x 609.77812pt>
+File: images/image92.png Graphic file (type png)
+<use images/image92.png>
+Package pdftex.def Info: images/image92.png  used on input line 47.
+(pdftex.def)             Requested size: 275.84073pt x 587.97629pt.
+ [144 <./images/image91.png>]
+<images/image93.png, id=1776, 733.99219pt x 696.35156pt>
+File: images/image93.png Graphic file (type png)
+<use images/image93.png>
+Package pdftex.def Info: images/image93.png  used on input line 55.
+(pdftex.def)             Requested size: 405.7465pt x 384.939pt.
+ [145 <./images/image92.png>]
+<images/image94.png, id=1782, 924.45375pt x 435.12563pt>
+File: images/image94.png Graphic file (type png)
+<use images/image94.png>
+Package pdftex.def Info: images/image94.png  used on input line 63.
+(pdftex.def)             Requested size: 405.73117pt x 190.97118pt.
+ [146 <./images/image93.png>]
+<images/image95.png, id=1789, 924.45375pt x 443.40656pt>
+File: images/image95.png Graphic file (type png)
+<use images/image95.png>
+Package pdftex.def Info: images/image95.png  used on input line 71.
+(pdftex.def)             Requested size: 405.73117pt x 194.60558pt.
+<images/image96.png, id=1790, 450.9347pt x 213.04594pt>
+File: images/image96.png Graphic file (type png)
+<use images/image96.png>
+Package pdftex.def Info: images/image96.png  used on input line 79.
+(pdftex.def)             Requested size: 405.75491pt x 191.70055pt.
+ [147 <./images/image94.png> <./images/image95.png>]
+<images/image97.png, id=1797, 950.04938pt x 713.66624pt>
+File: images/image97.png Graphic file (type png)
+<use images/image97.png>
+Package pdftex.def Info: images/image97.png  used on input line 87.
+(pdftex.def)             Requested size: 405.72993pt x 304.77968pt.
+<images/image98.png, id=1798, 454.69875pt x 658.71094pt>
+File: images/image98.png Graphic file (type png)
+<use images/image98.png>
+Package pdftex.def Info: images/image98.png  used on input line 95.
+(pdftex.def)             Requested size: 405.74214pt x 587.78871pt.
+ [148 <./images/image96.png> <./images/image97.png>]
+<images/image99.png, id=1805, 454.69875pt x 718.93594pt>
+File: images/image99.png Graphic file (type png)
+<use images/image99.png>
+Package pdftex.def Info: images/image99.png  used on input line 103.
+(pdftex.def)             Requested size: 371.88405pt x 587.99548pt.
+ [149 <./images/image98.png>]
+<images/image100.png, id=1811, 452.4403pt x 686.565pt>
+File: images/image100.png Graphic file (type png)
+<use images/image100.png>
+Package pdftex.def Info: images/image100.png  used on input line 111.
+(pdftex.def)             Requested size: 387.45491pt x 587.95155pt.
+ [150 <./images/image99.png>]
+<images/image101.png, id=1817, 453.94594pt x 709.14937pt>
+File: images/image101.png Graphic file (type png)
+<use images/image101.png>
+Package pdftex.def Info: images/image101.png  used on input line 119.
+(pdftex.def)             Requested size: 376.37328pt x 587.96623pt.
+ [151 <./images/image100.png>]
+<images/image102.png, id=1823, 1345.27594pt x 709.14937pt>
+File: images/image102.png Graphic file (type png)
+<use images/image102.png>
+Package pdftex.def Info: images/image102.png  used on input line 129.
+(pdftex.def)             Requested size: 405.74126pt x 213.88263pt.
+<images/image103.png, id=1824, 990.70125pt x 300.3722pt>
+File: images/image103.png Graphic file (type png)
+<use images/image103.png>
+Package pdftex.def Info: images/image103.png  used on input line 135.
+(pdftex.def)             Requested size: 405.73663pt x 123.01588pt.
+ [152 <./images/image101.png>]) [153 <./images/image102.png> <./images/image103.png>]
+Chapter 7.
+(chapters/conclusion.tex
+Overfull \hbox (3.00153pt too wide) in paragraph at lines 4--4
+|[]\T1/cmr/bx/n/17.28 Achievement of Re-search Con-tri-bu-tions and Goals| 
+ []
+
+[154
+
+]
+Overfull \hbox (2.507pt too wide) in paragraph at lines 29--31
+[]\T1/cmr/bx/n/12 Performance, Re-li-a-bil-ity, and Se-cu-rity (Non-Functional Re-quire-ments): 
+ []
+
+
+Overfull \hbox (3.15883pt too wide) in paragraph at lines 51--52
+[]\T1/cmr/m/n/12 Although the back-end is de-signed to scale hor-i-zon-tally us-ing a Re-dis Pub/Sub
+ []
+
+[155] [156] [157]) [158] (chapters/references.tex
+Overfull \hbox (233.99841pt too wide) in paragraph at lines 23--24
+\T1/cmr/m/it/12 Hack-ing and Gonzo. []$\T1/cmtt/m/n/12 https : / / medium . com / hacking-[]and-[]gonzo / how-[]hacker-[]news-[]ranking-[]algorithm-[]works-[]1d9b0cf2c08d$[] 
+ []
+
+
+Overfull \hbox (106.49359pt too wide) in paragraph at lines 43--44
+\T1/cmr/m/n/12 ga-tion. \T1/cmr/m/it/12 Ver-cel Next.js Doc-u-men-ta-tion. []$\T1/cmtt/m/n/12 https : / / nextjs . org / docs / app / building-[]your-[]application /
+ []
+
+[159
+
+]
+Overfull \hbox (37.7111pt too wide) in paragraph at lines 63--64
+\T1/cmr/m/it/12 ORM Doc-u-men-ta-tion. []$\T1/cmtt/m/n/12 https : / / www . prisma . io / docs / orm / prisma-[]schema / data-[]model /
+ []
+
+) [160] (chapters/appendix.tex) [161
+
+] (main_docx.aux)
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+ ***********
+Package rerunfilecheck Info: File `main_docx.out' has not changed.
+(rerunfilecheck)             Checksum: 2C0507C3CBEB1CC2F5680BC1CC34C4B7;21241.
+ ) 
+Here is how much of TeX's memory you used:
+ 27396 strings out of 467871
+ 495980 string characters out of 5418376
+ 900771 words of memory out of 5000000
+ 55250 multiletter control sequences out of 15000+600000
+ 642435 words of font info for 74 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 84i,7n,104p,1356b,700s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ <C:\Users\anhtu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ectt1200.pk> <C:\Users\anhtu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcbx1200.pk> <C:\Users\anhtu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm1200.pk> <C:\Users\anhtu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1728.pk> <C:\Users\anhtu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx2488.pk> <C:\Users\anhtu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecti1200.pk> <C:\Users\anhtu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecrm1200.pk> <C:\Users\anhtu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1440.pk> <C:\Users\anhtu\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\ecbx1200.pk><C:/Users/anhtu/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/anhtu/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/Users/anhtu/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/anhtu/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/anhtu/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/anhtu/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/anhtu/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
+Output written on main_docx.pdf (172 pages, 7157022 bytes).
+PDF statistics:
+ 2533 PDF objects out of 2984 (max. 8388607)
+ 540 named destinations out of 1000 (max. 500000)
+ 1436 words of extra memory for PDF output out of 10000 (max. 10000000)
+
