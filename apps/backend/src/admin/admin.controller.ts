@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/jwt.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { AdminService } from './admin.service';
+import { Cursor } from '../common/decorators/cursor.decorator';
 
 @Controller('api/admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -23,10 +24,10 @@ export class AdminController {
 
   @Get('users')
   getUsers(
-    @Query('cursor') cursor: string,
+    @Cursor(1) cursor: number,
     @Query('q') q?: string,
   ) {
-    return this.adminService.getUsers(parseInt(cursor ?? '1', 10), q);
+    return this.adminService.getUsers(cursor, q);
   }
 
   @Post('users/:id/ban')
@@ -42,8 +43,8 @@ export class AdminController {
   }
 
   @Get('reports')
-  getReports(@Query('cursor') cursor: string) {
-    return this.adminService.getReports(parseInt(cursor ?? '1', 10));
+  getReports(@Cursor(1) cursor: number) {
+    return this.adminService.getReports(cursor);
   }
 
   @Post('reports/:id/dismiss')

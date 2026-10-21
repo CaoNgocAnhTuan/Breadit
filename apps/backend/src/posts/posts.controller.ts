@@ -22,6 +22,7 @@ import { BannedUserGuard } from '../auth/banned-user.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt.guard';
 import { EmailVerifiedGuard } from '../auth/email-verified.guard';
 import { PostsService } from './posts.service';
+import { ReportDto } from './dto/report.dto';
 
 type AuthedRequest = FastifyRequest & {
   user?: { id: string; username: string };
@@ -68,8 +69,8 @@ export class PostsController {
 
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
-  async findOne(@Param('id') id: string, @Req() req: AuthedRequest) {
-    const post = await this.postsService.findOne(Number(id), req.user?.id);
+  async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: AuthedRequest) {
+    const post = await this.postsService.findOne(id, req.user?.id);
     if (!post) throw new NotFoundException();
     return post;
   }
@@ -166,7 +167,7 @@ export class PostsController {
   @UseGuards(JwtAuthGuard, BannedUserGuard)
   createReport(
     @Param('id', ParseIntPipe) postId: number,
-    @Body() body: { reason: string },
+    @Body() body: ReportDto,
     @Req() req: AuthedRequest,
   ) {
     return this.postsService.createReport(req.user!.id, postId, body.reason);
@@ -174,7 +175,7 @@ export class PostsController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, BannedUserGuard)
-  remove(@Param('id') id: string, @Req() req: AuthedRequest) {
-    return this.postsService.remove(+id, req.user!.id);
+  remove(@Param('id', ParseIntPipe) id: number, @Req() req: AuthedRequest) {
+    return this.postsService.remove(id, req.user!.id);
   }
 }

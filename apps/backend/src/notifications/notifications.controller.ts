@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Query,
   Req,
@@ -12,6 +13,7 @@ import {
 import type { FastifyRequest } from 'fastify';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { NotificationsService } from './notifications.service';
+import { Cursor } from '../common/decorators/cursor.decorator';
 
 type AuthedRequest = FastifyRequest & { user?: { id: string; username: string } };
 
@@ -23,12 +25,12 @@ export class NotificationsController {
   @UseGuards(JwtAuthGuard)
   findAll(
     @Req() req: AuthedRequest,
-    @Query('cursor') cursor: string,
+    @Cursor(1) cursor: number,
     @Query('unread') unread: string,
   ) {
     return this.notificationsService.findAll(
       req.user!.id,
-      parseInt(cursor ?? '1', 10),
+      cursor,
       unread === 'true',
     );
   }
@@ -43,7 +45,7 @@ export class NotificationsController {
   @Patch(':id/read')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
-  markRead(@Param('id') id: string, @Req() req: AuthedRequest) {
-    return this.notificationsService.markRead(req.user!.id, +id);
+  markRead(@Param('id', ParseIntPipe) id: number, @Req() req: AuthedRequest) {
+    return this.notificationsService.markRead(req.user!.id, id);
   }
 }

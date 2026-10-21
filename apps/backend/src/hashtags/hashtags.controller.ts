@@ -2,6 +2,7 @@ import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt.guard';
 import { HashtagsService } from './hashtags.service';
+import { Cursor } from '../common/decorators/cursor.decorator';
 
 type AuthedRequest = FastifyRequest & {
   user?: { id: string; username: string };
@@ -20,9 +21,9 @@ export class HashtagsController {
   @UseGuards(OptionalJwtAuthGuard)
   getPostsByTag(
     @Param('tag') tag: string,
-    @Query('cursor') cursor = '1',
+    @Cursor(1) cursor: number,
     @Req() req: AuthedRequest,
   ) {
-    return this.hashtagsService.getPostsByTag(tag, Number(cursor), req.user?.id);
+    return this.hashtagsService.getPostsByTag(tag, cursor, req.user?.id);
   }
 }

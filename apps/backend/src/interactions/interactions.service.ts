@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { POST_DESC_MAX, isTooLong } from '../common/limits';
 
 @Injectable()
 export class InteractionsService {
@@ -9,19 +10,25 @@ export class InteractionsService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
+  /** The post must exist and not be soft-deleted. Returns its author id. */
+  private async assertPostLive(postId: number): Promise<{ userId: string }> {
+    const post = await this.prisma.post.findFirst({
+      where: { id: postId, deletedAt: null },
+      select: { userId: true },
+    });
+    if (!post) throw new NotFoundException('Post not found');
+    return post;
+  }
+
   async toggleLike(userId: string, postId: number) {
-    const [post, existing] = await Promise.all([
-      this.prisma.post.findUnique({ where: { id: postId }, select: { userId: true } }),
-      this.prisma.like.findFirst({ where: { userId, postId } }),
-    ]);
+    const post = await this.assertPostLive(postId);
+    const existing = await this.prisma.like.findFirst({ where: { userId, postId } });
 
     if (existing) {
       await this.prisma.like.delete({ where: { id: existing.id } });
     } else {
       await this.prisma.like.create({ data: { userId, postId } });
-      if (post) {
-        void this.notificationsService.emit('LIKE', userId, post.userId, postId);
-      }
+      void this.notificationsService.emit('LIKE', userId, post.userId, postId);
     }
 
     const count = await this.prisma.like.count({ where: { postId } });
@@ -29,6 +36,7 @@ export class InteractionsService {
   }
 
   async toggleSave(userId: string, postId: number) {
+    await this.assertPostLive(postId);
     const existing = await this.prisma.savedPosts.findFirst({
       where: { userId, postId },
     });
@@ -43,18 +51,18 @@ export class InteractionsService {
   }
 
   async toggleRepost(userId: string, postId: number, desc?: string) {
-    const originalPost = await this.prisma.post.findUnique({
-      where: { id: postId },
-      select: { userId: true },
-    });
+    // Text that is only spaces is a plain repost, not a quote.
+    const quote = desc && desc.trim() ? desc : undefined;
+    if (isTooLong(quote, POST_DESC_MAX)) {
+      throw new BadRequestException(`Text is too long (max ${POST_DESC_MAX} characters)`);
+    }
+    const originalPost = await this.assertPostLive(postId);
 
-    if (desc) {
+    if (quote) {
       await this.prisma.post.create({
-        data: { userId, rePostId: postId, desc },
+        data: { userId, rePostId: postId, desc: quote },
       });
-      if (originalPost) {
-        void this.notificationsService.emit('REPOST', userId, originalPost.userId, postId);
-      }
+      void this.notificationsService.emit('REPOST', userId, originalPost.userId, postId);
       const count = await this.prisma.post.count({
         where: { rePostId: postId, deletedAt: null },
       });
@@ -72,9 +80,7 @@ export class InteractionsService {
       });
     } else {
       await this.prisma.post.create({ data: { userId, rePostId: postId } });
-      if (originalPost) {
-        void this.notificationsService.emit('REPOST', userId, originalPost.userId, postId);
-      }
+      void this.notificationsService.emit('REPOST', userId, originalPost.userId, postId);
     }
 
     const count = await this.prisma.post.count({

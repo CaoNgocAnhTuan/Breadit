@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -6,6 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { COMMENT_BODY_MAX, isTooLong } from '../common/limits';
 
 @Injectable()
 export class CommentsService {
@@ -34,6 +36,16 @@ export class CommentsService {
         ? { where: { userId }, select: { id: true } }
         : (false as const),
     };
+  }
+
+  /** A comment needs text or at least one image (N1), and the text must fit the column (B3). */
+  private assertText(text: string, mediaCount: number) {
+    if (isTooLong(text, COMMENT_BODY_MAX)) {
+      throw new BadRequestException(`Comment is too long (max ${COMMENT_BODY_MAX} characters)`);
+    }
+    if (!text.trim() && mediaCount === 0) {
+      throw new BadRequestException('Comment must have text or media');
+    }
   }
 
   async findByPost(postId: number, userId?: string, sort = 'relevant') {
@@ -97,11 +109,13 @@ export class CommentsService {
     parentCommentId?: number,
     files: BufferedFile[] = [],
   ) {
-    const post = await this.prisma.post.findUnique({
-      where: { id: postId },
+    this.assertText(body, files.length);
+
+    const post = await this.prisma.post.findFirst({
+      where: { id: postId, deletedAt: null },
       select: { id: true, userId: true },
     });
-    if (!post || !post.id) throw new NotFoundException('Post not found');
+    if (!post) throw new NotFoundException('Post not found');
 
     if (parentCommentId) {
       const parentComment = await this.prisma.comment.findUnique({
@@ -219,6 +233,11 @@ export class CommentsService {
       ? existing.media.filter((m) => mediaIdsToRemove.includes(m.id))
       : [];
 
+    if (body.body !== undefined) {
+      const mediaLeft = existing.media.length - mediaToRemove.length + files.length;
+      this.assertText(body.body, mediaLeft);
+    }
+
     for (const m of mediaToRemove) {
       await this.uploadsService.deleteFile(m.url);
     }
@@ -309,9 +328,9 @@ export class CommentsService {
   async toggleLike(userId: string, commentId: number) {
     const comment = await this.prisma.comment.findUnique({
       where: { id: commentId },
-      select: { userId: true, postId: true },
+      select: { userId: true, postId: true, deletedAt: true },
     });
-    if (!comment) throw new NotFoundException();
+    if (!comment || comment.deletedAt) throw new NotFoundException();
 
     const existing = await this.prisma.commentLike.findUnique({
       where: { userId_commentId: { userId, commentId } },

@@ -17,6 +17,7 @@ import { EmailVerifiedGuard } from '../auth/email-verified.guard';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { CreateConversationDto, CreateMessageDto } from './dto/create-message.dto';
 import { MessagesService } from './messages.service';
+import { Cursor } from '../common/decorators/cursor.decorator';
 
 type AuthedRequest = FastifyRequest & {
   user?: { id: string; username: string };
@@ -35,11 +36,11 @@ export class MessagesController {
   @Get()
   getConversations(
     @Req() req: AuthedRequest,
-    @Query('cursor') cursor?: string,
+    @Cursor() cursor?: number,
   ) {
     return this.messagesService.getConversations(
       req.user!.id,
-      cursor ? parseInt(cursor, 10) : undefined,
+      cursor,
     );
   }
 
@@ -69,12 +70,12 @@ export class MessagesController {
   getMessages(
     @Req() req: AuthedRequest,
     @Param('id', ParseIntPipe) id: number,
-    @Query('cursor') cursor?: string,
+    @Cursor() cursor?: number,
   ) {
     return this.messagesService.getMessages(
       id,
       req.user!.id,
-      cursor ? parseInt(cursor, 10) : undefined,
+      cursor,
     );
   }
 

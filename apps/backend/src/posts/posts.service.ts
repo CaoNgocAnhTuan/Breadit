@@ -10,6 +10,7 @@ import { BlockService } from '../block/block.service';
 import { CacheService } from '../cache/cache.service';
 import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { POST_DESC_MAX, isTooLong } from '../common/limits';
 
 // Feed page size (posts per batch). Increase for better UX.
 const LIMIT = 10;
@@ -132,6 +133,19 @@ export class PostsService {
         return memberships.map((m) => m.communityId);
       },
     );
+  }
+
+  /**
+   * A post needs text, media or a reposted post (N1), and the text must fit the column (B3).
+   * `itemCount` is the number of attached files plus 1 if it reposts another post.
+   */
+  private assertPostText(desc: string | undefined, itemCount: number) {
+    if (isTooLong(desc, POST_DESC_MAX)) {
+      throw new BadRequestException(`Post is too long (max ${POST_DESC_MAX} characters)`);
+    }
+    if (!desc?.trim() && itemCount === 0) {
+      throw new BadRequestException('Post must have text or media');
+    }
   }
 
   async findAll(cursorRaw: string, userParam?: string, userId?: string, feed?: string, communityId?: number) {
@@ -410,6 +424,16 @@ export class PostsService {
     },
     files: BufferedFile[] = [],
   ) {
+    this.assertPostText(body.desc, files.length + (body.rePostId != null ? 1 : 0));
+
+    if (body.rePostId != null) {
+      const original = await this.prisma.post.findFirst({
+        where: { id: body.rePostId, deletedAt: null },
+        select: { id: true },
+      });
+      if (!original) throw new NotFoundException('Post to repost not found');
+    }
+
     let communityMembership: { role: CommunityRole } | null = null;
     if (body.communityId) {
       const community = await this.prisma.community.findUnique({ where: { id: body.communityId } });
@@ -569,6 +593,12 @@ export class PostsService {
       ? existing.media.filter((m) => mediaIdsToRemove.includes(m.id))
       : [];
 
+    if (body.desc !== undefined) {
+      const itemsLeft =
+        existing.media.length - mediaToRemove.length + files.length + (existing.rePostId != null ? 1 : 0);
+      this.assertPostText(body.desc, itemsLeft);
+    }
+
     for (const m of mediaToRemove) {
       await this.uploadsService.deleteFile(m.url);
     }
@@ -677,6 +707,12 @@ export class PostsService {
   }
 
   async createReport(reporterId: string, postId: number, reason: string) {
+    const post = await this.prisma.post.findFirst({
+      where: { id: postId, deletedAt: null },
+      select: { id: true },
+    });
+    if (!post) throw new NotFoundException('Post not found');
+
     const report = await this.prisma.report.create({
       data: { reporterId, postId, reason, status: 'OPEN' },
     });

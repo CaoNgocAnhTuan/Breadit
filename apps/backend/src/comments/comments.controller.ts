@@ -90,12 +90,12 @@ export class CommentsController {
       throw new BadRequestException(mapped.message);
     }
 
-    if (body.body == null) throw new BadRequestException('Missing body');
+    if (body.body == null && bufferedFiles.length === 0) throw new BadRequestException('Missing body');
 
     return this.commentsService.create(
       req.user!.id,
       postId,
-      body.body,
+      body.body ?? '',
       body.parentCommentId,
       bufferedFiles,
     );

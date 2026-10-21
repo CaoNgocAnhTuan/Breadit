@@ -19,6 +19,7 @@ import { BannedUserGuard } from '../auth/banned-user.guard';
 import { OptionalJwtAuthGuard } from '../auth/optional-jwt.guard';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Cursor } from '../common/decorators/cursor.decorator';
 
 class ToggleFollowDto {
   @IsOptional()
@@ -77,9 +78,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   getConnectUsers(
     @Req() req: AuthedRequest,
-    @Query('cursor') cursor: string,
+    @Cursor(1) cursor: number,
   ) {
-    return this.usersService.getConnectUsers(req.user!.id, parseInt(cursor ?? '1', 10));
+    return this.usersService.getConnectUsers(req.user!.id, cursor);
   }
 
   @Get('me/blocked')
@@ -93,14 +94,14 @@ export class UsersController {
   getProfilePosts(
     @Param('username') username: string,
     @Query('tab') tab: string,
-    @Query('cursor') cursor: string,
+    @Cursor(1) cursor: number,
     @Query('q') q: string,
     @Req() req: AuthedRequest,
   ) {
     return this.usersService.getPostsByTab(
       username,
       tab ?? 'posts',
-      parseInt(cursor ?? '1', 10),
+      cursor,
       req.user?.id,
       q ?? '',
     );
@@ -110,12 +111,12 @@ export class UsersController {
   @UseGuards(OptionalJwtAuthGuard)
   getFollowers(
     @Param('username') username: string,
-    @Query('cursor') cursor: string,
+    @Cursor(1) cursor: number,
     @Req() req: AuthedRequest,
   ) {
     return this.usersService.getFollowers(
       username,
-      parseInt(cursor ?? '1', 10),
+      cursor,
       req.user?.id,
     );
   }
@@ -124,12 +125,12 @@ export class UsersController {
   @UseGuards(OptionalJwtAuthGuard)
   getFollowing(
     @Param('username') username: string,
-    @Query('cursor') cursor: string,
+    @Cursor(1) cursor: number,
     @Req() req: AuthedRequest,
   ) {
     return this.usersService.getFollowing(
       username,
-      parseInt(cursor ?? '1', 10),
+      cursor,
       req.user?.id,
     );
   }
@@ -138,9 +139,9 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   getSavedPosts(
     @Req() req: AuthedRequest,
-    @Query('cursor') cursor: string,
+    @Cursor(1) cursor: number,
   ) {
-    return this.usersService.getSavedPosts(req.user!.id, parseInt(cursor ?? '1', 10));
+    return this.usersService.getSavedPosts(req.user!.id, cursor);
   }
 
   @Get(':username')

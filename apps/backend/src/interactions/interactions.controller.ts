@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Req,
   UseGuards,
@@ -32,25 +33,25 @@ export class InteractionsController {
   @Post(':id/like')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)
-  toggleLike(@Param('id') id: string, @Req() req: AuthedRequest) {
-    return this.interactionsService.toggleLike(req.user!.id, +id);
+  toggleLike(@Param('id', ParseIntPipe) id: number, @Req() req: AuthedRequest) {
+    return this.interactionsService.toggleLike(req.user!.id, id);
   }
 
   @Post(':id/save')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)
-  toggleSave(@Param('id') id: string, @Req() req: AuthedRequest) {
-    return this.interactionsService.toggleSave(req.user!.id, +id);
+  toggleSave(@Param('id', ParseIntPipe) id: number, @Req() req: AuthedRequest) {
+    return this.interactionsService.toggleSave(req.user!.id, id);
   }
 
   @Post(':id/repost')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)
   toggleRepost(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() body: RepostDto,
     @Req() req: AuthedRequest,
   ) {
-    return this.interactionsService.toggleRepost(req.user!.id, +id, body.desc);
+    return this.interactionsService.toggleRepost(req.user!.id, id, body.desc);
   }
 }
