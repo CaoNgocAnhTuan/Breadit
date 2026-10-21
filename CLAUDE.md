@@ -42,7 +42,13 @@ docker compose up --build              # full stack; backend runs `prisma migrat
 make rebuild | backend-rebuild | frontend-rebuild | logs   # see Makefile
 ```
 
-There is no test suite. The Husky pre-commit hook runs `lint-staged` (ESLint `--fix` on `apps/frontend/src/**`) and then `npm run typecheck`.
+Backend tests (Jest): `npm run test -w @breadit/backend` runs the unit tests, `npm run test:it -w @breadit/backend` runs the integration tests, and `npm run test:backend` runs both. The integration tests boot the real app, so they need `docker compose up db redis -d`. They use the Postgres schema `it_test` and Redis database 1, so the dev data in schema `public` is not touched. The frontend has no tests.
+
+`scripts/verify-bug-sweep.sh` and `scripts/verify-socket.cjs` replay curl and Socket.IO checks against a running backend (see the header of the first one for how to start the backend without sending real email).
+
+When you add a backend dependency, use `npm install --legacy-peer-deps`: `@nestjs/core` is 10 while `@nestjs/websockets` is 11, and plain `npm install` stops on that peer conflict.
+
+The Husky pre-commit hook runs `lint-staged` (ESLint `--fix` on `apps/frontend/src/**`) and then `npm run typecheck`. It does not run the backend tests.
 
 ### Prisma
 
@@ -56,7 +62,7 @@ npx prisma studio --schema=apps/backend/prisma/schema.prisma
 ```
 
 - Because Docker deploys with `migrate deploy`, schema changes need a real migration. `db push` alone is not enough.
-- Seed users: `admin` / `123456` (ADMIN role) and `user1`–`user5` / `password`.
+- Seed users: `admin` / `123456` (ADMIN role) and `user1`–`user50` / `password` (set `SEED_USERS` to change the count).
 - Migrations `*_data_humans_v1*` are data migrations that insert demo users `human01`–`human50` along with their posts. `datasets/humans_v1.sql` holds the same data for manual import (`npm run dataset:humans`, which is PowerShell plus `psql`).
 
 ### Env

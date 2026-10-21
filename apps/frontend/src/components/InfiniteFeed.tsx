@@ -3,6 +3,7 @@
 import { type InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Post, { PostWithDetails } from "./Post";
+import { jsonOrThrow } from "@/lib/api";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
 
@@ -22,7 +23,7 @@ const fetchPosts = async (
   const res = await fetch(`${BACKEND_URL}/api/posts?${params}`, {
     credentials: "include",
   });
-  return res.json();
+  return jsonOrThrow<PostPage>(res);
 };
 
 const InfiniteFeed = ({
@@ -54,8 +55,8 @@ const InfiniteFeed = ({
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 
-  if (error) return "Something went wrong!";
-  if (!data) return "Loading...";
+  // A failed refetch keeps the posts that are already on screen; only an empty feed shows the error.
+  if (!data) return error ? "Something went wrong!" : "Loading...";
 
   const allPosts = data.pages.flatMap((page: PostPage) => page.posts);
 

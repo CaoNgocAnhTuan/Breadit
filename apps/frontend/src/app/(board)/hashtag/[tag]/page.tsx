@@ -4,6 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Post from "@/components/Post";
 import { use } from "react";
+import { jsonOrThrow } from "@/lib/api";
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
@@ -22,7 +23,7 @@ const HashtagPage = ({ params }: { params: Promise<{ tag: string }> }) => {
           `${BACKEND_URL}/api/hashtags/${tag}/posts?cursor=${encodeURIComponent(String(pageParam))}`,
           { credentials: "include" }
         );
-        return res.json();
+        return jsonOrThrow<PostPage>(res);
       },
       initialPageParam: 1,
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,

@@ -3,6 +3,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import InfiniteScroll from "react-infinite-scroll-component";
 import UserCard from "./UserCard";
+import { jsonOrThrow } from "@/lib/api";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:4000";
 
@@ -32,7 +33,7 @@ const UserList = ({
         `${BACKEND_URL}/api/users/${username}/${type}?cursor=${pageParam}`,
         { credentials: "include" }
       );
-      return res.json();
+      return jsonOrThrow<{ users: UserSummary[]; hasMore: boolean }>(res);
     },
     initialPageParam: 2,
     getNextPageParam: (lastPage, pages) =>
