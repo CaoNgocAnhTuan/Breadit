@@ -1,4 +1,5 @@
 import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsImageRef } from '../../common/validators/image-ref';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -27,10 +28,10 @@ export class UpdateUserDto {
   website?: string;
 
   @IsOptional()
-  @IsString()
+  @IsImageRef()
   img?: string;
 
   @IsOptional()
-  @IsString()
+  @IsImageRef()
   cover?: string;
 }

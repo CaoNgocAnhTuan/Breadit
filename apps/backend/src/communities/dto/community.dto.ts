@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsImageRef } from '../../common/validators/image-ref';
 
 export class CreateCommunityDto {
   @IsString()
@@ -28,12 +29,12 @@ export class UpdateCommunityDto {
   @MaxLength(255)
   description?: string;
 
-  @IsString()
   @IsOptional()
+  @IsImageRef()
   img?: string;
 
-  @IsString()
   @IsOptional()
+  @IsImageRef()
   cover?: string;
 }
 
