@@ -87,7 +87,7 @@ Week numbers count from 2026-10-14 (week 1). The plan is about 13 weeks. The def
 
 ### P0: Baseline freeze (week 1)
 
-**Do.** Tag `6f7b884` as `v1-prethesis`. Fast-forward `main` to it (`main` is at `5fac625`, 13 commits behind; no divergence). Create the branch `thesis`. Commit `CLAUDE.md` and `.docs/` on that branch. Add `.nvmrc` (Node 20, the same as the Docker image), `engines`, and Docker image digests. Write `.docs/prethesis-corrections.md` with four items: the LightFM sentence (`Latex/chapters/conclusion.tex:88`, `docs/chapter7_conclusion.md:64`), the abstract numbers that do not match chapter 5, the k6 failure explanation, and the NFR doc that still says 120/min.
+**Do.** Tag `6f7b884` as `v1-prethesis`. Fast-forward `main` to it (`main` is at `5fac625`, 13 commits behind; no divergence). All work stays on the single branch `test-app` (no separate `thesis` branch). Commit `CLAUDE.md` and `.docs/` on that branch. Add `.nvmrc` (Node 20, the same as the Docker image), `engines`, and Docker image digests. Write the pre-thesis text corrections in `.docs/Bugs Report.md` (section 7, which replaces the planned `prethesis-corrections.md`) with four items: the LightFM sentence (`Latex/chapters/conclusion.tex:88`, `docs/chapter7_conclusion.md:64`), the abstract numbers that do not match chapter 5, the k6 failure explanation, and the NFR doc that still says 120/min.
 
 **Done when.** A clean clone passes `npm ci`, `prisma migrate deploy`, the seed and `npm run typecheck`. Tagging, fast-forwarding and pushing need the author's approval first. Files in `Latex/` change only if the author asks.
 

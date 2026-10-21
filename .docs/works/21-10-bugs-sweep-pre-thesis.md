@@ -1,8 +1,13 @@
 # Bug sweep before the thesis phase: plan
 
-2026-10-21 · status: **done** · branch `thesis` · result in section 10
+2026-10-21 · status: **done** · branch `test-app` · result in section 10
 
-Sources: [Pre-thesis check.md](../Pre-thesis%20check.md) (findings and evidence), [Pre-thesis verify.md](../Pre-thesis%20verify.md) (the run), [super-plan.md](../super-plan.md) (phases P0–P9).
+Sources: [Bugs Report.md](../Bugs%20Report.md) (findings and evidence), [Pre-thesis verify.md](../Pre-thesis%20verify.md) (the run), [super-plan.md](../super-plan.md) (phases P0–P9).
+
+
+> **Note (2026-10-21):** after the sweep, `Pre-thesis check.md` and `prethesis-corrections.md` were merged into [Bugs Report.md](../Bugs%20Report.md). Names of those two files in this plan now point to it.
+>
+> **Branch:** the plan says `thesis` below because the work was first committed on a temporary branch of that name. It was fast-forwarded into `test-app`, which is the only working branch. The commit hashes are the same.
 
 ---
 
@@ -20,7 +25,7 @@ The pre-thesis app works, but the run found 36 problems. 14 of them sit on the t
 2. The curl script prints only PASS for the 14 items. Before the fixes it shows FAIL for them.
 3. `npm run typecheck`, `npm run lint` and `npm run build -w @breadit/backend` pass.
 4. The 72 routes are still mapped, and migrate and seed still pass on an empty database.
-5. Each fix has a line in `.docs/prethesis-corrections.md`.
+5. Each fix has a line in `.docs/Bugs Report.md`.
 
 ---
 
@@ -43,7 +48,7 @@ The pre-thesis app works, but the run found 36 problems. 14 of them sit on the t
 | B3 | Too-long text gives 500 | 300-char post, 1,200-char comment: 500. |
 | B4 | Feed fetch ignores HTTP errors | A 429 showed "Something went wrong" crash screen. |
 
-Also in this pass (no separate finding): fix the seed line in CLAUDE.md, add the test commands to CLAUDE.md, and write `.docs/prethesis-corrections.md`.
+Also in this pass (no separate finding): fix the seed line in CLAUDE.md, add the test commands to CLAUDE.md, and write `.docs/Bugs Report.md`.
 
 **Not touched here:** database schema and migrations (P2), ranking code (P6), the cache and `Date.now()` (P6, E7). See section 9.
 
@@ -98,7 +103,7 @@ About 1.5 to 2 days in total. This is more than the earlier "one day" because te
 - `REDIS_HTTP_CACHE_ENABLED=false`, fixed `JWT_SECRET`, SMTP pointed at a dead port, Cloudinary empty, `UPLOAD_DIR` in the OS temp folder.
 - Needs `docker compose up db redis -d`.
 
-**Verify scripts (written in this step, before any fix):** `scripts/verify-bug-sweep.sh` and `scripts/verify-socket.cjs` (details in section 8). The rows for the 14 IDs are written now with the **expected-after-fix** results. Run them on the unfixed code and save the output as the "before" record (in `.docs/prethesis-corrections.md`). The "still works" rows must already PASS.
+**Verify scripts (written in this step, before any fix):** `scripts/verify-bug-sweep.sh` and `scripts/verify-socket.cjs` (details in section 8). The rows for the 14 IDs are written now with the **expected-after-fix** results. Run them on the unfixed code and save the output as the "before" record (in `.docs/Bugs Report.md`). The "still works" rows must already PASS.
 
 **Check for this step:** `npm run build -w @breadit/backend` passes, the backend starts with 72 mapped routes, one trivial IT (`GET /api/health` returns 200) passes, and the verify scripts show FAIL for the 14 IDs and PASS for the "still works" group.
 
@@ -236,8 +241,8 @@ For each group: what changes, then tests. "IT" = integration test through the re
 - `InfiniteFeed.tsx` `fetchPosts` uses it. The render becomes `if (!data) return error ? "Something went wrong!" : "Loading..."`, so a failed refetch keeps the posts that are already shown.
 - Same one-line change in the other list fetchers that call `res.json()` blindly: `ProfileTabFeed.tsx:129`, `hashtag/[tag]/page.tsx:21`, `UserList.tsx:31`.
 - `CLAUDE.md`: seed users are `user1`–`user50` / `password`. Replace "There is no test suite" with the new commands and the need for `docker compose up db redis -d`.
-- New `.docs/prethesis-corrections.md` with a section "Code fixes (bug sweep)": one row per ID with the commit and the behavior change. P0 adds its four items later.
-- `.docs/Pre-thesis check.md`: add a "Fixed in" note per ID.
+- New `.docs/Bugs Report.md` with a section "Code fixes (bug sweep)": one row per ID with the commit and the behavior change. P0 adds its four items later.
+- `.docs/Bugs Report.md`: add a "Fixed in" note per ID.
 
 **Tests:** the frontend has no test runner and adding one is out of scope. Checks are `npm run typecheck`, `npm run lint`, and the browser check in section 8.
 
@@ -274,7 +279,7 @@ For each group: what changes, then tests. "IT" = integration test through the re
 5. **Browser (Chrome):** (a) B4: flood `/api/posts` with 1,300 requests, reload `/`: the layout stays and the page shows "Something went wrong!" with no crash screen. (b) T1 in the UI: repost, undo, reload: count 0 and a grey icon. (c) N4: the profile edit still saves an uploaded avatar. T3 (10-second feed cache) is **not** fixed here, so it is expected to remain.
 6. **Page sweep:** the 26 pages return the same status codes as in the verify run.
 7. **Clean database:** `docker compose down -v`, then `prisma migrate deploy` and the seed pass, and the 72 routes map.
-8. **Docs:** every ID has a row in `prethesis-corrections.md`.
+8. **Docs:** every ID has a row in `Bugs Report.md`.
 
 ---
 
@@ -297,7 +302,7 @@ Done on 2026-10-21. All 14 issues in section 2 are fixed, on the branch `thesis`
 2. The curl script: 42 passed and 53 failed before, **95 passed and 0 failed** after, on a freshly seeded database. Records: `21-10-bugs-sweep-before.txt` and `21-10-bugs-sweep-after.txt`.
 3. `npm run typecheck`, `npm run lint` (0 errors, warnings as before) and `npm run build -w @breadit/backend` pass.
 4. 72 routes are mapped. `docker compose down -v`, `prisma migrate deploy` and the seed pass on an empty database.
-5. Every fix has a row in [../prethesis-corrections.md](../prethesis-corrections.md).
+5. Every fix has a row in [../Bugs Report.md](../Bugs%20Report.md).
 
 **Tests:** 99 unit tests (8 suites) and 108 integration tests (7 suites), all passing.
 **Browser (Chrome):** B4 (a rate-limited feed keeps the page and shows "Something went wrong!"), T1 (repost, undo, reload: count 0, grey icon) and T8 (new suggestions in the right bar) confirmed. The page sweep gave the expected codes on 26 checks. The avatar upload in the profile form was not clicked through in the browser, because the file chooser cannot be driven. The same flow (upload, then save the returned file name) is covered by an integration test.

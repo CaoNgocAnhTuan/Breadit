@@ -2,17 +2,17 @@
 
 2026-10-21 · branch `test-app` · code unchanged (nothing was fixed in this run)
 
-This is the run that goes with [Pre-thesis check.md](Pre-thesis%20check.md). I started the whole system on this Mac and tested it with curl, one Socket.IO script and a real Chrome session. Finding IDs (T, S, B) are the same as in the check doc.
+This is the run that goes with [Bugs Report.md](Bugs%20Report.md). I started the whole system on this Mac and tested it with curl, one Socket.IO script and a real Chrome session. Finding IDs (T, S, B) are the same as in the check doc.
 
 ---
 
 ## 1. Result
 
-**25 of the 26 findings are confirmed. Only S6 is half confirmed.** The one thing in the check doc that was wrong: the rate limit is counted **per route** per IP, not once for the whole API (see section 5).
+**25 of the 26 findings are confirmed. Only S6 is half confirmed.** The one thing in the first review that was wrong: the rate limit is counted **per route** per IP, not once for the whole API (see section 5).
 
 The app itself works. All 72 routes start, all 26 pages render, and the main flows pass (list in section 3). The bugs are in the edges: counts after deletes, the 10-second cache, missing checks on IDs and lengths, and a few security gaps.
 
-I also found 10 new problems (section 4). The worst is N4: one user can set an avatar URL that makes other people's pages return 500. The full table, with code locations, is in the check doc.
+I also found 10 new problems (section 4). The worst is N4: one user can set an avatar URL that makes other people's pages return 500. The full table, with code locations, is in the Bugs Report.
 
 ---
 
