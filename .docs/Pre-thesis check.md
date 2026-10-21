@@ -2,7 +2,7 @@
 
 2026-10-21 · branch `test-app` · commit `9606923` (code is the same as `6f7b884`, the end of pre-thesis)
 
-This report says what the pre-thesis code does and what is wrong in it. It was written in two steps. First I read the code and listed 26 suspected problems. Then I ran the whole system and tested them. Each finding below now has an **Evidence** cell from that run. The run itself (setup, safety, list of working features) is in [Pre-thesis verify.md](Pre-thesis%20verify.md). Nothing in the application code was changed.
+This report says what the pre-thesis code does and what is wrong in it. It was written in two steps. First I read the code and listed 26 suspected problems. Then I ran the whole system and tested them. Each finding below now has an **Evidence** cell from that run. The run itself (setup, safety, list of working features) is in [Pre-thesis verify.md](Pre-thesis%20verify.md). The application code was not changed by the review itself. The fixes came afterwards (section 6).
 
 ---
 
@@ -187,7 +187,31 @@ Cache keys and lifetime:
 
 ---
 
-## 6. How complete is this review
+## 6. Fix status (bug sweep)
+
+The fixes were made on the branch `thesis` on 2026-10-21. Details, behavior changes and the before and after record are in [prethesis-corrections.md](prethesis-corrections.md). The plan is [works/21-10-bugs-sweep-pre-thesis.md](works/21-10-bugs-sweep-pre-thesis.md).
+
+**Fixed (14 findings).**
+
+| IDs | Commit |
+|---|---|
+| T7, B3, N1 | `c4d5d46` |
+| T1, T2 | `e48a289` |
+| T5, T8, T9 | `db5a8f4` |
+| T10, S2, S3 | `53fb757` |
+| N4 | `91f0aea` |
+| S1, S5 (the socket part) | `3b62928` |
+| B4 | `5db92b8` |
+
+**Open, with the place that handles them.**
+- T6 (duplicate rows): P2. T4 (`Date.now()`): P6. T3 (feed cache): P6, parity test with the cache off, and E7. N6 (rate limit per route): E7.
+- B6 (ban and the community cache): P6.
+- Known limits, not fixed: S4, S5 (the HTTP routes), S6, B1, B2, B5, B7, B8, B9, B10, N2, N3, N5, N7, N8, N9, N10.
+- Found in the sweep: the comment `_count.replies` still counts deleted replies.
+
+---
+
+## 7. How complete is this review
 
 - **Read in full:** every backend controller and service, the Prisma schema, the seed, Docker files, `Makefile`, the env examples, the frontend fetch layer, middleware, layouts, the home and feed components, the post card, compose box, post interactions, profile page, notifications, community page, and the admin layout.
 - **Mapped by search only:** the other frontend components (chat popup and drawer, comments UI, image editor, community admin UI, admin tables). I listed every `/api/...` path in the frontend (59 path patterns) and checked that each one exists in the backend. None is missing.

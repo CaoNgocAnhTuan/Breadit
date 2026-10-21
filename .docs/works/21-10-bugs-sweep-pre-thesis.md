@@ -1,6 +1,6 @@
 # Bug sweep before the thesis phase: plan
 
-2026-10-21 · status: **approved by the author, in progress** · branch `thesis`
+2026-10-21 · status: **done** · branch `thesis` · result in section 10
 
 Sources: [Pre-thesis check.md](../Pre-thesis%20check.md) (findings and evidence), [Pre-thesis verify.md](../Pre-thesis%20verify.md) (the run), [super-plan.md](../super-plan.md) (phases P0–P9).
 
@@ -284,3 +284,28 @@ For each group: what changes, then tests. "IT" = integration test through the re
 - **P6:** T4 (`asOf`), T3 (cache off in the parity test), `isApproved = true` and a deduped followee list in `buildPool`, B6 (ban clears the community cache).
 - **E7:** N6 (per-route rate limit as an env variable) and a note on whether the cache is on.
 - **Known limits (listed, not fixed):** S4, S5 (HTTP part), S6, B1, B2, B5, B6, B7–B10, N2, N3, N5, N7–N10, the 66 npm vulnerabilities, unused code and env names.
+
+---
+
+## 10. Result
+
+Done on 2026-10-21. All 14 issues in section 2 are fixed, on the branch `thesis`, one commit per group:
+`84e84a7` (setup), `c4d5d46`, `e48a289`, `db5a8f4`, `53fb757`, `91f0aea`, `3b62928`, `5db92b8`. The tag `v1-prethesis` marks `6f7b884`. Nothing was pushed.
+
+**Done-when checks (section 1)**
+1. Every fixed ID has a test that failed before and passes after: yes. Each step started with failing tests.
+2. The curl script: 42 passed and 53 failed before, **95 passed and 0 failed** after, on a freshly seeded database. Records: `21-10-bugs-sweep-before.txt` and `21-10-bugs-sweep-after.txt`.
+3. `npm run typecheck`, `npm run lint` (0 errors, warnings as before) and `npm run build -w @breadit/backend` pass.
+4. 72 routes are mapped. `docker compose down -v`, `prisma migrate deploy` and the seed pass on an empty database.
+5. Every fix has a row in [../prethesis-corrections.md](../prethesis-corrections.md).
+
+**Tests:** 99 unit tests (8 suites) and 108 integration tests (7 suites), all passing.
+**Browser (Chrome):** B4 (a rate-limited feed keeps the page and shows "Something went wrong!"), T1 (repost, undo, reload: count 0, grey icon) and T8 (new suggestions in the right bar) confirmed. The page sweep gave the expected codes on 26 checks. The avatar upload in the profile form was not clicked through in the browser, because the file chooser cannot be driven. The same flow (upload, then save the returned file name) is covered by an integration test.
+
+**Differences from the plan**
+- Cursor parsing uses a custom `@Cursor()` decorator, not a pipe. The global `ValidationPipe` converts a `number` query to `NaN` before a pipe runs, so a missing cursor became a 400. An integration test now checks every converted route without a cursor.
+- `ProfileTabFeed.tsx` already checked `res.ok`, so only the home feed, the hashtag page and the followers lists changed in B4.
+- Extra checks added while fixing T7 and N1: a repost through `rePostId` needs a live original, and editing a post or comment cannot leave it empty.
+- New dev dependencies had to be installed with `--legacy-peer-deps` (an old peer conflict between Nest 10 and Nest 11 packages). It is noted in `CLAUDE.md`.
+- The verify script and the socket script were written in Step 1, as planned, so the "before" record exists.
+
