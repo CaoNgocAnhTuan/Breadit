@@ -1,0 +1,108 @@
+== setup (run 3433c9)
+== W: still works
+PASS  W01  guest feed returns 200 with 10 posts
+PASS  W02  explore feed returns 200
+PASS  W03  create post
+PASS  W04  get post by id
+PASS  W05  other user cannot edit
+PASS  W06  owner edits own post
+PASS  W07  like toggles on
+PASS  W08  save works
+PASS  W09  create comment
+PASS  W10  create reply
+PASS  W11  follow
+PASS  W12  unfollow
+PASS  W13  block
+PASS  W14  create conversation
+PASS  W15  send message
+PASS  W16  read messages
+PASS  W17  upload an image
+PASS  W18  me
+PASS  W19  search
+PASS  W20  trending
+PASS  W21  list communities
+PASS  W22  notifications
+PASS  W23  admin user list
+PASS  W24  non-admin gets 403 on admin API
+PASS  W25  other user cannot delete
+PASS  W26  owner deletes own post
+PASS  W27  255-char post is accepted
+PASS  W28  post with only an image is accepted
+PASS  W29  plain repost via rePostId is accepted
+PASS  W30  wrong email code
+== T1, T2: counts
+FAIL  T1   after un-repost: _count.rePosts (expected 0, got 1)
+FAIL  T1   after un-repost: my repost flag is empty (expected 0, got 1)
+FAIL  T2   after deleting the reply: _count.comments (expected 1, got 2)
+== T5: follow and block rules
+FAIL  T5   self-follow (expected 400, got 200)
+FAIL  T5   follow unknown user (expected 404, got 500)
+FAIL  T5   self-block (expected 400, got 200)
+FAIL  T5   block unknown user (expected 404, got 500)
+== T7, B3, N1: input checks
+FAIL  T7   GET /api/posts/abc (expected 400, got 500)
+PASS  W31  GET missing post is 404
+FAIL  T7   like a missing post (expected 404, got 500)
+FAIL  T7   save a missing post (expected 404, got 500)
+FAIL  T7   repost a missing post (expected 404, got 500)
+FAIL  T7   like a deleted post (expected 404, got 200)
+FAIL  T7   save a deleted post (expected 404, got 200)
+FAIL  T7   repost a deleted post (expected 404, got 200)
+FAIL  T7   comment on a deleted post (expected 404, got 201)
+FAIL  T7   like a deleted comment (expected 404, got 200)
+FAIL  T7   report with no reason (expected 400, got 500)
+FAIL  T7   report a missing post (expected 404, got 500)
+FAIL  T7   repost via rePostId of a missing post (expected 404, got 500)
+FAIL  T7   notifications with cursor=abc (expected 400, got 500)
+FAIL  T7   profile posts with cursor=abc (expected 400, got 500)
+FAIL  T7   hashtag posts with cursor=abc (expected 400, got 500)
+FAIL  T7   admin users with cursor=abc (expected 400, got 500)
+FAIL  B3   300-char post (expected 400, got 500)
+FAIL  B3   1200-char comment (expected 400, got 500)
+FAIL  B3   400-char quote repost (expected 400, got 500)
+FAIL  N1   empty post (expected 400, got 201)
+FAIL  N1   empty comment (expected 400, got 201)
+== T8, T9: recommendations and connect
+FAIL  T8   top 3 recommendations are the most followed users (expected user16,user31,user40, got user32,user3,user48)
+FAIL  T9   blocked user is not in recommendations (expected false, got true)
+FAIL  T9   blocked user is not on any connect page (expected false, got true)
+FAIL  T9   banned user is not on any connect page (expected false, got true)
+== T10, S2, S3: visibility, privacy, banned users
+PASS  T10  member post in a community is pending
+FAIL  T10  outsider cannot open a pending post (expected 404, got 200)
+FAIL  T10  guest cannot open a pending post (expected 404, got 200)
+PASS  T10  the author can open it
+PASS  T10  the community owner can open it
+FAIL  T10  Likes tab does not list a pending post (expected false, got true)
+FAIL  S2   guest sees no email (expected false, got true)
+FAIL  S2   guest sees no emailVerified (expected false, got true)
+FAIL  S2   guest sees no banned flag (expected false, got true)
+PASS  S2   the user still sees their own email
+FAIL  S3   banned user: create post (expected 403, got 201)
+FAIL  S3   banned user: create comment (expected 403, got 201)
+FAIL  S3   banned user: upload (expected 403, got 201)
+FAIL  S3   banned user: create community (expected 403, got 201)
+FAIL  S3   banned user: create conversation (expected 403, got 201)
+FAIL  S3   banned user: send message (expected 403, got 201)
+== N4: avatar and cover URLs
+FAIL  N4   avatar on an unknown host (expected 400, got 200)
+FAIL  N4   cover with a javascript: URL (expected 400, got 200)
+PASS  N4   avatar as an uploaded file name
+PASS  N4   avatar on an allowed host
+FAIL  N4   community image on an unknown host (expected 400, got 200)
+  B4 (feed crash on HTTP 429): manual browser check, see the plan, section 8.
+== S1: sockets
+PASS  W    carol sends a DM (HTTP 201)
+PASS  W    bob receives newMessage after newUser
+FAIL  S1   alice (claiming to be bob) does NOT receive the DM
+FAIL  S1   bob receives it even without sending newUser (joined on connect)
+FAIL  S1   a client cannot push a fake notification to carol
+PASS  W    member bob receives userTyping
+FAIL  S1   non-member alice does NOT receive userTyping
+FAIL  S1   typing event carries the real username, not the one in the payload
+PASS  W    carol follows bob (HTTP 200)
+PASS  W    bob receives getNotification
+FAIL  S5   a logged-out token cannot keep a socket connection
+
+== 42 passed, 53 failed, 0 skipped
+bash scripts/verify-bug-sweep.sh  1.31s user 0.83s system 21% cpu 9.866 total
