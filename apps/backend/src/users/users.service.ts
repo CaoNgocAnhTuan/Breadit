@@ -4,6 +4,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { BlockService } from '../block/block.service';
 import { CacheService } from '../cache/cache.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { engagementSelect } from '../posts/engagement';
 
 const POST_LIMIT = 3;
 const USER_LIMIT = 10;
@@ -27,10 +28,7 @@ export class UsersService {
           user: { select: { id: true, username: true, displayName: true, img: true } },
         },
       },
-      _count: { select: { likes: true, rePosts: true, comments: true } },
-      likes: userId ? { where: { userId }, select: { id: true } } : (false as const),
-      rePosts: userId ? { where: { userId }, select: { id: true } } : (false as const),
-      saves: userId ? { where: { userId }, select: { id: true } } : (false as const),
+      ...engagementSelect(userId),
     };
   }
 

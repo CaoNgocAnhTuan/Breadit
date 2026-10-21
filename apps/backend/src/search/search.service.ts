@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BlockService } from '../block/block.service';
 import { CacheService } from '../cache/cache.service';
+import { engagementSelect } from '../posts/engagement';
 
 const RESULT_LIMIT = 5;
 
@@ -51,10 +52,7 @@ export class SearchService {
               user: { select: { id: true, username: true, displayName: true, img: true } },
             },
           },
-          _count: { select: { likes: true, rePosts: true, comments: true } },
-          likes: userId ? { where: { userId }, select: { id: true } } : (false as const),
-          rePosts: userId ? { where: { userId }, select: { id: true } } : (false as const),
-          saves: userId ? { where: { userId }, select: { id: true } } : (false as const),
+          ...engagementSelect(userId),
           community: { select: { name: true, slug: true } },
         },
         take: RESULT_LIMIT,

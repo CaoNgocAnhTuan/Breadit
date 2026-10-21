@@ -11,6 +11,7 @@ import { CacheService } from '../cache/cache.service';
 import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { POST_DESC_MAX, isTooLong } from '../common/limits';
+import { engagementSelect } from './engagement';
 
 // Feed page size (posts per batch). Increase for better UX.
 const LIMIT = 10;
@@ -98,10 +99,7 @@ export class PostsService {
       user: { select: { displayName: true, username: true, img: true } },
       media: true,
       mentions: this.mentionInclude(),
-      _count: { select: { likes: true, rePosts: true, comments: true } },
-      likes: userId ? { where: { userId }, select: { id: true } } : (false as const),
-      rePosts: userId ? { where: { userId }, select: { id: true } } : (false as const),
-      saves: userId ? { where: { userId }, select: { id: true } } : (false as const),
+      ...engagementSelect(userId),
     } as const;
   }
 

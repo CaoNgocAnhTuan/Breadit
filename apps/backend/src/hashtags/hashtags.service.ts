@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { engagementSelect } from '../posts/engagement';
 
 const LIMIT = 10;
 
@@ -16,10 +17,7 @@ export class HashtagsService {
           user: { select: { id: true, username: true, displayName: true, img: true } },
         },
       },
-      _count: { select: { likes: true, rePosts: true, comments: true } },
-      likes: userId ? { where: { userId }, select: { id: true } } : (false as const),
-      rePosts: userId ? { where: { userId }, select: { id: true } } : (false as const),
-      saves: userId ? { where: { userId }, select: { id: true } } : (false as const),
+      ...engagementSelect(userId),
     };
   }
 
