@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { BlockService } from '../block/block.service';
@@ -282,7 +282,16 @@ export class UsersService {
     return { users: rows.map((r) => r.following), hasMore: cursor * USER_LIMIT < total };
   }
 
+  /** Throws 404 if the user does not exist. */
+  private async assertUserExists(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!user) throw new NotFoundException('User not found');
+  }
+
   async toggleFollow(followerId: string, followingId: string, notify?: boolean) {
+    if (followerId === followingId) throw new BadRequestException('You cannot follow yourself');
+    await this.assertUserExists(followingId);
+
     const existing = await this.prisma.follow.findFirst({
       where: { followerId, followingId },
     });
@@ -310,6 +319,9 @@ export class UsersService {
   }
 
   async toggleBlock(blockerId: string, blockedId: string) {
+    if (blockerId === blockedId) throw new BadRequestException('You cannot block yourself');
+    await this.assertUserExists(blockedId);
+
     const existing = await this.prisma.block.findFirst({
       where: { blockerId, blockedId },
     });
@@ -324,7 +336,7 @@ export class UsersService {
       return { blocked: false };
     }
 
-    await Promise.all([
+    await this.prisma.$transaction([
       this.prisma.block.create({ data: { blockerId, blockedId } }),
       this.prisma.follow.deleteMany({
         where: {
@@ -393,33 +405,47 @@ export class UsersService {
     };
   }
 
+  /**
+   * Who may be suggested to `userId`: not themselves, nobody they already follow, no blocked
+   * peers (either direction), and no banned accounts (finding T9).
+   */
+  private async suggestionExclusions(userId: string) {
+    const [followed, blocked] = await Promise.all([
+      this.prisma.follow.findMany({ where: { followerId: userId }, select: { followingId: true } }),
+      this.blockService.getAllBlockedPeerIds(userId),
+    ]);
+    const followedIds = followed.map((f) => f.followingId);
+    return { followedIds, excludeIds: [userId, ...followedIds, ...blocked] };
+  }
+
+  // Schema naming: on `User`, `followings` are the Follow rows where this user is the one being
+  // followed, so `_count.followings` is the number of FOLLOWERS. `followers` is the opposite
+  // (accounts this user follows). Ranking by `followers` was the bug (finding T8).
+  private static readonly MOST_FOLLOWED = [{ followings: { _count: 'desc' as const } }, { id: 'asc' as const }];
+
   async getRecommendations(userId: string) {
-    const followedIds = (
-      await this.prisma.follow.findMany({
-        where: { followerId: userId },
-        select: { followingId: true },
-      })
-    ).map((f) => f.followingId);
+    const { followedIds, excludeIds } = await this.suggestionExclusions(userId);
 
     // Friends-of-friends first; fall back to popular users if < 3
     const fof = await this.prisma.user.findMany({
       where: {
-        id: { not: userId, notIn: followedIds },
+        id: { notIn: excludeIds },
+        banned: false,
         followings: { some: { followerId: { in: followedIds } } },
       },
       take: 3,
       select: { id: true, displayName: true, username: true, img: true },
-      orderBy: { followers: { _count: 'desc' } },
+      orderBy: UsersService.MOST_FOLLOWED,
     });
 
     if (fof.length >= 3) return fof;
 
     const existing = fof.map((u) => u.id);
     const others = await this.prisma.user.findMany({
-      where: { id: { not: userId, notIn: [...followedIds, ...existing] } },
+      where: { id: { notIn: [...excludeIds, ...existing] }, banned: false },
       take: 3 - fof.length,
       select: { id: true, displayName: true, username: true, img: true },
-      orderBy: { followers: { _count: 'desc' } },
+      orderBy: UsersService.MOST_FOLLOWED,
     });
 
     return [...fof, ...others];
@@ -427,28 +453,21 @@ export class UsersService {
 
   async getConnectUsers(userId: string, cursor: number) {
     const PAGE = 12;
-    const followedIds = (
-      await this.prisma.follow.findMany({
-        where: { followerId: userId },
-        select: { followingId: true },
-      })
-    ).map((f) => f.followingId);
+    const { followedIds, excludeIds } = await this.suggestionExclusions(userId);
 
-    const where = { id: { not: userId, notIn: followedIds } };
+    const where = { id: { notIn: excludeIds }, banned: false };
 
-    // Friends-of-friends come first (those with mutual connections rank higher)
-    const fofIds = (
-      await this.prisma.user.findMany({
-        where: {
-          ...where,
-          followings: { some: { followerId: { in: followedIds } } },
-        },
-        select: { id: true },
-        orderBy: { followers: { _count: 'desc' } },
-      })
-    ).map((u) => u.id);
+    // Friends-of-friends come first (users that someone I follow is following)
+    const fofIds = new Set(
+      (
+        await this.prisma.user.findMany({
+          where: { ...where, followings: { some: { followerId: { in: followedIds } } } },
+          select: { id: true },
+        })
+      ).map((u) => u.id),
+    );
 
-    // Build ordered id list: fof first, then rest by follower count
+    // Build ordered list: fof first, then the rest, each by follower count
     const ordered = await this.prisma.user.findMany({
       where,
       select: {
@@ -457,19 +476,27 @@ export class UsersService {
         username: true,
         img: true,
         bio: true,
-        _count: { select: { followers: true } },
+        _count: { select: { followings: true } },
       },
-      orderBy: { followers: { _count: 'desc' } },
+      orderBy: UsersService.MOST_FOLLOWED,
     });
 
     // Re-sort: fof IDs bubble to top
     const sorted = [
-      ...ordered.filter((u) => fofIds.includes(u.id)),
-      ...ordered.filter((u) => !fofIds.includes(u.id)),
+      ...ordered.filter((u) => fofIds.has(u.id)),
+      ...ordered.filter((u) => !fofIds.has(u.id)),
     ];
 
     const total = sorted.length;
-    const page = sorted.slice((cursor - 1) * PAGE, cursor * PAGE);
+    const page = sorted.slice((cursor - 1) * PAGE, cursor * PAGE).map((u) => ({
+      id: u.id,
+      displayName: u.displayName,
+      username: u.username,
+      img: u.img,
+      bio: u.bio,
+      // The UI shows `_count.followers` as "N followers", so keep that name for the real count.
+      _count: { followers: u._count.followings },
+    }));
 
     return { users: page, hasMore: cursor * PAGE < total };
   }
