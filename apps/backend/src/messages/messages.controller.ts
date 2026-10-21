@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
 import { EmailVerifiedGuard } from '../auth/email-verified.guard';
+import { BannedUserGuard } from '../auth/banned-user.guard';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { CreateConversationDto, CreateMessageDto } from './dto/create-message.dto';
 import { MessagesService } from './messages.service';
@@ -24,7 +25,7 @@ type AuthedRequest = FastifyRequest & {
 };
 
 @Controller('api/conversations')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, BannedUserGuard)
 export class MessagesController {
   constructor(private readonly messagesService: MessagesService) {}
 

@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
+import { BannedUserGuard } from '../auth/banned-user.guard';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { EmailVerifiedGuard } from '../auth/email-verified.guard';
 import { UploadsService, type BufferedFile } from './uploads.service';
@@ -19,7 +20,7 @@ export class UploadsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(JwtAuthGuard, EmailVerifiedGuard)
+  @UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)
   async upload(@Req() req: FastifyRequest) {
     let imgType: string | undefined;
     let bufferedFile: BufferedFile | undefined;

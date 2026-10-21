@@ -58,7 +58,7 @@ export class CommentsController {
 
   @Post('posts/:postId/comments')
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(JwtAuthGuard, EmailVerifiedGuard)
+  @UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)
   async create(
     @Param('postId', ParseIntPipe) postId: number,
     @Req() req: FastifyRequest & { user?: { id: string; username: string } },

@@ -77,7 +77,7 @@ export class PostsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(JwtAuthGuard, EmailVerifiedGuard)
+  @UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)
   async create(@Req() req: FastifyRequest & { user?: { id: string } }) {
     const body: {
       desc?: string;

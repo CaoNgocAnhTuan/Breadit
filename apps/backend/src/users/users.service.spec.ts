@@ -148,3 +148,66 @@ describe('UsersService suggestions (T8, T9)', () => {
     expect(res.hasMore).toBe(false);
   });
 });
+
+describe('UsersService.findByUsername (S2: private fields)', () => {
+  const row = {
+    id: 'u2',
+    username: 'bob',
+    password: 'hash',
+    email: 'bob@private.test',
+    emailVerified: new Date('2026-01-01'),
+    banned: true,
+    role: 'USER',
+    displayName: 'Bob',
+    bio: 'hi',
+    img: null,
+    cover: null,
+    createdAt: new Date('2026-01-01'),
+    updatedAt: new Date('2026-01-02'),
+    followings: [],
+    _count: { followers: 1, followings: 2 },
+  };
+
+  it('never returns the password hash', async () => {
+    const { service, prisma } = setup();
+    prisma.user.findUnique.mockResolvedValue({ ...row });
+    const me = await service.findByUsername('bob', 'u2');
+    const other = await service.findByUsername('bob', 'u9');
+    const guest = await service.findByUsername('bob');
+    for (const view of [me, other, guest]) expect(view).not.toHaveProperty('password');
+  });
+
+  it.each([
+    ['a guest', undefined],
+    ['another user', 'u9'],
+  ])('S2: hides email, emailVerified and banned from %s', async (_label, viewer) => {
+    const { service, prisma } = setup();
+    prisma.user.findUnique.mockResolvedValue({ ...row });
+    const view = await service.findByUsername('bob', viewer);
+    expect(view).not.toHaveProperty('email');
+    expect(view).not.toHaveProperty('emailVerified');
+    expect(view).not.toHaveProperty('banned');
+    // the public part is still there
+    expect(view).toMatchObject({ username: 'bob', displayName: 'Bob', bio: 'hi', role: 'USER', profileRestricted: false });
+    expect(view).toHaveProperty('_count');
+  });
+
+  it('S2: the owner still sees their own email, emailVerified and banned flag', async () => {
+    const { service, prisma } = setup();
+    prisma.user.findUnique.mockResolvedValue({ ...row });
+    const view = await service.findByUsername('bob', 'u2');
+    expect(view).toMatchObject({ email: 'bob@private.test', banned: true });
+    expect(view).toHaveProperty('emailVerified');
+  });
+
+  it('S2: the blocked-profile view has no email value and no banned flag', async () => {
+    const { service, prisma, block } = setup();
+    prisma.user.findUnique.mockResolvedValue({ ...row });
+    block.getBlockFlags.mockResolvedValue({ blockedByViewer: true, blockedYou: false });
+    const view: any = await service.findByUsername('bob', 'u9');
+    expect(view.profileRestricted).toBe(true);
+    expect(view.email).toBeNull();
+    expect(view.emailVerified).toBeNull();
+    expect(view).not.toHaveProperty('banned');
+  });
+});

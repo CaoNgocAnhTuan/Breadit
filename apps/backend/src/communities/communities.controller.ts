@@ -29,7 +29,7 @@ export class CommunitiesController {
   constructor(private readonly communitiesService: CommunitiesService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, EmailVerifiedGuard)
+  @UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)
   create(@Req() req: AuthedRequest, @Body() dto: CreateCommunityDto) {
     return this.communitiesService.create(req.user!.id, dto);
   }

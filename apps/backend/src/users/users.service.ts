@@ -9,6 +9,20 @@ import { engagementSelect } from '../posts/engagement';
 const POST_LIMIT = 3;
 const USER_LIMIT = 10;
 
+/**
+ * Other people must not get a user's email, whether it is verified, or the banned flag
+ * (finding S2). The owner sees their own profile in full.
+ */
+function toPublicProfile<T extends { email: string; emailVerified: Date | null; banned: boolean }>(
+  user: T,
+  isSelf: boolean,
+): T | Omit<T, 'email' | 'emailVerified' | 'banned'> {
+  if (isSelf) return user;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { email, emailVerified, banned, ...rest } = user;
+  return rest;
+}
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -45,6 +59,7 @@ export class UsersService {
     if (!user) return null;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safe } = user;
+    const isSelf = currentUserId === user.id;
 
     if (currentUserId && user.id !== currentUserId) {
       const flags = await this.blockService.getBlockFlags(currentUserId, user.id);
@@ -62,7 +77,6 @@ export class UsersService {
           cover: null,
           emailVerified: null,
           role: safe.role,
-          banned: safe.banned,
           createdAt: safe.createdAt,
           updatedAt: safe.updatedAt,
           profileRestricted: true,
@@ -76,7 +90,7 @@ export class UsersService {
     }
 
     const isBlocked = false;
-    return { ...safe, isBlocked, profileRestricted: false };
+    return { ...toPublicProfile(safe, isSelf), isBlocked, profileRestricted: false };
   }
 
   async listBlockedAccounts(blockerId: string) {
@@ -128,7 +142,7 @@ export class UsersService {
         media: { some: {} },
       };
     } else if (tab === 'likes') {
-      whereCondition = { likes: { some: { user: { username } } }, deletedAt: null };
+      whereCondition = { likes: { some: { user: { username } } }, deletedAt: null, isApproved: true };
     } else {
       whereCondition = {
         user: { username },
