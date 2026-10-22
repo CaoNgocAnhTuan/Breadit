@@ -33,6 +33,8 @@ Every feature, super-plan item or bug fix goes through three approvals before an
 3. `/plan` writes `plan.md`. Then `/approve`. Approving the plan also approves the commits it lists.
 4. `/implement` does the plan steps test first, ticks them, fills the Result section and closes the task.
 
+**Git.** Commit every change on the current branch, `test-app`. Never create a new branch for a change: no feature, task, fix or thesis branches. Tags, pushes and any change to `main` need the author's OK.
+
 Only the author runs `/approve` and `/freeze`. The hooks in `.claude/hooks/` enforce the rest: code edits ask the author unless the active task's plan is approved, `docs/`, `Latex/`, `.env` and committed migrations cannot be edited, and commits go on `test-app` only. Other commands: `/verify`, `/run-safe`. See `.claude/README.md` for the full map.
 
 ## Commands
