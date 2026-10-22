@@ -2,10 +2,10 @@
 
 2026-10-21 · status: **done** · branch `test-app` · result in section 10
 
-Sources: [Bugs Report.md](../Bugs%20Report.md) (findings and evidence), [Pre-thesis verify.md](../Pre-thesis%20verify.md) (the run), [super-plan.md](../super-plan.md) (phases P0–P9).
+Sources: [Bugs Report.md](../../Bugs%20Report.md) (findings and evidence), [Pre-thesis verify.md](../../Pre-thesis%20verify.md) (the run), [super-plan.md](../../super-plan.md) (phases P0–P9).
 
 
-> **Note (2026-10-21):** after the sweep, `Pre-thesis check.md` and `prethesis-corrections.md` were merged into [Bugs Report.md](../Bugs%20Report.md). Names of those two files in this plan now point to it.
+> **Note (2026-10-21):** after the sweep, `Pre-thesis check.md` and `prethesis-corrections.md` were merged into [Bugs Report.md](../../Bugs%20Report.md). Names of those two files in this plan now point to it.
 >
 > **Branch:** the plan says `thesis` below because the work was first committed on a temporary branch of that name. It was fast-forwarded into `test-app`, which is the only working branch. The commit hashes are the same.
 
@@ -299,10 +299,10 @@ Done on 2026-10-21. All 14 issues in section 2 are fixed, on the branch `thesis`
 
 **Done-when checks (section 1)**
 1. Every fixed ID has a test that failed before and passes after: yes. Each step started with failing tests.
-2. The curl script: 42 passed and 53 failed before, **95 passed and 0 failed** after, on a freshly seeded database. Records: `21-10-bugs-sweep-before.txt` and `21-10-bugs-sweep-after.txt`.
+2. The curl script: 42 passed and 53 failed before, **95 passed and 0 failed** after, on a freshly seeded database. Records: `sweep-before.txt` and `sweep-after.txt` (in this folder).
 3. `npm run typecheck`, `npm run lint` (0 errors, warnings as before) and `npm run build -w @breadit/backend` pass.
 4. 72 routes are mapped. `docker compose down -v`, `prisma migrate deploy` and the seed pass on an empty database.
-5. Every fix has a row in [../Bugs Report.md](../Bugs%20Report.md).
+5. Every fix has a row in [Bugs Report.md](../../Bugs%20Report.md).
 
 **Tests:** 99 unit tests (8 suites) and 108 integration tests (7 suites), all passing.
 **Browser (Chrome):** B4 (a rate-limited feed keeps the page and shows "Something went wrong!"), T1 (repost, undo, reload: count 0, grey icon) and T8 (new suggestions in the right bar) confirmed. The page sweep gave the expected codes on 26 checks. The avatar upload in the profile form was not clicked through in the browser, because the file chooser cannot be driven. The same flow (upload, then save the returned file name) is covered by an integration test.

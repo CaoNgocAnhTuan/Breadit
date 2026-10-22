@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Socket.IO checks for the pre-thesis bug sweep (finding S1, plus the socket part of S5).
- * Plan: .docs/works/21-10-bugs-sweep-pre-thesis.md
+ * Plan: .docs/works/2026-10-21-bugs-sweep/plan.md
  *
  * Normally started by scripts/verify-bug-sweep.sh. To run it alone, pass these env vars:
  *   BASE_URL     backend URL, default http://localhost:4000

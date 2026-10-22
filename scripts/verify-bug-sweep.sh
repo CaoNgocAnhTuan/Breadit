@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Replays the curl checks of the pre-thesis bug sweep against a RUNNING backend.
-# Plan: .docs/works/21-10-bugs-sweep-pre-thesis.md
+# Plan: .docs/works/2026-10-21-bugs-sweep/plan.md
 #
 # Every FIX row asserts the behaviour we want AFTER the fix, so on the old code
 # those rows print FAIL. The "still works" rows (W..) must PASS before and after.

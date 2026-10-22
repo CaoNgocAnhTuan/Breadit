@@ -2,7 +2,7 @@
 
 2026-10-21 · branch `test-app` · baseline tag `v1-prethesis` (commit `6f7b884`)
 
-All known bugs of the pre-thesis app, in one place: what was **resolved**, what is **still open**, and **which to fix first**. It replaces the two older files `Pre-thesis check.md` and `prethesis-corrections.md`. The run that tested every finding is in [Pre-thesis verify.md](Pre-thesis%20verify.md). The fix plan is [works/21-10-bugs-sweep-pre-thesis.md](works/21-10-bugs-sweep-pre-thesis.md).
+All known bugs of the pre-thesis app, in one place: what was **resolved**, what is **still open**, and **which to fix first**. It replaces the two older files `Pre-thesis check.md` and `prethesis-corrections.md`. The run that tested every finding is in [Pre-thesis verify.md](Pre-thesis%20verify.md). The fix plan is [works/2026-10-21-bugs-sweep/plan.md](works/2026-10-21-bugs-sweep/plan.md).
 
 How the report was made: first I read the code and listed 26 suspected problems. Then I ran the whole system (curl, Socket.IO scripts, Chrome) and tested them. The run confirmed 25 and half confirmed 1, and found 10 new ones, so the review has **36 findings**. During the fixes I found 6 more small items (R1–R6). IDs: **T** = on the thesis path, **S** = security, **B** = other bugs, **N** = new in the run, **R** = found during the fixes.
 
@@ -20,7 +20,7 @@ How the report was made: first I read the code and listed 26 suspected problems.
 Open items by priority: **P1 = 6, P2 = 6, P3 = 8, P4 = 8.** What the levels mean is in section 2.
 
 The fixes were checked like this:
-- The same curl script ran on the unfixed code (**42 passed, 53 failed**) and on the final code on a freshly seeded database (**95 passed, 0 failed**). Output: [works/21-10-bugs-sweep-before.txt](works/21-10-bugs-sweep-before.txt) and [works/21-10-bugs-sweep-after.txt](works/21-10-bugs-sweep-after.txt).
+- The same curl script ran on the unfixed code (**42 passed, 53 failed**) and on the final code on a freshly seeded database (**95 passed, 0 failed**). Output: [works/2026-10-21-bugs-sweep/sweep-before.txt](works/2026-10-21-bugs-sweep/sweep-before.txt) and [works/2026-10-21-bugs-sweep/sweep-after.txt](works/2026-10-21-bugs-sweep/sweep-after.txt).
 - 99 unit tests and 108 integration tests pass. Each fix started with a test that failed.
 - In Chrome: B4, T1 and T8 were confirmed in the UI. A sweep of 26 page checks gave the expected status codes.
 
@@ -30,7 +30,7 @@ The fixes were checked like this:
 
 | Level | Meaning | When to fix |
 |---|---|---|
-| **P1** | On the thesis path. It changes thesis results or a thesis phase needs it. | Inside the phase named in the row (P2, P6 or E7 of the super plan). |
+| **P1** | On the thesis path. It changes thesis results or a thesis phase needs it. | Inside the phase named in the row (P6 or E7 of the super plan). T6 is the exception: its schema migration was cut from the super plan (v0.2, §9). |
 | **P2** | Security or data loss. Harmless on one local machine. | **Before** anyone else uses the app: a demo on a shared server, or any deploy. |
 | **P3** | A bug that users see: wrong or broken behavior. | When time allows. |
 | **P4** | Small wrong behavior, cleanup or performance. | Last. |
@@ -38,7 +38,7 @@ The fixes were checked like this:
 Effort guess: **XS** under 30 min, **S** under 2 hours, **M** half a day, **L** over a day.
 
 **Suggested order**
-1. **By thesis phase:** T6 in **P2**. Then T4, T3, B6, R2 in **P6** (with the decision D1). Then N6 in **E7**.
+1. **By thesis phase:** T4, T3, B6, R2 in **P6** (with the decision D1). Then N6 in **E7**. T6 waits for the schema migration, which the super plan cut (v0.2, §9); the social feed counts distinct followees instead.
 2. **Before sharing the app:** S5 (HTTP part), B1, S4, S6, B5, R3.
 3. **Quick wins** (each XS or S, about half a day together): B9, B10, B2, R1, N8, B1, S5, N7.
 4. The rest of P3 and P4.
@@ -53,7 +53,7 @@ Code locations use function and file names, because line numbers moved during th
 
 | ID | Problem and effect | Evidence from the run | How to fix | Effort |
 |---|---|---|---|---|
-| **T6** | `interactions.service.ts` (like, save) and `users.service.ts` (follow) do "check, then write" and the tables have no unique key. Two fast requests make duplicate rows and wrong counts. Until fixed, `\|F_u\|` in the trust formula counts duplicates twice. | 6 parallel likes made 6 rows. 6 parallel follows made 6 rows, and one unfollow left 5. **The clean seed already has duplicates:** 53 like pairs (54 extra rows), 45 follow pairs (48 extra), 3 saved pairs (3 extra). | **P2 migration** (in the plan): delete duplicates (keep the lowest `id`), add unique keys, add a CHECK against self-follow. The toggles must catch the unique-key error. The seed is a ready test for the migration. | M |
+| **T6** | `interactions.service.ts` (like, save) and `users.service.ts` (follow) do "check, then write" and the tables have no unique key. Two fast requests make duplicate rows and wrong counts. Until fixed, `\|F_u\|` in the trust formula counts duplicates twice. | 6 parallel likes made 6 rows. 6 parallel follows made 6 rows, and one unfollow left 5. **The clean seed already has duplicates:** 53 like pairs (54 extra rows), 45 follow pairs (48 extra), 3 saved pairs (3 extra). | **The schema migration** (cut from the super plan in v0.2, kept in its §9): delete duplicates (keep the lowest `id`), add unique keys, add a CHECK against self-follow. The toggles must catch the unique-key error. The seed is a ready test for the migration. | M |
 | **T4** | Explore uses `Date.now()` for the 7-day window and for age (`posts.service.ts`, Explore branch). The same request gives a different order later, so it cannot be replayed at a past time. | The same Explore page 1 gave `nextCursor` `699:557`, and about ten minutes later `696:557`. | **P6** (in the plan): move the score into `ranking/core` and pass `asOf` as an argument. | M |
 | **T3** | The feed cache lives 10 s and is keyed by the `v:user` counter. Creating or deleting a post, like, repost and comment never change that counter, so a new post can be missing from the feed for up to 10 s. | bob's feed was empty. After he posted, the same call still returned 0 posts, while the profile feed showed it. 11 s later it was there. In Chrome the compose box cleared but the post did not show. With the cache off it showed at once. | Bump `v:user` of the author on create and delete (and on interactions), or skip the cache for the viewer's own feed. **P6/E7:** run the parity test with `REDIS_HTTP_CACHE_ENABLED=false`, and say in E7 whether the cache is on. | S |
 | **N6** | The rate limit (1,000 per minute, `app.module.ts`) is counted **per route** per IP and is hard-coded. The Next server calls from one IP, so all its users share each counter. It is the likely cause of the 71% failures in the old k6 file (not proven: that file stores no status codes). | After 1,300 calls to `/api/posts`, that route gave 429, while `/api/search`, `/api/hashtags/trending` and `/api/communities` gave 200. | **E7** (in the plan): make the limit an env variable. A k6 run counts only if `http_req_failed` is 0. | S |
@@ -76,7 +76,7 @@ Code locations use function and file names, because line numbers moved during th
 | ID | Problem and effect | Evidence from the run | How to fix | Effort |
 |---|---|---|---|---|
 | **N2** | `findByPost` in `comments.service.ts` has no block filter. A blocked user's comment is still shown to the person who blocked them. | carol blocked dave. On bob's post, carol still saw dave's comment. | Filter by `blockService.getAllBlockedPeerIds`, replies included. | S |
-| **N3** | `findOrCreateConversation` checks, then creates, with no unique pair. Parallel requests make duplicate threads. | 5 parallel creates made 5 conversations. DM search returned the same person 4 times. | A unique pair key with an upsert (fits the P2 migration), or a lock. | M |
+| **N3** | `findOrCreateConversation` checks, then creates, with no unique pair. Parallel requests make duplicate threads. | 5 parallel creates made 5 conversations. DM search returned the same person 4 times. | A unique pair key with an upsert (fits the schema migration), or a lock. | M |
 | **N5** | `Post.tsx` wraps the post text in a link to the status page, and `RichText.tsx` puts a link for each `@mention` inside it: `<a>` inside `<a>`. React logs a hydration error and rebuilds the tree on the client. | Chrome console: "In HTML, `<a>` cannot be a descendant of `<a>`" and "Hydration failed…", on a post with mentions. | Do not wrap the text in a link. Make the card clickable another way. | S |
 | **B2** | The community slug has no format rule. Spaces, `/` or capitals break `/c/<slug>` links. | Slug `Has Space/And Slash` was created (201). | `@Matches(/^[a-z0-9-]{3,30}$/)` in the DTO. | XS |
 | **B7** | `getTrending` counts tags of community posts (and, from code, deleted posts) and is not cached. Trending numbers are wrong. | Reported vs real: music 38 vs 16, photography 36 vs 12, books 36 vs 13, productivity 133 vs 113, coffee 82 vs 62. | Count only live root posts outside communities (a join or a raw query). Cache it for a minute. | S–M |
@@ -92,9 +92,9 @@ Code locations use function and file names, because line numbers moved during th
 | **B9** | The "Explore" menu item links to `/`, not `/?feed=explore` (`LeftBar.tsx`). | In the page HTML, Explore, Homepage and More all link to `/`. | Change the `href`. | XS |
 | **B10** | `GET messages` sets `lastReadAt` but does not clear the `dm:unreadCount` cache (60 s). | After `GET messages` the list showed `unread:2` while `unread-count` said 1. | Delete the cache key in `getMessages`. | XS |
 | **N7** | Small API mistakes: an unknown profile name returns 200 with an empty list, `%` in search works as a wildcard, and an empty search returns no `communities` key. | `GET /api/users/user1_nope/posts` gave 200. `q=%` returned 5 posts. `q=` returned only `hashtags`, `posts`, `users`. | Return 404, escape `%` and `_`, keep one response shape. | S |
-| **N9** | Every new follow row sends a notification, so follow, unfollow, follow again repeats it. | bob had 8 FOLLOW notifications from 3 people (6 from alice's parallel requests). | Skip the notification if one from the same actor already exists. Easier after P2. | S |
-| **N10** | One user can report the same post many times, and each report notifies every admin. | carol's two reports on one post made 2 rows and 2 notifications. | Unique key on (reporter, post) with an upsert (fits the P2 migration). | S |
-| **R4** | Dead code and unused config: the `Account` and `Session` models, `Post.parentPostId` and its relation (queries still filter `parentPostId: null`), the `resend` npm package, the env names `STORAGE_DRIVER`, `RESEND_API_KEY` and `EMAIL_FROM`, and frontend lint warnings (unused variables in six components). | From code and `npm run lint` (warnings only, 0 errors). | Remove them. The schema parts belong in the P2 migration. | S–M |
+| **N9** | Every new follow row sends a notification, so follow, unfollow, follow again repeats it. | bob had 8 FOLLOW notifications from 3 people (6 from alice's parallel requests). | Skip the notification if one from the same actor already exists. Easier after the schema migration. | S |
+| **N10** | One user can report the same post many times, and each report notifies every admin. | carol's two reports on one post made 2 rows and 2 notifications. | Unique key on (reporter, post) with an upsert (fits the schema migration). | S |
+| **R4** | Dead code and unused config: the `Account` and `Session` models, `Post.parentPostId` and its relation (queries still filter `parentPostId: null`), the `resend` npm package, the env names `STORAGE_DRIVER`, `RESEND_API_KEY` and `EMAIL_FROM`, and frontend lint warnings (unused variables in six components). | From code and `npm run lint` (warnings only, 0 errors). | Remove them. The schema parts belong in the schema migration. | S–M |
 | **R5** | `getConnectUsers` builds the whole user list in memory and slices it. Fine now, slow at 5,000 users. | Code only. The connect list had 9 pages for 107 users. | Page in the database. | M |
 
 ---
@@ -150,7 +150,7 @@ The 14 findings below are fixed on `test-app`. "Where" is the code at the tag `v
 
 | Phase | Bugs |
 |---|---|
-| **P2** (schema) | T6, and with the same migration: N3, N10, R4 (schema part) |
+| **Schema migration** (cut from the super plan in v0.2, §9) | T6, and with the same migration: N3, N10, R4 (schema part) |
 | **P6** (hybrid scorer) | T4, T3, B6, R2, and the decision D1 |
 | **E7** (cost run) | N6, and T3 (say if the cache is on) |
 | **Before sharing the app** | S5, B1, S4, S6, B5, R3, R6 |
