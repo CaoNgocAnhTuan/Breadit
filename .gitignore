@@ -53,3 +53,8 @@ apps/frontend/public/uploads/*
 !apps/frontend/public/uploads/.gitkeep
 
 /Latex/docx/
+
+# Claude Code harness: local state (active task, backend pid and log) and personal settings
+.claude/state/*
+!.claude/state/.gitkeep
+.claude/settings.local.json

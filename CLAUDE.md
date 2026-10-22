@@ -24,6 +24,17 @@ The author reads English as a second language (upper-intermediate). This applies
 - Brainstorming: one recommendation, at most two other options, then one question.
 - Existing docs are not rewritten unless asked.
 
+## Workflow
+
+Every feature, super-plan item or bug fix goes through three approvals before any code. Each task is one folder `.docs/works/YYYY-MM-DD-<slug>/`.
+
+1. `/task <item>` or `/bugfix <ID>` investigates and writes `spec.md`. The author reviews it and types `/approve`.
+2. `/design` starts the `designer` agent (Opus), which writes `design.md`. Then `/approve`.
+3. `/plan` writes `plan.md`. Then `/approve`. Approving the plan also approves the commits it lists.
+4. `/implement` does the plan steps test first, ticks them, fills the Result section and closes the task.
+
+Only the author runs `/approve` and `/freeze`. The hooks in `.claude/hooks/` enforce the rest: code edits ask the author unless the active task's plan is approved, `docs/`, `Latex/`, `.env` and committed migrations cannot be edited, and commits go on `test-app` only. Other commands: `/verify`, `/run-safe`. See `.claude/README.md` for the full map.
+
 ## Commands
 
 Root `npm run dev|build|start|lint|typecheck` only targets the **frontend**. Use `-w @breadit/backend` for the backend.
