@@ -7,6 +7,7 @@ Working notes for P1. Not thesis text.
 | Ref | Short name | Type | Verified | Read | Opened | Cited in |
 |---|---|---|---|---|---|---|
 | [1] | Social recommendation review (Tang 2013) | survey | verified | abstract only | 2026-10-24 | not cited |
+| [2] | SoRec (Ma 2008) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [5] | RealGraph (Kamath 2014) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [7] | Twitter blog (2023) | blog | do not cite, use [6] | index record | 2026-10-24 | not cited |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
@@ -23,7 +24,7 @@ Working notes for P1. Not thesis text.
 - PDF tool: PDFKit through the compiled `pdftxt` (Swift 5.9.2, source `.docs/works/2026-10-23-p1-literature/pdftxt.swift`, built with `swiftc -framework PDFKit`), tested on [5] (title, authors and the first sentence of the abstract read well) and on [25] (authors and abstract read well, a table and the text of page 3 come out in the right order; the title lost its spaces and PDFKit printed one "CoreGraphics PDF has logged an error" line), 2026-10-24, pass.
 - Tools that failed:
   - `swift pdftxt.swift` (interpreted): fails with "Symbols not found: PDFDocument", so the tool is compiled.
-- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [16] Cañamares 2020 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
+- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [2] Ma 2008 (ACM 403, repository needs a login), [16] Cañamares 2020 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
 
 ## 4. Core papers
 
@@ -39,7 +40,17 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - For us: Chapter 2 background on social recommendation and D2 (users with no history). The abstract names no trust formula, hop count or cold-start result, so it supports no decision.
 - Cited in: not cited
 
-### [5] RealGraph (Kamath 2014)
+### [2] SoRec (Ma 2008)
+#### Reading guide
+Could not be opened on 2026-10-24. This guide is from the abstract only.
+1. How does SoRec use the social network together with the rating records, and which factors do the two sources share?
+2. How is the strength of a social link between two users defined or normalised?
+3. How well does it do for users with few or no ratings, compared with the methods it is tested against?
+
+- Opened: 2026-10-24, abstract only [Semantic Scholar record of DOI 10.1145/1458082.1458205; the ACM page answered 403 and the University of Galway repository copy needs a login, so no full text was read]
+- Says: SoRec is a rating-prediction method by Hao Ma, Haixuan Yang, Michael R. Lyu and Irwin King (CIKM 2008). The abstract says it is a factor analysis approach based on probabilistic matrix factorization that uses both the users' social network and their rating records, that it scales linearly with the number of observations, and that it helps most when users have made few or no ratings.
+- For us: D1 (trust) and D2 (users with no history). The abstract gives no link formula, no data set and no numbers, so it supports no decision.
+- Cited in: not cited
 #### Reading guide
 - Read: the abstract, §1, §2.1 to §2.3, §3.1 and §3.2. Skip: §4 (related work).
 1. How does the paper define the weight of an edge between two users: a count of past interactions, or something else? (answer in §1)

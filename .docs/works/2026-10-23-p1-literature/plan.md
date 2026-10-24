@@ -91,10 +91,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 6: Core paper [2] SoRec (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 14` (TC14). It still reports `2 reading guides, want 5`
-- [ ] Change: add the status row and the entry with the reading guide in §4 ([2], after [1])
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 4 5 | grep -c '^TC[0-9]* PASS'` prints `3`; `part.sh 14` prints `TC14 FAIL` and the single line `3 reading guides, want 5`
-- [ ] Commit: `docs: core entry for SoRec [2]`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 14` (TC14). It still reports `2 reading guides, want 5`
+- [x] Change: add the status row and the entry with the reading guide in §4 ([2], after [1])
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 4 5 | grep -c '^TC[0-9]* PASS'` prints `3`; `part.sh 14` prints `TC14 FAIL` and the single line `3 reading guides, want 5`
+- [x] Commit: `docs: core entry for SoRec [2]`
 
 ### Step 7: Core papers [9] Sedhain and [15] Krichene and Rendle (effort S)
 
