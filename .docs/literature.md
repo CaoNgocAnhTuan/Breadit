@@ -44,6 +44,12 @@ Working notes for P1. Not thesis text.
 | [42] | X feed algorithm field experiment (Gauthier 2026) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [43] | SimClusters (Satuluri 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [44] | TwHIN (El-Kishky 2022) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [19] | Epinions and Ciao (Tang 2011) | data | verified | index record | 2026-10-24 | not cited |
+| [20] | Digg 2009 (Lerman 2009) | data | verified | index record | 2026-10-24 | not cited |
+| [21] | Significance tests (Smucker 2007) | paper | verified | index record | 2026-10-24 | not cited |
+| [22] | Holm correction (Holm 1979) | paper | verified | index record | 2026-10-24 | Ch3 (name only) |
+| [26] | PRNGs (bryc 2026) | code | verified | index record | 2026-10-24 | not cited |
+| [27] | Reproducible research (Sandve 2013) | paper | verified | index record | 2026-10-24 | not cited |
 
 ## 2. Claims
 
@@ -64,7 +70,7 @@ Working notes for P1. Not thesis text.
 - PDF tool: PDFKit through the compiled `pdftxt` (Swift 5.9.2, source `.docs/works/2026-10-23-p1-literature/pdftxt.swift`, built with `swiftc -framework PDFKit`), tested on [5] (title, authors and the first sentence of the abstract read well) and on [25] (authors and abstract read well, a table and the text of page 3 come out in the right order; the title lost its spaces and PDFKit printed one "CoreGraphics PDF has logged an error" line), 2026-10-24, pass.
 - Tools that failed:
   - `swift pdftxt.swift` (interpreted): fails with "Symbols not found: PDFDocument", so the tool is compiled.
-- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [8] Jamali 2010 (no legal copy found), [2] Ma 2008 (ACM 403, repository needs a login), [9] Sedhain 2014 (repository copy embargoed), [16] Cañamares 2020 (closed access), [28] Cestnik 1990 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
+- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [8] Jamali 2010 (no legal copy found), [2] Ma 2008 (ACM 403, repository needs a login), [9] Sedhain 2014 (repository copy embargoed), [16] Cañamares 2020 (closed access), [28] Cestnik 1990 (closed access), [21] Smucker 2007 (super-plan §5 states a finding of it), [23] Anagnostopoulos 2008 (no open copy found).
 
 ## 4. Core papers
 
@@ -388,6 +394,22 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Cited in: Ch3
 - Anchor: §2: "rather than explicitly producing these orderings we analytically derive their average".
 
+### [19] Epinions and Ciao (Tang 2011)
+- Opened: 2026-10-24, index record [Internet Archive copy of the page, snapshot 20240824170049; the live page at cse.msu.edu did not answer on 2026-10-24] · Cited in: not cited
+- Says: trust data sets crawled from the review sites Epinions and Ciao in May 2011. The Epinions data has user profiles, ratings with their time points and trust relations; only parts are released. For us: a candidate for P4; the details go to `.docs/datasets.md`, which does not exist yet because `p1-dataset-selection` has not run.
+
+### [20] Digg 2009 (Lerman 2009)
+- Opened: 2026-10-24, index record [the downloads page of Kristina Lerman at isi.edu] · Cited in: not cited
+- Says: the voting records of 3553 stories promoted to the front page of Digg over one month in 2009, each with the voter id and the vote time, plus friendship links of the voters. For us: the first candidate for P4 (super-plan, change log 0.3); the details go to `.docs/datasets.md`, which does not exist yet because `p1-dataset-selection` has not run.
+
+### [21] Significance tests (Smucker 2007)
+- Opened: 2026-10-24, index record [Crossref record of DOI 10.1145/1321440.1321528: Mark D. Smucker, James Allan and Ben Carterette, CIKM 2007, pp. 623-632] · Cited in: not cited
+- Says: "A comparison of statistical significance tests for information retrieval evaluation". Only the record was read. Super-plan §5 states a finding of this paper (little practical difference between the randomization, bootstrap and t-tests), so the full text is needed before the thesis cites it (PC9). For us: the statistics of Chapter 3.
+
+### [22] Holm correction (Holm 1979)
+- Opened: 2026-10-24, index record [OpenAlex record of DOI 10.2307/4615733: Sture Holm, Scandinavian Journal of Statistics 6, pp. 65-70; the record shows no issue number, and super-plan §10 says 6(2)] · Cited in: Ch3 (name only)
+- Says: "A simple sequentially rejective multiple test procedure", the Holm correction. Only the record was read. For us: the correction over the family method × K × bucket (super-plan §5). It is cited by name only.
+
 ### [23] Influence and correlation (Anagnostopoulos 2008)
 - Opened: 2026-10-24, index record [Crossref and OpenAlex records of DOI 10.1145/1401890.1401897]
 - Says: the records confirm the title, the three authors (Aris Anagnostopoulos, Ravi Kumar, Mohammad Mahdian), KDD 2008, pages 7-15. No full text or abstract was read, and no legal open copy was found (the Sapienza repository answered 403).
@@ -407,6 +429,14 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - For us: D5. It cuts against the plan: BL0 to BL5 are not personalised (BL0 only puts followees first) and are not tuned, so they may be weak baselines.
 - Cited in: Ch2, Ch3
 - Anchor: §1, "in the large majority of the investigated cases (6 out of 7)"; §2.2, 35 cases per algorithm.
+
+### [26] PRNGs (bryc 2026)
+- Opened: 2026-10-24, index record [github.com/bryc/code, file `jshash/PRNGs.md`, commit 88c1317ea6f9b25c153afa9c369c365fed11b482 (2026-01-31); the summary line and the speed table were read] · Cited in: not cited
+- Says: notes on JavaScript pseudorandom number generators. The page says that the best JS generators seem to be `sfc32` and `mulberry32`, with a speed table. For us: P3 and the determinism contract (seeded streams, super-plan §2).
+
+### [27] Reproducible research (Sandve 2013)
+- Opened: 2026-10-24, index record [Crossref record of DOI 10.1371/journal.pcbi.1003285: Geir Kjetil Sandve, Anton Nekrutenko, James Taylor and Eivind Hovig, PLoS Computational Biology 9(10), e1003285] · Cited in: not cited
+- Says: "Ten simple rules for reproducible computational research". Only the record was read. For us: the repro command and the reproducibility rules of Chapter 3.
 
 ## 7. Recent work (2022 or later)
 
@@ -647,3 +677,4 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | PC6 | Run the main comparison also with a larger pool (a second window W or N_max), to show that the pool does not act like a small sample. | super-plan §5 (pool), §7 | D6; [16] abstract only; [15] §4.2 | the author (P5 task; /freeze for new values) |
 | PC7 | Report the number of left-out users per history bucket, not only in total. | super-plan §5 (pool) | D6; super-plan §1 (H1 is about users with 0 to 4 earlier interactions) | the author (P5 task) |
 | PC8 | Say that [14] shows the harm of training on future interactions, and that the as-of rule for features is our own design. Super-plan §5 now cites [14] for the as-of features. | super-plan §5 (as-of features) | D6; [14], the whole text has no feature case | the author |
+| PC9 | Read [21] in full, or word the sentence of super-plan §5 about its finding (little practical difference between the randomization, bootstrap and t-tests) as a name only. Only the Crossref record of [21] was read. | super-plan §5 (statistics) | [21] index record | the author |

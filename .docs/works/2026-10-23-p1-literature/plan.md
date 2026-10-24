@@ -210,10 +210,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 22: Skim of [19], [20], [21], [22], [26] and [27] (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 2 | grep -E '^ +< '` (TC2). It prints `< 19`, `< 20`, `< 21`, `< 22`, `< 26` and `< 27`: these §10 references have no entry yet
-- [ ] Change: status rows and entries in §6. The short form of design §1.2 is allowed. [19] and [20] are two lines that point to `.docs/datasets.md`; say in the entry that this file does not exist yet, because `p1-dataset-selection` has not run. The `Cited in` value is `Ch3 (name only)` only for a standard method that the thesis names (for example [22] Holm); an `index record` can support no more than that
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 2 | grep -E '^ +< '` prints nothing (all 27 references of §10 have an entry; the `> ` lines that remain are the new references that wait for §10 in Step 24); `part.sh 3 5 18` prints three `PASS` lines (DW1)
-- [ ] Commit: `docs: skim of the remaining references`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 2 | grep -E '^ +< '` (TC2). It prints `< 19`, `< 20`, `< 21`, `< 22`, `< 26` and `< 27`: these §10 references have no entry yet
+- [x] Change: status rows and entries in §6. The short form of design §1.2 is allowed. [19] and [20] are two lines that point to `.docs/datasets.md`; say in the entry that this file does not exist yet, because `p1-dataset-selection` has not run. The `Cited in` value is `Ch3 (name only)` only for a standard method that the thesis names (for example [22] Holm); an `index record` can support no more than that
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 2 | grep -E '^ +< '` prints nothing (all 27 references of §10 have an entry; the `> ` lines that remain are the new references that wait for §10 in Step 24); `part.sh 3 5 18` prints three `PASS` lines (DW1)
+- [x] Commit: `docs: skim of the remaining references`
 
 ### Step 23: Final pass (effort S)
 
