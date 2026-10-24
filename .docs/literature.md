@@ -16,9 +16,12 @@ Working notes for P1. Not thesis text.
 | [8] | SocialMF (Jamali 2010) | paper | verified | index record | 2026-10-24 | not cited |
 | [9] | Social CF for cold start (Sedhain 2014) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [10] | Orkut communities (Chen 2009) | paper | verified | full text | 2026-10-24 | Ch2 |
+| [11] | Reddit hot sort (Reddit 2015) | code | verified | full text | 2026-10-24 | Ch3 |
+| [12] | Hacker News ranking (Shirriff 2013) | blog | verified | full text | 2026-10-24 | Ch3 |
 | [15] | Sampled metrics (Krichene 2020) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [23] | Influence and correlation (Anagnostopoulos 2008) | paper | verified | index record | 2026-10-24 | not cited |
+| [25] | Are we making progress (Ferrari Dacrema 2019) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [28] | m-estimate (Cestnik 1990) | paper | verified | index record | 2026-10-24 | Ch3 (name only) |
 | [29] | m-estimate in naive Bayes (Castellano 2020) | paper | verified | full text | 2026-10-24 | Ch3 |
 | [30] | X For You algorithm (xai-org 2026) | code | verified | full text | 2026-10-24 | not cited |
@@ -32,6 +35,7 @@ Working notes for P1. Not thesis text.
 | 4 | The form of the smoothing, (count + m × prior) / (total + m), is the m-estimate of Cestnik (1990), a known technique from classification. Using it for trust and community, and the value of `m`, are our own design. Super-plan §6 line 293 says "not a cited method". | supported | [29]: §2.4, eq. 19, p.6 (a secondary source for [28]); [28]: index record only, the paper was not read |
 | 5 | The notes decide each of the three §6 choices with evidence. Smoothing with `m` and one curve instead of three phases are decided in D2. The author term is decided in D1. | supported | D2: the form follows [29] eq. 19; the weight of the prior is `m / (N_u + m)` (algebra on eq. 19); replacing the three phases is our own design. D1: the author term is kept, by analogy with [6] lines 63-93 and [5] §1 |
 | 6 | 1 hop is our choice. A hop is one edge of the follow graph. 1 hop is partly a scope choice, because graph neural networks are out of scope (super-plan §9). [3] and [4] speak of layers, not hops. | own design | D4: [3] §3.1, §3.3.1 and Table 4 (§4.4); [4] §5.1 and Table 5; [8] is an index record and is not used |
+| 7 | BL0 to BL5 are cheap, well-known baselines, but they are not personalised (BL0 only puts followees first) and are not tuned, so [25] cuts against calling them strong. A small validation grid (PC4) and a count baseline BL6 (PC3) would make the test fairer. There is no learned baseline: the live app has no training data and there is little time, which is a limitation. | supported | [25]: §1 and §2.2; [11]: `r2/r2/lib/db/_sorts.pyx` line 59; [12]: the paragraph on the Arc code; [30]: `README.md`, Overview |
 
 ## 3. How this file was made
 
@@ -197,6 +201,26 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Feeds: super-plan §6 (`social`); the Chapter 2 argument (super-plan §9)
 - Author's note:
 
+### D5. Baselines
+- Question: Are the baselines strong enough?
+- Decides: BL4 and BL5 (§5)
+- Options: (a) BL0 to BL5 as in super-plan §5, run as they are; (b) the same baselines, with BL2, BL4 and BL5 tuned on the validation split with a small grid, plus a plain count baseline BL6; (c) add a learned baseline.
+- Evidence:
+  - [25] §1: of 18 neural methods it could reproduce 7, and in 6 of the 7 the neural method did not consistently beat simple, well-tuned baselines; in one case a most-popular recommender was best on some accuracy measures. §2.2: the baselines were tuned with a Bayesian search of 35 cases each.
+  - [11] `r2/r2/lib/db/_sorts.pyx` line 59 at commit `753b17407e9a9dca09558526805922de24133d53`: the hot score is the sign of the net votes times log10 of the larger of |net votes| and 1, plus the post time minus 1134028003 seconds, divided by 45000. This is the form of BL4.
+  - [12] the paragraph that starts "In case you don't read Arc code": the score is (votes - 1)^0.8 / (age in hours + 2)^1.8 times penalty factors, with gravity 1.8. This is the form of BL5. The penalties are ignored there (super-plan §5).
+  - [30] `README.md`, Overview: the newer release ranks all posts with a transformer.
+- Against: [25] cuts against the plan. It shows that well-tuned, simple, personalised baselines often beat new methods. BL0 to BL5 are not personalised (BL0 only puts followees first) and are not tuned, so they may be weak. [30] says the newer production ranking is a learned model, so beating hand-made scores like [11] and [12] does not show a gain over production.
+- Why no learned baseline: the live app has no training data, and there is little time. A learned social baseline (SoRec, SocialMF) is out of scope (super-plan §9). This is a limitation. "Interpretability" is a design preference, not a tested claim.
+- Tuned and not tuned: the hybrid H is tuned on the validation split (`m`, α and β in E4). BL0, BL1 and BL3 have nothing to tune. BL2, BL4 and BL5 are fixed formulas today. The proposal is a small validation grid for their time or age parameters, so that H is not the only tuned method (PC4). The grid sizes would be frozen values (super-plan §7).
+- BL6: "the number of followees who engaged, with no trust weights" is proposed as a baseline, to show what the trust weights add over a plain count (PC3).
+- Label: consistent only
+- Choice: keep BL0 to BL5, and ask for the grid (PC4) and BL6 (PC3). Consistent with [25]: tuned and simple baselines are the fair test.
+- Status: proposed change (PC3)
+- Result: BL0 to BL5 as in super-plan §5 on the same pool. If PC3 and PC4 are accepted: BL6, and a small validation grid for BL2, BL4 and BL5. No learned baseline; the limitation is named in Chapter 3.
+- Feeds: super-plan §5 (methods), super-plan §7 (grid sizes)
+- Author's note:
+
 ## 6. Other references
 
 ### [3] DiffNet (Wu 2019)
@@ -241,6 +265,20 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Anchor: §3.1: "we can recommend communities to a user based on his joined communities".
 - Against us: it recommends communities, not posts. Its evaluation ranks the withheld community among 1000 sampled ones, and [15] says sampled metrics can be inconsistent with the exact ones.
 
+### [11] Reddit hot sort (Reddit 2015)
+- Opened: 2026-10-24, full text [github.com/reddit-archive/reddit, file `r2/r2/lib/db/_sorts.pyx` read in full, commit 753b17407e9a9dca09558526805922de24133d53 (2017-10-14, "Update README for archival"); the file was last changed on 2015-08-17 (commit d990533d0b57); sha256 of the file text a2447de79fd7]
+- Says: the function `hot` (it calls `_hot`) scores a post from its net votes s = ups - downs. The vote part is the sign of s times log10 of the larger of |s| and 1. A time term is added: the post time in seconds minus 1134028003, divided by 45000. The return line is `round(sign * order + seconds / 45000, 7)` (line 59).
+- For us: D5, the formula of BL4 (likes as upvotes, no downvotes, super-plan §5). The file does not explain the offset 1134028003.
+- Cited in: Ch3
+- Anchor: `r2/r2/lib/db/_sorts.pyx`, line 59: `return round(sign * order + seconds / 45000, 7)`.
+
+### [12] Hacker News ranking (Shirriff 2013)
+- Opened: 2026-10-24, full text [righto.com page (Ken Shirriff's blog), read in full, no dated byline: the URL and the comments show November 2013, sha256 of the page 3a7ce7dac0c1]
+- Says: Hacker News scores a story as (votes - 1)^0.8 / (age in hours + 2)^1.8, times penalty factors. The formula is an image; its text is in the alt attribute of the page. The post shows Arc code with the constants gravity 1.8 and timebase 120 minutes. It describes penalties for some titles and domains, for controversy (more comments than upvotes and at least 40 comments) and for flags. The author says the real penalty system is more complex than the published code.
+- For us: D5, the formula of BL5, with penalties ignored (super-plan §5).
+- Cited in: Ch3
+- Anchor: the paragraph that starts "In case you don't read Arc code": gravity 1.8 and timebase 120.
+
 ### [16] Target item sampling (Cañamares 2020)
 - Opened: 2026-10-24, abstract only [Semantic Scholar record of DOI 10.1145/3383313.3412259; Crossref gives the same title, authors, year and pages 259-268]
 - Says: the paper studies how the choice of target set in offline evaluation changes the result of comparing recommenders. The abstract says that reduced target sets often contradict the result with large targets, and that minimum sets distort pairwise comparisons while maximum sets may not be ideal either. Super-plan §10 gives the code repository as the link. The paper itself is DOI 10.1145/3383313.3412259 (RecSys 2020).
@@ -252,6 +290,13 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Says: the records confirm the title, the three authors (Aris Anagnostopoulos, Ravi Kumar, Mohammad Mahdian), KDD 2008, pages 7-15. No full text or abstract was read, and no legal open copy was found (the Sapienza repository answered 403).
 - For us: D7 and claim 9, what W0, W1 and the timestamp shuffle can and cannot show. Without the text it supports no decision.
 - Cited in: not cited
+
+### [25] Are we making progress (Ferrari Dacrema 2019)
+- Opened: 2026-10-24, full text [arXiv 1907.06902v3, 16 Aug 2019, sha256 772fd88ba7ae]
+- Says: Maurizio Ferrari Dacrema, Paolo Cremonesi and Dietmar Jannach (RecSys 2019) tried to reproduce 18 recent neural methods for top-n recommendation and could do so for 7 (§1). In 6 of the 7 the neural method did not consistently beat simple, well-tuned baselines, and in one case even a most-popular recommender was best on some accuracy measures (§1). The baselines were TopPopular, UserKNN, ItemKNN, ItemKNN-CBF, ItemKNN-CFCBF, P3alpha and RP3beta. Each was tuned with a Bayesian search of 35 cases (§2.2).
+- For us: D5. It cuts against the plan: BL0 to BL5 are not personalised (BL0 only puts followees first) and are not tuned, so they may be weak baselines.
+- Cited in: Ch2, Ch3
+- Anchor: §1, "in the large majority of the investigated cases (6 out of 7)"; §2.2, 35 cases per algorithm.
 
 ## 7. Recent work (2022 or later)
 
@@ -283,3 +328,5 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 |---|---|---|---|---|
 | PC1 | Say that the form of the smoothing is the m-estimate, not "my own suggestion, not a cited method". Using it for trust, and the value of `m`, stay our own. Add [28] and [29] to §10 with their marks. | super-plan §6 line 293, §10 | D2; [29] §2.4 eq. 19 | the author (super-plan edit) |
 | PC2 | Decide whether trust fades with time: none, a half-life or a window. [5] decays old interactions and drops old edges; the §6 formula has none. A fade adds a parameter to super-plan §7 and a cell to E4. | super-plan §6, §7 | D1; [5] §2.1 and §2.1.1 | the author (decides; /freeze for a new value) |
+| PC3 | Add a baseline BL6: the number of followees who engaged, with no trust weights. It shows what the trust weights add over a plain count, and [25] argues for strong simple baselines. | super-plan §5 (methods) | D5; [25] §1 and §2.2 | the author (P5 task) |
+| PC4 | Give BL2, BL4 and BL5 a small validation grid for their time or age parameters, as H is tuned in E4. The grid sizes would be frozen values. | super-plan §5, §7 | D5; [25] §2.2 | the author (/freeze for new values) |

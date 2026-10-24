@@ -143,10 +143,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 13: D5 Baselines, claim 7 (effort S)
 
-- [ ] Test first: `grep -c '^### D5\.' .docs/literature.md` prints `0`, because D5 does not exist yet
-- [ ] Change: [25], [11] (code: function, file path and commit), [12]: status rows and entries in §6. D5 in §5 with the points of design §1.5: [25] cuts against the plan, why there is no learned baseline (a limitation; "interpretability" is a preference, not a tested claim), what is tuned and what is not, whether BL2, BL4 and BL5 get a small validation grid, BL6 as a PC row (add the row to §9 and use its PCn in Status), and a newer X release under `Against` if it opened in Step 9. Add the row for claim 7
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 | grep -E '^ +D5\. '` prints nothing (a `proposed change (PCn)` status has its row in §9); `grep -c '^### D5\.' .docs/literature.md` prints `1`
-- [ ] Commit: `docs: decision D5 (baselines), claim 7`
+- [x] Test first: `grep -c '^### D5\.' .docs/literature.md` prints `0`, because D5 does not exist yet
+- [x] Change: [25], [11] (code: function, file path and commit), [12]: status rows and entries in §6. D5 in §5 with the points of design §1.5: [25] cuts against the plan, why there is no learned baseline (a limitation; "interpretability" is a preference, not a tested claim), what is tuned and what is not, whether BL2, BL4 and BL5 get a small validation grid, BL6 as a PC row (add the row to §9 and use its PCn in Status), and a newer X release under `Against` if it opened in Step 9. Add the row for claim 7
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 | grep -E '^ +D5\. '` prints nothing (a `proposed change (PCn)` status has its row in §9); `grep -c '^### D5\.' .docs/literature.md` prints `1`
+- [x] Commit: `docs: decision D5 (baselines), claim 7`
 
 ### Step 14: D6 Protocol, part 1: [13] and [14] (effort S)
 
