@@ -65,14 +65,14 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 3: Status of [7], [16] and [23] (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 4` (TC4). It prints `0 of the rows [5] [7] [16] [23] found, want 4`, because the status table has no rows yet
-- [ ] Change: open each one and add its status-table row (§1) and its entry (§6, in number order):
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 4` (TC4). It prints `0 of the rows [5] [7] [16] [23] found, want 4`, because the status table has no rows yet
+- [x] Change: open each one and add its status-table row (§1) and its entry (§6, in number order):
   - [7]: the Internet Archive copy first. The gate reviewer saw snapshot 20240508043115 in the Wayback availability API; a direct fetch gave HTTP 429, so use the API or retry later. Then the blog's new address. Open it and compare it with the entry in §10. If it opens and matches: `verified`. If not: `do not cite, use [6]` (or the replacement found)
   - [16]: find the paper itself through DBLP, Crossref or an author copy. The code repository is not the paper. The result is `verified` or `do not cite, use [n]`
   - [23]: DOI page, Crossref, DBLP, then an author copy. The repository page returned 403. The result is `verified` with the real depth, or `do not cite, use [n]`
   - Each entry has `Opened:`, `Says:`, `For us:`, `Cited in:` and, for full text, `Anchor:`. A paywalled paper that shows only the abstract is `abstract only`, `not cited`, and goes on the "Needs full text" list in §3
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5` prints `TC3 PASS` and `TC5 PASS`; `part.sh 4` prints `TC4 FAIL` with the single line `3 of the rows [5] [7] [16] [23] found, want 4` (the missing row is [5], done in Step 4) and no line that contains `status:` (DW2: each of the three rows is `verified` or `do not cite, use [n]`)
-- [ ] Commit: `docs: check the status of references 7, 16 and 23`
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5` prints `TC3 PASS` and `TC5 PASS`; `part.sh 4` prints `TC4 FAIL` with the single line `3 of the rows [5] [7] [16] [23] found, want 4` (the missing row is [5], done in Step 4) and no line that contains `status:` (DW2: each of the three rows is `verified` or `do not cite, use [n]`)
+- [x] Commit: `docs: check the status of references 7, 16 and 23`
 
 ### Step 4: Core paper [5] RealGraph, claim 2 (effort S)
 
