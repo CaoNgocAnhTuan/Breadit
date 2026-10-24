@@ -179,10 +179,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 18: Search: cited-by chasing (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep 'cited-by'` prints three lines (`[2]`, `[5]`, `[9]`)
-- [ ] Change: for [2], [5] and [9]: list the papers from 2022 or later that cite them (the Semantic Scholar citations list, or "Cited by" in Google Scholar by hand). Read the titles and abstracts. One log row per source paper (`cited-by [n]`) with how many papers were looked at. Add the picks as in Step 17. Write the inclusion and stop rules (design §1.8) under the log
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep 'cited-by'` prints nothing; `part.sh 3 5 18` prints three `PASS` lines; `part.sh 7 | grep -E 'no DOI|older than|not verified|no \(\.\.\.'` prints nothing
-- [ ] Commit: `docs: cited-by chasing from references 2, 5 and 9`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep 'cited-by'` prints three lines (`[2]`, `[5]`, `[9]`)
+- [x] Change: for [2], [5] and [9]: list the papers from 2022 or later that cite them (the Semantic Scholar citations list, or "Cited by" in Google Scholar by hand). Read the titles and abstracts. One log row per source paper (`cited-by [n]`) with how many papers were looked at. Add the picks as in Step 17. Write the inclusion and stop rules (design §1.8) under the log
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep 'cited-by'` prints nothing; `part.sh 3 5 18` prints three `PASS` lines; `part.sh 7 | grep -E 'no DOI|older than|not verified|no \(\.\.\.'` prints nothing
+- [x] Commit: `docs: cited-by chasing from references 2, 5 and 9`
 
 ### Step 19: Search: groups 1 and 2 (effort S)
 

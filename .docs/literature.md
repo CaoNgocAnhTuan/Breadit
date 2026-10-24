@@ -33,6 +33,9 @@ Working notes for P1. Not thesis text.
 | [31] | SocRipple (Jaspal 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [32] | Community by Design (Weyl 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [33] | Interaction strength (Zhou 2024) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [34] | Community-aware community recommendation (Jiang 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [35] | Social trust and recommender performance (Dadgar 2022) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [36] | Social media visibility simulation (Akpinar 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
 
 ## 2. Claims
 
@@ -415,6 +418,17 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | 2026-10-24 | WebSearch | Q6: cold-start social recommendation followee engagement community heuristic | 9 | [31] |
 | 2026-10-24 | OpenAlex | Q6: cold-start social recommendation followee engagement community heuristic | 6 | none |
 | 2026-10-24 | journal page | follow-up check of a lead from the Q4 and Q5 runs (Zhou et al. 2024, interaction strength and group participation) | 1 | [33] |
+| 2026-10-24 | OpenAlex | cited-by [2] | 315 | [34], [35] |
+| 2026-10-24 | OpenAlex | cited-by [5] | 0 | none |
+| 2026-10-24 | OpenAlex | cited-by [9] | 32 | none |
+| 2026-10-24 | Semantic Scholar | cited-by [5] | 6 | [36] |
+
+### Inclusion and stop rules
+
+- Inclusion: published in 2022 or later; peer-reviewed, or an arXiv preprint (marked "preprint" in its entry); it fits one of four groups (1 social recommendation, 2 social cold start, 3 follow-graph feed ranking, 4 audits of feed algorithms) and the entry can say what it means for us; it has a DOI or an arXiv link, and its record or page was opened and the title, authors, year and venue match.
+- Not included: papers about LLM user profiles, graph neural network papers beyond what D4 needs, and anything seen only in a search snippet. No reference is written from memory.
+- Stop: a group stops after two queries in a row add nothing new, or when it has 3 picks. The whole search stops at 12 picks, and at least half must be from 2024 or later. If the total is below 8, the other groups go on and the cap of 3 per group no longer applies.
+- How the search ran: Haiku agents ran the queries and opened the records, and Claude checked every pick against Crossref, arXiv or the journal page. WebSearch results were mostly vendor pages, blogs and older material; the picks come from OpenAlex, Semantic Scholar, Crossref and arXiv records. OpenAlex has no record of [5].
 
 ### [31] SocRipple (Jaspal 2025)
 - Link: https://arxiv.org/abs/2508.07241
@@ -437,6 +451,28 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - For us: Group 1 (social recommendation). It is the closest idea to C2 that the search found (interaction strength plus group participation). It predicts ratings with a learned model. It does not rank posts and has no engagement score.
 - Cited in: not cited
 
+
+### [34] Community-aware community recommendation (Jiang 2025)
+- Link: https://doi.org/10.1145/3746252.3761373
+- Preprint: https://arxiv.org/abs/2508.05107
+- Opened: 2026-10-24, abstract only [Crossref record of the CIKM 2025 paper; the arXiv version 2508.05107 has the same title and authors]
+- Says: Runhao Jiang, Renchi Yang and Wenqing Lin (CIKM 2025). The abstract says that social recommendation models are made for regular items and largely fail for community recommendation, because they overlook that communities are made of dynamic individuals with rich structure in the social network. The paper uses this information to recommend communities (abstract).
+- For us: Group 1. It recommends communities, not posts, and has no engagement score. It reaches [2] through the citation list.
+- Cited in: not cited
+
+### [35] Social trust and recommender performance (Dadgar 2022)
+- Link: https://doi.org/10.1109/access.2022.3147955
+- Opened: 2026-10-24, abstract only [Crossref record of the IEEE Access paper]
+- Says: Masoud Dadgar and Ali Hamzeh (IEEE Access, 2022) propose a similarity measure and a simple link-prediction method for social trust, used in trust-aware matrix factorization against the cold-start and sparsity problems. The similarity measure is asymmetric, to follow the nature of social relationships (abstract).
+- For us: Group 1. A directed trust measure like our follow trust, but learned in a matrix factorization for rating prediction. It has no engagement score and no community signal.
+- Cited in: not cited
+
+### [36] Social media visibility simulation (Akpinar 2025)
+- Link: https://doi.org/10.1007/s11229-025-05293-z
+- Opened: 2026-10-24, abstract only [Crossref record of the Synthese paper]
+- Says: Nil-Jana Akpinar and Sina Fazelpour (Synthese, 2025) use agent-based simulations to study how components of a widely used recommendation algorithm shape the professional visibility of researchers from minority groups. They find that these algorithms disproportionately harm the visibility of such researchers (abstract). It reaches [5] through the citation list.
+- For us: Group 4 and D7. A simulation study of a feed algorithm, close to our use of synthetic worlds. It is about visibility and exclusion, not about ranking quality.
+- Cited in: not cited
 
 ## 8. Older neighbours and other added references
 
