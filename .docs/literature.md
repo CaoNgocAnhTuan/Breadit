@@ -45,7 +45,7 @@ Working notes for P1. Not thesis text.
 | [43] | SimClusters (Satuluri 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [44] | TwHIN (El-Kishky 2022) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [19] | Epinions and Ciao (Tang 2011) | data | verified | index record | 2026-10-24 | not cited |
-| [20] | Digg 2009 (Lerman 2009) | data | verified | index record | 2026-10-24 | not cited |
+| [20] | Digg data (Lerman 2009) | data | verified | index record | 2026-10-24 | not cited |
 | [21] | Significance tests (Smucker 2007) | paper | verified | index record | 2026-10-24 | not cited |
 | [22] | Holm correction (Holm 1979) | paper | verified | index record | 2026-10-24 | Ch3 (name only) |
 | [26] | PRNGs (bryc 2026) | code | verified | index record | 2026-10-24 | not cited |
@@ -55,6 +55,7 @@ Working notes for P1. Not thesis text.
 
 | # | Claim | Status | Evidence |
 |---|---|---|---|
+| 1 | Each of the 44 references says what its entry says, and each entry records how it was read (full text, abstract only or index record) and when. | supported | the status table (§1) has one row per reference with the depth and the date. The quotes of the Haiku extracts were checked against the extracted text with `checkquotes.py`. The spot checks of Step 25 are still to be done and may change this status |
 | 2 | RealGraph gives directed edge weights between users, learned from past interaction data. The weight is the predicted probability of a future interaction, not a count of past interactions. Super-plan §6 line 294 says "past interaction", which is looser. | supported | [5]: §1 defines the weight as the probability of an interaction from the source to the destination user in the future; §2.2 trains a logistic regression with a binary label on edge and user features; §3.1 gives the AUC per feature group. D1 uses this; Step 24 changes the wording of super-plan §6 line 294 |
 | 3 | In the 2023 release at commit `ef4c5eb65e6e04fac4f0e1fa8bbeff56b75c1f98`, home-mixer reads each viewer's RealGraph scores for followed users (top 1000 by score) and attaches the RealGraph edge features of the pair (viewer, author) to each tweet candidate. The files show these as inputs (features); they do not show how a ranker weights them. The newer release [30] has no RealGraph file and ranks with a transformer. | supported | [6]: `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphInNetworkScoresQueryFeatureHydrator.scala`, lines 26-40; `home-mixer/server/src/main/scala/com/twitter/home_mixer/store/RealGraphInNetworkScoresStore.scala`, line 18; `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphViewerAuthorFeatureHydrator.scala`, lines 27-31 and 63-93; [30]: README, Overview |
 | 4 | The form of the smoothing, (count + m × prior) / (total + m), is the m-estimate of Cestnik (1990), a known technique from classification. Using it for trust and community, and the value of `m`, are our own design. Super-plan §6 line 293 says "not a cited method". | supported | [29]: §2.4, eq. 19, p.6 (a secondary source for [28]); [28]: index record only, the paper was not read |
@@ -70,7 +71,11 @@ Working notes for P1. Not thesis text.
 - PDF tool: PDFKit through the compiled `pdftxt` (Swift 5.9.2, source `.docs/works/2026-10-23-p1-literature/pdftxt.swift`, built with `swiftc -framework PDFKit`), tested on [5] (title, authors and the first sentence of the abstract read well) and on [25] (authors and abstract read well, a table and the text of page 3 come out in the right order; the title lost its spaces and PDFKit printed one "CoreGraphics PDF has logged an error" line), 2026-10-24, pass.
 - Tools that failed:
   - `swift pdftxt.swift` (interpreted): fails with "Symbols not found: PDFDocument", so the tool is compiled.
-- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [8] Jamali 2010 (no legal copy found), [2] Ma 2008 (ACM 403, repository needs a login), [9] Sedhain 2014 (repository copy embargoed), [16] Cañamares 2020 (closed access), [28] Cestnik 1990 (closed access), [21] Smucker 2007 (super-plan §5 states a finding of it), [23] Anagnostopoulos 2008 (no open copy found).
+- Index sources used to verify: Crossref (`api.crossref.org`), OpenAlex (`api.openalex.org`), the arXiv abstract pages, Semantic Scholar, the journal page of [33], GitHub (commits and raw files), and the Internet Archive (for [19]). DBLP and the ACM Digital Library answered with a bot check or 403, so they were not used. No unofficial copy was used.
+- Rules (design §1.3): a reference is `verified` only after its record or page was opened and the details match. A cited row must be `verified` and not `abstract only`. An `index record` supports a name-only citation, never a finding. Read is one of `full text`, `abstract only` and `index record`, and it agrees with the Opened line. A decision that rests on an abstract-only source says so in its Label.
+- Haiku extracts: Haiku agents read most sources and ran the searches; Claude checked every quote with `checkquotes.py` against the extracted text, every PDF with `file` and `shasum`, and every pick of §7 against Crossref, arXiv or the journal page. The extracts are in `.docs/works/2026-10-23-p1-literature/extracts/`.
+- Spot checks: Step 25 (the author).
+- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [8] Jamali 2010 (no legal copy found), [2] Ma 2008 (ACM 403, repository needs a login), [9] Sedhain 2014 (repository copy embargoed), [16] Cañamares 2020 (closed access), [28] Cestnik 1990 (closed access), [21] Smucker 2007 (super-plan §5 states a finding of it), [23] Anagnostopoulos 2008 (no open copy found), [7] Twitter blog 2023 (the Internet Archive answered 429; Step 24 tries again).
 
 ## 4. Core papers
 
@@ -157,7 +162,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Fade over time: options are none, a half-life or a window. The §6 formula has none. [5] decays old interactions (§2.1) and drops old edges, so [5] cuts against "none". The core formula keeps no fade, to avoid a new parameter that super-plan §7 does not hold. PC2 puts the question to the author.
 - Author term (DW5): a post by a followee that nobody has engaged with yet gets no score from the friends' sum, so the term `[u follows author(p)] · trust(u, author(p), t)` is kept. [6] also feeds the viewer-author pair to its ranker for every candidate (lines 63-93). E4 shows what the term adds.
 - Claims 2 and 3: [5] says "probability of a future interaction", not "past interaction", so the super-plan wording is looser (claim 2; Step 24 changes line 294). The code of [6] shows features, not weights (claim 3, §2).
-- Against: [5] decays old interactions and learns its weight; ours does not decay and is a plain smoothed count, so we may say "in the spirit of RealGraph", not "like RealGraph". [30] ranks with a transformer and has no RealGraph file, so production may have moved to a learned model.
+- Against: [5] decays old interactions and learns its weight; ours does not decay and is a plain smoothed count, so we may say "in the spirit of RealGraph", not "like RealGraph". [30] ranks with a transformer and has no RealGraph file, so production may have moved to a learned model. The search of §7 found recent work that learns the weight between users ([33], [35], abstract only) or re-weights the followed accounts for another goal ([39], abstract only); none of it uses a smoothed count of past engagement.
 - Label: by analogy (abstract only)
 - Choice: option (a), with the author term. By analogy with [5] for weighting a directed user pair by past interaction, and with [6] for using the (viewer, author) pair as an input for every candidate. No fade in the core formula.
 - Status: proposed change (PC2)
@@ -184,7 +189,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | support | the outcomes cover all n events, so the estimates sum to 1 | the prior covers followees only, but N_u also counts positives on other posts, so trust summed over followees is at most 1 |
 
   The same holds for `community`, whose prior covers only u's communities. [29] is a classification paper, so the comparison is by analogy.
-- Against: [29] p.9: Cestnik gave no recommended value of m, so `m` has no value from theory and must be swept (E4). [29] p.2: the original experiments were very small (four data sets, no added noise). [29] is about class probabilities in a classifier, not about ranking posts. [9] (abstract only): page likes beat a friend-based recommender for users with no history, so friend-based trust may help less than hoped.
+- Against: [29] p.9: Cestnik gave no recommended value of m, so `m` has no value from theory and must be swept (E4). [29] p.2: the original experiments were very small (four data sets, no added noise). [29] is about class probabilities in a classifier, not about ranking posts. [9] (abstract only): page likes beat a friend-based recommender for users with no history, so friend-based trust may help less than hoped. [37] (abstract only) says item ratings are more influential than trust in collaborative filtering, so trust-based smoothing may help less than hoped. [31] and [38] (abstract only) are recent cold-start work that uses social signals; both are learned models.
 - Label: by analogy (abstract only)
 - Choice: option (a), one curve and no phases. By analogy with [29] for the form. The value of `m` is not cited, and replacing the three phases by one curve is our own design.
 - Status: proposed change (PC1)
@@ -200,7 +205,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
   - [10] §3.1: communities are recommended "based on his joined communities", so membership is the only input. §3.2: it enters as 1 (join) or 0 (not join). §6: counts of other activity are left as future work.
   - [10] §5.1.1: the data has 492,104 users and 118,002 communities. The abstract: LDA is better for lists of 4 or more communities, and ARM is a bit better for up to 3.
   - [10] has no friend data and no posts.
-- Against: [10] recommends communities, not posts, so it says nothing about a post ranking. Its evaluation ranks the withheld community among 1000 sampled ones (§5.1.2); [15] §4.2 says that sampled metrics can be inconsistent with the exact ones. [10] is Orkut data of one period and one language (§5.1.1).
+- Against: [10] recommends communities, not posts, so it says nothing about a post ranking. Its evaluation ranks the withheld community among 1000 sampled ones (§5.1.2); [15] §4.2 says that sampled metrics can be inconsistent with the exact ones. [10] is Orkut data of one period and one language (§5.1.1). [34] (abstract only) recommends communities, not posts, and says social recommendation models made for regular items fail for communities. [32] (abstract only) is a design proposal with no test.
 - Pool effect: today community posts are excluded from home and Explore (super-plan §3). The shared pool lets approved community posts in (super-plan §5), so two effects mix: the pool itself changes, and the community term acts on it. This affects every comparison of numbers across pool definitions, for example production BL2 against the BL2 of the evaluation. It does not affect comparisons inside one pool (H against BL2, H against H-follow), which all rank the same pool.
 - Strength: weak
 - Label: by analogy
@@ -219,9 +224,9 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
   - [3] §3.1: each user embedding is mixed with the embeddings of the users it trusts, for K steps (layers). §3.3.1 and Table 4 (§4.4): K = 2 is best on Yelp and Flickr. On HR@10, K = 1 is 2.50% (Yelp) and 2.96% (Flickr) below K = 2, and K = 3 drops again. The paper sets K = 2 (§4.1). The NDCG value printed for Yelp with K = 1 looks like a typo, so only HR@10 is used.
   - [4] §5.1 and Table 5: oversmoothing is listed as a known issue of GCN and graph attention encoders. §5.4 only defines K as the number of layers. The survey gives no best number of layers.
   - [8] index record: only the title was seen (trust propagation), so it is not used.
-- Against: in [3], 2 layers beat 1 by about 3% on HR@10 on two data sets, so 1 hop leaves a gain unused in that setting. The comparison is by analogy, because [3] learns embeddings and our trust is a heuristic count.
+- Against: in [3] §4.4, 2 layers beat 1 by about 3% on HR@10 on two data sets, so 1 hop leaves a gain unused in that setting. The comparison is by analogy, because [3] learns embeddings and our trust is a heuristic count. The search of §7 was not aimed at hops: it found no recent paper that compares 1 and 2 hops for a heuristic score.
 - Scope: 1 hop is partly a scope choice. Graph neural networks such as [3] are out of scope (super-plan §9). A 2-hop heuristic needs a rule for the trust of a friend of a friend, and no source in this file gives one.
-- Chapter 2 argument: we use 1 hop. In [3], 2 diffusion layers beat 1 by about 3% on HR@10, but that model learns embeddings, and [4] names oversmoothing as a known issue of deeper encoders. Our trust is a heuristic count. A learned diffusion is out of scope, so 2 hops are named as a limitation and as future work.
+- Chapter 2 argument: we use 1 hop. In [3] §4.4, 2 diffusion layers beat 1 by about 3% on HR@10, but that model learns embeddings, and [4] names oversmoothing as a known issue of deeper encoders. Our trust is a heuristic count. A learned diffusion is out of scope, so 2 hops are named as a limitation and as future work.
 - Label: against (abstract only)
 - Choice: option (a), 1 hop. Own design. [3] cuts against it for a learned model; the choice rests on scope (super-plan §9) and on the heuristic form of our trust.
 - Status: decided
@@ -238,7 +243,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
   - [11] `r2/r2/lib/db/_sorts.pyx` line 59 at commit `753b17407e9a9dca09558526805922de24133d53`: the hot score is the sign of the net votes times log10 of the larger of |net votes| and 1, plus the post time minus 1134028003 seconds, divided by 45000. This is the form of BL4.
   - [12] the paragraph that starts "In case you don't read Arc code": the score is (votes - 1)^0.8 / (age in hours + 2)^1.8 times penalty factors, with gravity 1.8. This is the form of BL5. The penalties are ignored there (super-plan §5).
   - [30] `README.md`, Overview: the newer release ranks all posts with a transformer.
-- Against: [25] cuts against the plan. It shows that well-tuned, simple, personalised baselines often beat new methods. BL0 to BL5 are not personalised (BL0 only puts followees first) and are not tuned, so they may be weak. [30] says the newer production ranking is a learned model, so beating hand-made scores like [11] and [12] does not show a gain over production.
+- Against: [25] cuts against the plan. It shows that well-tuned, simple, personalised baselines often beat new methods. BL0 to BL5 are not personalised (BL0 only puts followees first) and are not tuned, so they may be weak. [30] says the newer production ranking is a learned model, so beating hand-made scores like [11] and [12] does not show a gain over production. [40] (abstract only) describes a production feed ranker as a weighted sum of engagement predictions from a learned value model, so hand-made formulas like BL4 and BL5 are weaker than what production uses.
 - Why no learned baseline: the live app has no training data, and there is little time. A learned social baseline (SoRec, SocialMF) is out of scope (super-plan §9). This is a limitation. "Interpretability" is a design preference, not a tested claim.
 - Tuned and not tuned: the hybrid H is tuned on the validation split (`m`, α and β in E4). BL0, BL1 and BL3 have nothing to tune. BL2, BL4 and BL5 are fixed formulas today. The proposal is a small validation grid for their time or age parameters, so that H is not the only tuned method (PC4). The grid sizes would be frozen values (super-plan §7).
 - BL6: "the number of followees who engaged, with no trust weights" is proposed as a baseline, to show what the trust weights add over a plain count (PC3).
@@ -260,7 +265,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
   - [16] abstract only: results with reduced target sets often contradict the results with large ones, and minimum sets distort pairwise comparisons.
   - [17] §2: catalogue coverage is the share of available items that the system ever recommends, measured over recommendation sessions. The paper has no experiments.
   - [18] §1 and §2: with tied scores, the order of the tied results can change a ranking measure. The authors give tie-aware versions of six measures that average over all tie orders, in closed form and deterministically (§2), at about the cost of the usual measures (§4).
-- Against: [13] §5 recommends the global temporal split as the default, and [14] §5 prefers its timeline scheme to leave-last-out alone. Our test time `t_u` differs per user. The as-of features of super-plan §5 apply the same principle (nothing after `t_u` is used for u), but the tuning of `m`, α and β is a gap (see the table).
+- Against: [13] §5 recommends the global temporal split as the default, and [14] §5 prefers its timeline scheme to leave-last-out alone. Our test time `t_u` differs per user. The as-of features of super-plan §5 apply the same principle (nothing after `t_u` is used for u), but the tuning of `m`, α and β is a gap (see the table). The search of §7 was not aimed at offline protocols and found no recent paper on them. [38] (abstract only) reports cold-start users as a separate group, like our history buckets.
 - Leakage table: each case of [14] against the protocol of super-plan §5.
 
 | Leakage case ([14] section) | Our protocol (super-plan §5) | Status |
@@ -294,7 +299,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - What a W1 win means: in W1, follows and interactions both come from shared interests, and there is no influence (super-plan §7). If the hybrid beats BL2 in W1, the social term predicts better. That is prediction, not influence. Whether follows influence what users do cannot be read from W1.
 - The shuffle test checks the test, not the generator: a pass or a fail of the timestamp shuffle (E5) says whether the evaluation reacts to time order. It does not say whether the generator built the social signal into the data. This is our reading; [23] was not read.
 - RQ2 thresholds: they are "in generator units" until they are calibrated to real data (task `p1-dataset-selection`, `.docs/datasets.md`, which does not exist yet).
-- Against: [24] says what can happen under stated assumptions, and it models a feedback loop between a recommender and its logged data. Our worlds make interactions from interests, follows and memberships, not from a ranking algorithm, so a feedback loop is not modelled. Real data may differ.
+- Against: [24] says what can happen under stated assumptions, and it models a feedback loop between a recommender and its logged data. Our worlds make interactions from interests, follows and memberships, not from a ranking algorithm, so a feedback loop is not modelled. Real data may differ. [42] (abstract only) is a field experiment on X; it shows effects on behaviour that an offline test on synthetic data cannot show.
 - Label: by analogy (abstract only)
 - Choice: option (a), with W0, W1 and the shuffle in E5. By analogy with [24]: a simulation shows what can happen under its assumptions, not what happens in a real system.
 - Status: decided
@@ -344,7 +349,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - For us: D3 (community). The method uses membership only, as 1 or 0 (§3.2, §6). It uses no friend data and no posts.
 - Cited in: Ch2
 - Anchor: §3.1: "we can recommend communities to a user based on his joined communities".
-- Against us: it recommends communities, not posts. Its evaluation ranks the withheld community among 1000 sampled ones, and [15] says sampled metrics can be inconsistent with the exact ones.
+- Against us: it recommends communities, not posts. Its evaluation ranks the withheld community among 1000 sampled ones (§5.1.2), and [15] says sampled metrics can be inconsistent with the exact ones.
 
 ### [11] Reddit hot sort (Reddit 2015)
 - Opened: 2026-10-24, full text [github.com/reddit-archive/reddit, file `r2/r2/lib/db/_sorts.pyx` read in full, commit 753b17407e9a9dca09558526805922de24133d53 (2017-10-14, "Update README for archival"); the file was last changed on 2015-08-17 (commit d990533d0b57); sha256 of the file text a2447de79fd7]
@@ -398,7 +403,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Opened: 2026-10-24, index record [Internet Archive copy of the page, snapshot 20240824170049; the live page at cse.msu.edu did not answer on 2026-10-24] · Cited in: not cited
 - Says: trust data sets crawled from the review sites Epinions and Ciao in May 2011. The Epinions data has user profiles, ratings with their time points and trust relations; only parts are released. For us: a candidate for P4; the details go to `.docs/datasets.md`, which does not exist yet because `p1-dataset-selection` has not run.
 
-### [20] Digg 2009 (Lerman 2009)
+### [20] Digg data (Lerman 2009)
 - Opened: 2026-10-24, index record [the downloads page of Kristina Lerman at isi.edu] · Cited in: not cited
 - Says: the voting records of 3553 stories promoted to the front page of Digg over one month in 2009, each with the voter id and the vote time, plus friendship links of the voters. For us: the first candidate for P4 (super-plan, change log 0.3); the details go to `.docs/datasets.md`, which does not exist yet because `p1-dataset-selection` has not run.
 
@@ -461,62 +466,62 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | 2026-10-24 | OpenAlex | cited-by [5] | 0 | none |
 | 2026-10-24 | OpenAlex | cited-by [9] | 32 | none |
 | 2026-10-24 | Semantic Scholar | cited-by [5] | 6 | [36] |
-| 2026-10-24 | WebSearch | G1: social recommendation trust network 2024 paper | 9 | [37] |
-| 2026-10-24 | OpenAlex | G1: social recommendation trust network | 25 | [37] |
-| 2026-10-24 | Crossref | G1: social recommendation trust network | 25 | none |
-| 2026-10-24 | arXiv | G1: social recommendation trust network | 25 | [37] |
-| 2026-10-24 | OpenAlex | G1: social recommendation graph neural network trust | 25 | none |
-| 2026-10-24 | Crossref | G1: social recommendation graph neural network trust | 25 | none |
-| 2026-10-24 | arXiv | G1: social recommendation graph neural network trust | 21 | none |
-| 2026-10-24 | OpenAlex | G1: social recommendation trust community affinity | 25 | none |
-| 2026-10-24 | Crossref | G1: social recommendation trust community | 25 | none |
-| 2026-10-24 | arXiv | G1: social recommendation community | 25 | [34] |
-| 2026-10-24 | OpenAlex | G1: trust-aware social recommendation sparse users | 25 | none |
-| 2026-10-24 | Crossref | G1: trust-aware social recommendation sparse users | 0 | none |
-| 2026-10-24 | arXiv | G1: trust social recommendation | 25 | none |
-| 2026-10-24 | OpenAlex | G2: social cold start recommendation new users social links | 25 | none |
-| 2026-10-24 | Crossref | G2: social cold start new users social links recommendation | 25 | none |
-| 2026-10-24 | arXiv | G2: cold-start social recommendation | 25 | none |
-| 2026-10-24 | OpenAlex | G2: cold-start users social relations friends recommendation | 25 | none |
-| 2026-10-24 | Crossref | G2: cold-start users social relations friends recommendation | 25 | none |
-| 2026-10-24 | arXiv | G2: cold start social relations | 25 | [38] |
-| 2026-10-24 | OpenAlex | G2: social-aware cold-start recommendation | 25 | none |
-| 2026-10-24 | Crossref | G2: social-aware cold-start recommendation | 25 | none |
-| 2026-10-24 | arXiv | G2: social cold-start recommendation | 25 | none |
-| 2026-10-24 | WebSearch | G2: social network cold-start new users friends recommendation 2023 2025 | 9 | none |
-| 2026-10-24 | OpenAlex | G3: social media feed ranking follow graph | 25 | [39] |
-| 2026-10-24 | arXiv | G3: all:"feed ranking" AND all:follow | 0 | none |
-| 2026-10-24 | Crossref | G3: social media feed ranking follow graph | 25 | none |
-| 2026-10-24 | WebSearch | G3: follow graph home timeline ranking in-network posts recommendation 2024 | 10 | none |
-| 2026-10-24 | OpenAlex | G3: home timeline ranking followed accounts | 25 | none |
-| 2026-10-24 | arXiv | G3: all:"home timeline" AND all:ranking | 3 | none |
-| 2026-10-24 | Crossref | G3: home timeline ranking followed accounts | 25 | none |
-| 2026-10-24 | OpenAlex | G3: in-network ranking followed accounts feed | 25 | [40] |
-| 2026-10-24 | arXiv | G3: in-network ranking followed accounts feed | 0 | none |
-| 2026-10-24 | Crossref | G3: in-network ranking followed accounts feed | 25 | none |
-| 2026-10-24 | arXiv | G3: all:feed AND all:ranking AND all:social AND all:network | 25 | none |
-| 2026-10-24 | OpenAlex | G4: Twitter algorithmic amplification audit | 25 | [41] |
-| 2026-10-24 | arXiv | G4: all:Twitter AND all:amplification | 25 | none |
-| 2026-10-24 | Crossref | G4: Twitter algorithmic amplification audit | 25 | none |
-| 2026-10-24 | OpenAlex | G4: engagement-based ranking audit social media feed | 25 | [41] |
-| 2026-10-24 | arXiv | G4: all:audit AND all:engagement AND all:feed | 4 | none |
-| 2026-10-24 | Crossref | G4: engagement-based ranking audit social media feed | 25 | none |
-| 2026-10-24 | OpenAlex | G4: X For You feed audit | 25 | none |
-| 2026-10-24 | arXiv | G4: all:"For You" AND all:audit | 0 | none |
-| 2026-10-24 | Crossref | G4: X For You feed audit | 25 | none |
-| 2026-10-24 | WebSearch | G4: audit of X For You feed engagement ranking amplification study 2025 | 10 | none |
-| 2026-10-24 | OpenAlex | G3: lead TwHIN | 5 | none |
-| 2026-10-24 | Crossref | G3: lead TwHIN | 4 | none |
-| 2026-10-24 | arXiv | G3: lead TwHIN | 2 | none |
-| 2026-10-24 | OpenAlex | G4: lead Huszar (Algorithmic amplification of politics on Twitter) | 5 | none |
-| 2026-10-24 | Crossref | G4: lead Huszar (Algorithmic amplification of politics on Twitter) | 4 | none |
-| 2026-10-24 | arXiv | G4: lead Huszar (ti:amplification AND ti:politics AND ti:Twitter) | 3 | none |
-| 2026-10-24 | OpenAlex | G4: lead Milli (Engagement, user satisfaction, and the amplification of divisive content on social media) | 5 | [41] |
-| 2026-10-24 | Crossref | G4: lead Milli (Engagement, user satisfaction, and the amplification of divisive content on social media) | 4 | [41] |
-| 2026-10-24 | arXiv | G4: lead Milli (ti:engagement AND ti:divisive) | 3 | [41] |
-| 2026-10-24 | OpenAlex | G3: lead SimClusters | 5 | none |
-| 2026-10-24 | Crossref | G3: lead SimClusters | 4 | none |
-| 2026-10-24 | arXiv | G3: lead SimClusters (ti:SimClusters) | 2 | none |
+| 2026-10-24 | WebSearch | group social recommendation: social recommendation trust network 2024 paper | 9 | [37] |
+| 2026-10-24 | OpenAlex | group social recommendation: social recommendation trust network | 25 | [37] |
+| 2026-10-24 | Crossref | group social recommendation: social recommendation trust network | 25 | none |
+| 2026-10-24 | arXiv | group social recommendation: social recommendation trust network | 25 | [37] |
+| 2026-10-24 | OpenAlex | group social recommendation: social recommendation graph neural network trust | 25 | none |
+| 2026-10-24 | Crossref | group social recommendation: social recommendation graph neural network trust | 25 | none |
+| 2026-10-24 | arXiv | group social recommendation: social recommendation graph neural network trust | 21 | none |
+| 2026-10-24 | OpenAlex | group social recommendation: social recommendation trust community affinity | 25 | none |
+| 2026-10-24 | Crossref | group social recommendation: social recommendation trust community | 25 | none |
+| 2026-10-24 | arXiv | group social recommendation: social recommendation community | 25 | [34] |
+| 2026-10-24 | OpenAlex | group social recommendation: trust-aware social recommendation sparse users | 25 | none |
+| 2026-10-24 | Crossref | group social recommendation: trust-aware social recommendation sparse users | 0 | none |
+| 2026-10-24 | arXiv | group social recommendation: trust social recommendation | 25 | none |
+| 2026-10-24 | OpenAlex | group social cold start: social cold start recommendation new users social links | 25 | none |
+| 2026-10-24 | Crossref | group social cold start: social cold start new users social links recommendation | 25 | none |
+| 2026-10-24 | arXiv | group social cold start: cold-start social recommendation | 25 | none |
+| 2026-10-24 | OpenAlex | group social cold start: cold-start users social relations friends recommendation | 25 | none |
+| 2026-10-24 | Crossref | group social cold start: cold-start users social relations friends recommendation | 25 | none |
+| 2026-10-24 | arXiv | group social cold start: cold start social relations | 25 | [38] |
+| 2026-10-24 | OpenAlex | group social cold start: social-aware cold-start recommendation | 25 | none |
+| 2026-10-24 | Crossref | group social cold start: social-aware cold-start recommendation | 25 | none |
+| 2026-10-24 | arXiv | group social cold start: social cold-start recommendation | 25 | none |
+| 2026-10-24 | WebSearch | group social cold start: social network cold-start new users friends recommendation 2023 2025 | 9 | none |
+| 2026-10-24 | OpenAlex | group follow-graph feed ranking: social media feed ranking follow graph | 25 | [39] |
+| 2026-10-24 | arXiv | group follow-graph feed ranking: all:"feed ranking" AND all:follow | 0 | none |
+| 2026-10-24 | Crossref | group follow-graph feed ranking: social media feed ranking follow graph | 25 | none |
+| 2026-10-24 | WebSearch | group follow-graph feed ranking: follow graph home timeline ranking in-network posts recommendation 2024 | 10 | none |
+| 2026-10-24 | OpenAlex | group follow-graph feed ranking: home timeline ranking followed accounts | 25 | none |
+| 2026-10-24 | arXiv | group follow-graph feed ranking: all:"home timeline" AND all:ranking | 3 | none |
+| 2026-10-24 | Crossref | group follow-graph feed ranking: home timeline ranking followed accounts | 25 | none |
+| 2026-10-24 | OpenAlex | group follow-graph feed ranking: in-network ranking followed accounts feed | 25 | [40] |
+| 2026-10-24 | arXiv | group follow-graph feed ranking: in-network ranking followed accounts feed | 0 | none |
+| 2026-10-24 | Crossref | group follow-graph feed ranking: in-network ranking followed accounts feed | 25 | none |
+| 2026-10-24 | arXiv | group follow-graph feed ranking: all:feed AND all:ranking AND all:social AND all:network | 25 | none |
+| 2026-10-24 | OpenAlex | group feed audits: Twitter algorithmic amplification audit | 25 | [41] |
+| 2026-10-24 | arXiv | group feed audits: all:Twitter AND all:amplification | 25 | none |
+| 2026-10-24 | Crossref | group feed audits: Twitter algorithmic amplification audit | 25 | none |
+| 2026-10-24 | OpenAlex | group feed audits: engagement-based ranking audit social media feed | 25 | [41] |
+| 2026-10-24 | arXiv | group feed audits: all:audit AND all:engagement AND all:feed | 4 | none |
+| 2026-10-24 | Crossref | group feed audits: engagement-based ranking audit social media feed | 25 | none |
+| 2026-10-24 | OpenAlex | group feed audits: X For You feed audit | 25 | none |
+| 2026-10-24 | arXiv | group feed audits: all:"For You" AND all:audit | 0 | none |
+| 2026-10-24 | Crossref | group feed audits: X For You feed audit | 25 | none |
+| 2026-10-24 | WebSearch | group feed audits: audit of X For You feed engagement ranking amplification study 2025 | 10 | none |
+| 2026-10-24 | OpenAlex | group follow-graph feed ranking: lead TwHIN | 5 | none |
+| 2026-10-24 | Crossref | group follow-graph feed ranking: lead TwHIN | 4 | none |
+| 2026-10-24 | arXiv | group follow-graph feed ranking: lead TwHIN | 2 | none |
+| 2026-10-24 | OpenAlex | group feed audits: lead Huszar (Algorithmic amplification of politics on Twitter) | 5 | none |
+| 2026-10-24 | Crossref | group feed audits: lead Huszar (Algorithmic amplification of politics on Twitter) | 4 | none |
+| 2026-10-24 | arXiv | group feed audits: lead Huszar (ti:amplification AND ti:politics AND ti:Twitter) | 3 | none |
+| 2026-10-24 | OpenAlex | group feed audits: lead Milli (Engagement, user satisfaction, and the amplification of divisive content on social media) | 5 | [41] |
+| 2026-10-24 | Crossref | group feed audits: lead Milli (Engagement, user satisfaction, and the amplification of divisive content on social media) | 4 | [41] |
+| 2026-10-24 | arXiv | group feed audits: lead Milli (ti:engagement AND ti:divisive) | 3 | [41] |
+| 2026-10-24 | OpenAlex | group follow-graph feed ranking: lead SimClusters | 5 | none |
+| 2026-10-24 | Crossref | group follow-graph feed ranking: lead SimClusters | 4 | none |
+| 2026-10-24 | arXiv | group follow-graph feed ranking: lead SimClusters (ti:SimClusters) | 2 | none |
 | 2026-10-24 | Crossref, OpenAlex, arXiv | follow-up check of the leads SimClusters and TwHIN (records opened) | 2 | [43], [44] |
 | 2026-10-24 | WebSearch | EdgeRank (lead from memory): a primary source of the Facebook News Feed formula; not added: no verifiable source | 10 | none |
 | 2026-10-24 | Crossref | EdgeRank (lead from memory): not added: no verifiable source | 4 | none |

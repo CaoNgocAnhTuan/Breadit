@@ -217,16 +217,16 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 23: Final pass (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 16 17` (TC16, TC17). TC17 fails because the claims table is not complete (claim 1 is missing), and TC16 prints `CHECK` lines for numbers with no source
-- [ ] Change:
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 16 17` (TC16, TC17). TC17 fails because the claims table is not complete (claim 1 is missing), and TC16 prints `CHECK` lines for numbers with no source
+- [x] Change:
   - Update every `Against` line with what the search found
   - Complete the claims table (§2): claim 1 names the status table and the spot checks; every row is `supported`, `own design` or `not supported`
   - Complete §9 (proposed changes: BL6, the left-out users per bucket, any evidence against §5 or §6, a paper that does C2). A change to a value frozen "now" goes to the author only
   - Complete §3: the index sources used to verify, the rules of design §1.3, and the "Needs full text" list for the author
   - Fix every `CHECK` line of TC16: add the source to the number, or accept it by hand (a year, a formula, a line number) and say so in the commit message. Replace any copied frozen value with a link to super-plan §7. TC16 can also match an arXiv id that contains `0.05` or a sha prefix that contains `10000`: write the id in a form the grep does not match, or change the text, and say so
   - Read every `CHECK` line of TC11 (`full text (§x–y)`): the decision must use only those sections
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 1 3 4 5 7 8 9 10 11 12 13 14 16 17 18 | grep -c '^TC[0-9]* PASS'` prints `15`, and the same command with `grep '^TC[0-9]* FAIL'` prints nothing. TC2, TC6, TC15 and TC19 are not in this run: they need Steps 24 and 25
-- [ ] Commit: `docs: final pass on the P1 literature notes`
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 1 3 4 5 7 8 9 10 11 12 13 14 16 17 18 | grep -c '^TC[0-9]* PASS'` prints `15`, and the same command with `grep '^TC[0-9]* FAIL'` prints nothing. TC2, TC6, TC15 and TC19 are not in this run: they need Steps 24 and 25
+- [x] Commit: `docs: final pass on the P1 literature notes`
 
 ### Step 24: Edit the super plan (effort S)
 
