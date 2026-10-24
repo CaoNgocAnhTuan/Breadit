@@ -25,6 +25,7 @@ Working notes for P1. Not thesis text.
 | [17] | Coverage and serendipity (Ge 2010) | paper | verified | full text | 2026-10-24 | Ch3 |
 | [18] | Tied scores (McSherry 2008) | paper | verified | full text | 2026-10-24 | Ch3 |
 | [23] | Influence and correlation (Anagnostopoulos 2008) | paper | verified | index record | 2026-10-24 | not cited |
+| [24] | Algorithmic confounding (Chaney 2018) | paper | verified | full text | 2026-10-24 | Ch2 |
 | [25] | Are we making progress (Ferrari Dacrema 2019) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [28] | m-estimate (Cestnik 1990) | paper | verified | index record | 2026-10-24 | Ch3 (name only) |
 | [29] | m-estimate in naive Bayes (Castellano 2020) | paper | verified | full text | 2026-10-24 | Ch3 |
@@ -41,6 +42,7 @@ Working notes for P1. Not thesis text.
 | 6 | 1 hop is our choice. A hop is one edge of the follow graph. 1 hop is partly a scope choice, because graph neural networks are out of scope (super-plan §9). [3] and [4] speak of layers, not hops. | own design | D4: [3] §3.1, §3.3.1 and Table 4 (§4.4); [4] §5.1 and Table 5; [8] is an index record and is not used |
 | 7 | BL0 to BL5 are cheap, well-known baselines, but they are not personalised (BL0 only puts followees first) and are not tuned, so [25] cuts against calling them strong. A small validation grid (PC4) and a count baseline BL6 (PC3) would make the test fairer. There is no learned baseline: the live app has no training data and there is little time, which is a limitation. | supported | [25]: §1 and §2.2; [11]: `r2/r2/lib/db/_sorts.pyx` line 59; [12]: the paragraph on the Arc code; [30]: `README.md`, Overview |
 | 8 | The protocol (leave-last-out, full ranking, as-of features, ties) was checked against [13] to [18], item by item against the leakage cases of [14]: 4 cases are covered by the plan, 2 are not applicable and 1 is a gap (tuning on validation items). Full ranking agrees with [15]. The tie rule is fixed and tested (E6, [18]). | supported | D6 and its leakage table; [13] §5; [14] §2.2, §3.2, §4.1 and §5; [15] §4.2 and §8; [17] §2; [18] §1 and §2; [16] is abstract only |
+| 9 | W0 is a sanity check: if the hybrid beats BL2 there, there is a bug or a leak (H0). A W1 win shows prediction, not influence, because W1 has no influence by construction. The timestamp shuffle checks the test, not the generator. A simulation shows what can happen under its assumptions, and our worlds model no feedback loop between a recommender and its data. [23] was not read, so its shuffle test is not described here. | own design | D7; [24] §1, §5.1, §5.2 and §5.3; [23] is an index record and is not used |
 
 ## 3. How this file was made
 
@@ -261,6 +263,24 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Feeds: super-plan §5 (split, pool, ties, metrics)
 - Author's note:
 
+### D7. Built into the data
+- Question: How do we show the result is not built into the data?
+- Decides: Worlds W0 and W1, the shuffle test (P3, E5)
+- Options: (a) the null world W0, the latent-homophily world W1 and the timestamp shuffle in E5, as in super-plan §7; (b) W0 only; (c) public data only (P4).
+- Evidence:
+  - [24] §5.1: a simulation of 100 users over 1,000 time intervals with six methods (popularity, content filtering, matrix factorization, social filtering, random and ideal). §5.2: repeated training on data that the recommender helped create makes users more alike, without a gain in utility. §1, Figure 1 caption: "Confounding occurs when a platform attempts to model user behavior without accounting for recommendations." §5.3: it assumes a fixed utility for each user and item. All data are simulated.
+  - [23] index record: the title names influence and correlation in social networks. The text was not read, so the details of its shuffle test are not used here.
+- What a W1 win means: in W1, follows and interactions both come from shared interests, and there is no influence (super-plan §7). If the hybrid beats BL2 in W1, the social term predicts better. That is prediction, not influence. Whether follows influence what users do cannot be read from W1.
+- The shuffle test checks the test, not the generator: a pass or a fail of the timestamp shuffle (E5) says whether the evaluation reacts to time order. It does not say whether the generator built the social signal into the data. This is our reading; [23] was not read.
+- RQ2 thresholds: they are "in generator units" until they are calibrated to real data (task `p1-dataset-selection`, `.docs/datasets.md`, which does not exist yet).
+- Against: [24] says what can happen under stated assumptions, and it models a feedback loop between a recommender and its logged data. Our worlds make interactions from interests, follows and memberships, not from a ranking algorithm, so a feedback loop is not modelled. Real data may differ.
+- Label: by analogy (abstract only)
+- Choice: option (a), with W0, W1 and the shuffle in E5. By analogy with [24]: a simulation shows what can happen under its assumptions, not what happens in a real system.
+- Status: decided
+- Result: W0 must not favour the hybrid (H0). A W1 win is reported as prediction, not influence. The shuffle is reported as a check of the test. RQ2 thresholds are written "in generator units" until calibrated.
+- Feeds: P3 worlds and E5 (super-plan §7)
+- Author's note:
+
 ## 6. Other references
 
 ### [3] DiffNet (Wu 2019)
@@ -358,6 +378,13 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Says: the records confirm the title, the three authors (Aris Anagnostopoulos, Ravi Kumar, Mohammad Mahdian), KDD 2008, pages 7-15. No full text or abstract was read, and no legal open copy was found (the Sapienza repository answered 403).
 - For us: D7 and claim 9, what W0, W1 and the timestamp shuffle can and cannot show. Without the text it supports no decision.
 - Cited in: not cited
+
+### [24] Algorithmic confounding (Chaney 2018)
+- Opened: 2026-10-24, full text [arXiv 1710.11214v2, 27 Nov 2018, sha256 3965bdb1e39d]
+- Says: Allison J. B. Chaney, Brandon M. Stewart and Barbara E. Engelhardt (RecSys 2018) simulate 100 users over 1,000 time intervals with six recommendation methods: popularity, content filtering, matrix factorization, social filtering, random and ideal (§5.1). Repeated training on data that the recommender helped create makes users more alike without a gain in utility (§5.2). The paper has no standalone definition of "algorithmic confounding", only the caption of Figure 1, and no statement of the limits of simulation. All data are simulated.
+- For us: D7 and claim 9. It supports the point that a simulation shows what can happen under stated assumptions, and that logged data made by a recommender carry a feedback loop that our worlds do not model.
+- Cited in: Ch2
+- Anchor: §1, the caption of Figure 1: "Confounding occurs when a platform attempts to model user behavior without accounting for recommendations."
 
 ### [25] Are we making progress (Ferrari Dacrema 2019)
 - Opened: 2026-10-24, full text [arXiv 1907.06902v3, 16 Aug 2019, sha256 772fd88ba7ae]

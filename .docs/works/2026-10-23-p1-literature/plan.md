@@ -164,11 +164,11 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 16: D7 Built into the data, claim 9, all seven decisions (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 9 10` (TC9, TC10). Both fail because D7 does not exist, so the questions and the decisions are not complete
-- [ ] Change: [24]: status row and entry in §6 ([23] was done in Step 3). D7 in §5: what a W1 win means (prediction, not influence), the shuffle test checks the test and not the generator, RQ2 thresholds are "in generator units" until calibrated (`p1-dataset-selection`). Add the row for claim 9
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 9 10 11 12` prints six `PASS` lines (DW4, DW5: D1 to D7 in order, with the exact Question and Decides lines of the super-plan §4 table)
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 9 10` (TC9, TC10). Both fail because D7 does not exist, so the questions and the decisions are not complete
+- [x] Change: [24]: status row and entry in §6 ([23] was done in Step 3). D7 in §5: what a W1 win means (prediction, not influence), the shuffle test checks the test and not the generator, RQ2 thresholds are "in generator units" until calibrated (`p1-dataset-selection`). Add the row for claim 9
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 9 10 11 12` prints six `PASS` lines (DW4, DW5: D1 to D7 in order, with the exact Question and Decides lines of the super-plan §4 table)
 - [ ] Decision point (Part A is done: the five core entries, the four statuses and D1 to D7): stop and tell the author. `literature.md` can now feed P2 and the supervisor note. Ask whether to continue with Steps 17 to 22 now, or later. Write the answer in the Result section
-- [ ] Commit: `docs: decision D7 (built into the data), claim 9`
+- [x] Commit: `docs: decision D7 (built into the data), claim 9`
 
 ### Step 17: Search: the fixed C2 queries (effort S)
 
