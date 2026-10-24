@@ -13,6 +13,7 @@ Working notes for P1. Not thesis text.
 | [7] | Twitter blog (2023) | blog | do not cite, use [6] | index record | 2026-10-24 | not cited |
 | [8] | SocialMF (Jamali 2010) | paper | verified | index record | 2026-10-24 | not cited |
 | [9] | Social CF for cold start (Sedhain 2014) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [10] | Orkut communities (Chen 2009) | paper | verified | full text | 2026-10-24 | Ch2 |
 | [15] | Sampled metrics (Krichene 2020) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [23] | Influence and correlation (Anagnostopoulos 2008) | paper | verified | index record | 2026-10-24 | not cited |
@@ -156,6 +157,24 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Feeds: super-plan §6 (smoothing), super-plan §7 (`m`)
 - Author's note: Zhai and Lafferty 2001 (a lead from memory) was checked as a record only (SIGIR 2001, DOI 10.1145/383952.384019). No legal full text was found, so it is not used.
 
+### D3. Community
+- Question: Is community membership a useful signal, and in what form?
+- Decides: The community term (§6)
+- Options: (a) membership as a signal for posts, with the form of super-plan §6: u's earlier positives in the post's community, plus a membership prior; (b) membership only, as a 1 or 0, as [10] uses it; (c) no community term.
+- Evidence:
+  - [10] §3.1: communities are recommended "based on his joined communities", so membership is the only input. §3.2: it enters as 1 (join) or 0 (not join). §6: counts of other activity are left as future work.
+  - [10] §5.1.1: the data has 492,104 users and 118,002 communities. The abstract: LDA is better for lists of 4 or more communities, and ARM is a bit better for up to 3.
+  - [10] has no friend data and no posts.
+- Against: [10] recommends communities, not posts, so it says nothing about a post ranking. Its evaluation ranks the withheld community among 1000 sampled ones (§5.1.2); [15] §4.2 says that sampled metrics can be inconsistent with the exact ones. [10] is Orkut data of one period and one language (§5.1.1).
+- Pool effect: today community posts are excluded from home and Explore (super-plan §3). The shared pool lets approved community posts in (super-plan §5), so two effects mix: the pool itself changes, and the community term acts on it. This affects every comparison of numbers across pool definitions, for example production BL2 against the BL2 of the evaluation. It does not affect comparisons inside one pool (H against BL2, H against H-follow), which all rank the same pool.
+- Strength: weak
+- Label: by analogy
+- Choice: keep the `community` term of super-plan §6. By analogy with [10], which shows that membership helps to recommend communities. The form with u's earlier positives in the community, and its use for posts, are our own design.
+- Status: decided
+- Result: `community(p, u, t)` as in super-plan §6, with every event strictly before t. E4 and the H-follow and H-comm ablations show what it adds. The support is weak: [10] is about communities and not posts, and the evidence here is synthetic.
+- Feeds: super-plan §6 (`community`) and §5 (the pool)
+- Author's note:
+
 ## 6. Other references
 
 ### [6] Twitter code (Twitter 2023)
@@ -177,6 +196,14 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Says: Mohsen Jamali and Martin Ester, "A matrix factorization technique with trust propagation for recommendation in social networks", RecSys 2010, pp. 135-142 (Crossref). No abstract or text was read, so nothing is claimed about the method.
 - For us: D1 and D4 (trust and hops). The title names trust propagation, but a title supports no decision.
 - Cited in: not cited
+
+### [10] Orkut communities (Chen 2009)
+- Opened: 2026-10-24, full text [web-archive.southampton.ac.uk/www2009.eprints.org, the WWW 2009 conference archive PDF (proceedings version; its copyright line allows classroom and personal use), sha256 988e0831f21d]
+- Says: Wen-Yen Chen, Jon-Chyuan Chu, Junyi Luan, Hongjie Bai, Yi Wang and Edward Y. Chang (WWW 2009, pp. 681-690) compare association rule mining (ARM) and latent Dirichlet allocation (LDA) for recommending Orkut communities to a user from the communities the user has joined (§3.1, §3.2). The data has 492,104 users and 118,002 communities (§5.1.1). Each user's evaluation set is one withheld community plus 1000 random communities the user has not joined (§5.1.2). The abstract says LDA is better for lists of 4 or more communities and ARM is a bit better for lists of up to 3.
+- For us: D3 (community). The method uses membership only, as 1 or 0 (§3.2, §6). It uses no friend data and no posts.
+- Cited in: Ch2
+- Anchor: §3.1: "we can recommend communities to a user based on his joined communities".
+- Against us: it recommends communities, not posts. Its evaluation ranks the withheld community among 1000 sampled ones, and [15] says sampled metrics can be inconsistent with the exact ones.
 
 ### [16] Target item sampling (Cañamares 2020)
 - Opened: 2026-10-24, abstract only [Semantic Scholar record of DOI 10.1145/3383313.3412259; Crossref gives the same title, authors, year and pages 259-268]

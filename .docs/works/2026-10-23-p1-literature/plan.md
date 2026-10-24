@@ -129,10 +129,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 11: D3 Community (effort S)
 
-- [ ] Test first: `grep -c '^### D3\.' .docs/literature.md` prints `0`, because D3 does not exist yet
-- [ ] Change: [10] Orkut: status row and entry in §6. D3 in §5, after D2 (the order stays D1, D2, D3), with `- Strength:` (expected `weak`), the point that [10] recommends communities, not posts, and the point that community posts entering the pool mix two effects (which comparisons this affects)
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 | grep -E '^ +D3\. '` prints nothing (no missing field, `Strength` is valid); `grep -c '^### D3\.' .docs/literature.md` prints `1`
-- [ ] Commit: `docs: decision D3 (community)`
+- [x] Test first: `grep -c '^### D3\.' .docs/literature.md` prints `0`, because D3 does not exist yet
+- [x] Change: [10] Orkut: status row and entry in §6. D3 in §5, after D2 (the order stays D1, D2, D3), with `- Strength:` (expected `weak`), the point that [10] recommends communities, not posts, and the point that community posts entering the pool mix two effects (which comparisons this affects)
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 | grep -E '^ +D3\. '` prints nothing (no missing field, `Strength` is valid); `grep -c '^### D3\.' .docs/literature.md` prints `1`
+- [x] Commit: `docs: decision D3 (community)`
 
 ### Step 12: D4 Hops, claim 6, DiffNet title (effort S)
 
