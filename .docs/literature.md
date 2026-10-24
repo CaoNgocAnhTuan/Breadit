@@ -9,6 +9,7 @@ Working notes for P1. Not thesis text.
 | [1] | Social recommendation review (Tang 2013) | survey | verified | abstract only | 2026-10-24 | not cited |
 | [2] | SoRec (Ma 2008) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [5] | RealGraph (Kamath 2014) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
+| [6] | Twitter code (Twitter 2023) | code | verified | full text | 2026-10-24 | Ch2 |
 | [7] | Twitter blog (2023) | blog | do not cite, use [6] | index record | 2026-10-24 | not cited |
 | [9] | Social CF for cold start (Sedhain 2014) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [15] | Sampled metrics (Krichene 2020) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
@@ -16,12 +17,14 @@ Working notes for P1. Not thesis text.
 | [23] | Influence and correlation (Anagnostopoulos 2008) | paper | verified | index record | 2026-10-24 | not cited |
 | [28] | m-estimate (Cestnik 1990) | paper | verified | index record | 2026-10-24 | Ch3 (name only) |
 | [29] | m-estimate in naive Bayes (Castellano 2020) | paper | verified | full text | 2026-10-24 | Ch3 |
+| [30] | X For You algorithm (xai-org 2026) | code | verified | full text | 2026-10-24 | not cited |
 
 ## 2. Claims
 
 | # | Claim | Status | Evidence |
 |---|---|---|---|
 | 2 | RealGraph gives directed edge weights between users, learned from past interaction data. The weight is the predicted probability of a future interaction, not a count of past interactions. Super-plan §6 line 294 says "past interaction", which is looser. | supported | [5]: §1 defines the weight as the probability of an interaction from the source to the destination user in the future; §2.2 trains a logistic regression with a binary label on edge and user features; §3.1 gives the AUC per feature group |
+| 3 | In the 2023 release at commit `ef4c5eb65e6e04fac4f0e1fa8bbeff56b75c1f98`, home-mixer reads each viewer's RealGraph scores for followed users (top 1000 by score) and attaches the RealGraph edge features of the pair (viewer, author) to each tweet candidate. The files show these as inputs (features); they do not show how a ranker weights them. The newer release [30] has no RealGraph file and ranks with a transformer. | supported | [6]: `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphInNetworkScoresQueryFeatureHydrator.scala`, lines 26-40; `home-mixer/server/src/main/scala/com/twitter/home_mixer/store/RealGraphInNetworkScoresStore.scala`, line 18; `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphViewerAuthorFeatureHydrator.scala`, lines 27-31 and 63-93; [30]: README, Overview |
 | 4 | The form of the smoothing, (count + m × prior) / (total + m), is the m-estimate of Cestnik (1990), a known technique from classification. Using it for trust and community, and the value of `m`, are our own design. Super-plan §6 line 293 says "not a cited method". | supported | [29]: §2.4, eq. 19, p.6 (a secondary source for [28]); [28]: index record only, the paper was not read |
 | 5 | The notes decide each of the three §6 choices with evidence. The D2 half: smoothing with `m` and one curve instead of three phases are decided in D2. The author term waits for D1 (Step 10). | supported | D2: the form follows [29] eq. 19; the weight of the prior is `m / (N_u + m)` (algebra on eq. 19); replacing the three phases is our own design |
 
@@ -128,6 +131,14 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 
 ## 6. Other references
 
+### [6] Twitter code (Twitter 2023)
+- Opened: 2026-10-24, full text [github.com/twitter/the-algorithm, commit ef4c5eb65e6e04fac4f0e1fa8bbeff56b75c1f98 (2023-03-31, "Twitter Recommendation Algorithm"); the three files named below were read in full]
+- Says: in `home-mixer`, `RealGraphInNetworkScoresQueryFeatureHydrator` reads the viewer's RealGraph scores for followed users from the dataset `real_graph_scores_in` (`RealGraphInNetworkScoresStore`), keeps the top 1000 by score and stores them as the query feature `RealGraphInNetworkScoresFeature`. `RealGraphViewerAuthorFeatureHydrator` attaches the RealGraph edge features of the pair (viewer, author) to each tweet candidate as a `DataRecord` feature. The files show these scores as inputs. They do not show how a ranker weights them.
+- For us: D1 (trust and the author term) and claim 3. Super-plan §6 says the open-source ranking "uses it for in-network tweets"; the code shows only that the scores are features. The same three files differ at the later HEAD `c54bec0d4e029fe34926ef3258a86ccacc0d0182` (2025-09-03; 52, 14 and 2 changed lines), so claims name the 2023 commit. A Haiku agent read the HEAD versions of these and three more files (`extracts/06.md`).
+- Cited in: Ch2
+- Anchor: `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphViewerAuthorFeatureHydrator.scala`, lines 27-31 and 63-93 at the commit above.
+- Against us: the newer release [30] ranks posts with a transformer and has no RealGraph file in its tree, so production may have moved to a learned model.
+
 ### [7] Twitter recommendation blog (Twitter Engineering 2023)
 - Opened: 2026-10-24, index record [Wayback availability API: snapshot 20240508043115, a record only]
 - Says: the text of the post was not read. Direct fetches of the snapshot returned HTTP 429 five times on 2026-10-24, `blog.x.com` returned HTTP 403, and the availability API returned 429 on its last try. Nothing is claimed about what the post says.
@@ -149,6 +160,13 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 ## 7. Recent work (2022 or later)
 
 ## 8. Older neighbours and other added references
+
+### [30] X For You algorithm (xai-org 2026)
+- Opened: 2026-10-24, full text (§Overview, §Scoring and Ranking) [github.com/xai-org/x-algorithm, commit 6258a1549ef808be88fba83d3b2d58364b587ee0 (HEAD); the repository was created on 2026-01-19; the README sections named were read; the tree of 2886 paths has no path with real_graph or interaction_graph]
+- Says: the README says that the For You feed joins in-network posts (from followed accounts) with out-of-network posts (retrieval models and a popular-posts list), and that both are ranked together by the same transformer model (Phoenix). Phoenix reads the viewer's recent engagement history and predicts the chance of each action on each post. The predictions are combined into one score with weights held in the code.
+- For us: claim 3 and D5 (Against): the open-source ranking of 2023 [6] may no longer be the production ranking. This is code with no DOI, so it is not a recent reference of §7.
+- Cited in: not cited
+- Anchor: `README.md`, Overview, the paragraph after the two lists: "Both are ranked together by the same model."
 
 ### [28] m-estimate (Cestnik 1990)
 - Opened: 2026-10-24, index record [OpenAlex record W203696055; closed access, no full text found]

@@ -115,10 +115,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 9: Twitter code [6], claim 3 (effort S)
 
-- [ ] Test first: `grep -E '^\| 3 \|' .docs/literature.md | grep -c -E '[0-9a-f]{40}'` prints `0`, because claim 3 has no row and no commit hash yet
-- [ ] Change: confirm the commit with `git ls-remote https://github.com/twitter/the-algorithm HEAD`. List the paths with the GitHub tree API (`truncated` must be false), search them for `real_graph`, `realgraph`, `RealGraph` and `interaction_graph`, and read the file at that commit. Add the entry of [6] in §6 (code: function, path, commit). Add claim 3 to the claims table, worded "In the 2023 release at commit `<40 characters>`, <what the file shows>", with the path in backticks and the line numbers. If no file is found, it is "not supported", and the hash that was searched is recorded (F11). If a newer X release is seen (lead: `xai-org/x-algorithm`, not verified), open it and add it to §8 as code
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5` prints two `PASS` lines; `grep -E '^\| 3 \|' .docs/literature.md | grep -c -E '[0-9a-f]{40}'` prints `1` (DW10: claim 3 has a hash and a path)
-- [ ] Commit: `docs: Twitter code entry [6] and claim 3`
+- [x] Test first: `grep -E '^\| 3 \|' .docs/literature.md | grep -c -E '[0-9a-f]{40}'` prints `0`, because claim 3 has no row and no commit hash yet
+- [x] Change: confirm the commit with `git ls-remote https://github.com/twitter/the-algorithm HEAD`. List the paths with the GitHub tree API (`truncated` must be false), search them for `real_graph`, `realgraph`, `RealGraph` and `interaction_graph`, and read the file at that commit. Add the entry of [6] in §6 (code: function, path, commit). Add claim 3 to the claims table, worded "In the 2023 release at commit `<40 characters>`, <what the file shows>", with the path in backticks and the line numbers. If no file is found, it is "not supported", and the hash that was searched is recorded (F11). If a newer X release is seen (lead: `xai-org/x-algorithm`, not verified), open it and add it to §8 as code
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5` prints two `PASS` lines; `grep -E '^\| 3 \|' .docs/literature.md | grep -c -E '[0-9a-f]{40}'` prints `1` (DW10: claim 3 has a hash and a path)
+- [x] Commit: `docs: Twitter code entry [6] and claim 3`
 
 ### Step 10: D1 Trust, claims 2 and 5 (effort S)
 
