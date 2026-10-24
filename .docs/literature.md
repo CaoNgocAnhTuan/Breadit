@@ -30,6 +30,9 @@ Working notes for P1. Not thesis text.
 | [28] | m-estimate (Cestnik 1990) | paper | verified | index record | 2026-10-24 | Ch3 (name only) |
 | [29] | m-estimate in naive Bayes (Castellano 2020) | paper | verified | full text | 2026-10-24 | Ch3 |
 | [30] | X For You algorithm (xai-org 2026) | code | verified | full text | 2026-10-24 | not cited |
+| [31] | SocRipple (Jaspal 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [32] | Community by Design (Weyl 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [33] | Interaction strength (Zhou 2024) | paper | verified | abstract only | 2026-10-24 | not cited |
 
 ## 2. Claims
 
@@ -394,6 +397,46 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Anchor: §1, "in the large majority of the investigated cases (6 out of 7)"; §2.2, 35 cases per algorithm.
 
 ## 7. Recent work (2022 or later)
+
+### Search log
+
+| Date | Source | Query | Looked at | Picked |
+|---|---|---|---|---|
+| 2026-10-24 | WebSearch | Q1: follow trust community affinity engagement feed ranking | 9 | none |
+| 2026-10-24 | OpenAlex | Q1: follow trust community affinity engagement feed ranking | 25 | none |
+| 2026-10-24 | WebSearch | Q2: social trust and community membership in news feed ranking | 9 | [32] |
+| 2026-10-24 | OpenAlex | Q2: social trust and community membership in news feed ranking | 25 | none |
+| 2026-10-24 | WebSearch | Q3: hybrid feed ranking engagement score follow graph community signal | 9 | none |
+| 2026-10-24 | OpenAlex | Q3: hybrid feed ranking engagement score follow graph community signal | 25 | none |
+| 2026-10-24 | WebSearch | Q4: interaction strength between users and group membership for post recommendation | 9 | none |
+| 2026-10-24 | OpenAlex | Q4: interaction strength between users and group membership for post recommendation | 25 | none |
+| 2026-10-24 | WebSearch | Q5: tie strength and community affinity in personalized social feed | 9 | none |
+| 2026-10-24 | OpenAlex | Q5: tie strength and community affinity in personalized social feed | 25 | none |
+| 2026-10-24 | WebSearch | Q6: cold-start social recommendation followee engagement community heuristic | 9 | [31] |
+| 2026-10-24 | OpenAlex | Q6: cold-start social recommendation followee engagement community heuristic | 6 | none |
+| 2026-10-24 | journal page | follow-up check of a lead from the Q4 and Q5 runs (Zhou et al. 2024, interaction strength and group participation) | 1 | [33] |
+
+### [31] SocRipple (Jaspal 2025)
+- Link: https://arxiv.org/abs/2508.07241
+- Opened: 2026-10-24, abstract only [arXiv abstract page 2508.07241; this is a preprint]
+- Says: Amit Jaspal, Kapil Dalwani and Ajantha Ramineni (arXiv preprint, 2025) propose a two-stage retrieval framework for cold-start items on platforms with a social graph. Stage 1 shows a new item to the creator's social connections. Stage 2 uses early engagement and learned user embeddings to spread the item with nearest-neighbour search. On a large video platform it raised cold-start item distribution by 36% while keeping the engagement rate on those items (abstract).
+- For us: Group 2 (social cold start). It uses a signal from the social graph and early engagement, in two retrieval stages. It has no community signal and no single combined score.
+- Cited in: not cited
+
+### [32] Community by Design (Weyl 2025)
+- Link: https://arxiv.org/abs/2502.10834
+- Opened: 2026-10-24, abstract only [arXiv abstract page 2502.10834; this is a preprint]
+- Says: E. Glen Weyl and five co-authors (arXiv preprint, 2025) argue that platforms use the social fabric as an input and may erode it by maximizing engagement. They propose a platform model in which the social fabric, with communities defined by affiliation or by shared attitudes, is also an explicit output, to support social cohesion (abstract).
+- For us: Group 3 (follow-graph feed ranking). A design proposal with a community signal. It has no follow-based trust and no engagement score in one ranking.
+- Cited in: not cited
+
+### [33] Interaction strength (Zhou 2024)
+- Link: https://doi.org/10.19734/j.issn.1001-3695.2023.05.0280
+- Opened: 2026-10-24, abstract only [the journal page of Application Research of Computers, in Chinese; the DOI is not in Crossref and resolves through chndoi.org; no full text was read]
+- Says: Luxin Zhou, Man Li, Mingyang Jiang and Lei Zhang (Chongqing Jiaotong University), Application Research of Computers 41(1), pp. 65-71, 2024. The page gives the English title "Improving social recommendation algorithm via incorporating interaction strength". The Chinese abstract describes a matrix factorization model for rating prediction. It enriches the social matrix with two similarities, defines an interaction strength between users, and links it to the social relations and to the users' group-participation features. On three real data sets it improves the accuracy of rating prediction (abstract).
+- For us: Group 1 (social recommendation). It is the closest idea to C2 that the search found (interaction strength plus group participation). It predicts ratings with a learned model. It does not rank posts and has no engagement score.
+- Cited in: not cited
+
 
 ## 8. Older neighbours and other added references
 

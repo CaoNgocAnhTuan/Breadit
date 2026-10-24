@@ -172,10 +172,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 17: Search: the fixed C2 queries (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep 'search log has no row for Q'` prints six lines, because the search log does not exist yet
-- [ ] Change: in §7, write the search log (`| Date | Source | Query | Looked at | Picked |`) and run Q1 to Q6 of design §1.8, each on at least two sources (the WebSearch tool, and Semantic Scholar or arXiv), one row per run. Open each pick, check the details, and add its status row (§1) and its entry (§7: heading with `(<first author> <year>)`, a `- Link:` line, `verified`). Papers seen only in a snippet are not added. New numbers start after the last one used
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep 'search log has no row for Q'` prints nothing; `part.sh 3 5 18` prints three `PASS` lines
-- [ ] Commit: `docs: search log for the fixed C2 queries`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep 'search log has no row for Q'` prints six lines, because the search log does not exist yet
+- [x] Change: in §7, write the search log (`| Date | Source | Query | Looked at | Picked |`) and run Q1 to Q6 of design §1.8, each on at least two sources (the WebSearch tool, and Semantic Scholar or arXiv), one row per run. Open each pick, check the details, and add its status row (§1) and its entry (§7: heading with `(<first author> <year>)`, a `- Link:` line, `verified`). Papers seen only in a snippet are not added. New numbers start after the last one used
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep 'search log has no row for Q'` prints nothing; `part.sh 3 5 18` prints three `PASS` lines
+- [x] Commit: `docs: search log for the fixed C2 queries`
 
 ### Step 18: Search: cited-by chasing (effort S)
 
