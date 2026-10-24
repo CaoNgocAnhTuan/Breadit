@@ -186,10 +186,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 19: Search: groups 1 and 2 (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 7` (TC7) prints `FAIL <n> recent refs (want 8 to 12)` with n below 8. If Steps 17 and 18 already gave 8 or more, say so here, and run the group searches only until 12
-- [ ] Change: group searches (1) social recommendation and (2) social cold start, on the WebSearch tool, DBLP, arXiv, Semantic Scholar and the ACM Digital Library. One log row per query. A group stops after two queries in a row add nothing new, or at 3 picks (the total of 8 wins over this). Add the picks as in Step 17
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 18` prints three `PASS` lines; `part.sh 7 | grep -E 'no DOI|older than|not verified|no \(\.\.\.'` prints nothing (the two count lines of TC7 can still say `FAIL`)
-- [ ] Commit: `docs: recent work, groups social recommendation and social cold start`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 7` (TC7) prints `FAIL <n> recent refs (want 8 to 12)` with n below 8. If Steps 17 and 18 already gave 8 or more, say so here, and run the group searches only until 12
+- [x] Change: group searches (1) social recommendation and (2) social cold start, on the WebSearch tool, DBLP, arXiv, Semantic Scholar and the ACM Digital Library. One log row per query. A group stops after two queries in a row add nothing new, or at 3 picks (the total of 8 wins over this). Add the picks as in Step 17
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 18` prints three `PASS` lines; `part.sh 7 | grep -E 'no DOI|older than|not verified|no \(\.\.\.'` prints nothing (the two count lines of TC7 can still say `FAIL`)
+- [x] Commit: `docs: recent work, groups social recommendation and social cold start`
 
 ### Step 20: Search: groups 3 and 4 (effort S)
 

@@ -36,6 +36,8 @@ Working notes for P1. Not thesis text.
 | [34] | Community-aware community recommendation (Jiang 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [35] | Social trust and recommender performance (Dadgar 2022) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [36] | Social media visibility simulation (Akpinar 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [37] | Trust-based recommendation first principles (Stefanopoulos 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [38] | Social relationships and historical behaviors (Lee 2022) | paper | verified | abstract only | 2026-10-24 | not cited |
 
 ## 2. Claims
 
@@ -422,6 +424,29 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | 2026-10-24 | OpenAlex | cited-by [5] | 0 | none |
 | 2026-10-24 | OpenAlex | cited-by [9] | 32 | none |
 | 2026-10-24 | Semantic Scholar | cited-by [5] | 6 | [36] |
+| 2026-10-24 | WebSearch | G1: social recommendation trust network 2024 paper | 9 | [37] |
+| 2026-10-24 | OpenAlex | G1: social recommendation trust network | 25 | [37] |
+| 2026-10-24 | Crossref | G1: social recommendation trust network | 25 | none |
+| 2026-10-24 | arXiv | G1: social recommendation trust network | 25 | [37] |
+| 2026-10-24 | OpenAlex | G1: social recommendation graph neural network trust | 25 | none |
+| 2026-10-24 | Crossref | G1: social recommendation graph neural network trust | 25 | none |
+| 2026-10-24 | arXiv | G1: social recommendation graph neural network trust | 21 | none |
+| 2026-10-24 | OpenAlex | G1: social recommendation trust community affinity | 25 | none |
+| 2026-10-24 | Crossref | G1: social recommendation trust community | 25 | none |
+| 2026-10-24 | arXiv | G1: social recommendation community | 25 | [34] |
+| 2026-10-24 | OpenAlex | G1: trust-aware social recommendation sparse users | 25 | none |
+| 2026-10-24 | Crossref | G1: trust-aware social recommendation sparse users | 0 | none |
+| 2026-10-24 | arXiv | G1: trust social recommendation | 25 | none |
+| 2026-10-24 | OpenAlex | G2: social cold start recommendation new users social links | 25 | none |
+| 2026-10-24 | Crossref | G2: social cold start new users social links recommendation | 25 | none |
+| 2026-10-24 | arXiv | G2: cold-start social recommendation | 25 | none |
+| 2026-10-24 | OpenAlex | G2: cold-start users social relations friends recommendation | 25 | none |
+| 2026-10-24 | Crossref | G2: cold-start users social relations friends recommendation | 25 | none |
+| 2026-10-24 | arXiv | G2: cold start social relations | 25 | [38] |
+| 2026-10-24 | OpenAlex | G2: social-aware cold-start recommendation | 25 | none |
+| 2026-10-24 | Crossref | G2: social-aware cold-start recommendation | 25 | none |
+| 2026-10-24 | arXiv | G2: social cold-start recommendation | 25 | none |
+| 2026-10-24 | WebSearch | G2: social network cold-start new users friends recommendation 2023 2025 | 9 | none |
 
 ### Inclusion and stop rules
 
@@ -472,6 +497,21 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Opened: 2026-10-24, abstract only [Crossref record of the Synthese paper]
 - Says: Nil-Jana Akpinar and Sina Fazelpour (Synthese, 2025) use agent-based simulations to study how components of a widely used recommendation algorithm shape the professional visibility of researchers from minority groups. They find that these algorithms disproportionately harm the visibility of such researchers (abstract). It reaches [5] through the citation list.
 - For us: Group 4 and D7. A simulation study of a feed algorithm, close to our use of synthetic worlds. It is about visibility and exclusion, not about ranking quality.
+- Cited in: not cited
+
+### [37] Trust-based recommendation first principles (Stefanopoulos 2025)
+- Link: https://doi.org/10.1016/j.osnem.2025.100315
+- Preprint: https://arxiv.org/abs/2407.00062
+- Opened: 2026-10-24, abstract only [Crossref record of the journal paper in Online Social Networks and Media; the preprint arXiv 2407.00062 was first posted in 2024]
+- Says: Paras Stefanopoulos, Sourin Chatterjee and Ahad N. Zehmakan (Online Social Networks and Media, 2025). The abstract says the paper studies recommenders that use item ratings, item similarity and a trust graph. Item-rating information is more influential than the other types in collaborative filtering. Approaches based on the trust graph are more robust to network attacks. The paper also introduces a Weighted Average framework for any user-to-user similarity.
+- For us: Group 1. It is a hint that ratings (our engagement) may matter more than trust. It is about rating prediction, with no community signal.
+- Cited in: not cited
+
+### [38] Social relationships and historical behaviors (Lee 2022)
+- Link: https://arxiv.org/abs/2206.13072
+- Opened: 2026-10-24, abstract only [arXiv abstract page 2206.13072; this is a preprint]
+- Says: Yan-Li Lee, Tao Zhou, Kexin Yang, Yajun Du and Liming Pan (arXiv preprint, 2022) assume that social relationships and historical behaviours of users relate to the same factors. They propose an algorithm that uses both with mutual constraints, and test it on all users, active users, inactive users and cold-start users (abstract).
+- For us: Group 2. It combines social relations with history and reports cold-start users separately, like our history buckets. It is a learned model, with no community signal and no engagement score.
 - Cited in: not cited
 
 ## 8. Older neighbours and other added references
