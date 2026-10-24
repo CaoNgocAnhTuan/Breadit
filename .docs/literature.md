@@ -18,6 +18,8 @@ Working notes for P1. Not thesis text.
 | [10] | Orkut communities (Chen 2009) | paper | verified | full text | 2026-10-24 | Ch2 |
 | [11] | Reddit hot sort (Reddit 2015) | code | verified | full text | 2026-10-24 | Ch3 |
 | [12] | Hacker News ranking (Shirriff 2013) | blog | verified | full text | 2026-10-24 | Ch3 |
+| [13] | Splitting strategies (Meng 2020) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
+| [14] | Data leakage (Ji 2023) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [15] | Sampled metrics (Krichene 2020) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [23] | Influence and correlation (Anagnostopoulos 2008) | paper | verified | index record | 2026-10-24 | not cited |
@@ -221,6 +223,28 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Feeds: super-plan §5 (methods), super-plan §7 (grid sizes)
 - Author's note:
 
+### D6. Protocol
+- Question: How do we split and measure without bias?
+- Decides: The protocol (§5)
+- Options: (a) the protocol of super-plan §5: as-of temporal leave-last-out per user, full ranking, no sampled negatives; (b) a global temporal split, with one time point for all users ([13] §5, [14] §5); (c) a random split.
+- Evidence:
+  - [13] §2: leaving out each user's last item can leak future evidence into training. §4: the ranking of the models changes with the split. §5: the global temporal split should be the default.
+  - [14] §1 and §2.2: training interactions that happen after the test instances are a source of leakage, for leave-last-out and for random splits. §4.1: models then recommend items that did not exist yet. §4.2: the effect is as large as 89.5% in accuracy, with no clear pattern in the model ranking. §5: a timeline scheme is proposed. The preprint says this; the journal copy was not read.
+- Against: [13] §5 recommends the global temporal split as the default, and [14] §5 prefers its timeline scheme to leave-last-out alone. Our test time `t_u` differs per user. The as-of features of super-plan §5 apply the same principle (nothing after `t_u` is used for u), but the tuning of `m`, α and β is a gap (see the table).
+- Leakage table: each case of [14] against the protocol of super-plan §5.
+
+| Leakage case ([14] section) | Our protocol (super-plan §5) | Status |
+|---|---|---|
+| Training interactions that happen after the test instances (§1) | every feature for u uses only events strictly before `t_u`, and nothing is trained on later events | covered by the plan, to be tested by the P5 leakage test |
+| Leave-last-out with a collaborative model: similar users' later items are future for u's test point (§2.2) | as-of features use other users' events only before `t_u`, and the scores are heuristics with no collaborative model | covered by the plan, to be tested by the P5 leakage test |
+| Random split by ratio or by user (§2.2) | not used: the split is a per-user temporal leave-last-out | not applicable |
+| Recommending items that do not exist yet at the test time (§4.1) | the pool holds posts created before `t_u` | covered by the plan, to be tested by the P5 leakage test |
+| Duplicated interactions (§3.1; [14] removes them in preprocessing and does not call them leakage) | the test item is a post the user had not touched before, and the pool drops the user's earlier positives | not applicable |
+| Tuning on the validation items of the test users (§3.2; [14] does not call it leakage) | the validation item is the one before the test item of each user, so tuned values (`m`, α, β) can use events later than another user's test time | gap |
+| Features built from future data (not a case in [14]; the whole text was searched) | as-of features are our own rule (super-plan §5) | covered by the plan, to be tested by the P5 leakage test |
+
+- Label: consistent only
+
 ## 6. Other references
 
 ### [3] DiffNet (Wu 2019)
@@ -278,6 +302,20 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - For us: D5, the formula of BL5, with penalties ignored (super-plan §5).
 - Cited in: Ch3
 - Anchor: the paragraph that starts "In case you don't read Arc code": gravity 1.8 and timebase 120.
+
+### [13] Splitting strategies (Meng 2020)
+- Opened: 2026-10-24, full text [arXiv 2007.13237v1, sha256 f07580de388a]
+- Says: Zaiqiao Meng, Richard McCreadie, Craig Macdonald and Iadh Ounis (RecSys 2020) compare split strategies on two grocery data sets (Tafeng and Dunnhumby) with seven recommenders (§3). The ranking of the models changes with the split, and Kendall's tau between pairs of strategies is only moderate, 0.5284 to 0.7630 (§4). Leaving out each user's last item can leak future evidence into training (§2). The paper recommends the global temporal split as the default (§5).
+- For us: D6. It cuts against a per-user leave-last-out for trained models. The paper says nothing about sampled versus full ranking, and nothing about ties.
+- Cited in: Ch2, Ch3
+- Anchor: §5, best practice 2: "This is generally seen as the most realistic setting, and so should be the default splitting strategy used."
+
+### [14] Data leakage (Ji 2023)
+- Opened: 2026-10-24, full text [arXiv 2010.11060v4, 30 Oct 2022, marked "Accepted by TOIS"; this is the preprint, not the typeset journal copy, sha256 e10a1ebfbccc]
+- Says: Yitong Ji, Aixin Sun, Jie Zhang and Chenliang Li (ACM TOIS 41(3), 2023). The preprint says that, with four models (BPR, NeuMF, SASRec, LightGCN) on four data sets (MovieLens-25M, Yelp, Amazon-music, Amazon-electronic), training on data from the future changes the reported accuracy by as much as 89.5% and changes the ranking of the models with no clear pattern (§4.2). The cause is a split that does not follow the global timeline (§2.2). The authors propose a timeline scheme (§5).
+- For us: D6 and the leakage table. The paper has no case about features built from future data, so the as-of rule of super-plan §5 is our own design.
+- Cited in: Ch2, Ch3
+- Anchor: §4.2: "the magnitudes in Table 5 can be as high as 89.5%, and there is no particular pattern."
 
 ### [16] Target item sampling (Cañamares 2020)
 - Opened: 2026-10-24, abstract only [Semantic Scholar record of DOI 10.1145/3383313.3412259; Crossref gives the same title, authors, year and pages 259-268]

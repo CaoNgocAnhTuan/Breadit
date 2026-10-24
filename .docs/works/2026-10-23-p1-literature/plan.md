@@ -150,10 +150,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 14: D6 Protocol, part 1: [13] and [14] (effort S)
 
-- [ ] Test first: `grep -c '^### D6\.' .docs/literature.md` prints `0`, because D6 does not exist yet
-- [ ] Change: [13] and [14]: status rows and entries in §6 ([14] in full text, it is the base of the leakage table). Start D6 in §5 with `Question`, `Decides`, `Options`, `Evidence`, `Against` and `Label`, and the leakage table: the header starts with `| Leakage case |`, each case has its [14] section, and the last column is the status, which is "covered by the plan, to be tested by the P5 leakage test", "gap" or "not applicable" and nothing else. `Choice`, `Status`, `Result` and `Feeds` wait for Step 15
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 | grep -E '^ +D6\. bad leakage'` prints nothing; `part.sh 10 | grep -E '^ +D6\. missing'` prints the single line `D6. missing: Choice Status Result Feeds` (indented by four spaces)
-- [ ] Commit: `docs: decision D6 (protocol), leakage table from [14]`
+- [x] Test first: `grep -c '^### D6\.' .docs/literature.md` prints `0`, because D6 does not exist yet
+- [x] Change: [13] and [14]: status rows and entries in §6 ([14] in full text, it is the base of the leakage table). Start D6 in §5 with `Question`, `Decides`, `Options`, `Evidence`, `Against` and `Label`, and the leakage table: the header starts with `| Leakage case |`, each case has its [14] section, and the last column is the status, which is "covered by the plan, to be tested by the P5 leakage test", "gap" or "not applicable" and nothing else. `Choice`, `Status`, `Result` and `Feeds` wait for Step 15
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 | grep -E '^ +D6\. bad leakage'` prints nothing; `part.sh 10 | grep -E '^ +D6\. missing'` prints the single line `D6. missing: Choice Status Result Feeds` (indented by four spaces)
+- [x] Commit: `docs: decision D6 (protocol), leakage table from [14]`
 
 ### Step 15: D6 Protocol, part 2: [17], [18], claim 8 (effort S)
 
