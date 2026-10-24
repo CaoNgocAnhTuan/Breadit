@@ -122,10 +122,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 10: D1 Trust, claims 2 and 5 (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 12 | grep -E '^ +D1 '` (TC12) prints `D1 does not cover the author term`, and `grep -c '^### D1\.' .docs/literature.md` prints `0`, because D1 does not exist yet
-- [ ] Change: [8] SocialMF: status row and entry in §6. D1 in §5, inserted before D2: options, evidence, `Against`, label, choice, result, feeds. At least four `Domain gap:` sub-bullets, one per source ([5], [6], [2], [8]: task, data, graph type, learned or heuristic). It covers the fade over time (none, half-life or window), the author term (DW5), the RealGraph wording (claim 2) and the Twitter code (claim 3). Complete the rows of claim 2 and claim 5
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11 12` prints four `PASS` lines (TC12 now sees both D1 and D2); `part.sh 10 | grep -E '^ +D1\. '` prints nothing; `grep -n '^### D' .docs/literature.md` lists D1 before D2 (DW4, DW5)
-- [ ] Commit: `docs: decision D1 (trust), SocialMF entry`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 12 | grep -E '^ +D1 '` (TC12) prints `D1 does not cover the author term`, and `grep -c '^### D1\.' .docs/literature.md` prints `0`, because D1 does not exist yet
+- [x] Change: [8] SocialMF: status row and entry in §6. D1 in §5, inserted before D2: options, evidence, `Against`, label, choice, result, feeds. At least four `Domain gap:` sub-bullets, one per source ([5], [6], [2], [8]: task, data, graph type, learned or heuristic). It covers the fade over time (none, half-life or window), the author term (DW5), the RealGraph wording (claim 2) and the Twitter code (claim 3). Complete the rows of claim 2 and claim 5
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11 12` prints four `PASS` lines (TC12 now sees both D1 and D2); `part.sh 10 | grep -E '^ +D1\. '` prints nothing; `grep -n '^### D' .docs/literature.md` lists D1 before D2 (DW4, DW5)
+- [x] Commit: `docs: decision D1 (trust), SocialMF entry`
 
 ### Step 11: D3 Community (effort S)
 

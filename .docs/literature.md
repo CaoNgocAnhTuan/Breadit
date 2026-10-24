@@ -11,6 +11,7 @@ Working notes for P1. Not thesis text.
 | [5] | RealGraph (Kamath 2014) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [6] | Twitter code (Twitter 2023) | code | verified | full text | 2026-10-24 | Ch2 |
 | [7] | Twitter blog (2023) | blog | do not cite, use [6] | index record | 2026-10-24 | not cited |
+| [8] | SocialMF (Jamali 2010) | paper | verified | index record | 2026-10-24 | not cited |
 | [9] | Social CF for cold start (Sedhain 2014) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [15] | Sampled metrics (Krichene 2020) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
@@ -23,17 +24,17 @@ Working notes for P1. Not thesis text.
 
 | # | Claim | Status | Evidence |
 |---|---|---|---|
-| 2 | RealGraph gives directed edge weights between users, learned from past interaction data. The weight is the predicted probability of a future interaction, not a count of past interactions. Super-plan §6 line 294 says "past interaction", which is looser. | supported | [5]: §1 defines the weight as the probability of an interaction from the source to the destination user in the future; §2.2 trains a logistic regression with a binary label on edge and user features; §3.1 gives the AUC per feature group |
+| 2 | RealGraph gives directed edge weights between users, learned from past interaction data. The weight is the predicted probability of a future interaction, not a count of past interactions. Super-plan §6 line 294 says "past interaction", which is looser. | supported | [5]: §1 defines the weight as the probability of an interaction from the source to the destination user in the future; §2.2 trains a logistic regression with a binary label on edge and user features; §3.1 gives the AUC per feature group. D1 uses this; Step 24 changes the wording of super-plan §6 line 294 |
 | 3 | In the 2023 release at commit `ef4c5eb65e6e04fac4f0e1fa8bbeff56b75c1f98`, home-mixer reads each viewer's RealGraph scores for followed users (top 1000 by score) and attaches the RealGraph edge features of the pair (viewer, author) to each tweet candidate. The files show these as inputs (features); they do not show how a ranker weights them. The newer release [30] has no RealGraph file and ranks with a transformer. | supported | [6]: `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphInNetworkScoresQueryFeatureHydrator.scala`, lines 26-40; `home-mixer/server/src/main/scala/com/twitter/home_mixer/store/RealGraphInNetworkScoresStore.scala`, line 18; `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphViewerAuthorFeatureHydrator.scala`, lines 27-31 and 63-93; [30]: README, Overview |
 | 4 | The form of the smoothing, (count + m × prior) / (total + m), is the m-estimate of Cestnik (1990), a known technique from classification. Using it for trust and community, and the value of `m`, are our own design. Super-plan §6 line 293 says "not a cited method". | supported | [29]: §2.4, eq. 19, p.6 (a secondary source for [28]); [28]: index record only, the paper was not read |
-| 5 | The notes decide each of the three §6 choices with evidence. The D2 half: smoothing with `m` and one curve instead of three phases are decided in D2. The author term waits for D1 (Step 10). | supported | D2: the form follows [29] eq. 19; the weight of the prior is `m / (N_u + m)` (algebra on eq. 19); replacing the three phases is our own design |
+| 5 | The notes decide each of the three §6 choices with evidence. Smoothing with `m` and one curve instead of three phases are decided in D2. The author term is decided in D1. | supported | D2: the form follows [29] eq. 19; the weight of the prior is `m / (N_u + m)` (algebra on eq. 19); replacing the three phases is our own design. D1: the author term is kept, by analogy with [6] lines 63-93 and [5] §1 |
 
 ## 3. How this file was made
 
 - PDF tool: PDFKit through the compiled `pdftxt` (Swift 5.9.2, source `.docs/works/2026-10-23-p1-literature/pdftxt.swift`, built with `swiftc -framework PDFKit`), tested on [5] (title, authors and the first sentence of the abstract read well) and on [25] (authors and abstract read well, a table and the text of page 3 come out in the right order; the title lost its spaces and PDFKit printed one "CoreGraphics PDF has logged an error" line), 2026-10-24, pass.
 - Tools that failed:
   - `swift pdftxt.swift` (interpreted): fails with "Symbols not found: PDFDocument", so the tool is compiled.
-- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [2] Ma 2008 (ACM 403, repository needs a login), [9] Sedhain 2014 (repository copy embargoed), [16] Cañamares 2020 (closed access), [28] Cestnik 1990 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
+- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [8] Jamali 2010 (no legal copy found), [2] Ma 2008 (ACM 403, repository needs a login), [9] Sedhain 2014 (repository copy embargoed), [16] Cañamares 2020 (closed access), [28] Cestnik 1990 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
 
 ## 4. Core papers
 
@@ -102,6 +103,32 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 
 ## 5. Design decisions
 
+### D1. Trust
+- Question: How much should a follow count (trust), and should it fade over time?
+- Decides: The trust formula (§6)
+- Options: (a) trust is the share of u's earlier positives that went to f's posts, smoothed with `m` (super-plan §6, D2); (b) a learned weight, as RealGraph does: a logistic regression on many edge and user features ([5] §2.2); (c) a plain follow: every followee counts the same.
+- Evidence:
+  - [5] §1: the weight of a directed pair is "defined as the probability of any inter- action going from the edge source to the edge destination in the future". §2.2: it is learned with a logistic regression and a binary label. §2.1: "we decay historical interaction values" and an edge is removed when its latest interaction is too old. §2.1.1: one feature is a daily exponentially decayed count.
+  - [6] `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphViewerAuthorFeatureHydrator.scala`, lines 27-31 and 63-93 at commit `ef4c5eb65e6e04fac4f0e1fa8bbeff56b75c1f98`: the RealGraph features of the pair (viewer, author) are attached to each tweet candidate. They are inputs; the code does not show their weights.
+  - [7] index record: not read, so not used.
+  - [2] abstract only: uses the social network and the ratings together in a matrix factorization; the abstract has no link formula.
+  - [8] index record: only the title was seen, which names trust propagation in a matrix factorization.
+- Domain gap:
+  - [5] task: ranking users to follow and similar uses (§2.3). Data: Twitter interaction logs. Graph: directed and weighted. Learned (§2.2). Ours is a heuristic count for ranking posts.
+  - [6] task: ranking tweets for a timeline. Data: Twitter production data. Graph: the pair (viewer, author) as a per-candidate input. The ranker that uses it is not in the files, so learned or heuristic is unknown.
+  - [2] task: predicting ratings. Data: ratings with a social network (abstract only). Graph: not stated. Learned (a probabilistic matrix factorization).
+  - [8] from the title only: a matrix factorization with trust propagation, so learned. Task, data and graph were not read.
+- Fade over time: options are none, a half-life or a window. The §6 formula has none. [5] decays old interactions (§2.1) and drops old edges, so [5] cuts against "none". The core formula keeps no fade, to avoid a new parameter that super-plan §7 does not hold. PC2 puts the question to the author.
+- Author term (DW5): a post by a followee that nobody has engaged with yet gets no score from the friends' sum, so the term `[u follows author(p)] · trust(u, author(p), t)` is kept. [6] also feeds the viewer-author pair to its ranker for every candidate (lines 63-93). E4 shows what the term adds.
+- Claims 2 and 3: [5] says "probability of a future interaction", not "past interaction", so the super-plan wording is looser (claim 2; Step 24 changes line 294). The code of [6] shows features, not weights (claim 3, §2).
+- Against: [5] decays old interactions and learns its weight; ours does not decay and is a plain smoothed count, so we may say "in the spirit of RealGraph", not "like RealGraph". [30] ranks with a transformer and has no RealGraph file, so production may have moved to a learned model.
+- Label: by analogy (abstract only)
+- Choice: option (a), with the author term. By analogy with [5] for weighting a directed user pair by past interaction, and with [6] for using the (viewer, author) pair as an input for every candidate. No fade in the core formula.
+- Status: proposed change (PC2)
+- Result: `trust(u, f, t)` and the author term as in super-plan §6, with every event strictly before t. The fade question goes to the author (PC2).
+- Feeds: super-plan §6 (`trust` and the author term)
+- Author's note:
+
 ### D2. No history
 - Question: How do we help users with no history yet?
 - Decides: The prior `m` and its form (§6)
@@ -145,6 +172,12 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - For us: super-plan §6 cites it together with [6] for the use of RealGraph in the ranking. Use [6] instead. Step 24 tries the snapshot again.
 - Cited in: not cited
 
+### [8] SocialMF (Jamali 2010)
+- Opened: 2026-10-24, index record [Crossref record of DOI 10.1145/1864708.1864736; the ACM page is paywalled and no legal full text was found]
+- Says: Mohsen Jamali and Martin Ester, "A matrix factorization technique with trust propagation for recommendation in social networks", RecSys 2010, pp. 135-142 (Crossref). No abstract or text was read, so nothing is claimed about the method.
+- For us: D1 and D4 (trust and hops). The title names trust propagation, but a title supports no decision.
+- Cited in: not cited
+
 ### [16] Target item sampling (Cañamares 2020)
 - Opened: 2026-10-24, abstract only [Semantic Scholar record of DOI 10.1145/3383313.3412259; Crossref gives the same title, authors, year and pages 259-268]
 - Says: the paper studies how the choice of target set in offline evaluation changes the result of comparing recommenders. The abstract says that reduced target sets often contradict the result with large targets, and that minimum sets distort pairwise comparisons while maximum sets may not be ideal either. Super-plan §10 gives the code repository as the link. The paper itself is DOI 10.1145/3383313.3412259 (RecSys 2020).
@@ -186,3 +219,4 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | ID | Change | Where | Evidence | Goes to |
 |---|---|---|---|---|
 | PC1 | Say that the form of the smoothing is the m-estimate, not "my own suggestion, not a cited method". Using it for trust, and the value of `m`, stay our own. Add [28] and [29] to §10 with their marks. | super-plan §6 line 293, §10 | D2; [29] §2.4 eq. 19 | the author (super-plan edit) |
+| PC2 | Decide whether trust fades with time: none, a half-life or a window. [5] decays old interactions and drops old edges; the §6 formula has none. A fade adds a parameter to super-plan §7 and a cell to E4. | super-plan §6, §7 | D1; [5] §2.1 and §2.1.1 | the author (decides; /freeze for a new value) |
