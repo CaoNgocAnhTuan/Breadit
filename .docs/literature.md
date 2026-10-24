@@ -8,6 +8,8 @@ Working notes for P1. Not thesis text.
 |---|---|---|---|---|---|---|
 | [1] | Social recommendation review (Tang 2013) | survey | verified | abstract only | 2026-10-24 | not cited |
 | [2] | SoRec (Ma 2008) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [3] | DiffNet (Wu 2019) | paper | verified | full text | 2026-10-24 | Ch2 |
+| [4] | GNN social recommender survey (Sharma 2024) | survey | verified | full text | 2026-10-24 | Ch2 |
 | [5] | RealGraph (Kamath 2014) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [6] | Twitter code (Twitter 2023) | code | verified | full text | 2026-10-24 | Ch2 |
 | [7] | Twitter blog (2023) | blog | do not cite, use [6] | index record | 2026-10-24 | not cited |
@@ -29,6 +31,7 @@ Working notes for P1. Not thesis text.
 | 3 | In the 2023 release at commit `ef4c5eb65e6e04fac4f0e1fa8bbeff56b75c1f98`, home-mixer reads each viewer's RealGraph scores for followed users (top 1000 by score) and attaches the RealGraph edge features of the pair (viewer, author) to each tweet candidate. The files show these as inputs (features); they do not show how a ranker weights them. The newer release [30] has no RealGraph file and ranks with a transformer. | supported | [6]: `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphInNetworkScoresQueryFeatureHydrator.scala`, lines 26-40; `home-mixer/server/src/main/scala/com/twitter/home_mixer/store/RealGraphInNetworkScoresStore.scala`, line 18; `home-mixer/server/src/main/scala/com/twitter/home_mixer/functional_component/feature_hydrator/RealGraphViewerAuthorFeatureHydrator.scala`, lines 27-31 and 63-93; [30]: README, Overview |
 | 4 | The form of the smoothing, (count + m × prior) / (total + m), is the m-estimate of Cestnik (1990), a known technique from classification. Using it for trust and community, and the value of `m`, are our own design. Super-plan §6 line 293 says "not a cited method". | supported | [29]: §2.4, eq. 19, p.6 (a secondary source for [28]); [28]: index record only, the paper was not read |
 | 5 | The notes decide each of the three §6 choices with evidence. Smoothing with `m` and one curve instead of three phases are decided in D2. The author term is decided in D1. | supported | D2: the form follows [29] eq. 19; the weight of the prior is `m / (N_u + m)` (algebra on eq. 19); replacing the three phases is our own design. D1: the author term is kept, by analogy with [6] lines 63-93 and [5] §1 |
+| 6 | 1 hop is our choice. A hop is one edge of the follow graph. 1 hop is partly a scope choice, because graph neural networks are out of scope (super-plan §9). [3] and [4] speak of layers, not hops. | own design | D4: [3] §3.1, §3.3.1 and Table 4 (§4.4); [4] §5.1 and Table 5; [8] is an index record and is not used |
 
 ## 3. How this file was made
 
@@ -175,7 +178,40 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Feeds: super-plan §6 (`community`) and §5 (the pool)
 - Author's note:
 
+### D4. Hops
+- Question: Should influence reach friends of friends (2 hops)?
+- Decides: 1 hop or 2, and the Chapter 2 argument for the choice
+- Options: (a) 1 hop: only the accounts u follows count (super-plan §6); (b) 2 hops: also the accounts that those accounts follow, with trust multiplied along the path; (c) a learned diffusion over K layers, as in [3] (out of scope, super-plan §9).
+- Definition: a hop is one edge of the follow graph. 1 hop reaches the accounts u follows. 2 hops also reach the accounts that those accounts follow. The sum over followees who engaged and the author term of super-plan §6 use 1 hop. [3] and [4] speak of layers, not hops: [4] never uses the word, and [3] only hypothesises a link to k-hop neighbours (§4.4). A layer is therefore not the same as a hop here.
+- Evidence:
+  - [3] §3.1: each user embedding is mixed with the embeddings of the users it trusts, for K steps (layers). §3.3.1 and Table 4 (§4.4): K = 2 is best on Yelp and Flickr. On HR@10, K = 1 is 2.50% (Yelp) and 2.96% (Flickr) below K = 2, and K = 3 drops again. The paper sets K = 2 (§4.1). The NDCG value printed for Yelp with K = 1 looks like a typo, so only HR@10 is used.
+  - [4] §5.1 and Table 5: oversmoothing is listed as a known issue of GCN and graph attention encoders. §5.4 only defines K as the number of layers. The survey gives no best number of layers.
+  - [8] index record: only the title was seen (trust propagation), so it is not used.
+- Against: in [3], 2 layers beat 1 by about 3% on HR@10 on two data sets, so 1 hop leaves a gain unused in that setting. The comparison is by analogy, because [3] learns embeddings and our trust is a heuristic count.
+- Scope: 1 hop is partly a scope choice. Graph neural networks such as [3] are out of scope (super-plan §9). A 2-hop heuristic needs a rule for the trust of a friend of a friend, and no source in this file gives one.
+- Chapter 2 argument: we use 1 hop. In [3], 2 diffusion layers beat 1 by about 3% on HR@10, but that model learns embeddings, and [4] names oversmoothing as a known issue of deeper encoders. Our trust is a heuristic count. A learned diffusion is out of scope, so 2 hops are named as a limitation and as future work.
+- Label: against (abstract only)
+- Choice: option (a), 1 hop. Own design. [3] cuts against it for a learned model; the choice rests on scope (super-plan §9) and on the heuristic form of our trust.
+- Status: decided
+- Result: 1 hop in the `social` term and in the author term (super-plan §6). 2 hops is a limitation named in Chapter 2.
+- Feeds: super-plan §6 (`social`); the Chapter 2 argument (super-plan §9)
+- Author's note:
+
 ## 6. Other references
+
+### [3] DiffNet (Wu 2019)
+- Opened: 2026-10-24, full text [arXiv 1904.10322v1, sha256 8ff64645267c]
+- Says: Le Wu, Peijie Sun, Yanjie Fu, Richang Hong, Xiting Wang and Meng Wang, "A Neural Influence Diffusion Model for Social Recommendation" (SIGIR 2019; the model is called DiffNet). Each user embedding is mixed with the average embedding of the users it trusts, repeated for K steps (§3.1). K = 2 is best (§3.3.1). On Yelp and Flickr, K = 1 is 2.50% and 2.96% below K = 2 on HR@10, and K = 3 drops again (Table 4, §4.4). The paper has no formal definition of a hop; §4.4 only hypothesises a link to k-hop neighbours.
+- For us: D4. It is a neural embedding model, not a count, so its depth result is by analogy only.
+- Cited in: Ch2
+- Anchor: §4.4, Table 4: HR@10 for K = 0 to 3, with K = 2 best on both data sets.
+
+### [4] GNN social recommender survey (Sharma 2024)
+- Opened: 2026-10-24, full text (§1, §4.1.2–4.1.3, §5.1–5.1.3, §5.4, §6.3, §7, §8) [arXiv 2212.04481v3, the preprint (volume and issue are not shown, so it may differ from the ACM copy), sha256 ed3630bc5228]
+- Says: Kartik Sharma and six co-authors review GNN-based social recommender systems. They annotate 2,151 papers with the PRISMA framework and identify 84 on GNN-based social recommenders (abstract). Table 5 (§5.1) compares encoders: GCN and graph attention encoders list oversmoothing as a known issue. The word "hop" never appears in the text, and no best number of layers is given.
+- For us: D4. Only the parts named in Opened were read, so it can support a statement only about those sections.
+- Cited in: Ch2
+- Anchor: §5.1, Table 5: the Known Issues column lists oversmoothing for the GCN and GANN rows.
 
 ### [6] Twitter code (Twitter 2023)
 - Opened: 2026-10-24, full text [github.com/twitter/the-algorithm, commit ef4c5eb65e6e04fac4f0e1fa8bbeff56b75c1f98 (2023-03-31, "Twitter Recommendation Algorithm"); the three files named below were read in full]

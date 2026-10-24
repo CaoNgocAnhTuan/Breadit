@@ -136,10 +136,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 12: D4 Hops, claim 6, DiffNet title (effort S)
 
-- [ ] Test first: `grep -c '^### D4\.' .docs/literature.md` prints `0` and `grep -ic 'neural influence' .docs/literature.md` prints `0`, because D4 and the entry for [3] do not exist yet
-- [ ] Change: [3] DiffNet and [4] Sharma 2024 (a long survey: `full text (§x–y)` is allowed for the sections that D4 uses): status rows and entries in §6. Use the exact title "A Neural Influence Diffusion Model for Social Recommendation" or the bare name "DiffNet", never "DiffNet:" as a prefix. D4 in §5: the definition of "hop", the statement that 1 hop is partly a scope choice (super-plan §9), and a short argument for Chapter 2. Add the row for claim 6
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11 13` prints four `PASS` lines, and the `CHECK` lines of TC13 show only the exact title or the bare name (DW6); `part.sh 10 | grep -E '^ +D4\. '` prints nothing; `grep -c '^### D4\.' .docs/literature.md` prints `1`
-- [ ] Commit: `docs: decision D4 (hops), DiffNet and Sharma entries`
+- [x] Test first: `grep -c '^### D4\.' .docs/literature.md` prints `0` and `grep -ic 'neural influence' .docs/literature.md` prints `0`, because D4 and the entry for [3] do not exist yet
+- [x] Change: [3] DiffNet and [4] Sharma 2024 (a long survey: `full text (§x–y)` is allowed for the sections that D4 uses): status rows and entries in §6. Use the exact title "A Neural Influence Diffusion Model for Social Recommendation" or the bare name "DiffNet", never "DiffNet:" as a prefix. D4 in §5: the definition of "hop", the statement that 1 hop is partly a scope choice (super-plan §9), and a short argument for Chapter 2. Add the row for claim 6
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11 13` prints four `PASS` lines, and the `CHECK` lines of TC13 show only the exact title or the bare name (DW6); `part.sh 10 | grep -E '^ +D4\. '` prints nothing; `grep -c '^### D4\.' .docs/literature.md` prints `1`
+- [x] Commit: `docs: decision D4 (hops), DiffNet and Sharma entries`
 
 ### Step 13: D5 Baselines, claim 7 (effort S)
 
