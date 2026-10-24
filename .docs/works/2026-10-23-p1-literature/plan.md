@@ -29,6 +29,7 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
   - **Extracts saved in the repo.** The scratchpad is temporary. The extracts of 2026-10-24 are copied to `.docs/works/2026-10-23-p1-literature/extracts/NN.md` (no PDF, no `paper.txt`), with `MANIFEST.md`. They are inputs for the entries, not thesis text. Step 2 notes that `checkquotes.py` can only run while the scratchpad copy exists.
   - **Version.** `Opened:` names the exact version that was read. An arXiv preprint is not the typeset journal copy: [4] was read as arXiv v3 and [14] as arXiv v4. The entry says so, and a claim is worded as "the preprint says".
   - **A source that cannot be opened.** If the only copy is closed, behind a login, embargoed, or blocked with a 403 or 429, the agent does not get around it and does not use a third-party upload. The entry stays `abstract only`, `index record` or `do not cite`, and goes on the "Needs full text" list. The author may save a PDF by hand in `refs-manual/`, and then a Haiku agent reads it.
+- **Core paper without full text (changed 2026-10-24, plan reopened).** The author could not save [1], [2] and [9] (Springer sells [1]; [2] and [9] need a library or the authors). [15] came as `refs-manual/15.pdf` and is full text. For a core paper with no full text, the entry is `abstract only`, `not cited`, on the "Needs full text" list, and its guide is the line "Could not be opened on <date>. This guide is from the abstract only." followed by three questions, with no `- Read:` line and no "(answer in §x)" ending. TC14 in `check.sh` accepts this (design §1.6; `check.sh` is now 276 lines, sha `dafbf453fa82`) only when Read is not `full text`. If a PDF arrives later (`refs-manual/NN.pdf`), a Haiku agent reads it and the guide is rewritten in the normal form. The commit of Step 5 also holds the changed `design.md` and `check.sh`.
 - **Needs from the author.** `brew install poppler` (only if Step 2 fails twice), paywalled papers (Steps 4 to 16), the decision after Step 16, and the spot check (Step 25). The four open questions in spec §8 are still on their defaults (design, top).
 - **Commits** go on `test-app` and are never pushed. A step's commit holds its own files and this `plan.md` (the ticks, including the Commit box, are made just before the commit). The first commit also adds the task folder (spec, design, plan).
 - Effort scale: XS under 30 minutes, S under 2 hours.
@@ -48,7 +49,7 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
   - `part.sh`, 5 lines: it loads the functions of `check.sh` with `eval "$(sed '/^out=\$(tc2)/,$d' "$(dirname "$0")/check.sh")"`, then runs `run "TC$t" "tc$t"` for each argument and ends with `exit "$FAILED"`. It uses `eval`, because `source <(…)` does not work in the macOS bash 3.2
   - `pdftxt.swift`, taken from the ```swift block of design §1.7, Step 0
-- [x] Verify: `bash -n .docs/works/2026-10-23-p1-literature/check.sh` prints nothing; `wc -l < .docs/works/2026-10-23-p1-literature/check.sh` prints `273`; `shasum -a 256 .docs/works/2026-10-23-p1-literature/check.sh | cut -c1-12` prints `a18b73504187` (the copy the designer and the gate reviewer tested); `bash .docs/works/2026-10-23-p1-literature/check.sh | head -1` prints `TC2 FAIL (the other checks need the right reference set, so they did not run)`; `bash .docs/works/2026-10-23-p1-literature/part.sh 4 | head -1` prints `TC4 FAIL`
+- [x] Verify: `bash -n .docs/works/2026-10-23-p1-literature/check.sh` prints nothing; `wc -l < .docs/works/2026-10-23-p1-literature/check.sh` prints `273`; `shasum -a 256 .docs/works/2026-10-23-p1-literature/check.sh | cut -c1-12` prints `a18b73504187` (the copy the designer and the gate reviewer tested; after the TC14 change of 2026-10-24 the file has 276 lines and the sha is `dafbf453fa82`, see "Core paper without full text" above); `bash .docs/works/2026-10-23-p1-literature/check.sh | head -1` prints `TC2 FAIL (the other checks need the right reference set, so they did not run)`; `bash .docs/works/2026-10-23-p1-literature/part.sh 4 | head -1` prints `TC4 FAIL`
 - [x] Commit: `docs: P1 literature task (spec, design, plan) and check scripts`
 
 ### Step 2: Tools and the file skeleton (effort S)
@@ -83,10 +84,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 5: Core paper [1] Tang (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 14` (TC14). It reports `1 reading guides, want 5`
-- [ ] Change: add the status row and the entry with the reading guide in §4, before [5] (number order). [1] is a long survey: the entry may say `full text (§x–y)`, and then it can support a decision only about those sections. The status table keeps `full text`. Ask the author if it is paywalled and only the abstract opened
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 4 5 | grep -c '^TC[0-9]* PASS'` prints `3`; `part.sh 14` prints `TC14 FAIL` and the single line `2 reading guides, want 5`
-- [ ] Commit: `docs: core entry for Tang [1]`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 14` (TC14). It reports `1 reading guides, want 5`
+- [x] Change: add the status row and the entry with the reading guide in §4, before [5] (number order). [1] is a long survey: the entry may say `full text (§x–y)`, and then it can support a decision only about those sections. The status table keeps `full text`. The author was asked on 2026-10-24: [1] is paywalled (Springer shows "Buy article PDF") and only the abstract could be opened, so the entry is `abstract only` with the fallback guide (see "Core paper without full text" above), unless `refs-manual/01.pdf` exists
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 4 5 | grep -c '^TC[0-9]* PASS'` prints `3`; `part.sh 14` prints `TC14 FAIL` and the single line `2 reading guides, want 5`
+- [x] Commit: `docs: core entry for Tang [1]`
 
 ### Step 6: Core paper [2] SoRec (effort S)
 
@@ -98,7 +99,7 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 ### Step 7: Core papers [9] Sedhain and [15] Krichene and Rendle (effort S)
 
 - [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 14` (TC14). It still reports `3 reading guides, want 5`
-- [ ] Change: add the status rows and the entries with reading guides in §4 ([9], [15])
+- [ ] Change: add the status rows and the entries with reading guides in §4 ([9], [15]). [9] is `abstract only` with the fallback guide (no PDF, the ANU copy is embargoed). [15] is `full text` from `refs-manual/15.pdf` (sha256 first 12 hex `5212f092b6ae`, the KDD '20 version); its extract is `extracts/15.md` and its guide is in the normal form
 - [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 4 5 14` prints four `PASS` lines (DW7: five guides, each with one Read line and three questions)
 - [ ] Commit: `docs: core entries for Sedhain [9] and Krichene and Rendle [15]`
 
@@ -298,4 +299,4 @@ Left open:
   - [14] has no case about features built from future data. Super-plan line 252 cites it for as-of features, so the as-of rule is our own design.
   - [3] and [4] never define "hop" (they use layers), which D4 must do itself.
   - [24] does not state the limits of its own simulations, so claim 9 is our own argument.
-  - Needs full text from the author: [1], [2], [8], [9], [15], [16], [23]. Until they are read, D1, D2, D6 and D7 cannot cite them.
+  - Needs full text from the author: [1], [2], [8], [9], [16], [23] ([15] arrived on 2026-10-24 as `refs-manual/15.pdf`). Until they are read, D1, D2, D6 and D7 cannot cite them. [1] is paywalled (not open access, as the first extract said).

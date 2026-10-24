@@ -6,6 +6,7 @@ Working notes for P1. Not thesis text.
 
 | Ref | Short name | Type | Verified | Read | Opened | Cited in |
 |---|---|---|---|---|---|---|
+| [1] | Social recommendation review (Tang 2013) | survey | verified | abstract only | 2026-10-24 | not cited |
 | [5] | RealGraph (Kamath 2014) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [7] | Twitter blog (2023) | blog | do not cite, use [6] | index record | 2026-10-24 | not cited |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
@@ -22,9 +23,21 @@ Working notes for P1. Not thesis text.
 - PDF tool: PDFKit through the compiled `pdftxt` (Swift 5.9.2, source `.docs/works/2026-10-23-p1-literature/pdftxt.swift`, built with `swiftc -framework PDFKit`), tested on [5] (title, authors and the first sentence of the abstract read well) and on [25] (authors and abstract read well, a table and the text of page 3 come out in the right order; the title lost its spaces and PDFKit printed one "CoreGraphics PDF has logged an error" line), 2026-10-24, pass.
 - Tools that failed:
   - `swift pdftxt.swift` (interpreted): fails with "Symbols not found: PDFDocument", so the tool is compiled.
-- Needs full text (for the author): [16] Cañamares 2020 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
+- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [16] Cañamares 2020 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
 
 ## 4. Core papers
+
+### [1] Social recommendation review (Tang 2013)
+#### Reading guide
+Could not be opened on 2026-10-24. This guide is from the abstract only.
+1. How does the review define social recommendation, and which kinds of social information does it name (trust, friends, follows)?
+2. How does it split memory-based and model-based social recommenders, and where does it put trust and its propagation?
+3. Which positive and negative experiences does it report for social recommendation, and does it cover users with no history?
+
+- Opened: 2026-10-24, abstract only [Springer landing page of DOI 10.1007/s13278-013-0141-9; the PDF is sold ("Buy article PDF"), so no full text was read]
+- Says: a review of social recommender systems by Jiliang Tang, Xia Hu and Huan Liu (Social Network Analysis and Mining 3(4), pp. 1113-1133). The abstract says it gives formal definitions, sorts systems into memory-based and model-based ones, and reports findings from positive and negative experiences and research directions.
+- For us: Chapter 2 background on social recommendation and D2 (users with no history). The abstract names no trust formula, hop count or cold-start result, so it supports no decision.
+- Cited in: not cited
 
 ### [5] RealGraph (Kamath 2014)
 #### Reading guide

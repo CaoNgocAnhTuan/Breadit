@@ -198,7 +198,7 @@ The table has one row per reference, so at least 27 rows. The allowed values:
 | 3 | In the 2023 release at commit `<40-character hash>`, <what the file shows> | supported | [6]: `<path>`, lines a–b |
 ```
 
-**Reading guide** (under each core entry). Each question ends with "(answer in §x)", so the author can check their own answer. If [5] cannot be opened, its guide says "Could not be opened on <date>. This guide is from the abstract only."
+**Reading guide** (under each core entry). Each question ends with "(answer in §x)", so the author can check their own answer. If a core paper ([1], [2], [5], [9] or [15]) cannot be opened in full text (no legal copy, or the author has not saved one), its guide is the line "Could not be opened on <date>. This guide is from the abstract only." followed by three questions from the abstract, with no "(answer in §x)" ending and no `- Read:` line, because the section numbers are unknown. TC14 accepts such a guide only when the entry's Read value is not `full text`. When the full text arrives, the guide is rewritten in the normal form. (Changed on 2026-10-24: before, only [5] had this fallback. [1], [2] and [9] came back as abstract only.)
 
 ```
 #### Reading guide
@@ -471,7 +471,7 @@ All checks are scripts or manual checks. There are no unit or IT tests, because 
 | TC11 | DW4 | Script: every [n] in every Evidence line and sub-bullet was read in full text, or the Label says "(abstract only)". A `full text (§x–y)` source is printed as CHECK | PASS. Each CHECK line is read by hand: the decision uses only those sections |
 | TC12 | DW5 | Script and manual: D1 covers the author term. D2 has "same shape as, but differs in" and the count, total, prior and support rows. Read the printed smoothing and curve lines | PASS. The smoothing is "Own design" or names [n] |
 | TC13 | DW6 | Script: list the DiffNet hits. No "DiffNet:" prefix. Every "neural influence" hit is the exact Title Case title | PASS |
-| TC14 | DW7 | Script: 5 reading guides, each with one `- Read:` line and three questions that end with "(answer in §x)". If [5] is not `full text`, its entry says "Could not be opened" | PASS |
+| TC14 | DW7 | Script: 5 reading guides, each with one `- Read:` line and three questions that end with "(answer in §x)". If a core paper is not `full text`, its guide says "Could not be opened on <date>" and is then exempt from the line and question format | PASS |
 | TC15 | DW8 | Script: `git status --short` before each commit. After the last commit: the files changed since BASE, §1 to §3, §5, §7 to §9 and §11 unchanged. The changed lines in §4 and §6 are printed. Every §10 change is listed, and extras are marked "EXTRA, needs the author" | PASS. The printed lines match Step 7, and each EXTRA is in the "Changes that need the author's OK" list (§7) |
 | TC16 | DW9 | Script and manual: the number scan prints each line whose number does not name its source. The frozen-value grep must print nothing | PASS. Each CHECK line is fixed, or accepted by hand (a year, a formula, a line number) |
 | TC17 | DW10 | Script: 10 claim rows with an allowed status. "Supported" needs [n] (claims 2 to 9), "status table" (claim 1) or "search log" (claim 10). Claim 3 says "2023 release at commit", has a 40-character hash and a path in backticks | PASS |
@@ -664,16 +664,19 @@ tc13() {
 }
 
 tc14() {
-  awk 'function flush() { if (g != "") { n++; if (q != 3 || r != 1 || bad) print g, q, "questions ending in (answer in §x),", r, "Read lines" (bad ? ", and other numbered lines" : "") } g = "" }
-    /^#### Reading guide/ { flush(); g = ref; q = r = bad = 0; next }
+  awk 'function flush() { if (g != "") { n++; if (!co && (q != 3 || r != 1 || bad)) print g, q, "questions ending in (answer in §x),", r, "Read lines" (bad ? ", and other numbered lines" : "") } g = "" }
+    /^#### Reading guide/ { flush(); g = ref; q = r = bad = co = 0; next }
     /^##/ { flush(); if (/^### \[/) ref = $2; next }
-    g != "" { if (/^[1-9]\. /) { if (/^[1-3]\. .*\(answer in §[0-9][^)]*\) *$/) q++; else bad = 1 }; if (/^- Read:/) r++ }
+    g != "" { if (/^[1-9]\. /) { if (/^[1-3]\. .*\(answer in §[0-9][^)]*\) *$/) q++; else bad = 1 }; if (/^- Read:/) r++; if (/Could not be opened on /) co = 1 }
     END { flush(); if (n != 5) print n + 0, "reading guides, want 5" }' "$L"
-  local r5; r5=$(awk -F'|' '$2 ~ /^ \[5\] $/ { r = $6; gsub(/^ +| +$/, "", r); print r }' "$L")
-  case "$r5" in
-    "full text"*) ;;
-    *) awk '/^### \[5\]/ { p = 1; next } /^### / { p = 0 } p' "$L" | grep -q 'Could not be opened' || echo "[5] is '$r5' but its guide does not say 'Could not be opened'" ;;
-  esac
+  local k rk
+  for k in 1 2 5 9 15; do
+    rk=$(awk -F'|' -v want=" [$k] " '$2 == want { r = $6; gsub(/^ +| +$/, "", r); print r }' "$L")
+    case "$rk" in
+      "full text"*) awk -v h="### [$k]" 'index($0, h) == 1 { p = 1; next } /^### / { p = 0 } p' "$L" | grep -q 'Could not be opened' && echo "[$k] is full text but its guide says 'Could not be opened'" ;;
+      *) awk -v h="### [$k]" 'index($0, h) == 1 { p = 1; next } /^### / { p = 0 } p' "$L" | grep -q 'Could not be opened' || echo "[$k] is '$rk' but its guide does not say 'Could not be opened'" ;;
+    esac
+  done
 }
 
 tc15() {

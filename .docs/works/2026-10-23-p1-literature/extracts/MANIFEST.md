@@ -6,7 +6,7 @@ These are inputs for the entries in `.docs/literature.md`. They are not thesis t
 
 | Ref | Depth | What was opened | sha256 (12) | Quotes | Note |
 |---|---|---|---|---|---|
-| [1] Tang | abstract only | Springer landing page (open access; its PDF link returns HTML) | none | 1/1 | Second author is Xia Hu |
+| [1] Tang | abstract only | Springer landing page (paywalled: 'Buy article PDF'; checked in the browser) | none | 1/1 | Second author is Xia Hu |
 | [2] Ma (SoRec) | abstract only | Semantic Scholar abstract (ACM 403, repository needs a login) | none | 5/5 | |
 | [3] Wu (DiffNet) | full text | arXiv v1 | 8ff64645267c | 14/14 | Authors: Wu, Sun, Fu, Hong, Wang, Wang. No formal "hop" |
 | [4] Sharma | full text (§1, §4.1.2–4.1.3, §5.1–5.1.3, §5.4, §6.3, §7, §8) | arXiv 2212.04481v3 | ed3630bc5228 | 5/5 | Preprint, not the ACM copy. The word "hop" never appears |
@@ -20,7 +20,7 @@ These are inputs for the entries in `.docs/literature.md`. They are not thesis t
 | [12] Shirriff | full text | righto.com page | 3a7ce7dac0c1 (page.html) | 5/5 | The formula is an image; read from its alt text |
 | [13] Meng | full text | arXiv v1 | f07580de388a | 7/7 | Table 3 not readable in the text |
 | [14] Ji | full text | arXiv 2010.11060v4 | e10a1ebfbccc | all real quotes found | Preprint, not the TOIS copy. No feature-leakage case |
-| [15] Krichene | abstract only | Google Research abstract (ACM 403) | none | 4/4 (agent) | Not re-checked by Claude. Open access per Semantic Scholar |
+| [15] Krichene | full text (all 10 pages) | ACM open-access PDF saved by the author in refs-manual/15.pdf (KDD '20 version) | 5212f092b6ae | 6/6 | Replaces the abstract-only extract of the first pass. Tables 2 and 3 are garbled in the text |
 | [16] Cañamares | abstract only | Semantic Scholar abstract (UAM repository 403) | none | 3/3 | |
 | [17] Ge | full text | Jannach's university page | 92cfd8b1f440 | 9/9 | No experiments in the paper |
 | [18] McSherry | full text | Microsoft Research PDF | 1c72e054f2c3 | 13/13 | |
@@ -29,4 +29,4 @@ These are inputs for the entries in `.docs/literature.md`. They are not thesis t
 | [25] Ferrari Dacrema | full text | arXiv v3 | 772fd88ba7ae | 8/8 | |
 
 Not yet read: [19] to [22], [26], [27] (skim in Step 22), and the recent-work search.
-Needs full text from the author (save in `refs-manual/`): [1], [2], [8], [9], [15], [16], [23].
+Needs full text from the author (save in `refs-manual/`): [1], [2], [8], [9], [16], [23]. [15] arrived on 2026-10-24.

@@ -165,16 +165,19 @@ tc13() {
 }
 
 tc14() {
-  awk 'function flush() { if (g != "") { n++; if (q != 3 || r != 1 || bad) print g, q, "questions ending in (answer in §x),", r, "Read lines" (bad ? ", and other numbered lines" : "") } g = "" }
-    /^#### Reading guide/ { flush(); g = ref; q = r = bad = 0; next }
+  awk 'function flush() { if (g != "") { n++; if (!co && (q != 3 || r != 1 || bad)) print g, q, "questions ending in (answer in §x),", r, "Read lines" (bad ? ", and other numbered lines" : "") } g = "" }
+    /^#### Reading guide/ { flush(); g = ref; q = r = bad = co = 0; next }
     /^##/ { flush(); if (/^### \[/) ref = $2; next }
-    g != "" { if (/^[1-9]\. /) { if (/^[1-3]\. .*\(answer in §[0-9][^)]*\) *$/) q++; else bad = 1 }; if (/^- Read:/) r++ }
+    g != "" { if (/^[1-9]\. /) { if (/^[1-3]\. .*\(answer in §[0-9][^)]*\) *$/) q++; else bad = 1 }; if (/^- Read:/) r++; if (/Could not be opened on /) co = 1 }
     END { flush(); if (n != 5) print n + 0, "reading guides, want 5" }' "$L"
-  local r5; r5=$(awk -F'|' '$2 ~ /^ \[5\] $/ { r = $6; gsub(/^ +| +$/, "", r); print r }' "$L")
-  case "$r5" in
-    "full text"*) ;;
-    *) awk '/^### \[5\]/ { p = 1; next } /^### / { p = 0 } p' "$L" | grep -q 'Could not be opened' || echo "[5] is '$r5' but its guide does not say 'Could not be opened'" ;;
-  esac
+  local k rk
+  for k in 1 2 5 9 15; do
+    rk=$(awk -F'|' -v want=" [$k] " '$2 == want { r = $6; gsub(/^ +| +$/, "", r); print r }' "$L")
+    case "$rk" in
+      "full text"*) awk -v h="### [$k]" 'index($0, h) == 1 { p = 1; next } /^### / { p = 0 } p' "$L" | grep -q 'Could not be opened' && echo "[$k] is full text but its guide says 'Could not be opened'" ;;
+      *) awk -v h="### [$k]" 'index($0, h) == 1 { p = 1; next } /^### / { p = 0 } p' "$L" | grep -q 'Could not be opened' || echo "[$k] is '$rk' but its guide does not say 'Could not be opened'" ;;
+    esac
+  done
 }
 
 tc15() {
