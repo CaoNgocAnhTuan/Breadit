@@ -157,10 +157,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 15: D6 Protocol, part 2: [17], [18], claim 8 (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 10 | grep -E '^ +D6\. missing'` prints `D6. missing: Choice Status Result Feeds`, and `part.sh 2 | grep -E '^ +< (17|18)$'` prints `< 17` and `< 18`
-- [ ] Change: status rows and entries for [17] and [18] in §6 ([16] was done in Step 3: add the full entry text there if it was short). Complete D6: `Choice`, `Status`, `Result`, `Feeds`, whether the candidate pool acts like sampling [15][16], the number of users left out per history bucket (a PC row if D6 keeps it, because super-plan §5 only says the number of left-out users is reported), and ties [18]. Add the row for claim 8
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 | grep -E '^ +D6\. '` prints nothing; `part.sh 2 | grep -E '^ +< (17|18)$'` prints nothing
-- [ ] Commit: `docs: decision D6 (protocol) complete, claim 8`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 10 | grep -E '^ +D6\. missing'` prints `D6. missing: Choice Status Result Feeds`, and `part.sh 2 | grep -E '^ +< (17|18)$'` prints `< 17` and `< 18`
+- [x] Change: status rows and entries for [17] and [18] in §6 ([16] was done in Step 3: add the full entry text there if it was short). Complete D6: `Choice`, `Status`, `Result`, `Feeds`, whether the candidate pool acts like sampling [15][16], the number of users left out per history bucket (a PC row if D6 keeps it, because super-plan §5 only says the number of left-out users is reported), and ties [18]. Add the row for claim 8
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 | grep -E '^ +D6\. '` prints nothing; `part.sh 2 | grep -E '^ +< (17|18)$'` prints nothing
+- [x] Commit: `docs: decision D6 (protocol) complete, claim 8`
 
 ### Step 16: D7 Built into the data, claim 9, all seven decisions (effort S)
 

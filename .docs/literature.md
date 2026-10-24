@@ -22,6 +22,8 @@ Working notes for P1. Not thesis text.
 | [14] | Data leakage (Ji 2023) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [15] | Sampled metrics (Krichene 2020) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [17] | Coverage and serendipity (Ge 2010) | paper | verified | full text | 2026-10-24 | Ch3 |
+| [18] | Tied scores (McSherry 2008) | paper | verified | full text | 2026-10-24 | Ch3 |
 | [23] | Influence and correlation (Anagnostopoulos 2008) | paper | verified | index record | 2026-10-24 | not cited |
 | [25] | Are we making progress (Ferrari Dacrema 2019) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [28] | m-estimate (Cestnik 1990) | paper | verified | index record | 2026-10-24 | Ch3 (name only) |
@@ -38,6 +40,7 @@ Working notes for P1. Not thesis text.
 | 5 | The notes decide each of the three §6 choices with evidence. Smoothing with `m` and one curve instead of three phases are decided in D2. The author term is decided in D1. | supported | D2: the form follows [29] eq. 19; the weight of the prior is `m / (N_u + m)` (algebra on eq. 19); replacing the three phases is our own design. D1: the author term is kept, by analogy with [6] lines 63-93 and [5] §1 |
 | 6 | 1 hop is our choice. A hop is one edge of the follow graph. 1 hop is partly a scope choice, because graph neural networks are out of scope (super-plan §9). [3] and [4] speak of layers, not hops. | own design | D4: [3] §3.1, §3.3.1 and Table 4 (§4.4); [4] §5.1 and Table 5; [8] is an index record and is not used |
 | 7 | BL0 to BL5 are cheap, well-known baselines, but they are not personalised (BL0 only puts followees first) and are not tuned, so [25] cuts against calling them strong. A small validation grid (PC4) and a count baseline BL6 (PC3) would make the test fairer. There is no learned baseline: the live app has no training data and there is little time, which is a limitation. | supported | [25]: §1 and §2.2; [11]: `r2/r2/lib/db/_sorts.pyx` line 59; [12]: the paragraph on the Arc code; [30]: `README.md`, Overview |
+| 8 | The protocol (leave-last-out, full ranking, as-of features, ties) was checked against [13] to [18], item by item against the leakage cases of [14]: 4 cases are covered by the plan, 2 are not applicable and 1 is a gap (tuning on validation items). Full ranking agrees with [15]. The tie rule is fixed and tested (E6, [18]). | supported | D6 and its leakage table; [13] §5; [14] §2.2, §3.2, §4.1 and §5; [15] §4.2 and §8; [17] §2; [18] §1 and §2; [16] is abstract only |
 
 ## 3. How this file was made
 
@@ -230,6 +233,10 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Evidence:
   - [13] §2: leaving out each user's last item can leak future evidence into training. §4: the ranking of the models changes with the split. §5: the global temporal split should be the default.
   - [14] §1 and §2.2: training interactions that happen after the test instances are a source of leakage, for leave-last-out and for random splits. §4.1: models then recommend items that did not exist yet. §4.2: the effect is as large as 89.5% in accuracy, with no clear pattern in the model ranking. §5: a timeline scheme is proposed. The preprint says this; the journal copy was not read.
+  - [15] §1 and §4.2: sampled metrics can be inconsistent with the exact ones, even on average; only AUC is consistent. §8: sampling should be avoided as much as possible.
+  - [16] abstract only: results with reduced target sets often contradict the results with large ones, and minimum sets distort pairwise comparisons.
+  - [17] §2: catalogue coverage is the share of available items that the system ever recommends, measured over recommendation sessions. The paper has no experiments.
+  - [18] §1 and §2: with tied scores, the order of the tied results can change a ranking measure. The authors give tie-aware versions of six measures that average over all tie orders, in closed form and deterministically (§2), at about the cost of the usual measures (§4).
 - Against: [13] §5 recommends the global temporal split as the default, and [14] §5 prefers its timeline scheme to leave-last-out alone. Our test time `t_u` differs per user. The as-of features of super-plan §5 apply the same principle (nothing after `t_u` is used for u), but the tuning of `m`, α and β is a gap (see the table).
 - Leakage table: each case of [14] against the protocol of super-plan §5.
 
@@ -243,7 +250,16 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | Tuning on the validation items of the test users (§3.2; [14] does not call it leakage) | the validation item is the one before the test item of each user, so tuned values (`m`, α, β) can use events later than another user's test time | gap |
 | Features built from future data (not a case in [14]; the whole text was searched) | as-of features are our own rule (super-plan §5) | covered by the plan, to be tested by the P5 leakage test |
 
-- Label: consistent only
+- Pool and sampling: the pool is a rule-based filter, not a random sample: posts that are not deleted, are approved, were created before `t_u`, are inside the window W, are not blocked, newest N_max first (super-plan §5). So the inconsistency of [15] for random negatives does not apply directly. But the pool is a reduced candidate set, and [16] (abstract only) says that reduced target sets can contradict the result with large ones, so W and N_max may matter. PC6 asks for a second run with a larger pool.
+- Left-out users: super-plan §5 reports the number of users whose test post is not in the pool, in total. H1 is about users with 0 to 4 earlier interactions (super-plan §1), so a total hides a bias in that bucket. PC7 asks for the number per history bucket.
+- Ties: [18] shows that tied scores make a metric depend on an arbitrary order. The fixed rule `(scoreFixed desc, postId desc)` is deterministic, and E6 repeats the run with the reversed rule (super-plan §5). If E6 changes the ranking of the methods, the results are reported with the tie-aware measures of [18].
+- Coverage: Coverage@K of super-plan §5 follows the idea of catalogue coverage in [17] §2. [17] gives only the definition, no experiment.
+- Label: consistent only (abstract only)
+- Choice: option (a), the protocol of super-plan §5, and PC5 to close the tuning gap. Consistent with [14] and [13] on the principle that nothing after the test time is used for a user, with [15] on full ranking with no sampled negatives, and with [18] on a fixed tie rule that is tested (E6).
+- Status: proposed change (PC5)
+- Result: the protocol of super-plan §5 as written. The table above has 4 cases covered by the plan, 2 not applicable and 1 gap. The gap, the pool run and the left-out users are proposed changes (PC5, PC6, PC7). The wording of super-plan §5 on as-of features is PC8.
+- Feeds: super-plan §5 (split, pool, ties, metrics)
+- Author's note:
 
 ## 6. Other references
 
@@ -323,6 +339,20 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - For us: D6, sampled versus full ranking. Only the abstract was read, so it supports no decision. The ACM page and the UAM repository gave no full text (the repository answered 403).
 - Cited in: not cited
 
+### [17] Coverage and serendipity (Ge 2010)
+- Opened: 2026-10-24, full text [Dietmar Jannach's university page (web-ainf.aau.at), the RecSys 2010 paper as printed (4 pages), sha256 92cfd8b1f440]
+- Says: Mouzhi Ge, Carla Delgado-Battenfeld and Dietmar Jannach (RecSys 2010) argue that recommender systems should not be judged on accuracy alone. They define catalogue coverage as the share of available items that the system ever recommends, measured over recommendation sessions (§2), and propose a measure of serendipity (§3). The paper has no data set, no algorithm and no results; it describes a planned user study.
+- For us: D6, the Coverage@K metric of super-plan §5. It supports the definition only. The formulas are garbled in the text, so this entry rests on the words around them.
+- Cited in: Ch3
+- Anchor: §2, the paragraph on catalogue coverage: the share of available items that the system ever recommends.
+
+### [18] Tied scores (McSherry 2008)
+- Opened: 2026-10-24, full text [Microsoft Research PDF (microsoft.com/en-us/research), ECIR 2008, LNCS 4956, pp. 414-421, sha256 1c72e054f2c3]
+- Says: Frank McSherry and Marc Najork (ECIR 2008) show that when scores are tied, different orders of the tied results can give appreciably different values of a ranking measure (§1). They adapt six measures (precision, recall, F1, average precision, reciprocal rank and NDCG) so that they give the average over all tie orders, in closed form and deterministically (§2). The cost is about that of the usual measures (§4).
+- For us: D6, ties. The fixed tie rule and the reversed run of E6 (super-plan §5) test the same risk. The paper gives no numeric example and does not discuss breaking ties by item id.
+- Cited in: Ch3
+- Anchor: §2: "rather than explicitly producing these orderings we analytically derive their average".
+
 ### [23] Influence and correlation (Anagnostopoulos 2008)
 - Opened: 2026-10-24, index record [Crossref and OpenAlex records of DOI 10.1145/1401890.1401897]
 - Says: the records confirm the title, the three authors (Aris Anagnostopoulos, Ravi Kumar, Mohammad Mahdian), KDD 2008, pages 7-15. No full text or abstract was read, and no legal open copy was found (the Sapienza repository answered 403).
@@ -368,3 +398,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | PC2 | Decide whether trust fades with time: none, a half-life or a window. [5] decays old interactions and drops old edges; the §6 formula has none. A fade adds a parameter to super-plan §7 and a cell to E4. | super-plan §6, §7 | D1; [5] §2.1 and §2.1.1 | the author (decides; /freeze for a new value) |
 | PC3 | Add a baseline BL6: the number of followees who engaged, with no trust weights. It shows what the trust weights add over a plain count, and [25] argues for strong simple baselines. | super-plan §5 (methods) | D5; [25] §1 and §2.2 | the author (P5 task) |
 | PC4 | Give BL2, BL4 and BL5 a small validation grid for their time or age parameters, as H is tuned in E4. The grid sizes would be frozen values. | super-plan §5, §7 | D5; [25] §2.2 | the author (/freeze for new values) |
+| PC5 | Close the tuning gap of the leakage table: tune `m`, α and β only on validation items that are all earlier than the test items of the users in the test split (one global cut time), as in the global temporal split of [13] and the timeline scheme of [14]. | super-plan §5 (split) | D6; [13] §5; [14] §3.2 and §5 | the author (the protocol is frozen; /freeze) |
+| PC6 | Run the main comparison also with a larger pool (a second window W or N_max), to show that the pool does not act like a small sample. | super-plan §5 (pool), §7 | D6; [16] abstract only; [15] §4.2 | the author (P5 task; /freeze for new values) |
+| PC7 | Report the number of left-out users per history bucket, not only in total. | super-plan §5 (pool) | D6; super-plan §1 (H1 is about users with 0 to 4 earlier interactions) | the author (P5 task) |
+| PC8 | Say that [14] shows the harm of training on future interactions, and that the as-of rule for features is our own design. Super-plan §5 now cites [14] for the as-of features. | super-plan §5 (as-of features) | D6; [14], the whole text has no feature case | the author |
