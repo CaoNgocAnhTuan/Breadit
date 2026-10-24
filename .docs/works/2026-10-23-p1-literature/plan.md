@@ -230,16 +230,16 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 24: Edit the super plan (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/check.sh | head -3` (TC2) prints `TC2 FAIL`, because the new references [28] and up are in `literature.md` but not in §10. `bash .docs/works/2026-10-23-p1-literature/part.sh 6` (TC6) prints `TC6 FAIL`, because the marks of [5], [7] and [16] in §10 still say "search only". This step ends when both pass
-- [ ] Change: in `.docs/super-plan.md` only these places (design §1.7, Step 7, with the extras that the author approved in design §7):
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/check.sh | head -3` (TC2) prints `TC2 FAIL`, because the new references [28] and up are in `literature.md` but not in §10. `bash .docs/works/2026-10-23-p1-literature/part.sh 6` (TC6) prints `TC6 FAIL`, because the marks of [5], [7] and [16] in §10 still say "search only". This step ends when both pass
+- [x] Change: in `.docs/super-plan.md` only these places (design §1.7, Step 7, with the extras that the author approved in design §7):
   - line 3: version 0.5 and the date
   - §10: the new marks for [5], [7], [16], [23]; the new references from `literature.md` (numbers [28] and up, in the §10 format); one sentence in the §10 intro that defines "do not cite"; a changed URL only if the verified copy is elsewhere; a fix to another §10 entry only if its details do not match the source, named in the change log
   - line 136: both sentences ("RealGraph [5] and the Twitter blog [7] are "search only" today. RealGraph is central to the trust term, so verify it before citing it.") are replaced by the result
   - §6 line 294: only if [5] or [7] became `do not cite`, or the RealGraph wording or the Twitter claim needs the fix that `literature.md` shows
   - the change log: one line for 0.5
   - Everything else (lines 110, 124 and 293, and the §5 and §7 values) stays a proposed change in §9
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/check.sh | grep -E '^TC(2|6) '` prints `TC2 PASS` and `TC6 PASS`; `bash .docs/works/2026-10-23-p1-literature/check.sh | sed -n '/^TC15 /,/^TC16 /p'` prints `TC15 PASS` and the lines of the changes in this step. Each `CHECK EXTRA, needs the author` line is on the list in design §7. §1 to §3, §5, §7 to §9 and §11 of the super plan are unchanged (DW8)
-- [ ] Commit: `docs: super plan 0.5, reference marks and new references from P1`
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/check.sh | grep -E '^TC(2|6) '` prints `TC2 PASS` and `TC6 PASS`; `bash .docs/works/2026-10-23-p1-literature/check.sh | sed -n '/^TC15 /,/^TC16 /p'` prints `TC15 PASS` and the lines of the changes in this step. Each `CHECK EXTRA, needs the author` line is on the list in design §7. §1 to §3, §5, §7 to §9 and §11 of the super plan are unchanged (DW8)
+- [x] Commit: `docs: super plan 0.5, reference marks and new references from P1`
 
 ### Step 25: Spot checks and the full run (effort S)
 

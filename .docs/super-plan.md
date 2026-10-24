@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.4 · 2026-10-22 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.5 · 2026-10-24 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -133,7 +133,7 @@ Candidates to check: Digg 2009 [20], Epinions and Ciao [19], the Flickr favorite
 
 **Step 5: write the survey** (task `p1-related-work`). The Orientation asks for a 3–4 page survey. It becomes the core of Chapter 2.
 
-**Who reads what.** The author deep-reads the core papers, because the committee will ask the author about them: Tang [1], SoRec [2], RealGraph [5], Sedhain [9], and Krichene and Rendle [15]. Claude prepares the notes on the others, searches for recent work, and checks every reference. RealGraph [5] and the Twitter blog [7] are "search only" today. RealGraph is central to the trust term, so verify it before citing it.
+**Who reads what.** The author deep-reads the core papers, because the committee will ask the author about them: Tang [1], SoRec [2], RealGraph [5], Sedhain [9], and Krichene and Rendle [15]. Claude prepares the notes on the others, searches for recent work, and checks every reference. RealGraph [5] is now verified in full text (task `p1-literature`, notes in `.docs/literature.md`). The Twitter blog [7] could not be opened, so it is marked "do not cite" and the source code [6] replaces it.
 
 **Done when.** The supervisor confirms RQ1, RQ2, the data choice and the design decisions. Every design question has an answer with evidence. Every reference cited in Chapter 2 is marked "verified" in §10.
 
@@ -291,7 +291,7 @@ Symbols: `n_uf` is u's earlier positives on f's posts. `N_u` is u's total earlie
 
 Three design choices, confirmed in P1 (Step 3) with the evidence in `.docs/literature.md`:
 - **Smoothing with `m`.** Without it, `trust = n_uf / N_u` is 0/0 for a user with no history, and the follow signal cannot help exactly the users RQ1 is about. The smoothing is my own suggestion, not a cited method. At `N_u = 0` the prior spreads trust equally over followees and communities.
-- **Author term.** The Orientation formula sums trust over friends who engaged with the post. A post by a followee that nobody has engaged with yet would get nothing. The author term fixes this. RealGraph weights the edges between users by their past interaction [5], and Twitter's open-source ranking uses it for in-network tweets [6][7]. E4 shows what each term adds.
+- **Author term.** The Orientation formula sums trust over friends who engaged with the post. A post by a followee that nobody has engaged with yet would get nothing. The author term fixes this. RealGraph gives each directed edge between users a weight that is the predicted probability of a future interaction, learned from past interaction data [5]. In the 2023 open-source release, these scores are inputs (features) for in-network tweets [6]; the code does not show how the ranker weights them. E4 shows what each term adds.
 - **Phases become a curve.** With smoothing, the weight of the prior is `m / (N_u + m)`. It falls smoothly as history grows. The three cold-start phases in the Orientation doc become this one curve. Buckets are used only for reporting.
 
 ---
@@ -349,15 +349,15 @@ The thesis results do not need the schema migration: generated data has no dupli
 
 ## 10. Appendix: references
 
-"Verified" means I opened the source or a trusted index and the details match. "Search only" means only a search excerpt or secondary source was seen. Cite only verified items in the thesis, or check the others first.
+"Verified" means I opened the source or a trusted index and the details match. "Search only" means only a search excerpt or secondary source was seen. Cite only verified items in the thesis, or check the others first. "Do not cite" means the source could not be opened or its details do not match, so a replacement is named.
 
 1. Tang, Hu, Liu (2013). Social recommendation: a review. *Social Network Analysis and Mining* 3(4). https://doi.org/10.1007/s13278-013-0141-9 · verified
 2. Ma, Yang, Lyu, King (2008). SoRec: Social recommendation using probabilistic matrix factorization. *CIKM*. https://doi.org/10.1145/1458082.1458205 · verified
 3. Wu et al. (2019). A neural influence diffusion model for social recommendation (DiffNet). *SIGIR*. https://arxiv.org/abs/1904.10322 · verified
 4. Sharma et al. (2024). A survey of graph neural networks for social recommender systems. *ACM Computing Surveys* 56(10). https://doi.org/10.1145/3661821 · verified
-5. Kamath, Sharma, Wang, Yin (2014). RealGraph: User interaction prediction at Twitter. *UEO Workshop at KDD*. https://www.ueo-workshop.com/wp-content/uploads/2014/04/sig-alternate.pdf · search only (title and authors)
+5. Kamath, Sharma, Wang, Yin (2014). RealGraph: User interaction prediction at Twitter. *UEO '14 workshop, New York*. https://www.ueo-workshop.com/wp-content/uploads/2014/04/sig-alternate.pdf · verified
 6. Twitter (2023). the-algorithm (source code). https://github.com/twitter/the-algorithm · verified
-7. Twitter Engineering (2023). Twitter's recommendation algorithm (blog). https://blog.twitter.com/engineering/en_us/topics/open-source/2023/twitter-recommendation-algorithm · search only (page returned 403)
+7. Twitter Engineering (2023). Twitter's recommendation algorithm (blog). https://blog.twitter.com/engineering/en_us/topics/open-source/2023/twitter-recommendation-algorithm · do not cite, use [6] (not opened: the Internet Archive answered 429 and the new address 403)
 8. Jamali, Ester (2010). A matrix factorization technique with trust propagation (SocialMF). *RecSys*. https://doi.org/10.1145/1864708.1864736 · verified
 9. Sedhain, Sanner, Braziunas, Xie, Christensen (2014). Social collaborative filtering for cold-start recommendations. *RecSys*. https://researchportalplus.anu.edu.au/en/publications/social-collaborative-filtering-for-cold-start-recommendations/ · verified
 10. Chen et al. (2009). Collaborative filtering for Orkut communities. *WWW*. https://doi.org/10.1145/1526709.1526801 · verified
@@ -366,18 +366,35 @@ The thesis results do not need the schema migration: generated data has no dupli
 13. Meng, McCreadie, Macdonald, Ounis (2020). Exploring data splitting strategies for the evaluation of recommendation models. *RecSys*. https://arxiv.org/abs/2007.13237 · verified
 14. Ji, Sun, Zhang, Li (2023). A critical study on data leakage in recommender system offline evaluation. *ACM TOIS* 41(3). https://doi.org/10.1145/3569930 · verified
 15. Krichene, Rendle (2020). On sampled metrics for item recommendation. *KDD*. https://doi.org/10.1145/3394486.3403226 · verified
-16. Cañamares, Castells (2020). On target item sampling in offline recommender system evaluation. *RecSys*. https://github.com/ir-uam/RecSys2020 · search only (code repository)
+16. Cañamares, Castells (2020). On target item sampling in offline recommender system evaluation. *RecSys*. https://doi.org/10.1145/3383313.3412259 · verified (record and abstract; the code repository is https://github.com/ir-uam/RecSys2020)
 17. Ge, Delgado-Battenfeld, Jannach (2010). Beyond accuracy: evaluating recommender systems by coverage and serendipity. *RecSys*. https://doi.org/10.1145/1864708.1864761 · verified
 18. McSherry, Najork (2008). Computing information retrieval performance measures efficiently in the presence of tied scores. *ECIR*. https://doi.org/10.1007/978-3-540-78646-7_38 · verified
 19. Tang. Epinions and Ciao datasets. https://www.cse.msu.edu/~tangjili/datasetcode/truststudy.htm · verified
 20. Lerman. Digg 2009 data. https://www.isi.edu/people-lerman/research/downloads/ · verified
 21. Smucker, Allan, Carterette (2007). A comparison of statistical significance tests for information retrieval evaluation. *CIKM*. https://doi.org/10.1145/1321440.1321528 · verified
 22. Holm (1979). A simple sequentially rejective multiple test procedure. *Scandinavian Journal of Statistics* 6(2). https://www.jstor.org/stable/4615733 · verified
-23. Anagnostopoulos, Kumar, Mahdian (2008). Influence and correlation in social networks. *KDD*. https://iris.uniroma1.it/handle/11573/332226 · verified (repository record)
+23. Anagnostopoulos, Kumar, Mahdian (2008). Influence and correlation in social networks. *KDD*. https://doi.org/10.1145/1401890.1401897 · verified (Crossref record; no full text found)
 24. Chaney, Stewart, Engelhardt (2018). How algorithmic confounding in recommendation systems increases homogeneity and decreases utility. *RecSys*. https://arxiv.org/abs/1710.11214 · verified
 25. Ferrari Dacrema, Cremonesi, Jannach (2019). Are we really making much progress? *RecSys*. https://arxiv.org/abs/1907.06902 · verified
 26. bryc. PRNGs (notes on mulberry32, sfc32). https://github.com/bryc/code/blob/master/jshash/PRNGs.md · verified
 27. Sandve et al. (2013). Ten simple rules for reproducible computational research. *PLoS Computational Biology*. https://doi.org/10.1371/journal.pcbi.1003285 · verified
+28. Cestnik (1990). Estimating probabilities: a crucial task in machine learning. *ECAI 1990*, pp. 147–149. https://openalex.org/W203696055 · verified (record only; no full text found)
+29. Castellano, Moral-García, Mantas, Abellán (2020). On the use of m-probability-estimation and imprecise probabilities in the naïve Bayes classifier. *International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems* 28(4). https://doi.org/10.1142/S0218488520500282 · verified
+30. xai-org (2026). x-algorithm (source code of the For You feed on X). https://github.com/xai-org/x-algorithm · verified (README read, commit 6258a1549ef808be88fba83d3b2d58364b587ee0)
+31. Jaspal, Dalwani, Ramineni (2025). SocRipple: A two-stage framework for cold-start video recommendations. *arXiv preprint*. https://arxiv.org/abs/2508.07241 · verified (abstract only)
+32. Weyl et al. (2025). Community by design. *arXiv preprint*. https://arxiv.org/abs/2502.10834 · verified (abstract only)
+33. Zhou, Li, Jiang, Zhang (2024). Improving social recommendation algorithm via incorporating interaction strength. *Application Research of Computers* 41(1). https://doi.org/10.19734/j.issn.1001-3695.2023.05.0280 · verified (journal page, abstract only)
+34. Jiang, Yang, Lin (2025). Community-aware social community recommendation. *CIKM*. https://doi.org/10.1145/3746252.3761373 · verified (abstract only)
+35. Dadgar, Hamzeh (2022). How to boost the performance of recommender systems by social trust? Studying the challenges and proposing a solution. *IEEE Access*. https://doi.org/10.1109/ACCESS.2022.3147955 · verified (abstract only)
+36. Akpinar, Fazelpour (2025). Authenticity and exclusion: a simulation study of how social media algorithms shape visibility in epistemic communities. *Synthese*. https://doi.org/10.1007/s11229-025-05293-z · verified (abstract only)
+37. Stefanopoulos, Chatterjee, Zehmakan (2025). A first principles approach to trust-based recommendation systems in social networks. *Online Social Networks and Media*. https://doi.org/10.1016/j.osnem.2025.100315 · verified (abstract only)
+38. Lee, Zhou, Yang, Du, Pan (2022). Personalized recommendation system based on social relationships and historical behaviors. *arXiv preprint*. https://arxiv.org/abs/2206.13072 · verified (abstract only)
+39. Cinus, Gionis, Bonchi (2023). Rebalancing social feed to minimize polarization and disagreement. *CIKM*. https://doi.org/10.1145/3583780.3615025 · verified (abstract only)
+40. Chen et al. (2026). Baseline and incremental: user, item, and request debiasing in Instagram feed ranking. *arXiv preprint*. https://arxiv.org/abs/2610.27423 · verified (abstract only)
+41. Milli, Carroll, Wang, Pandey, Zhao, Dragan (2025). Engagement, user satisfaction, and the amplification of divisive content on social media. *PNAS Nexus*. https://doi.org/10.1093/pnasnexus/pgaf062 · verified (abstract only)
+42. Gauthier, Hodler, Widmer, Zhuravskaya (2026). The political effects of X's feed algorithm. *Nature*. https://doi.org/10.1038/s41586-026-10098-2 · verified (abstract only)
+43. Satuluri et al. (2020). SimClusters: community-based representations for heterogeneous recommendations at Twitter. *KDD*. https://doi.org/10.1145/3394486.3403370 · verified (abstract only)
+44. El-Kishky et al. (2022). TwHIN: embedding the Twitter heterogeneous information network for personalized recommendation. *KDD*. https://doi.org/10.1145/3534678.3539080 · verified (abstract only)
 
 ---
 
@@ -397,3 +414,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.2 · 2026-10-22 · Organized by phase, with no week numbers. Deadline 2026-11-20. Cut: P2 (schema migration), Epinions, the `reasons` field, size L, the full W2 grid (now three cells), k6 runs from 10 to 5. Added: `packages/ranking` as the home of the shared scorer, `eval` as a workspace, the Tasks column, supervisor checkpoints (★), the chapter map (P9), P10 defense package, the cut order (§8), the Orientation baseline mapping (§5). §3 rechecked after the bug sweep; line numbers replaced by function names. H1's primary cell is now the middle of the three W2 cells (no test-split run has happened). LaTeX location decided: `.docs/latex/`.
 - 0.3 · 2026-10-22 · Added dataset selection to P1 (task `p1-dataset-selection`, output `.docs/datasets.md`): four criteria, candidates, calibration targets for the generator. P4 is now the adapter for the dataset chosen there (Digg 2009 is the first candidate).
 - 0.4 · 2026-10-22 · P1 rewritten as five steps (map the field, dataset selection, design questions, lock the decisions, survey), with `.docs/literature.md`; the three §6 design choices are now confirmed in P1. P2 is now the implementation blueprint (`.docs/implementation-plan.md`: module map, data contracts, measurement plan, task list). The cut schema migration moved to §9. The Tasks column for P3–P10 is a first guess until P2.
+- 0.5 · 2026-10-24 · Task `p1-literature`: the marks of [5] (verified, full text; the venue "at KDD" removed because the paper does not say it), [7] (do not cite, use [6]), [16] (verified; the URL is now the paper DOI, not the code repository) and [23] (verified through Crossref; the URL is now the DOI); new references [28] to [44]; one sentence in the §10 intro that defines "do not cite"; line 136 and the §6 author-term bullet (RealGraph is a predicted probability of a future interaction, and the Twitter code shows scores as features) rewritten with the P1 result. The other proposed changes are in `.docs/literature.md` §9.
