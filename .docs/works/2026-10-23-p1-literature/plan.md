@@ -193,10 +193,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 20: Search: groups 3 and 4 (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 7` (TC7). If fewer than 8 recent references exist, it still prints `FAIL <n> recent refs (want 8 to 12)`
-- [ ] Change: groups (3) follow-graph feed ranking and (4) audits of feed algorithms, with the same rules as Step 19. Stop at 12 picks in total. At least 8 are needed and at least half from 2024 or later. If all searches give fewer than 8, stop and tell the author (F18); TC7 then stays failed until the author decides
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 7 18` prints four `PASS` lines, and the two `CHECK PASS` lines of TC7 ("8 to 12 refs", "at least half from 2024 or later") (DW3)
-- [ ] Commit: `docs: recent work, groups follow-graph feed ranking and audits`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 7` (TC7). If fewer than 8 recent references exist, it still prints `FAIL <n> recent refs (want 8 to 12)`
+- [x] Change: groups (3) follow-graph feed ranking and (4) audits of feed algorithms, with the same rules as Step 19. Stop at 12 picks in total. At least 8 are needed and at least half from 2024 or later. If all searches give fewer than 8, stop and tell the author (F18); TC7 then stays failed until the author decides
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 7 18` prints four `PASS` lines, and the two `CHECK PASS` lines of TC7 ("8 to 12 refs", "at least half from 2024 or later") (DW3)
+- [x] Commit: `docs: recent work, groups follow-graph feed ranking and audits`
 
 ### Step 21: Closest work, older neighbours, claim 10 (effort S)
 

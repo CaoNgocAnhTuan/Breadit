@@ -38,6 +38,10 @@ Working notes for P1. Not thesis text.
 | [36] | Social media visibility simulation (Akpinar 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [37] | Trust-based recommendation first principles (Stefanopoulos 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [38] | Social relationships and historical behaviors (Lee 2022) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [39] | Rebalancing social feed (Cinus 2023) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [40] | Instagram feed debiasing (Chen 2026) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [41] | Engagement and divisive content (Milli 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [42] | X feed algorithm field experiment (Gauthier 2026) | paper | verified | abstract only | 2026-10-24 | not cited |
 
 ## 2. Claims
 
@@ -447,6 +451,39 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | 2026-10-24 | Crossref | G2: social-aware cold-start recommendation | 25 | none |
 | 2026-10-24 | arXiv | G2: social cold-start recommendation | 25 | none |
 | 2026-10-24 | WebSearch | G2: social network cold-start new users friends recommendation 2023 2025 | 9 | none |
+| 2026-10-24 | OpenAlex | G3: social media feed ranking follow graph | 25 | [39] |
+| 2026-10-24 | arXiv | G3: all:"feed ranking" AND all:follow | 0 | none |
+| 2026-10-24 | Crossref | G3: social media feed ranking follow graph | 25 | none |
+| 2026-10-24 | WebSearch | G3: follow graph home timeline ranking in-network posts recommendation 2024 | 10 | none |
+| 2026-10-24 | OpenAlex | G3: home timeline ranking followed accounts | 25 | none |
+| 2026-10-24 | arXiv | G3: all:"home timeline" AND all:ranking | 3 | none |
+| 2026-10-24 | Crossref | G3: home timeline ranking followed accounts | 25 | none |
+| 2026-10-24 | OpenAlex | G3: in-network ranking followed accounts feed | 25 | [40] |
+| 2026-10-24 | arXiv | G3: in-network ranking followed accounts feed | 0 | none |
+| 2026-10-24 | Crossref | G3: in-network ranking followed accounts feed | 25 | none |
+| 2026-10-24 | arXiv | G3: all:feed AND all:ranking AND all:social AND all:network | 25 | none |
+| 2026-10-24 | OpenAlex | G4: Twitter algorithmic amplification audit | 25 | [41] |
+| 2026-10-24 | arXiv | G4: all:Twitter AND all:amplification | 25 | none |
+| 2026-10-24 | Crossref | G4: Twitter algorithmic amplification audit | 25 | none |
+| 2026-10-24 | OpenAlex | G4: engagement-based ranking audit social media feed | 25 | [41] |
+| 2026-10-24 | arXiv | G4: all:audit AND all:engagement AND all:feed | 4 | none |
+| 2026-10-24 | Crossref | G4: engagement-based ranking audit social media feed | 25 | none |
+| 2026-10-24 | OpenAlex | G4: X For You feed audit | 25 | none |
+| 2026-10-24 | arXiv | G4: all:"For You" AND all:audit | 0 | none |
+| 2026-10-24 | Crossref | G4: X For You feed audit | 25 | none |
+| 2026-10-24 | WebSearch | G4: audit of X For You feed engagement ranking amplification study 2025 | 10 | none |
+| 2026-10-24 | OpenAlex | G3: lead TwHIN | 5 | none |
+| 2026-10-24 | Crossref | G3: lead TwHIN | 4 | none |
+| 2026-10-24 | arXiv | G3: lead TwHIN | 2 | none |
+| 2026-10-24 | OpenAlex | G4: lead Huszar (Algorithmic amplification of politics on Twitter) | 5 | none |
+| 2026-10-24 | Crossref | G4: lead Huszar (Algorithmic amplification of politics on Twitter) | 4 | none |
+| 2026-10-24 | arXiv | G4: lead Huszar (ti:amplification AND ti:politics AND ti:Twitter) | 3 | none |
+| 2026-10-24 | OpenAlex | G4: lead Milli (Engagement, user satisfaction, and the amplification of divisive content on social media) | 5 | [41] |
+| 2026-10-24 | Crossref | G4: lead Milli (Engagement, user satisfaction, and the amplification of divisive content on social media) | 4 | [41] |
+| 2026-10-24 | arXiv | G4: lead Milli (ti:engagement AND ti:divisive) | 3 | [41] |
+| 2026-10-24 | OpenAlex | G3: lead SimClusters | 5 | none |
+| 2026-10-24 | Crossref | G3: lead SimClusters | 4 | none |
+| 2026-10-24 | arXiv | G3: lead SimClusters (ti:SimClusters) | 2 | none |
 
 ### Inclusion and stop rules
 
@@ -512,6 +549,34 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Opened: 2026-10-24, abstract only [arXiv abstract page 2206.13072; this is a preprint]
 - Says: Yan-Li Lee, Tao Zhou, Kexin Yang, Yajun Du and Liming Pan (arXiv preprint, 2022) assume that social relationships and historical behaviours of users relate to the same factors. They propose an algorithm that uses both with mutual constraints, and test it on all users, active users, inactive users and cold-start users (abstract).
 - For us: Group 2. It combines social relations with history and reports cold-start users separately, like our history buckets. It is a learned model, with no community signal and no engagement score.
+- Cited in: not cited
+
+### [39] Rebalancing social feed (Cinus 2023)
+- Link: https://doi.org/10.1145/3583780.3615025
+- Opened: 2026-10-24, abstract only [Crossref record of the CIKM 2023 paper]
+- Says: Federico Cinus, Aristides Gionis and Francesco Bonchi (CIKM 2023) propose to nudge users' social feeds to balance relevance and diversity and so reduce polarization. The approach re-weights the relative importance of the accounts that a user follows, to calibrate how often the content of each account is shown (abstract).
+- For us: Group 3. It weights the followed accounts, as our follow trust does. The goal is to reduce polarization, and the weights do not come from past engagement.
+- Cited in: not cited
+
+### [40] Instagram feed debiasing (Chen 2026)
+- Link: https://arxiv.org/abs/2610.27423
+- Opened: 2026-10-24, abstract only [arXiv abstract page 2610.27423; this is a preprint]
+- Says: Hsin-Chiang Chen and co-authors (arXiv preprint, 2026) describe a feed ranker that scores candidates with a value model, a weighted sum of engagement predictions. They argue that a multi-signal value model should keep the raw prediction and add the incremental part, the amount above what the viewer, item or request would produce anyway, as a separately weighted term. They test this in a controlled four-arm ablation on Instagram Feed (abstract).
+- For us: Group 3. It has the same shape as C2: an engagement-based weighted sum with extra terms added. The extra terms are debiasing terms, not follow trust or community affinity.
+- Cited in: not cited
+
+### [41] Engagement and divisive content (Milli 2025)
+- Link: https://doi.org/10.1093/pnasnexus/pgaf062
+- Opened: 2026-10-24, abstract only [Crossref record of the PNAS Nexus paper]
+- Says: Smitha Milli, Micah Carroll, Yike Wang, Sashrika Pandey, Sebastian Zhao and Anca D. Dragan (PNAS Nexus, 2025) report a preregistered audit. Relative to a reverse-chronological baseline, Twitter's engagement-based ranking algorithm amplifies emotionally charged, out-group hostile content, and users do not prefer the political tweets that it selects (abstract).
+- For us: Group 4. It audits an engagement-only ranking and finds costs. This supports adding other signals to engagement, but C2 is not tested for this effect.
+- Cited in: not cited
+
+### [42] X feed algorithm field experiment (Gauthier 2026)
+- Link: https://doi.org/10.1038/s41586-026-10098-2
+- Opened: 2026-10-24, abstract only [Crossref record of the Nature paper]
+- Says: Germain Gauthier, Roland Hodler, Philine Widmer and Ekaterina Zhuravskaya (Nature, 2026) report a 2023 field experiment on X. Active US users were randomly given an algorithmic or a chronological feed for 7 weeks. Switching from chronological to algorithmic increased engagement and shifted political opinion towards more conservative positions (abstract).
+- For us: Group 4. A field experiment on the feed of the platform we imitate. Our evaluation is offline with synthetic data, so it cannot show effects like these.
 - Cited in: not cited
 
 ## 8. Older neighbours and other added references
