@@ -243,13 +243,13 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 25: Spot checks and the full run (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 19` (TC19). It fails: `0 spot-check lines in §3, want 2`
-- [ ] Change:
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 19` (TC19). It fails: `0 spot-check lines in §3, want 2`
+- [x] Change:
   - Pick the entries: `grep -oE '^### \[[0-9]+\]' .docs/literature.md | grep -v -E '\[(1|2|5|9|15)\]' | sort -R | head -5` (the author) and `grep -oE '^### \[[0-9]+\]' .docs/literature.md | sort -R | head -3` (the writer)
   - The writer re-opens the 3 entries and compares `Says:` and `Anchor:` with the source. Write the line `- Spot check <date>, writer: [x], [y], [z]. <result>` in §3
   - Stop and ask the author for the 5 entries (`[a]` to `[e]`). When the author answers, write `- Spot check <date>, author: [a], [b], [c], [d], [e]. <result>`. Fix every mismatch in the entry, then compare again
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/check.sh` ends with all 19 checks `PASS` and exit code 0. Every `CHECK` line was read (TC11, TC16) (DW1 to DW10)
-- [ ] Commit: `docs: spot checks for the P1 literature notes`
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/check.sh` ends with all 19 checks `PASS` and exit code 0. Every `CHECK` line was read (TC11, TC16) (DW1 to DW10)
+- [x] Commit: `docs: spot checks for the P1 literature notes`
 
 ### Step 26: Record (effort XS)
 
