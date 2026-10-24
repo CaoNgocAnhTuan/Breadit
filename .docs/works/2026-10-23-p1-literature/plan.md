@@ -200,13 +200,13 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 21: Closest work, older neighbours, claim 10 (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep -E 'closest-work|older-neighbour'` prints `0 closest-work lines in §7, want 3 to 5` and `0 older-neighbour lines, want at least 2 ([5] and [6])`
-- [ ] Change:
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 8 | grep -E 'closest-work|older-neighbour'` prints `0 closest-work lines in §7, want 3 to 5` and `0 older-neighbour lines, want at least 2 ([5] and [6])`
+- [x] Change:
   - Closest work: 3 to 5 of the recent entries in §7, each with a line `How C2 differs:`
   - `### Older neighbours` in §8: [5] and [6] with `How C2 differs:`, and SimClusters, TwHIN and EdgeRank only if a source opens (otherwise the search log says "lead, not verified" or "not added: no verifiable source")
   - Claim 10 in the claims table: the fixed queries, the cited-by chasing, the sources and the date. A paper that already does what C2 does makes claim 10 "not supported" and gets a PC row for the supervisor note
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 7 8` prints four `PASS` lines (DW3)
-- [ ] Commit: `docs: closest work, older neighbours and claim 10`
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 7 8` prints four `PASS` lines (DW3)
+- [x] Commit: `docs: closest work, older neighbours and claim 10`
 
 ### Step 22: Skim of [19], [20], [21], [22], [26] and [27] (effort S)
 

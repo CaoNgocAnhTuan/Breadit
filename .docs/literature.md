@@ -42,6 +42,8 @@ Working notes for P1. Not thesis text.
 | [40] | Instagram feed debiasing (Chen 2026) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [41] | Engagement and divisive content (Milli 2025) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [42] | X feed algorithm field experiment (Gauthier 2026) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [43] | SimClusters (Satuluri 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [44] | TwHIN (El-Kishky 2022) | paper | verified | abstract only | 2026-10-24 | not cited |
 
 ## 2. Claims
 
@@ -55,6 +57,7 @@ Working notes for P1. Not thesis text.
 | 7 | BL0 to BL5 are cheap, well-known baselines, but they are not personalised (BL0 only puts followees first) and are not tuned, so [25] cuts against calling them strong. A small validation grid (PC4) and a count baseline BL6 (PC3) would make the test fairer. There is no learned baseline: the live app has no training data and there is little time, which is a limitation. | supported | [25]: §1 and §2.2; [11]: `r2/r2/lib/db/_sorts.pyx` line 59; [12]: the paragraph on the Arc code; [30]: `README.md`, Overview |
 | 8 | The protocol (leave-last-out, full ranking, as-of features, ties) was checked against [13] to [18], item by item against the leakage cases of [14]: 4 cases are covered by the plan, 2 are not applicable and 1 is a gap (tuning on validation items). Full ranking agrees with [15]. The tie rule is fixed and tested (E6, [18]). | supported | D6 and its leakage table; [13] §5; [14] §2.2, §3.2, §4.1 and §5; [15] §4.2 and §8; [17] §2; [18] §1 and §2; [16] is abstract only |
 | 9 | W0 is a sanity check: if the hybrid beats BL2 there, there is a bug or a leak (H0). A W1 win shows prediction, not influence, because W1 has no influence by construction. The timestamp shuffle checks the test, not the generator. A simulation shows what can happen under its assumptions, and our worlds model no feedback loop between a recommender and its data. [23] was not read, so its shuffle test is not described here. | own design | D7; [24] §1, §5.1, §5.2 and §5.3; [23] is an index record and is not used |
+| 10 | In the search of 2026-10-24 (the six fixed queries on WebSearch and OpenAlex, the cited-by lists of [2], [5] and [9], and four group searches; all rows are in the search log of §7) we found no paper from 2022 or later that adds follow trust and community affinity to engagement in one feed ranking. This says something about this search only, not that nobody has done it. The closest paper found is [33] (interaction strength plus group participation, a rating-prediction model). The search can miss papers: [33] is in no index that Crossref or OpenAlex covers, TrustGo was dropped because the ACM page answered 403, and WebSearch returned mostly vendor pages. | supported | search log (§7); [31] to [42] and their "How C2 differs" lines; the leads in §8 |
 
 ## 3. How this file was made
 
@@ -484,6 +487,9 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | 2026-10-24 | OpenAlex | G3: lead SimClusters | 5 | none |
 | 2026-10-24 | Crossref | G3: lead SimClusters | 4 | none |
 | 2026-10-24 | arXiv | G3: lead SimClusters (ti:SimClusters) | 2 | none |
+| 2026-10-24 | Crossref, OpenAlex, arXiv | follow-up check of the leads SimClusters and TwHIN (records opened) | 2 | [43], [44] |
+| 2026-10-24 | WebSearch | EdgeRank (lead from memory): a primary source of the Facebook News Feed formula; not added: no verifiable source | 10 | none |
+| 2026-10-24 | Crossref | EdgeRank (lead from memory): not added: no verifiable source | 4 | none |
 
 ### Inclusion and stop rules
 
@@ -497,6 +503,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Opened: 2026-10-24, abstract only [arXiv abstract page 2508.07241; this is a preprint]
 - Says: Amit Jaspal, Kapil Dalwani and Ajantha Ramineni (arXiv preprint, 2025) propose a two-stage retrieval framework for cold-start items on platforms with a social graph. Stage 1 shows a new item to the creator's social connections. Stage 2 uses early engagement and learned user embeddings to spread the item with nearest-neighbour search. On a large video platform it raised cold-start item distribution by 36% while keeping the engagement rate on those items (abstract).
 - For us: Group 2 (social cold start). It uses a signal from the social graph and early engagement, in two retrieval stages. It has no community signal and no single combined score.
+- How C2 differs: C2 puts a signal from the follow graph and a community signal into one score. SocRipple uses the creator's connections in a first retrieval stage and early engagement in a second stage, for new items.
 - Cited in: not cited
 
 ### [32] Community by Design (Weyl 2025)
@@ -504,6 +511,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Opened: 2026-10-24, abstract only [arXiv abstract page 2502.10834; this is a preprint]
 - Says: E. Glen Weyl and five co-authors (arXiv preprint, 2025) argue that platforms use the social fabric as an input and may erode it by maximizing engagement. They propose a platform model in which the social fabric, with communities defined by affiliation or by shared attitudes, is also an explicit output, to support social cohesion (abstract).
 - For us: Group 3 (follow-graph feed ranking). A design proposal with a community signal. It has no follow-based trust and no engagement score in one ranking.
+- How C2 differs: C2 is a concrete scoring rule, with follow trust and community affinity next to engagement, and it is tested offline. [32] is a design proposal for a platform model, with no ranking rule and no test.
 - Cited in: not cited
 
 ### [33] Interaction strength (Zhou 2024)
@@ -511,6 +519,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Opened: 2026-10-24, abstract only [the journal page of Application Research of Computers, in Chinese; the DOI is not in Crossref and resolves through chndoi.org; no full text was read]
 - Says: Luxin Zhou, Man Li, Mingyang Jiang and Lei Zhang (Chongqing Jiaotong University), Application Research of Computers 41(1), pp. 65-71, 2024. The page gives the English title "Improving social recommendation algorithm via incorporating interaction strength". The Chinese abstract describes a matrix factorization model for rating prediction. It enriches the social matrix with two similarities, defines an interaction strength between users, and links it to the social relations and to the users' group-participation features. On three real data sets it improves the accuracy of rating prediction (abstract).
 - For us: Group 1 (social recommendation). It is the closest idea to C2 that the search found (interaction strength plus group participation). It predicts ratings with a learned model. It does not rank posts and has no engagement score.
+- How C2 differs: [33] learns latent features by matrix factorization to predict ratings, and uses an interaction strength between users and a group-participation matrix. C2 ranks posts with a fixed hybrid score that adds follow trust and community affinity to engagement, and is tested with a ranking protocol.
 - Cited in: not cited
 
 
@@ -556,6 +565,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Opened: 2026-10-24, abstract only [Crossref record of the CIKM 2023 paper]
 - Says: Federico Cinus, Aristides Gionis and Francesco Bonchi (CIKM 2023) propose to nudge users' social feeds to balance relevance and diversity and so reduce polarization. The approach re-weights the relative importance of the accounts that a user follows, to calibrate how often the content of each account is shown (abstract).
 - For us: Group 3. It weights the followed accounts, as our follow trust does. The goal is to reduce polarization, and the weights do not come from past engagement.
+- How C2 differs: C2 weights the followed accounts by the past engagement of the user, to rank more relevant posts. [39] re-weights the followed accounts to reduce polarization, and does not use past engagement.
 - Cited in: not cited
 
 ### [40] Instagram feed debiasing (Chen 2026)
@@ -563,6 +573,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Opened: 2026-10-24, abstract only [arXiv abstract page 2610.27423; this is a preprint]
 - Says: Hsin-Chiang Chen and co-authors (arXiv preprint, 2026) describe a feed ranker that scores candidates with a value model, a weighted sum of engagement predictions. They argue that a multi-signal value model should keep the raw prediction and add the incremental part, the amount above what the viewer, item or request would produce anyway, as a separately weighted term. They test this in a controlled four-arm ablation on Instagram Feed (abstract).
 - For us: Group 3. It has the same shape as C2: an engagement-based weighted sum with extra terms added. The extra terms are debiasing terms, not follow trust or community affinity.
+- How C2 differs: C2 adds terms about who the author is to the viewer (follow trust) and in which community the post is. [40] adds debiasing terms for viewer habit, item popularity and request context to a learned value model.
 - Cited in: not cited
 
 ### [41] Engagement and divisive content (Milli 2025)
@@ -580,6 +591,29 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Cited in: not cited
 
 ## 8. Older neighbours and other added references
+
+### Older neighbours
+
+- [5] RealGraph (Kamath 2014), full text. How C2 differs: RealGraph learns a directed weight for each pair of users, the probability of a future interaction, with a logistic regression on many features. C2 uses a simple smoothed count of past engagement with each followee (trust), adds a community term and engagement, and has no learned model.
+- [6] Twitter code (2023 release, commit `ef4c5eb65e6e04fac4f0e1fa8bbeff56b75c1f98`), full text. How C2 differs: the code attaches RealGraph scores of the pair (viewer, author) to each tweet candidate as features of a ranker that is not in the files. C2 is an explicit hybrid score with a community term, and it is tested offline.
+- [43] SimClusters (Satuluri 2020), abstract only. How C2 differs: SimClusters builds sparse vectors for users and content from overlapping communities that a sampling algorithm discovers, for many recommendation tasks. C2 uses the communities that users have joined, as one term of a ranking score next to follow trust and engagement, and it discovers no communities.
+- [44] TwHIN (El-Kishky 2022), abstract only. How C2 differs: TwHIN learns knowledge-graph embeddings of the Twitter network of users, content and their interactions, and uses them in downstream models such as ads ranking, follow recommendation and search ranking. C2 has no embeddings; its terms are counts. TwHIN is from 2022, but it is listed here because the recent list is full (12).
+- EdgeRank (lead from memory): not added: no verifiable source. One WebSearch (10 results) and a Crossref search found only articles and blogs about it, and no paper, patent or official page, so it stays out.
+
+### [43] SimClusters (Satuluri 2020)
+- Link: https://doi.org/10.1145/3394486.3403370
+- Opened: 2026-10-24, abstract only [Crossref record: title "SimClusters", subtitle "Community-Based Representations for Heterogeneous Recommendations at Twitter", Venu Satuluri and eight co-authors, KDD 2020, pp. 3183-3193; the abstract text comes from the OpenAlex record]
+- Says: SimClusters is a general-purpose representation layer based on overlapping communities. Users and content become sparse, interpretable vectors that support many recommendation tasks at Twitter. The authors propose a community discovery algorithm based on Metropolis-Hastings sampling, which they say is more accurate and faster than off-the-shelf alternatives, and they say it scales to billions of users (abstract).
+- For us: an older neighbour (2020), about communities as a signal for recommendation at Twitter, to compare with the community term of C2. Only the abstract was read.
+- Cited in: not cited
+
+### [44] TwHIN (El-Kishky 2022)
+- Link: https://doi.org/10.1145/3534678.3539080
+- Preprint: https://arxiv.org/abs/2202.05387
+- Opened: 2026-10-24, abstract only [Crossref record of the KDD 2022 paper, pp. 2842-2850; the abstract text comes from the arXiv abstract page 2202.05387]
+- Says: Ahmed El-Kishky and ten co-authors (KDD 2022) treat Twitter as a heterogeneous information network, with nodes for users and content and edges for interactions such as re-sharing and following. They learn knowledge-graph embeddings for its entities and report offline and online gains for personalized ads ranking, account follow-recommendation, offensive content detection and search ranking (abstract).
+- For us: an older neighbour, about Twitter models that use the follow graph and engagement together as embeddings. Only the abstract was read.
+- Cited in: not cited
 
 ### [30] X For You algorithm (xai-org 2026)
 - Opened: 2026-10-24, full text (§Overview, §Scoring and Ranking) [github.com/xai-org/x-algorithm, commit 6258a1549ef808be88fba83d3b2d58364b587ee0 (HEAD); the repository was created on 2026-01-19; the README sections named were read; the tree of 2886 paths has no path with real_graph or interaction_graph]
