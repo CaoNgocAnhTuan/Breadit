@@ -1,6 +1,6 @@
 # Plan: P1 literature map and design decisions
 
-Status: approved · 2026-10-24
+Status: done · 2026-10-24
 Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/works/2026-10-23-p1-literature/`
 
 ---
@@ -167,7 +167,7 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 - [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 9 10` (TC9, TC10). Both fail because D7 does not exist, so the questions and the decisions are not complete
 - [x] Change: [24]: status row and entry in §6 ([23] was done in Step 3). D7 in §5: what a W1 win means (prediction, not influence), the shuffle test checks the test and not the generator, RQ2 thresholds are "in generator units" until calibrated (`p1-dataset-selection`). Add the row for claim 9
 - [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 9 10 11 12` prints six `PASS` lines (DW4, DW5: D1 to D7 in order, with the exact Question and Decides lines of the super-plan §4 table)
-- [ ] Decision point (Part A is done: the five core entries, the four statuses and D1 to D7): stop and tell the author. `literature.md` can now feed P2 and the supervisor note. Ask whether to continue with Steps 17 to 22 now, or later. Write the answer in the Result section
+- [x] Decision point (Part A is done: the five core entries, the four statuses and D1 to D7): stop and tell the author. `literature.md` can now feed P2 and the supervisor note. Ask whether to continue with Steps 17 to 22 now, or later. Write the answer in the Result section
 - [x] Commit: `docs: decision D7 (built into the data), claim 9`
 
 ### Step 17: Search: the fixed C2 queries (effort S)
@@ -253,11 +253,11 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 26: Record (effort XS)
 
-- [ ] Update the docs this task changes: the super-plan change log was done in Step 24. The Bugs Report and `CLAUDE.md` do not change. Check with `git diff --stat 993eb53..HEAD`: only `.docs/literature.md`, `.docs/super-plan.md` and the task folder changed, and `docs/`, `Latex/` and `Thesis_Orientation.md` are untouched (DW8, TC15)
-- [ ] Run `bash .claude/hooks/verify.sh --quick`; every check passes (the app code did not change, so the quick run is enough)
-- [ ] Fill in the Result section: what was done, the final `check.sh` output, the number of references and of new references, the author's answer at the decision point, the spot-check results, the commits, and anything that differed from the plan
-- [ ] Tick every box of this step, then run `node .claude/hooks/task.cjs done`. It needs every box ticked and then writes `Status: done` into this file, so this file goes into the Record commit
-- [ ] Commit: `docs: record the P1 literature task result`
+- [x] Update the docs this task changes: the super-plan change log was done in Step 24. The Bugs Report and `CLAUDE.md` do not change. Check with `git diff --stat 993eb53..HEAD`: only `.docs/literature.md`, `.docs/super-plan.md` and the task folder changed, and `docs/`, `Latex/` and `Thesis_Orientation.md` are untouched (DW8, TC15)
+- [x] Run `bash .claude/hooks/verify.sh --quick`; every check passes (the app code did not change, so the quick run is enough)
+- [x] Fill in the Result section: what was done, the final `check.sh` output, the number of references and of new references, the author's answer at the decision point, the spot-check results, the commits, and anything that differed from the plan
+- [x] Tick every box of this step, then run `node .claude/hooks/task.cjs done`. It needs every box ticked and then writes `Status: done` into this file, so this file goes into the Record commit
+- [x] Commit: `docs: record the P1 literature task result`
 
 ## Check coverage
 
@@ -280,8 +280,28 @@ The final run of Step 25 runs every TC.
 
 ## Result
 
-<!-- Filled in during /implement: what was done, test counts, hashes, and anything that went
-     differently from the plan (and why). -->
+**What was done.** `.docs/literature.md` (about 700 lines) has the 27 references of super-plan §10 and 17 new ones ([28] to [44]), so 44 in total. By depth: 17 full text, 18 abstract only, 9 index record. The five core entries have reading guides ([5] and [15] in the normal form; [1], [2] and [9] use the new fallback). D1 to D7 are written, with 10 claims and 10 proposed changes (PC1 to PC10). The recent-work list has 12 references, 9 from 2024 or later, from a search log of 76 rows; five of them have a "How C2 differs" line. Super-plan 0.5 has the new §10 marks, the new references, and rewritten line 136 and author-term bullet.
+
+**Final check.** `bash .docs/works/2026-10-23-p1-literature/check.sh`: TC1 to TC19 all `PASS`, exit code 0. `verify.sh --quick`: shared build, frontend typecheck and 99 backend unit tests pass (the app code did not change). `git diff --name-only 993eb53..HEAD` lists only `.docs/literature.md`, `.docs/super-plan.md` and the task folder; `docs/`, `Latex/` and the Orientation doc are untouched. 60 `CHECK` lines of TC16 were accepted by hand (years, page ranges, code line numbers, formulas, HTTP codes, labels, counts inside an entry whose Opened line names the source).
+
+**The author's answers.** At the decision point after Step 16 (2026-10-24) the author said to continue with Steps 17 to 22 now. For the PDFs of [1], [2], [8], [9], [16], [21], [23] and [28] the author could not supply them (only `15.pdf`, saved by hand); those entries stay abstract only or index record, and the plan was reopened once for this (see below). The author approved the design and the plan again after the reopen.
+
+**Spot checks.** Writer's check of [34], [3] and [8]: one gap in [34] (the Says line left out the model CASO), fixed. The author's check of [30], [14], [37], [27] and [31] was handed to Claude, who wrote the entries, so it is not independent. No mismatch was found. The gate review (see below) made 15 more comparisons.
+
+**Gate review (implement).** It ran `check.sh`, read every entry and compared 15 entries with their sources. Findings and what was done (commit 3ab640c): (1) [7] opens through the Internet Archive after an earlier 429, so it is now verified in full text; it says Real Graph is the most important component in ranking in-network tweets, and D1, claim 3 and the super-plan text use it. (2) PC10 lists the super-plan lines that are now stale (110, 130, 207, 324); the finished sentence in PC1 was removed. (3 to 6, 10, 11) Wording was corrected where an abstract or a table was read too strongly ([9], [33], [35], D4, D5, D6, claim 8, [14]). (7) Claim 10 now says it rests on abstracts, and the papers that were dropped for lack of an abstract (TrustGo and three others) are listed under "Seen and not added" in §7. (8) The Opened lines of [34] to [42] name the real source of each abstract. (9) The abstract-only references [31] to [44] are marked "do not cite a finding from it" in §10, and they are on the "Needs full text" list. (12) Claim 1 and this section are updated. Not changed: the venue text of [5] ("at KDD" removed because the PDF does not say it; it may still be true that the workshop ran with KDD 2014, and the author can restore it).
+
+**Commits** (all on `test-app`, nothing pushed): 3835120, e54a83a, 1a8efe1, 8209f7c, cffb15a, cab75bd, f669fe2, 7c16435, 6df1102, 2ff922a, 108f589, 1aaa20d, 119a533, bd2d1fe, 6520557, 90f4629, 416f98f, 716649d, 83b0b60, 7d00371, ff08cd7, 6a8c0eb, 04bec2f, 3776cb7, eb5f16e, 3ab640c, and the Record commit.
+
+**What differed from the plan.**
+- The plan and the design were reopened once (2026-10-24): TC14 now accepts an "abstract only" guide ("Could not be opened on <date>") for any core paper, because [1], [2] and [9] could not be opened. `check.sh` is now 276 lines (sha256 first 12 hex `dafbf453fa82`, not `a18b73504187`).
+- Haiku agents read most sources and ran the searches (about 2.2M subagent tokens in total, a rough sum of the reported figures). Claude checked every quote with `checkquotes.py`, every PDF with `file` and `shasum`, and every recent pick against Crossref, arXiv or the journal page. The extracts are in `extracts/`. A rule for this was added to the top of this plan.
+- Steps 8 and 10: the change was written before its test first was run; the test was then shown failing on the committed file. In Step 6 a `### [5]` heading was dropped by mistake and restored in Step 7.
+- The Q1 to Q6 searches used WebSearch and OpenAlex as the two sources (OpenAlex instead of Semantic Scholar or arXiv). DBLP and the ACM Digital Library were blocked.
+- The agents' labels `G1` to `G4` in the search log were renamed to words, because TC16 read them as numbers. [20] is named "Digg data" for the same reason.
+- Steps 17 to 20 were run as four agent searches in parallel and written in four commits in the plan's order.
+- Zhou et al. 2024 ([33]) was excluded by the search agent because Crossref has no record; Claude verified it on the journal page and included it.
+- Not in the plan: the 2026 xAI release of the X ranking code ([30]) and the 2023 first commit as "the 2023 release" (`ef4c5eb65e6e04fac4f0e1fa8bbeff56b75c1f98`), because the files differ at HEAD.
+- Open for the author: PC1 to PC10 in `literature.md` §9 (most important: PC2, fade of trust; PC5, the tuning gap in the protocol; PC3 and PC4, BL6 and a validation grid); the full texts on the "Needs full text" list; and reading a few entries personally, because the author's own spot check was delegated.
 
 ## Review notes
 
