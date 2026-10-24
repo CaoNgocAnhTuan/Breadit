@@ -53,15 +53,15 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 2: Tools and the file skeleton (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 1` (TC1). It fails because `.docs/literature.md` has no `- PDF tool:` line
-- [ ] Change:
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 1` (TC1). It fails because `.docs/literature.md` has no `- PDF tool:` line
+- [x] Change:
   - Build the tool: `swiftc -o <scratchpad>/pdftxt .docs/works/2026-10-23-p1-literature/pdftxt.swift -framework PDFKit`. Never commit the binary
   - Test it on the [5] PDF (`https://www.ueo-workshop.com/wp-content/uploads/2014/04/sig-alternate.pdf`) and on one two-column arXiv PDF (for example [25], arXiv 1907.06902). Pass rule: the title, the authors and the first sentence of the abstract are readable, and one paragraph of a two-column page is in the right order. A title that lost its spaces (the gate reviewer saw this on [25]) still passes, if the authors and the abstract read well
   - If the tool fails: try `pypdf` in a virtual environment in the scratchpad (`python3 -m venv`, `python3 -I`, NFKC with `unicodedata.normalize`). If that fails too, ask the author before `brew install poppler`
   - Create `.docs/literature.md` with line 1 (`# Literature notes (P1) · updated <date> · task 2026-10-23-p1-literature`), line 3 (`Working notes for P1. Not thesis text.`) and the nine sections of design §1.1, with these exact headings: `## 1. Status table` (header row of design §1.3 only), `## 2. Claims` (header row of design §1.6 only), `## 3. How this file was made`, `## 4. Core papers`, `## 5. Design decisions`, `## 6. Other references`, `## 7. Recent work (2022 or later)`, `## 8. Older neighbours and other added references`, `## 9. Proposed changes` (header row of design §1.6 only)
   - In §3, write the `- PDF tool:` line and the tools that failed, each with its reason. Add the "Needs full text" list for the author, empty for now
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 1` prints `TC1 PASS` and one `CHECK - PDF tool:` line that names the tool, both test files, the date and "pass" (DW1)
-- [ ] Commit: `docs: start the P1 literature notes with the PDF tool check`
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 1` prints `TC1 PASS` and one `CHECK - PDF tool:` line that names the tool, both test files, the date and "pass" (DW1)
+- [x] Commit: `docs: start the P1 literature notes with the PDF tool check`
 
 ### Step 3: Status of [7], [16] and [23] (effort S)
 
