@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.6 · 2026-10-24 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.7 · 2026-10-24 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -125,7 +125,7 @@ Candidates to check: Digg 2009 [20], Epinions and Ciao [19], the Flickr favorite
 | How do we help users with no history yet? | Sedhain [9], Tang [1] | The prior `m` and its form (§6) |
 | Is community membership a useful signal, and in what form? | Orkut communities [10] | The community term (§6) |
 | Should influence reach friends of friends (2 hops)? | DiffNet [3], SocialMF [8], Sharma [4] | 1 hop or 2, and the Chapter 2 argument for the choice |
-| Are the baselines strong enough? | Ferrari Dacrema [25], Reddit [11], Hacker News [12] | BL4 and BL5 (§5) |
+| Are the baselines strong enough? | Ferrari Dacrema [25], Reddit [11], Hacker News [12] | BL4, BL5 and BL6 (§5) |
 | How do we split and measure without bias? | Meng [13], Ji [14], Krichene [15], Cañamares [16], Ge [17], McSherry [18] | The protocol (§5) |
 | How do we show the result is not built into the data? | Anagnostopoulos [23], Chaney [24] | Worlds W0 and W1, the shuffle test (P3, E5) |
 
@@ -133,7 +133,7 @@ Candidates to check: Digg 2009 [20], Epinions and Ciao [19], the Flickr favorite
 
 **Step 5: write the survey** (task `p1-related-work`). The Orientation asks for a 3–4 page survey. It becomes the core of Chapter 2.
 
-**Status (2026-10-24).** The task `p1-literature` is done: Steps 1 and 3, in `.docs/literature.md` (44 references, decisions D1 to D7, 10 claims, and proposed changes PC1 to PC10). Steps 2, 4 and 5 are not started. The proposed changes that wait for the author are in §11, item 6.
+**Status (2026-10-24).** The task `p1-literature` is done: Steps 1 and 3, in `.docs/literature.md` (44 references, decisions D1 to D7, 10 claims, and proposed changes PC1 to PC10). Steps 2, 4 and 5 are not started. The author decided the proposed changes PC2 to PC10 on 2026-10-24 (version 0.7). The open points are in §11, item 6.
 
 **Who reads what.** The author deep-reads the core papers, because the committee will ask the author about them: Tang [1], SoRec [2], RealGraph [5], Sedhain [9], and Krichene and Rendle [15]. Claude prepares the notes on the others, searches for recent work, and checks every reference. RealGraph [5] and the Twitter blog [7] are now verified in full text (task `p1-literature`, notes in `.docs/literature.md`). The blog [7] was read through an Internet Archive copy. The full texts of [1], [2], [8], [9], [16], [21], [23] and [28] are still missing. Until they are read, cite [21] (the test comparison) and [23] (the timestamp shuffle) by name only, and do not describe what they found.
 
@@ -178,7 +178,7 @@ A loader writes the same data into Postgres with explicit IDs, so the live app c
 
 ### P5: Ranking package and evaluation harness ★
 
-**Do, part 1: `packages/ranking` (`@breadit/ranking`).** Pure code: no Nest, Prisma or Redis imports. Move `computeExploreScoreFixed` from `posts.service.ts` into it and make the backend import it, so BL2 in the evaluation is the production code. Add the baselines BL0–BL5, the hybrid (section 6) and the shared `buildPool` (section 5). The author cap `applyExploreDiversity` is a page-level filter and stays in Explore. Point the harness determinism check and rule (`.claude/hooks/lib.cjs`, `.claude/rules/determinism.md`, the `leakage-auditor` and `designer` agents) at `packages/ranking/` instead of `apps/backend/src/ranking/`.
+**Do, part 1: `packages/ranking` (`@breadit/ranking`).** Pure code: no Nest, Prisma or Redis imports. Move `computeExploreScoreFixed` from `posts.service.ts` into it and make the backend import it, so BL2 in the evaluation is the production code. Add the baselines BL0–BL6, with a grid for BL2t, BL4 and BL5 (section 5), the hybrid (section 6) and the shared `buildPool` (section 5). The author cap `applyExploreDiversity` is a page-level filter and stays in Explore. Point the harness determinism check and rule (`.claude/hooks/lib.cjs`, `.claude/rules/determinism.md`, the `leakage-auditor` and `designer` agents) at `packages/ranking/` instead of `apps/backend/src/ranking/`.
 
 **Do, part 2: the harness.** Build the protocol in section 5 in `eval/src/` (`harness`, `metrics`, `stats`, `report`). Baselines are pure functions that take the same pool. Statistics are written in TypeScript, then cross-checked once against scipy on a small fixture. The fixture result is committed.
 
@@ -206,9 +206,10 @@ Run each experiment once on the frozen config. Do not look at test results while
 | E2 | Does the hybrid help cold-start users? (RQ1) | Results by history bucket |
 | E3 | Where does the social signal start to help? (RQ2) | Gain against social density and against own history |
 | E4 | Which term matters? | Ablations: follow-only, community-only, author term, engager term, `m` |
-| E5 | Is the result built into the data? | W0 null world, the three W2 cells, timestamp shuffle [23] |
+| E5 | Is the result built into the data? | W0 null world, the three W2 cells, timestamp shuffle (our own test; see [23] on influence and correlation) |
 | E6 | Do ties change the result? | Rerun with reversed tie-break |
 | E7 | What does the new feed cost? (Class R) | Latency and query count for `chrono`, `engagement`, `social` |
+| E8 | Does the pool size change the result? | Main comparison again with the larger pool (W_L, N_L): H, BL2 and the baseline with the highest validation NDCG@10; world M, K = 10 |
 
 E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, drop the first run as warm-up, and report the median with a bootstrap confidence interval. The throttle limit in `app.module.ts:28` must become an env variable so the benchmark can raise it (N6). A run counts only if `http_req_failed` is 0. This gate would have caught the 71% failures in the pre-thesis data. Also count the Prisma queries per request. That number is deterministic.
 
@@ -249,11 +250,11 @@ E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, d
 
 This protocol is frozen with the config.
 
-**Split.** As-of temporal leave-last-out with full ranking. There are no sampled negatives, because sampled metrics can change which method looks best [15][16]. A user's *test item* is their last positive interaction (like, comment or repost) on a post they had not touched before. The *validation item* is the one before it.
+**Split.** As-of temporal leave-last-out with full ranking. There are no sampled negatives, because sampled metrics can change which method looks best [15][16]. A user's *test item* is their last positive interaction (like, comment or repost) on a post they had not touched before. A user's *validation item* is their last such positive before the cut time T. One global cut time T separates tuning from testing, as in the global temporal split of [13]: every validation item is before T, and a test item must be after T. A user with no such positive after T has no test item and is left out. The rule that sets T is decided in P2, and its value is frozen in P5 (section 7).
 
-**As-of features.** Every feature for user `u` uses only events strictly before the test time `t_u` (ties broken by event id). This includes engagement counts, post age (`t_u` minus `createdAt`), follows, memberships and trust. Leakage from the future is a known problem in offline evaluation [14].
+**As-of features.** Every feature for user `u` uses only events strictly before the test time `t_u` (ties broken by event id). This includes engagement counts, post age (`t_u` minus `createdAt`), follows, memberships and trust. This rule is our own design. [14] shows that training on interactions after the test time is a source of leakage.
 
-**Candidate pool.** One shared function `buildPool` (in `packages/ranking`) is used by both the live feed and the harness. The pool holds root posts that are not deleted, are approved, were created before `t_u`, are inside the window W, and are not blocked. It keeps the newest N_max posts. It removes the user's own posts and the user's earlier positives. If the test post is not in the pool, the user is left out, and the number of left-out users is reported. Public datasets can override W.
+**Candidate pool.** One shared function `buildPool` (in `packages/ranking`) is used by both the live feed and the harness. The pool holds root posts that are not deleted, are approved, were created before `t_u`, are inside the window W, and are not blocked. It keeps the newest N_max posts. It removes the user's own posts and the user's earlier positives. If the test post is not in the pool, the user is left out. The number of left-out users is reported in total and for each history bucket. Public datasets can override W. E8 runs the main comparison again with a larger pool (W_L and N_L, section 7).
 
 **History buckets.** History is the number of positive events before `t_u`. Buckets: 0, 1–4, 5–19, 20 or more. The Orientation uses "≤5 vs >20" and phases at 0/5/20. Those overlap at 5 and drop users with 6–20 events.
 
@@ -261,7 +262,9 @@ This protocol is frozen with the config.
 
 **Methods.** All methods rank the same pool. BL0 is the production "For You": followee posts first, newest first, then the rest newest first. BL1 is plain newest first. BL2 is the production Explore score, as of `t_u`. BL3 is global popularity (likes as of `t_u`).
 
-BL4 and BL5 are two cheap, well-known "hot" formulas, added so the baselines are not weak [25]. BL4 is Reddit "hot" [11] with likes as upvotes and no downvotes. BL5 is Hacker News ranking [12], `(P-1)^0.8 / (T+2)^1.8`, with penalties ignored. H is the hybrid. H-follow (β = 0) and H-comm (α = 0) are ablations.
+BL4 and BL5 are two cheap, well-known "hot" formulas, added so the baselines are not weak [25]. BL4 is Reddit "hot" [11] with likes as upvotes and no downvotes. BL5 is Hacker News ranking [12], `(P-1)^0.8 / (T+2)^1.8`, with penalties ignored. BL6 is H-follow with every trust weight set to 1: `engagement + α · ([u follows author(p)] + the number of followees who engaged with p before t)`. It shows what the trust weights add over a plain count. H is the hybrid. H-follow (β = 0) and H-comm (α = 0) are ablations.
+
+**Tuned baselines.** BL4 and BL5 each have one tuned parameter: the time divisor of BL4 (45,000 seconds as published) and the gravity of BL5 (1.8 as published). BL2 stays as the production score. BL2t is BL2 with its age weight tuned (0.25 per hour in production). Each grid contains the published or production value. This is so that the hybrid is not the only tuned method [25].
 
 The Orientation names three baselines. They map like this: its BL1 "Chronological (For You hiện tại)" is our BL0 (production For You) and BL1 (plain newest first); its BL2 "Engagement heuristic" is our BL2; its BL3 "Popularity global" is our BL3.
 
@@ -269,9 +272,9 @@ The author cap in production Explore is a page-level filter. It is not applied i
 
 **Ties.** Ties are broken by `(scoreFixed desc, postId desc)`. E6 repeats the run with the reversed tie-break. Many ties (BL3 especially) can change metrics [18].
 
-**Statistics.** For each user, take the paired difference against the reference method. Use a paired bootstrap 95% confidence interval (10,000 resamples) and a paired randomization test (10,000 permutations), both with seeded PRNG streams. Correct all p-values with Holm [22] across the family method × K × bucket. Smucker et al. found little practical difference between the randomization, bootstrap and t-tests [21].
+**Statistics.** For each user, take the paired difference against the reference method. Use a paired bootstrap 95% confidence interval (10,000 resamples) and a paired randomization test (10,000 permutations), both with seeded PRNG streams. Correct all p-values with Holm [22] across the family method × K × bucket. Smucker et al. compare significance tests for information retrieval evaluation [21].
 
-**Tuning.** Tune α and β on the validation item only, using the grid in section 7. Choose by NDCG@10, and break ties by the smaller (α, β) pair. Freeze the choice. Then run the test item once.
+**Tuning.** Tune α and β on the validation items only (all before T), using the grid in section 7. Choose by NDCG@10, and break ties by the smaller (α, β) pair. The same rule tunes the one parameter of BL2t, BL4 and BL5 on their grids (section 7), and the α of BL6 on the α grid; ties go to the smaller value. Freeze the choice. Then run the test item once.
 
 ---
 
@@ -314,6 +317,9 @@ One source of truth. A change needs a new config version and a line in the chang
 | Prior strength `m` | 5 (E4 tests 0, 2, 5, 10) | P5 |
 | α, β grid | 0, 1, 2, 4, 8, 16 (engagement points per unit) | P5 |
 | Window W / pool cap N_max | 7 days / 2,000 | P5 |
+| Cut time T | the rule is set in P2; the value is set before the first test-split run | P5 |
+| Larger pool (W_L, N_L) for E8 | larger than W and N_max; values set in P5 | P5 |
+| Baseline grids | one parameter each: age weight of BL2t (production 0.25 per hour), time divisor of BL4 (published 45,000 s), gravity of BL5 (published 1.8); 3 to 5 values each, including the published value; set in P5 | P5 |
 | Dataset sizes | S 200 users, 4k posts · M 1,000 users, 20k posts (E7 uses M) | P3 |
 | Synthetic world parameters | in `synthetic-v1.json`, calibrated to `.docs/datasets.md` where possible; W2 has three cells: low, middle and high influence at the middle homophily | P3 |
 | Primary W2 cell for H1 | the middle cell | P3 |
@@ -323,7 +329,7 @@ One source of truth. A change needs a new config version and a line in the chang
 
 ## 8. Risks and cut order
 
-- **The result is built into the data.** If interactions are made from follows, the social signal wins by construction. Defense: the W0 null world, W1, the timestamp shuffle in E5 [23], three W2 cells instead of one setting, and the public dataset if P4 works. Present synthetic results as a check that the mechanism works, and public data as outside evidence.
+- **The result is built into the data.** If interactions are made from follows, the social signal wins by construction. Defense: the W0 null world, W1, the timestamp shuffle in E5 (our own test; [23] is cited for the question of influence and correlation), three W2 cells instead of one setting, and the public dataset if P4 works. Present synthetic results as a check that the mechanism works, and public data as outside evidence.
 - **No public dataset.** If P4 is dropped, all results are synthetic. Say so plainly in chapters 3 and 6, and lean on W0 and W1 to show the result is not built in.
 - **Leakage.** Defense: as-of features and the mutation test in P5.
 - **Weak community evidence.** No public dataset I found has a follow graph, item interactions and explicit community membership together. State it as a limitation.
@@ -331,9 +337,10 @@ One source of truth. A change needs a new config version and a line in the chang
 **Cut order.** The deadline is 2026-11-20. If time runs short, drop in this order:
 1. P4, the public dataset (at its gate in P5).
 2. The timestamp shuffle in E5.
-3. The finer parts of E4 (author term, engager term, the `m` sweep). Keep H-follow and H-comm.
-4. E7 down to `chrono` against `social`.
-5. The frontend toggle in P6. Keep the backend `algo` option and the parity test.
+3. E8, the larger-pool run.
+4. The finer parts of E4 (author term, engager term, the `m` sweep). Keep H-follow and H-comm.
+5. E7 down to `chrono` against `social`.
+6. The frontend toggle in P6. Keep the backend `algo` option and the parity test.
 
 Never cut: the W0 null world (H0), the leakage and double-run tests, the repro command, and the supervisor checkpoints.
 
@@ -407,7 +414,7 @@ The thesis results do not need the schema migration: generated data has no dupli
 3. **D1.** Can a non-member post into a community (Bugs Report §4)? Decide before P3. The recommendation is to require membership.
 4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval.
 5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `Latex/` and `docs/` needs the author's request.
-6. **Proposed changes from P1** (`.docs/literature.md` §9). §5 and §7 are frozen, so these wait for the author (`/freeze` for new values). Decisions: PC2, does trust fade over time (none, a half-life or a window)? PC3, add the baseline BL6 (the number of followees who engaged, with no trust weights)? PC4, give BL2, BL4 and BL5 a small validation grid? PC5, tune `m`, α and β only on events before one global cut time, so that tuning cannot use events later than another user's test item? PC6, run the main comparison also with a larger pool? PC7, report the left-out users per history bucket? Wording fixes in §5: PC8 (line 252: [14] shows the harm of training on future interactions, and the as-of rule for features is our own design) and PC9 (line 270: only the record of [21] was read, so its finding about the tests should not be stated yet).
+6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family.
 
 ---
 
@@ -419,3 +426,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.4 · 2026-10-22 · P1 rewritten as five steps (map the field, dataset selection, design questions, lock the decisions, survey), with `.docs/literature.md`; the three §6 design choices are now confirmed in P1. P2 is now the implementation blueprint (`.docs/implementation-plan.md`: module map, data contracts, measurement plan, task list). The cut schema migration moved to §9. The Tasks column for P3–P10 is a first guess until P2.
 - 0.5 · 2026-10-24 · Task `p1-literature`: the marks of [5] (verified, full text; the venue "at KDD" removed because the paper does not say it), [7] (verified in full text through an Internet Archive copy), [16] (verified; the URL is now the paper DOI, not the code repository) and [23] (verified through Crossref; the URL is now the DOI); new references [28] to [44]; one sentence in the §10 intro that defines "do not cite"; line 136 and the §6 author-term bullet (RealGraph is a predicted probability of a future interaction, and the Twitter code shows scores as features) rewritten with the P1 result; the marks of [31] to [44] say "do not cite a finding from it" where only the abstract was read. The other proposed changes are in `.docs/literature.md` §9.
 - 0.6 · 2026-10-24 · After the P1 literature task: the P1 text (line 110 and a status paragraph), the smoothing bullet in §6 (the form is the m-estimate [28][29]), "Who reads what" (which full texts are missing, and that [21] and [23] are cited by name only), and open item 6 (the proposed changes that wait for the author). No frozen value and no part of §5 or §7 changed.
+- 0.7 · 2026-10-24 · The author decided the proposed changes PC2 to PC10 of P1 (`.docs/literature.md` §9). §5: the global cut time T, BL6, tuned BL2t, BL4 and BL5, left-out users per history bucket, the larger-pool run E8, and two wording fixes ([14] and [21]). §7: three new rows with no numbers yet (cut time T, larger pool, baseline grids), to be set in P5. §4 and §8: E8, the cut order, and [23] cited by name. No existing frozen value changed.

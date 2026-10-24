@@ -160,14 +160,14 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
   - [6] task: ranking tweets for a timeline. Data: Twitter production data. Graph: the pair (viewer, author) as a per-candidate input. The ranker that uses it is not in the files, so learned or heuristic is unknown.
   - [2] task: predicting ratings. Data: ratings with a social network (abstract only). Graph: not stated. Learned (a probabilistic matrix factorization).
   - [8] from the title only: a matrix factorization with trust propagation, so learned. Task, data and graph were not read.
-- Fade over time: options are none, a half-life or a window. The §6 formula has none. [5] decays old interactions (§2.1) and drops old edges, so [5] cuts against "none". The core formula keeps no fade, to avoid a new parameter that super-plan §7 does not hold. PC2 puts the question to the author.
+- Fade over time: options are none, a half-life or a window. The §6 formula has none. [5] decays old interactions (§2.1) and drops old edges, so [5] cuts against "none". The core formula keeps no fade, to avoid a new parameter that super-plan §7 does not hold. PC2 asked the author, who chose none on 2026-10-24.
 - Author term (DW5): a post by a followee that nobody has engaged with yet gets no score from the friends' sum, so the term `[u follows author(p)] · trust(u, author(p), t)` is kept. [6] also attaches the viewer-author pair as features to every candidate (lines 63-93), and [7] says that Real Graph is the most important component in ranking In-Network Tweets. E4 shows what the term adds.
 - Claims 2 and 3: [5] says "probability of a future interaction", not "past interaction", so the super-plan wording is looser (claim 2; Step 24 changes line 294). The code of [6] shows features, not weights, and [7] says that Real Graph is the most important component in ranking In-Network Tweets (claim 3, §2).
 - Against: [5] decays old interactions and learns its weight; ours does not decay and is a plain smoothed count, so we may say "in the spirit of RealGraph", not "like RealGraph". [30] ranks with a transformer and has no RealGraph file, so production may have moved to a learned model. The search of §7 found recent work on weights between users: [33] defines an interaction strength between users, and [35] proposes a similarity measure and a simple link-prediction method for social trust. Both are abstract only, and the abstracts do not say whether the weights are learned, so [35] may be closer to our trust than a learned weight. [39] re-weights the followed accounts for another goal (abstract only). The abstracts name no smoothed count of past engagement.
 - Label: by analogy (abstract only)
 - Choice: option (a), with the author term. By analogy with [5] for weighting a directed user pair by past interaction, and with [6] for using the (viewer, author) pair as an input for every candidate. No fade in the core formula.
-- Status: proposed change (PC2)
-- Result: `trust(u, f, t)` and the author term as in super-plan §6, with every event strictly before t. The fade question goes to the author (PC2).
+- Status: decided
+- Result: `trust(u, f, t)` and the author term as in super-plan §6, with every event strictly before t. No fade: the author decided this on 2026-10-24 (PC2). Chapter 3 names the missing fade as a limitation.
 - Feeds: super-plan §6 (`trust` and the author term)
 - Author's note:
 
@@ -193,8 +193,8 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Against: [29] p.9: Cestnik gave no recommended value of m, so `m` has no value from theory and must be swept (E4). [29] p.2: the original experiments were very small (four data sets, no added noise). [29] is about class probabilities in a classifier, not about ranking posts. [9] (abstract only): page likes gave up to a 3-fold gain over three baselines, one of them based on Facebook friends. The abstract gives no number for that baseline alone, so it is only a hint that friend-based trust may help less than hoped. [37] (abstract only) says item ratings are more influential than trust in collaborative filtering, so trust-based smoothing may help less than hoped. [31] and [38] (abstract only) are recent cold-start work that uses social signals; both are learned models.
 - Label: by analogy (abstract only)
 - Choice: option (a), one curve and no phases. By analogy with [29] for the form. The value of `m` is not cited, and replacing the three phases by one curve is our own design.
-- Status: proposed change (PC1)
-- Result: `trust(u, f, t) = (n_uf + m / |F_u|) / (N_u + m)` and the same form for `community`, as in super-plan §6. The weight of the prior is `m / (N_u + m)`. P5 implements these, and E4 sweeps `m` (super-plan §7).
+- Status: decided
+- Result: `trust(u, f, t) = (n_uf + m / |F_u|) / (N_u + m)` and the same form for `community`, as in super-plan §6. The weight of the prior is `m / (N_u + m)`. P5 implements these, and E4 sweeps `m` (super-plan §7). The wording fix PC1 was applied in super-plan 0.6.
 - Feeds: super-plan §6 (smoothing), super-plan §7 (`m`)
 - Author's note: Zhai and Lafferty 2001 (a lead from memory) was checked as a record only (SIGIR 2001, DOI 10.1145/383952.384019). No legal full text was found, so it is not used.
 
@@ -237,7 +237,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 
 ### D5. Baselines
 - Question: Are the baselines strong enough?
-- Decides: BL4 and BL5 (§5)
+- Decides: BL4, BL5 and BL6 (§5)
 - Options: (a) BL0 to BL5 as in super-plan §5, run as they are; (b) the same baselines, with BL2, BL4 and BL5 tuned on the validation split with a small grid, plus a plain count baseline BL6; (c) add a learned baseline.
 - Evidence:
   - [25] §1: of 18 neural methods it could reproduce 7, and in 6 of the 7 the neural method did not consistently beat simple, well-tuned baselines; in one case a most-popular recommender was best on some accuracy measures. §2.2: the baselines were tuned with a Bayesian search of 35 cases each.
@@ -246,12 +246,12 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
   - [30] `README.md`, Overview: the newer release ranks all posts with a transformer.
 - Against: [25] cuts against the plan. It shows that well-tuned, simple, personalised baselines often beat new methods. BL0 to BL5 are not personalised (BL0 only puts followees first) and are not tuned, so they may be weak. [30] says the newer production ranking is a learned model, so beating hand-made scores like [11] and [12] does not show a gain over production. [40] (abstract only) describes a production feed ranker as a weighted sum of engagement predictions from a value model. Its abstract says nothing about hand-made formulas like BL4 and BL5, so whether they are weaker than production is our inference.
 - Why no learned baseline: the live app has no training data, and there is little time. A learned social baseline (SoRec, SocialMF) is out of scope (super-plan §9). This is a limitation. "Interpretability" is a design preference, not a tested claim.
-- Tuned and not tuned: the hybrid H is tuned on the validation split (`m`, α and β in E4). BL0, BL1 and BL3 have nothing to tune. BL2, BL4 and BL5 are fixed formulas today. The proposal is a small validation grid for their time or age parameters, so that H is not the only tuned method (PC4). The grid sizes would be frozen values (super-plan §7).
-- BL6: "the number of followees who engaged, with no trust weights" is proposed as a baseline, to show what the trust weights add over a plain count (PC3).
+- Tuned and not tuned: the hybrid H is tuned on the validation split (`m`, α and β in E4). BL0, BL1 and BL3 have nothing to tune. BL2, BL4 and BL5 are fixed formulas today. PC4 adds a small validation grid for their time or age parameters, so that H is not the only tuned method. The grid sizes are frozen values (super-plan §7), set in P5. BL2 also stays as the production score, in its own row.
+- BL6: H-follow with every trust weight set to 1 (engagement plus α times the follow of the author plus the number of followees who engaged), to show what the trust weights add over a plain count (PC3). A count alone would be mostly ties and would lose easily, so the engagement term stays.
 - Label: consistent only (abstract only)
-- Choice: keep BL0 to BL5, and ask for the grid (PC4) and BL6 (PC3). Consistent with [25]: tuned and simple baselines are the fair test.
-- Status: proposed change (PC3)
-- Result: BL0 to BL5 as in super-plan §5 on the same pool. If PC3 and PC4 are accepted: BL6, and a small validation grid for BL2, BL4 and BL5. No learned baseline; the limitation is named in Chapter 3.
+- Choice: keep BL0 to BL5, and add the grid (PC4) and BL6 (PC3). Consistent with [25]: tuned and simple baselines are the fair test. [25] backs the principle of fair tuning. It studies neural top-n recommenders, not feed formulas, so it does not show that BL4 and BL5 are weak.
+- Status: decided
+- Result: BL0 to BL5 as in super-plan §5 on the same pool, plus BL6 and a small validation grid for BL2, BL4 and BL5. The author decided PC3 and PC4 on 2026-10-24. No learned baseline; the limitation is named in Chapter 3.
 - Feeds: super-plan §5 (methods), super-plan §7 (grid sizes)
 - Author's note:
 
@@ -279,14 +279,14 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 | Tuning on the validation items of the test users (§3.2; [14] does not call it leakage) | the validation item is the one before the test item of each user, so tuned values (`m`, α, β) can use events later than another user's test time | gap |
 | Features built from future data (not a case in [14]; the whole text was searched) | as-of features are our own rule (super-plan §5) | covered by the plan, to be tested by the P5 leakage test |
 
-- Pool and sampling: the pool is a rule-based filter, not a random sample: posts that are not deleted, are approved, were created before `t_u`, are inside the window W, are not blocked, newest N_max first (super-plan §5). So the inconsistency of [15] for random negatives does not apply directly. But the pool is a reduced candidate set, and [16] (abstract only) says that reduced target sets can contradict the result with large ones, so W and N_max may matter. PC6 asks for a second run with a larger pool.
-- Left-out users: super-plan §5 reports the number of users whose test post is not in the pool, in total. H1 is about users with 0 to 4 earlier interactions (super-plan §1), so a total hides a bias in that bucket. PC7 asks for the number per history bucket.
+- Pool and sampling: the pool is a rule-based filter, not a random sample: posts that are not deleted, are approved, were created before `t_u`, are inside the window W, are not blocked, newest N_max first (super-plan §5). So the inconsistency of [15] for random negatives does not apply directly. But the pool is a reduced candidate set, and [16] (abstract only) says that reduced target sets can contradict the result with large ones, so W and N_max may matter. PC6 adds a second run with a larger pool (E8).
+- Left-out users: super-plan §5 reports the number of users whose test post is not in the pool, in total. H1 is about users with 0 to 4 earlier interactions (super-plan §1), so a total hides a bias in that bucket. PC7 adds the number per history bucket.
 - Ties: [18] shows that tied scores make a metric depend on an arbitrary order. The fixed rule `(scoreFixed desc, postId desc)` is deterministic, and E6 repeats the run with the reversed rule (super-plan §5). If E6 changes the ranking of the methods, the results are reported with the tie-aware measures of [18].
 - Coverage: Coverage@K of super-plan §5 follows the idea of catalogue coverage in [17] §2. [17] gives only the definition, no experiment.
 - Label: consistent only (abstract only)
 - Choice: option (a), the protocol of super-plan §5, and PC5 to close the tuning gap. Consistent with [14] and [13] on the principle that nothing after the test time is used for a user, with [15] on full ranking with no sampled negatives, and with [18] on a fixed tie rule that is tested (E6).
-- Status: proposed change (PC5)
-- Result: the protocol of super-plan §5 as written. The table above has 7 rows: 4 are cases of [14] (3 covered by the plan, 1 not applicable) and 3 are our own additions (1 covered, 1 not applicable, 1 gap). The gap, the pool run and the left-out users are proposed changes (PC5, PC6, PC7). The wording of super-plan §5 on as-of features is PC8.
+- Status: decided
+- Result: the protocol of super-plan §5 with the changes below. The table above has 7 rows: 4 are cases of [14] (3 covered by the plan, 1 not applicable) and 3 are our own additions (1 covered, 1 not applicable, 1 gap). The table shows the protocol as it was before the changes. The author decided on 2026-10-24: PC5 closes the gap (one global cut time T), PC6 adds the pool run (E8), PC7 adds the left-out users per history bucket, and PC8 fixes the wording on as-of features.
 - Feeds: super-plan §5 (split, pool, ties, metrics)
 - Author's note:
 
@@ -697,3 +697,15 @@ The DOIs below come from the search notes. Those of the papers that were not add
 | PC8 | Say that [14] shows the harm of training on future interactions, and that the as-of rule for features is our own design. Super-plan §5 now cites [14] for the as-of features. | super-plan §5 (as-of features) | D6; [14], the whole text has no feature case | the author |
 | PC9 | Read [21] in full, or word the sentence of super-plan §5 about its finding (little practical difference between the randomization, bootstrap and t-tests) as a name only. Only the Crossref record of [21] was read. | super-plan §5 (statistics) | [21] index record | the author |
 | PC10 | Update super-plan line 110 ("the list in §10 has nothing newer than the 2024 survey": §10 now has [40] and [42] from 2026). Say in lines 130, 207 and 324 that the timestamp shuffle of [23] is not described until [23] is read: [23] is an index record. | super-plan §4 (line 110), §4 and §7 (lines 130, 207) and §8 (line 324) | [23] index record; §7 | the author |
+
+**Decisions (the author, 2026-10-24, in chat).** They are applied in super-plan 0.7.
+- PC1: applied in 0.6.
+- PC2: no fade.
+- PC3: yes, as option (b). BL6 is H-follow with every trust weight set to 1, and α is tuned on the same grid.
+- PC4: yes. A grid for BL2, BL4 and BL5, one parameter each. BL2 also stays as the production score, in its own row.
+- PC5: yes. One global cut time T: validation items before T, test items after T. The rule that sets T is open (P2).
+- PC6: yes, as option (a). A small rerun of the main comparison with a larger pool (world M, K = 10), called E8.
+- PC7: yes.
+- PC8: yes.
+- PC9: yes, as option (a). [21] is cited by name only.
+- PC10: yes, as option (a). The timestamp shuffle is our own test, and [23] is cited by name only.
