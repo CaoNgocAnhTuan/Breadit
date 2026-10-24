@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.5 · 2026-10-24 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.6 · 2026-10-24 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -107,7 +107,7 @@ The Tasks column for P3–P10 is a first guess. The P2 blueprint sets the final 
 
 P1 does more than collect citations: every paper either decides something in our design or is cited in Chapter 2. It has five steps.
 
-**Step 1: map the field** (task `p1-literature`). Skim every reference in §10: the abstract, the method, and how it was evaluated. Search for recent work (2022 or later) on social recommendation, cold start and feed ranking; the list in §10 has nothing newer than the 2024 survey. Write a few lines per paper in `.docs/literature.md`: what it says, what it means for us, and where Chapter 2 cites it. Correct the DiffNet title: the paper is "A Neural Influence Diffusion Model for Social Recommendation" [3]; DiffNet is the model name.
+**Step 1: map the field** (task `p1-literature`). Skim every reference in §10: the abstract, the method, and how it was evaluated. Search for recent work (2022 or later) on social recommendation, cold start and feed ranking (done on 2026-10-24: §10 now has 12 recent references, [31] to [42]; the closest work and the search log are in `.docs/literature.md` §7). Write a few lines per paper in `.docs/literature.md`: what it says, what it means for us, and where Chapter 2 cites it. Correct the DiffNet title: the paper is "A Neural Influence Diffusion Model for Social Recommendation" [3]; DiffNet is the model name.
 
 **Step 2: dataset selection** (task `p1-dataset-selection`). Choose the public dataset before P3 and P4 depend on it. Score each candidate against four criteria, which come from what the method needs (sections 5 and 6):
 - **Social graph:** directed follows between users, ideally with timestamps. Without them, future follows leak into the past.
@@ -133,7 +133,9 @@ Candidates to check: Digg 2009 [20], Epinions and Ciao [19], the Flickr favorite
 
 **Step 5: write the survey** (task `p1-related-work`). The Orientation asks for a 3–4 page survey. It becomes the core of Chapter 2.
 
-**Who reads what.** The author deep-reads the core papers, because the committee will ask the author about them: Tang [1], SoRec [2], RealGraph [5], Sedhain [9], and Krichene and Rendle [15]. Claude prepares the notes on the others, searches for recent work, and checks every reference. RealGraph [5] and the Twitter blog [7] are now verified in full text (task `p1-literature`, notes in `.docs/literature.md`). The blog [7] was read through an Internet Archive copy.
+**Status (2026-10-24).** The task `p1-literature` is done: Steps 1 and 3, in `.docs/literature.md` (44 references, decisions D1 to D7, 10 claims, and proposed changes PC1 to PC10). Steps 2, 4 and 5 are not started. The proposed changes that wait for the author are in §11, item 6.
+
+**Who reads what.** The author deep-reads the core papers, because the committee will ask the author about them: Tang [1], SoRec [2], RealGraph [5], Sedhain [9], and Krichene and Rendle [15]. Claude prepares the notes on the others, searches for recent work, and checks every reference. RealGraph [5] and the Twitter blog [7] are now verified in full text (task `p1-literature`, notes in `.docs/literature.md`). The blog [7] was read through an Internet Archive copy. The full texts of [1], [2], [8], [9], [16], [21], [23] and [28] are still missing. Until they are read, cite [21] (the test comparison) and [23] (the timestamp shuffle) by name only, and do not describe what they found.
 
 **Done when.** The supervisor confirms RQ1, RQ2, the data choice and the design decisions. Every design question has an answer with evidence. Every reference cited in Chapter 2 is marked "verified" in §10.
 
@@ -290,7 +292,7 @@ community(p, u, t) = (c_u,c(p) + m · [u is member of c(p)] / |M_u|) / (N_u + m)
 Symbols: `n_uf` is u's earlier positives on f's posts. `N_u` is u's total earlier positives. `F_u` is u's followees at time t (distinct). `c_u,c` is u's earlier positives in community c. `M_u` is u's communities at time t. `m` is the prior strength.
 
 Three design choices, confirmed in P1 (Step 3) with the evidence in `.docs/literature.md`:
-- **Smoothing with `m`.** Without it, `trust = n_uf / N_u` is 0/0 for a user with no history, and the follow signal cannot help exactly the users RQ1 is about. The smoothing is my own suggestion, not a cited method. At `N_u = 0` the prior spreads trust equally over followees and communities.
+- **Smoothing with `m`.** Without it, `trust = n_uf / N_u` is 0/0 for a user with no history, and the follow signal cannot help exactly the users RQ1 is about. The form is the m-estimate [28][29]. Using it for trust and community, and the value of `m`, are my own design. At `N_u = 0` the prior spreads trust equally over followees and communities.
 - **Author term.** The Orientation formula sums trust over friends who engaged with the post. A post by a followee that nobody has engaged with yet would get nothing. The author term fixes this. RealGraph gives each directed edge between users a weight that is the predicted probability of a future interaction, learned from past interaction data [5]. Twitter's engineering blog says that Real Graph is the most important component in ranking in-network tweets [7]. In the 2023 open-source release, these scores are inputs (features) for in-network tweets [6]; the code does not show how the ranker weights them. E4 shows what each term adds.
 - **Phases become a curve.** With smoothing, the weight of the prior is `m / (N_u + m)`. It falls smoothly as history grows. The three cold-start phases in the Orientation doc become this one curve. Buckets are used only for reporting.
 
@@ -405,6 +407,7 @@ The thesis results do not need the schema migration: generated data has no dupli
 3. **D1.** Can a non-member post into a community (Bugs Report §4)? Decide before P3. The recommendation is to require membership.
 4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval.
 5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `Latex/` and `docs/` needs the author's request.
+6. **Proposed changes from P1** (`.docs/literature.md` §9). §5 and §7 are frozen, so these wait for the author (`/freeze` for new values). Decisions: PC2, does trust fade over time (none, a half-life or a window)? PC3, add the baseline BL6 (the number of followees who engaged, with no trust weights)? PC4, give BL2, BL4 and BL5 a small validation grid? PC5, tune `m`, α and β only on events before one global cut time, so that tuning cannot use events later than another user's test item? PC6, run the main comparison also with a larger pool? PC7, report the left-out users per history bucket? Wording fixes in §5: PC8 (line 252: [14] shows the harm of training on future interactions, and the as-of rule for features is our own design) and PC9 (line 270: only the record of [21] was read, so its finding about the tests should not be stated yet).
 
 ---
 
@@ -415,3 +418,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.3 · 2026-10-22 · Added dataset selection to P1 (task `p1-dataset-selection`, output `.docs/datasets.md`): four criteria, candidates, calibration targets for the generator. P4 is now the adapter for the dataset chosen there (Digg 2009 is the first candidate).
 - 0.4 · 2026-10-22 · P1 rewritten as five steps (map the field, dataset selection, design questions, lock the decisions, survey), with `.docs/literature.md`; the three §6 design choices are now confirmed in P1. P2 is now the implementation blueprint (`.docs/implementation-plan.md`: module map, data contracts, measurement plan, task list). The cut schema migration moved to §9. The Tasks column for P3–P10 is a first guess until P2.
 - 0.5 · 2026-10-24 · Task `p1-literature`: the marks of [5] (verified, full text; the venue "at KDD" removed because the paper does not say it), [7] (verified in full text through an Internet Archive copy), [16] (verified; the URL is now the paper DOI, not the code repository) and [23] (verified through Crossref; the URL is now the DOI); new references [28] to [44]; one sentence in the §10 intro that defines "do not cite"; line 136 and the §6 author-term bullet (RealGraph is a predicted probability of a future interaction, and the Twitter code shows scores as features) rewritten with the P1 result; the marks of [31] to [44] say "do not cite a finding from it" where only the abstract was read. The other proposed changes are in `.docs/literature.md` §9.
+- 0.6 · 2026-10-24 · After the P1 literature task: the P1 text (line 110 and a status paragraph), the smoothing bullet in §6 (the form is the m-estimate [28][29]), "Who reads what" (which full texts are missing, and that [21] and [23] are cited by name only), and open item 6 (the proposed changes that wait for the author). No frozen value and no part of §5 or §7 changed.
