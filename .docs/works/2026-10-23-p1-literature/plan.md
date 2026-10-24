@@ -76,10 +76,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 4: Core paper [5] RealGraph, claim 2 (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 4 14 | head -20` (TC4, TC14). TC4 reports `3 of the rows … found, want 4` (the row [5] is missing). TC14 reports `0 reading guides, want 5`
-- [ ] Change: open the [5] PDF (`pdftxt`), add its row (§1) and its entry with the reading guide at the top of §4. The guide has one `- Read:` line and three questions that end with "(answer in §x)". Add claim 2 to the claims table (§2): what the abstract and the model section say about the edge weight, compared with the wording of super-plan §6 line 294. If [5] cannot be opened, the guide says "Could not be opened on <date>. This guide is from the abstract only."
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 4 5` prints `TC3 PASS`, `TC4 PASS`, `TC5 PASS` (DW2: all four rows exist)
-- [ ] Commit: `docs: core entry for RealGraph [5] and claim 2`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 4 14 | head -20` (TC4, TC14). TC4 reports `3 of the rows … found, want 4` (the row [5] is missing). TC14 reports `0 reading guides, want 5`
+- [x] Change: open the [5] PDF (`pdftxt`), add its row (§1) and its entry with the reading guide at the top of §4. The guide has one `- Read:` line and three questions that end with "(answer in §x)". Add claim 2 to the claims table (§2): what the abstract and the model section say about the edge weight, compared with the wording of super-plan §6 line 294. If [5] cannot be opened, the guide says "Could not be opened on <date>. This guide is from the abstract only."
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 4 5` prints `TC3 PASS`, `TC4 PASS`, `TC5 PASS` (DW2: all four rows exist)
+- [x] Commit: `docs: core entry for RealGraph [5] and claim 2`
 
 ### Step 5: Core paper [1] Tang (effort S)
 

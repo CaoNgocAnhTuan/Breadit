@@ -6,6 +6,7 @@ Working notes for P1. Not thesis text.
 
 | Ref | Short name | Type | Verified | Read | Opened | Cited in |
 |---|---|---|---|---|---|---|
+| [5] | RealGraph (Kamath 2014) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [7] | Twitter blog (2023) | blog | do not cite, use [6] | index record | 2026-10-24 | not cited |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [23] | Influence and correlation (Anagnostopoulos 2008) | paper | verified | index record | 2026-10-24 | not cited |
@@ -14,6 +15,7 @@ Working notes for P1. Not thesis text.
 
 | # | Claim | Status | Evidence |
 |---|---|---|---|
+| 2 | RealGraph gives directed edge weights between users, learned from past interaction data. The weight is the predicted probability of a future interaction, not a count of past interactions. Super-plan §6 line 294 says "past interaction", which is looser. | supported | [5]: §1 defines the weight as the probability of an interaction from the source to the destination user in the future; §2.2 trains a logistic regression with a binary label on edge and user features; §3.1 gives the AUC per feature group |
 
 ## 3. How this file was made
 
@@ -23,6 +25,20 @@ Working notes for P1. Not thesis text.
 - Needs full text (for the author): [16] Cañamares 2020 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
 
 ## 4. Core papers
+
+### [5] RealGraph (Kamath 2014)
+#### Reading guide
+- Read: the abstract, §1, §2.1 to §2.3, §3.1 and §3.2. Skip: §4 (related work).
+1. How does the paper define the weight of an edge between two users: a count of past interactions, or something else? (answer in §1)
+2. What data and what model produce the weight, and what is the training label? (answer in §2.2)
+3. How do the authors check that the weights are good, and how strong is that check? (answer in §3)
+
+- Opened: 2026-10-24, full text [ueo-workshop.com PDF, UEO '14 workshop paper with no version number, sha256 1ecfd151c66e]
+- Says: a framework at Twitter that gives each one-way tie between two users a weight. The weight is defined as the probability of an interaction from the source user to the destination user in the future (§1). It is learned with a logistic regression on edge features and on the features of both users, from past interaction data, with a binary label (§2.2). The weights are checked with AUC per feature group (Table 1, §3.1) and with a small survey of top-20 followings, which the authors call a preliminary result (§3.2). Twitter uses them for user recommendation and a "Circle of Trust" (§2.3).
+- For us: D1 (trust) and the author term, and claim 2. Our trust is a plain smoothed frequency of past positives (super-plan §6), a simpler idea in the same spirit: RealGraph predicts a future interaction with a learned model. The paper has no smoothing or prior for users with few interactions (the only regularisation is the global L2 term of the model, §3.1). The paper does not say "at KDD"; it names "UEO '14 New York" on page 1.
+- Cited in: Ch2, Ch3 (trust term)
+- Anchor: §1, the weight is "defined as the probability of any inter- action going from the edge source to the edge destination in the future" (line break of the PDF kept in the quote).
+- Against us: the weight is learned from many features and trained to predict a future interaction. We must say "in the spirit of RealGraph", not "the same as RealGraph".
 
 ## 5. Design decisions
 
