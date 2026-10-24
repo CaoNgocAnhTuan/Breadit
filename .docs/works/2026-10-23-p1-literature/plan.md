@@ -105,13 +105,13 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 8: D2 No history, claim 4, smoothing source (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 12 | grep -E '^ +D2 '` (TC12) prints `D2 has no 'same shape as, but differs in'` and the lines for the four mapping rows, and `grep -c '^### D2\.' .docs/literature.md` prints `0`, because D2 does not exist yet
-- [ ] Change:
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 12 | grep -E '^ +D2 '` (TC12) prints `D2 has no 'same shape as, but differs in'` and the lines for the four mapping rows, and `grep -c '^### D2\.' .docs/literature.md` prints `0`, because D2 does not exist yet
+- [x] Change:
   - Search for a smoothing source (design §1.8: "m-estimate", "additive smoothing", "Bayesian average", "Dirichlet prior smoothing", "shrinkage estimator"; the leads Cestnik 1990 and Zhai and Lafferty 2001 are not verified). Open each one that is used. New references get the next free number ([28], …) and go into §8 (older than 2022) with a status row and an entry
   - Write D2 in §5 in the format of design §1.4, with the mapping table (count, total, prior, support) and the words "same shape as, but differs in". It also covers `community`, whose prior covers only u's communities. It decides: smoothing with `m` (a named source or own design), `m` is tuned in E4 and not cited, one curve instead of three phases
   - Add the rows for claim 4 and claim 5 (the D2 half) to the claims table
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 12 | grep -E '^ +D2[. ]'` prints nothing; `grep -c '^### D2\.' .docs/literature.md` prints `1` (DW4, DW5). TC12 still reports the author term of D1, which is Step 10
-- [ ] Commit: `docs: decision D2 (no history), smoothing source, claim 4`
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 5 11` prints three `PASS` lines; `part.sh 10 12 | grep -E '^ +D2[. ]'` prints nothing; `grep -c '^### D2\.' .docs/literature.md` prints `1` (DW4, DW5). TC12 still reports the author term of D1, which is Step 10
+- [x] Commit: `docs: decision D2 (no history), smoothing source, claim 4`
 
 ### Step 9: Twitter code [6], claim 3 (effort S)
 

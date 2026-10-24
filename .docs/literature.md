@@ -14,19 +14,23 @@ Working notes for P1. Not thesis text.
 | [15] | Sampled metrics (Krichene 2020) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [23] | Influence and correlation (Anagnostopoulos 2008) | paper | verified | index record | 2026-10-24 | not cited |
+| [28] | m-estimate (Cestnik 1990) | paper | verified | index record | 2026-10-24 | Ch3 (name only) |
+| [29] | m-estimate in naive Bayes (Castellano 2020) | paper | verified | full text | 2026-10-24 | Ch3 |
 
 ## 2. Claims
 
 | # | Claim | Status | Evidence |
 |---|---|---|---|
 | 2 | RealGraph gives directed edge weights between users, learned from past interaction data. The weight is the predicted probability of a future interaction, not a count of past interactions. Super-plan §6 line 294 says "past interaction", which is looser. | supported | [5]: §1 defines the weight as the probability of an interaction from the source to the destination user in the future; §2.2 trains a logistic regression with a binary label on edge and user features; §3.1 gives the AUC per feature group |
+| 4 | The form of the smoothing, (count + m × prior) / (total + m), is the m-estimate of Cestnik (1990), a known technique from classification. Using it for trust and community, and the value of `m`, are our own design. Super-plan §6 line 293 says "not a cited method". | supported | [29]: §2.4, eq. 19, p.6 (a secondary source for [28]); [28]: index record only, the paper was not read |
+| 5 | The notes decide each of the three §6 choices with evidence. The D2 half: smoothing with `m` and one curve instead of three phases are decided in D2. The author term waits for D1 (Step 10). | supported | D2: the form follows [29] eq. 19; the weight of the prior is `m / (N_u + m)` (algebra on eq. 19); replacing the three phases is our own design |
 
 ## 3. How this file was made
 
 - PDF tool: PDFKit through the compiled `pdftxt` (Swift 5.9.2, source `.docs/works/2026-10-23-p1-literature/pdftxt.swift`, built with `swiftc -framework PDFKit`), tested on [5] (title, authors and the first sentence of the abstract read well) and on [25] (authors and abstract read well, a table and the text of page 3 come out in the right order; the title lost its spaces and PDFKit printed one "CoreGraphics PDF has logged an error" line), 2026-10-24, pass.
 - Tools that failed:
   - `swift pdftxt.swift` (interpreted): fails with "Symbols not found: PDFDocument", so the tool is compiled.
-- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [2] Ma 2008 (ACM 403, repository needs a login), [9] Sedhain 2014 (repository copy embargoed), [16] Cañamares 2020 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
+- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [2] Ma 2008 (ACM 403, repository needs a login), [9] Sedhain 2014 (repository copy embargoed), [16] Cañamares 2020 (closed access), [28] Cestnik 1990 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
 
 ## 4. Core papers
 
@@ -77,7 +81,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 
 - Opened: 2026-10-24, abstract only [ANU research portal record of DOI 10.1145/2645710.2645772; the repository PDF is embargoed until 2037-12-31 and the ACM page answered 403, so no full text was read]
 - Says: Suvash Sedhain, Scott Sanner, Darius Braziunas, Lexing Xie and Jordan Christensen (RecSys 2014) study recommendation for users who have bought nothing yet but share side information such as demographics or social network data (Facebook friends, page likes). They write neighbourhood-based methods in a matrix algebra framework that needs no purchase data for the target user. On 30,000 users and 80,000+ books, the abstract reports that Facebook page likes give up to a 3-fold gain in mean average precision and up to 6-fold gains in Precision@k and Recall@k over the most-popular-item, demographic and Facebook-friend recommenders.
-- For us: D2 (users with no history), the closest cold-start paper. The abstract gives no weighting formula and no smoothing, and the large gain comes from page likes, not from friends, so it supports no decision.
+- For us: D2 (users with no history), the closest cold-start paper. The abstract gives no weighting formula and no smoothing, and the large gain it reports is for page likes over a friend-based recommender, so it supports no decision.
 - Cited in: not cited
 
 ### [15] Sampled metrics (Krichene 2020)
@@ -94,6 +98,33 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Anchor: §8, "sampling should be avoided as much as possible during evaluation."
 
 ## 5. Design decisions
+
+### D2. No history
+- Question: How do we help users with no history yet?
+- Decides: The prior `m` and its form (§6)
+- Options: (a) smoothing with `m`, one smooth curve: trust = (n_uf + m / |F_u|) / (N_u + m), as in super-plan §6; (b) no smoothing: trust = n_uf / N_u, which is 0/0 when N_u = 0, so users with no history need a separate rule; (c) the three cold-start phases of the Orientation, with a fixed rule per phase.
+- Evidence:
+  - [29] §2.4, eq. 19, p.6: the m-estimate of a probability is (count + m × prior) / (total + m). The prior is the class prior, estimated with Laplace's law of succession (p.7). The weight of the prior is m / (total + m), which is algebra on eq. 19. [29] p.7: a higher level of noise needs a higher m.
+  - [28] index record: [29] says that Cestnik 1990 introduced this estimate. The paper itself was not read. The name "m-estimate" came later, from Cestnik and Bratko 1991 ([29], footnote on p.2).
+  - [9] abstract only: cold-start users who share side information; Facebook page likes gave up to a 3-fold gain in mean average precision over a recommender that uses Facebook friends. The abstract has no weighting or smoothing formula.
+  - [1] abstract only: nothing on users with no history.
+- Mapping: our trust has the same shape as, but differs in some parts from, the m-estimate of [29] eq. 19:
+
+| Part | m-estimate | Our trust (super-plan §6) |
+|---|---|---|
+| count | n_c: events with outcome c | n_uf: u's earlier positives on f's posts |
+| total | n: all events | N_u: all of u's earlier positives |
+| prior | p: the prior probability of c ([29] estimates it with Laplace's law) | one over the number of followees: an even split, not estimated |
+| support | the outcomes cover all n events, so the estimates sum to 1 | the prior covers followees only, but N_u also counts positives on other posts, so trust summed over followees is at most 1 |
+
+  The same holds for `community`, whose prior covers only u's communities. [29] is a classification paper, so the comparison is by analogy.
+- Against: [29] p.9: Cestnik gave no recommended value of m, so `m` has no value from theory and must be swept (E4). [29] p.2: the original experiments were very small (four data sets, no added noise). [29] is about class probabilities in a classifier, not about ranking posts. [9] (abstract only): page likes beat a friend-based recommender for users with no history, so friend-based trust may help less than hoped.
+- Label: by analogy (abstract only)
+- Choice: option (a), one curve and no phases. By analogy with [29] for the form. The value of `m` is not cited, and replacing the three phases by one curve is our own design.
+- Status: proposed change (PC1)
+- Result: `trust(u, f, t) = (n_uf + m / |F_u|) / (N_u + m)` and the same form for `community`, as in super-plan §6. The weight of the prior is `m / (N_u + m)`. P5 implements these, and E4 sweeps `m` (super-plan §7).
+- Feeds: super-plan §6 (smoothing), super-plan §7 (`m`)
+- Author's note: Zhai and Lafferty 2001 (a lead from memory) was checked as a record only (SIGIR 2001, DOI 10.1145/383952.384019). No legal full text was found, so it is not used.
 
 ## 6. Other references
 
@@ -119,7 +150,21 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 
 ## 8. Older neighbours and other added references
 
+### [28] m-estimate (Cestnik 1990)
+- Opened: 2026-10-24, index record [OpenAlex record W203696055; closed access, no full text found]
+- Says: Bojan Cestnik, "Estimating probabilities: a crucial task in machine learning", ECAI 1990, pp. 147-149 (the record matches the lead from the super-plan work). The paper was not read. [29] says it introduced the estimate (count + m × prior) / (total + m) for a conditional probability (§2.4), and that the name "m-estimate" came later, from Cestnik and Bratko (1991, LNCS 482, pp. 138-150).
+- For us: D2, the source of the form of the smoothing, through [29] only. The paper supports the name only, no detail.
+- Cited in: Ch3 (name only)
+
+### [29] m-estimate in naive Bayes (Castellano 2020)
+- Opened: 2026-10-24, full text [digibug.ugr.es PDF, University of Granada repository, open copy of DOI 10.1142/S0218488520500282 (manuscript or published version not stated), sha256 f9af44ebb514]
+- Says: Javier G. Castellano, Serafín Moral-García, Carlos J. Mantas and Joaquín Abellán (International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems 28(4), pp. 661-682, 2020; Crossref matches) study the m-estimate and imprecise probabilities in the naive Bayes classifier. §2.4 gives the m-estimate of a conditional probability as the count of the class value with the attribute value plus m times the class prior, over the count of the attribute value plus m (eq. 19). The prior is estimated with Laplace's law of succession (p.7), and a higher level of noise needs a higher m (p.7). The authors say the original experiments were very small (p.2) and that Cestnik gave no recommended value of m (p.9).
+- For us: D2 and claim 4, the source for the form of our smoothing, and a secondary source for [28]. It is about classification, not about ranking posts.
+- Cited in: Ch3
+- Anchor: §2.4, eq. 19 (p.6): (N_ti,cj + m · P(C = cj)) / (N_ti + m).
+
 ## 9. Proposed changes
 
 | ID | Change | Where | Evidence | Goes to |
 |---|---|---|---|---|
+| PC1 | Say that the form of the smoothing is the m-estimate, not "my own suggestion, not a cited method". Using it for trust, and the value of `m`, stay our own. Add [28] and [29] to §10 with their marks. | super-plan §6 line 293, §10 | D2; [29] §2.4 eq. 19 | the author (super-plan edit) |
