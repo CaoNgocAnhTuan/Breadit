@@ -98,10 +98,10 @@ Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/wor
 
 ### Step 7: Core papers [9] Sedhain and [15] Krichene and Rendle (effort S)
 
-- [ ] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 14` (TC14). It still reports `3 reading guides, want 5`
-- [ ] Change: add the status rows and the entries with reading guides in §4 ([9], [15]). [9] is `abstract only` with the fallback guide (no PDF, the ANU copy is embargoed). [15] is `full text` from `refs-manual/15.pdf` (sha256 first 12 hex `5212f092b6ae`, the KDD '20 version); its extract is `extracts/15.md` and its guide is in the normal form
-- [ ] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 4 5 14` prints four `PASS` lines (DW7: five guides, each with one Read line and three questions)
-- [ ] Commit: `docs: core entries for Sedhain [9] and Krichene and Rendle [15]`
+- [x] Test first: `bash .docs/works/2026-10-23-p1-literature/part.sh 14` (TC14). It still reports `3 reading guides, want 5`
+- [x] Change: add the status rows and the entries with reading guides in §4 ([9], [15]). [9] is `abstract only` with the fallback guide (no PDF, the ANU copy is embargoed). [15] is `full text` from `refs-manual/15.pdf` (sha256 first 12 hex `5212f092b6ae`, the KDD '20 version); its extract is `extracts/15.md` and its guide is in the normal form
+- [x] Verify: `bash .docs/works/2026-10-23-p1-literature/part.sh 3 4 5 14` prints four `PASS` lines (DW7: five guides, each with one Read line and three questions)
+- [x] Commit: `docs: core entries for Sedhain [9] and Krichene and Rendle [15]`
 
 ### Step 8: D2 No history, claim 4, smoothing source (effort S)
 

@@ -10,6 +10,8 @@ Working notes for P1. Not thesis text.
 | [2] | SoRec (Ma 2008) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [5] | RealGraph (Kamath 2014) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [7] | Twitter blog (2023) | blog | do not cite, use [6] | index record | 2026-10-24 | not cited |
+| [9] | Social CF for cold start (Sedhain 2014) | paper | verified | abstract only | 2026-10-24 | not cited |
+| [15] | Sampled metrics (Krichene 2020) | paper | verified | full text | 2026-10-24 | Ch2, Ch3 |
 | [16] | Target item sampling (Cañamares 2020) | paper | verified | abstract only | 2026-10-24 | not cited |
 | [23] | Influence and correlation (Anagnostopoulos 2008) | paper | verified | index record | 2026-10-24 | not cited |
 
@@ -24,7 +26,7 @@ Working notes for P1. Not thesis text.
 - PDF tool: PDFKit through the compiled `pdftxt` (Swift 5.9.2, source `.docs/works/2026-10-23-p1-literature/pdftxt.swift`, built with `swiftc -framework PDFKit`), tested on [5] (title, authors and the first sentence of the abstract read well) and on [25] (authors and abstract read well, a table and the text of page 3 come out in the right order; the title lost its spaces and PDFKit printed one "CoreGraphics PDF has logged an error" line), 2026-10-24, pass.
 - Tools that failed:
   - `swift pdftxt.swift` (interpreted): fails with "Symbols not found: PDFDocument", so the tool is compiled.
-- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [2] Ma 2008 (ACM 403, repository needs a login), [16] Cañamares 2020 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
+- Needs full text (for the author): [1] Tang 2013 (Springer sells the PDF), [2] Ma 2008 (ACM 403, repository needs a login), [9] Sedhain 2014 (repository copy embargoed), [16] Cañamares 2020 (closed access), [23] Anagnostopoulos 2008 (no open copy found).
 
 ## 4. Core papers
 
@@ -51,6 +53,8 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Says: SoRec is a rating-prediction method by Hao Ma, Haixuan Yang, Michael R. Lyu and Irwin King (CIKM 2008). The abstract says it is a factor analysis approach based on probabilistic matrix factorization that uses both the users' social network and their rating records, that it scales linearly with the number of observations, and that it helps most when users have made few or no ratings.
 - For us: D1 (trust) and D2 (users with no history). The abstract gives no link formula, no data set and no numbers, so it supports no decision.
 - Cited in: not cited
+
+### [5] RealGraph (Kamath 2014)
 #### Reading guide
 - Read: the abstract, §1, §2.1 to §2.3, §3.1 and §3.2. Skip: §4 (related work).
 1. How does the paper define the weight of an edge between two users: a count of past interactions, or something else? (answer in §1)
@@ -63,6 +67,31 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 - Cited in: Ch2, Ch3 (trust term)
 - Anchor: §1, the weight is "defined as the probability of any inter- action going from the edge source to the edge destination in the future" (line break of the PDF kept in the quote).
 - Against us: the weight is learned from many features and trained to predict a future interaction. We must say "in the spirit of RealGraph", not "the same as RealGraph".
+
+### [9] Social CF for cold start (Sedhain 2014)
+#### Reading guide
+Could not be opened on 2026-10-24. This guide is from the abstract only.
+1. How do the neighbourhood-based methods use side information (demographics, Facebook friends, page likes) for a user with no purchases?
+2. How are friends weighted or combined, and is there any smoothing for users with few friends?
+3. By how much does the best method beat the most-popular, demographic and friends baselines, and on which metrics?
+
+- Opened: 2026-10-24, abstract only [ANU research portal record of DOI 10.1145/2645710.2645772; the repository PDF is embargoed until 2037-12-31 and the ACM page answered 403, so no full text was read]
+- Says: Suvash Sedhain, Scott Sanner, Darius Braziunas, Lexing Xie and Jordan Christensen (RecSys 2014) study recommendation for users who have bought nothing yet but share side information such as demographics or social network data (Facebook friends, page likes). They write neighbourhood-based methods in a matrix algebra framework that needs no purchase data for the target user. On 30,000 users and 80,000+ books, the abstract reports that Facebook page likes give up to a 3-fold gain in mean average precision and up to 6-fold gains in Precision@k and Recall@k over the most-popular-item, demographic and Facebook-friend recommenders.
+- For us: D2 (users with no history), the closest cold-start paper. The abstract gives no weighting formula and no smoothing, and the large gain comes from page likes, not from friends, so it supports no decision.
+- Cited in: not cited
+
+### [15] Sampled metrics (Krichene 2020)
+#### Reading guide
+- Read: §1, §3, §4.1, §4.2, §6.2, §7 and §8. Skip: §5 (the correction formulas) and §9.
+1. What does it mean that a sampled metric is inconsistent with the exact metric? (answer in §4.1)
+2. Which metric stays consistent under sampling, and what happens to the others? (answer in §4.2)
+3. Does the paper advise to avoid sampling or to correct it, and what does the correction cost? (answer in §7)
+
+- Opened: 2026-10-24, full text [ACM open-access PDF saved by the author, KDD '20 version, sha256 5212f092b6ae]
+- Says: metrics computed on a small random sample of items can disagree with the exact metrics, even on average (§1, §4.1). Only AUC stays consistent; for the other metrics a sampled score can rank two models in the opposite order (§4.2). In a MovieLens 1M experiment with 100 sampled items, the sampled metrics rank the models differently from the exact metrics (Table 3, §6.2). Corrected estimators lower the bias but add variance (§5.3). Advice: avoid sampling as much as possible (§8); if it is needed, use a correction and several seeds (§7).
+- For us: D6, the protocol. It supports ranking the full pool for each user and reporting no sampled metrics. The paper gives no cost numbers for full ranking on a large catalogue (§4), so the cost for our pool is our own check.
+- Cited in: Ch2, Ch3 (full ranking)
+- Anchor: §8, "sampling should be avoided as much as possible during evaluation."
 
 ## 5. Design decisions
 
