@@ -95,8 +95,8 @@ Do only the steps the author marked "apply". Skip the others and write "not appl
 
 #### Step 10: The P4 sentence (effort XS)
 
-- [ ] Change: replace "may have no timestamps (not confirmed)" in P4 with the checked fact from Step 5.
-- [ ] Commit: `docs: super-plan, correct the P4 sentence about Digg timestamps`
+- [x] Change: replace "may have no timestamps (not confirmed)" in P4 with the checked fact from Step 5.
+- [x] Commit: `docs: super-plan, correct the P4 sentence about Digg timestamps`
 
 #### Step 11: References, version and change log (effort XS)
 
