@@ -5,7 +5,7 @@ Version 0.7 · 2026-10-24 · Direction: Hướng A, Social-Graph-Aware Hybrid "F
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
 Four decisions are already made:
-- **Data:** a seeded synthetic generator is the main source. One public dataset, chosen in P1 against fixed criteria (Digg 2009 is the first candidate), is a stretch goal. No real-user pilot.
+- **Data:** two main sources. One is a seeded synthetic generator. The other is real data: Digg 2009, chosen in P1 against fixed criteria (`.docs/datasets.md`). Both are co-primary for RQ1 and the follow term, because Digg follows and votes are dated on one clock. Synthetic data alone keeps the null world W0, the influence sweep W2 and the community term, because Digg has no groups. Digg is small (3,553 stories, one month, only front-page stories). No real-user pilot.
 - **Method:** the heuristic hybrid score (Option A) plus ablations. No DiffNet, no learned baseline.
 - **Determinism:** two classes. Quality results are byte-identical. Latency is repeatable, not identical (section 2).
 - **Workflow:** each phase is done as one or more task folders in `.docs/works/`: spec, design and plan, each approved by the author, then code (`.claude/README.md`).
@@ -85,7 +85,7 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | P1 Literature, RQ and data lock ★ | `literature.md`, `datasets.md`, one-page note, Chapter 2 survey | The supervisor confirms the RQs, the data and the design decisions | `p1-literature`, `p1-dataset-selection`, `p1-supervisor-note`, `p1-related-work` |
 | P2 Implementation blueprint | `implementation-plan.md` | The author approves it, and it names every later task | `p2-implementation-blueprint` |
 | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator`, `p3-postgres-loader` |
-| P4 Public dataset adapter (stretch) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-dataset-adapter` |
+| P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-dataset-adapter` |
 | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package`, `p5-eval-harness` |
 | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
 | P7 Experiments ★ | E1–E7 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark` |
@@ -115,7 +115,7 @@ P1 does more than collect citations: every paper either decides something in our
 - **Communities:** group membership, for the community term.
 - **Practical:** terms of use that allow thesis use, the data still downloadable, and a size that runs on a laptop.
 
-Candidates to check: Digg 2009 [20], Epinions and Ciao [19], the Flickr favorites data, and a Weibo retweet dataset. None of their details are verified yet; add each one used to §10 once verified. The output is `.docs/datasets.md`: the candidate table, the decision, what each dataset can and cannot test, and calibration targets for the generator (activity skew, follower and followee distributions, interactions per user), each with its source. If no candidate meets the first two criteria, P4 is dropped and the thesis uses synthetic data only (§8).
+Candidates to check: Digg 2009 [20], Epinions and Ciao [19], the Flickr favorites data, and a Weibo retweet dataset. They were checked on 2026-10-26 and 2026-10-27: Digg 2009 is the main real set and Flickr WWW 2009 is the second one (`.docs/datasets.md`). The output is `.docs/datasets.md`: the candidate table, the decision, what each dataset can and cannot test, and calibration targets for the generator (activity skew, follower and followee distributions, interactions per user), each with its source. If no candidate meets the first two criteria, P4 is dropped and the thesis uses synthetic data only (§8).
 
 **Step 3: answer the design questions** (task `p1-literature`). Each question gets a decision in `.docs/literature.md`: the question, the options, the evidence, and our choice. They include the three choices in §6, so P5 starts from decisions, not open questions.
 
@@ -155,7 +155,7 @@ The super plan says what we build and in what order. The blueprint says how the 
 
 ### P3: Synthetic generator
 
-**Do.** Decide D1 first (Bugs Report §4), because it decides who can post into a community. Create the `eval/` workspace (`@breadit/eval`) and add `eval` to the root `workspaces`. Write a versioned config `eval/config/synthetic-v1.json`. Calibrate its parameters to the targets in `.docs/datasets.md` where they exist, and say in the config which values are calibrated and which are chosen. The generator has five stages, each with its own PRNG stream: users (with hidden interests and Pareto activity, about 20% of users make 80% of actions), follow graph, communities and memberships, posts, interactions. It writes canonical CSV and a `manifest.json`. The generator does not run the feed, so interactions never depend on a ranking and there is no feedback loop in the data [24].
+**Do.** Decide D1 first (Bugs Report §4), because it decides who can post into a community. Create the `eval/` workspace (`@breadit/eval`) and add `eval` to the root `workspaces`. Write a versioned config `eval/config/synthetic-v1.json`. The generator is one of two main sources (see "Data" at the top). It is the only source for W0, the influence sweep W2 and the community term. Calibrate its parameters to the targets in `.docs/datasets.md` where they exist, and say in the config which values are calibrated and which are chosen. The generator has five stages, each with its own PRNG stream: users (with hidden interests and Pareto activity, about 20% of users make 80% of actions), follow graph, communities and memberships, posts, interactions. It writes canonical CSV and a `manifest.json`. The generator does not run the feed, so interactions never depend on a ranking and there is no feedback loop in the data [24].
 
 Three worlds, so a reader can see the result is not built into the data:
 - **W0, null.** Interactions depend on interests only. Follows and memberships carry no influence.
@@ -168,11 +168,11 @@ A loader writes the same data into Postgres with explicit IDs, so the live app c
 
 **Done when.** Generating twice gives identical manifests. Loading twice gives identical canonical table hashes.
 
-### P4: Public dataset adapter (stretch)
+### P4: Public dataset adapter (Digg 2009)
 
-**Do.** Convert the dataset chosen in P1. The text below assumes Digg 2009 [20], the first candidate: it has timestamped votes and a directed follower graph, so it looks like a feed. Raw files are downloaded by hand, stay out of git, and are recorded with source URL and SHA-256. Check the terms of use before download; the page states no license. The adapter converts the data to the same CSV format as P3. Digg has no community membership, so the community term is switched off there (or item categories are used as a stand-in and marked as a limitation). The Digg follower graph may have no timestamps (not confirmed). If so, it is treated as fixed over time, which can leak future follows into the past. Report this as a limitation.
+**Do.** Convert Digg 2009 [20], the dataset chosen in P1 (`.docs/datasets.md`). It has dated votes and a directed follower graph, so it looks like a feed. P4 is a planned phase, not an optional extra: Digg is co-primary with the synthetic data for RQ1 and the follow term. Raw files are downloaded by hand, stay out of git, and are recorded with source URL and SHA-256. The original Digg host is dead, so the two zips come from the Internet Archive copy of 2013-08-26. They are password protected, and the Digg page gives the password. Check the terms of use before download; the page states no license. The adapter converts the data to the same CSV format as P3. Digg has no community membership, so the community term is tested on synthetic data only. The Digg limits are: 3,553 stories, one month, only front-page stories, and only about 59% of the voters are in the friend table. The Digg follower graph may have no timestamps (not confirmed). If so, it is treated as fixed over time, which can leak future follows into the past. Report this as a limitation.
 
-**Gate.** If the dataset is not converted by the time the P5 baseline table is done, drop this phase and state "no public dataset" as a limitation (§8).
+**Gate.** Digg must be converted before the P5 baseline table is made. If the conversion fails, drop this phase and state "no public dataset" as a limitation (§8).
 
 **Done when.** The adapter output hash is stable and a table of users, items and edges is printed.
 
@@ -329,18 +329,19 @@ One source of truth. A change needs a new config version and a line in the chang
 
 ## 8. Risks and cut order
 
-- **The result is built into the data.** If interactions are made from follows, the social signal wins by construction. Defense: the W0 null world, W1, the timestamp shuffle in E5 (our own test; [23] is cited for the question of influence and correlation), three W2 cells instead of one setting, and the public dataset if P4 works. Present synthetic results as a check that the mechanism works, and public data as outside evidence.
-- **No public dataset.** If P4 is dropped, all results are synthetic. Say so plainly in chapters 3 and 6, and lean on W0 and W1 to show the result is not built in.
+- **The result is built into the data.** If interactions are made from follows, the social signal wins by construction. Defense: the W0 null world, W1, the timestamp shuffle in E5 (our own test; [23] is cited for the question of influence and correlation), three W2 cells instead of one setting, and the real Digg data (P4). Present synthetic results as a check that the mechanism works, and Digg as outside evidence, where nobody set the influence.
+- **No public dataset.** This is now a fallback risk. It applies only if the Digg conversion fails (the gate in P4). Then all results are synthetic. Say so plainly in chapters 3 and 6, and lean on W0 and W1 to show the result is not built in.
+- **Digg is small and special.** It has 3,553 stories in one month, and only stories that reached the front page, so every story is already popular and a popularity baseline may look strong. Only about 59% of the voters are in the friend table. The zips come from the Internet Archive copy of 2013-08-26 and have a password that the page gives. The terms say "research purposes only" and ask to cite Hogg and Lerman (2012) [50]. The license question goes to the supervisor note. State all of these as limits.
 - **Leakage.** Defense: as-of features and the mutation test in P5.
 - **Weak community evidence.** No public dataset I found has a follow graph, item interactions and explicit community membership together. State it as a limitation.
 
 **Cut order.** The deadline is 2026-11-20. If time runs short, drop in this order:
-1. P4, the public dataset (at its gate in P5).
-2. The timestamp shuffle in E5.
-3. E8, the larger-pool run.
-4. The finer parts of E4 (author term, engager term, the `m` sweep). Keep H-follow and H-comm.
-5. E7 down to `chrono` against `social`.
-6. The frontend toggle in P6. Keep the backend `algo` option and the parity test.
+1. The timestamp shuffle in E5.
+2. E8, the larger-pool run.
+3. The finer parts of E4 (author term, engager term, the `m` sweep). Keep H-follow and H-comm.
+4. E7 down to `chrono` against `social`.
+5. The frontend toggle in P6. Keep the backend `algo` option and the parity test.
+6. P4, the Digg adapter, only as a last resort. It is co-primary evidence for RQ1, so it is no longer the first cut. Cut it only if the conversion fails at its gate.
 
 Never cut: the W0 null world (H0), the leakage and double-run tests, the repro command, and the supervisor checkpoints.
 

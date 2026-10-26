@@ -70,8 +70,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-digg-archiv
 
 #### Step 6: STOP (checkpoint)
 
-- [ ] The Sonnet run ends here. It reports to Claude: the commits, the Step 2 and Step 4 results, the SHA-256 of both zips, and whether `friend_date` is a real spread and the author is known. It does not start Stage 2 and does not touch the super-plan (F14).
-- [ ] Claude reads the report and `datasets.md`, runs the Stage 1 checks, and reports to the author. The author answers (DW10): Digg or Flickr as the main real set, and apply or do not apply for each of P-B, P-C, P-D and the P4 sentence.
+- [x] The Sonnet run ends here. It reports to Claude: the commits, the Step 2 and Step 4 results, the SHA-256 of both zips, and whether `friend_date` is a real spread and the author is known. It does not start Stage 2 and does not touch the super-plan (F14).
+- [x] Claude reads the report and `datasets.md`, runs the Stage 1 checks, and reports to the author. The author answers (DW10): Digg or Flickr as the main real set, and apply or do not apply for each of P-B, P-C, P-D and the P4 sentence.
 
 ### Stage 2: apply what the author chose (second run, after Step 6)
 
@@ -79,9 +79,9 @@ Do only the steps the author marked "apply". Skip the others and write "not appl
 
 #### Step 7: P-B, real data co-primary (effort S)
 
-- [ ] Test first: TC10 lists the places that may change. Run it before: the diff of the super-plan is empty.
-- [ ] Change: the "Data" decision at the top of `.docs/super-plan.md`, the P3 and P4 text, and §8 (the first risk and the cut order, where P4 is the first cut today). Use the decision of Step 6.
-- [ ] Commit: `docs: super-plan, real data as co-primary (P-B)`
+- [x] Test first: TC10 lists the places that may change. Run it before: the diff of the super-plan is empty.
+- [x] Change: the "Data" decision at the top of `.docs/super-plan.md`, the P3 and P4 text, and §8 (the first risk and the cut order, where P4 is the first cut today). Use the decision of Step 6.
+- [x] Commit: `docs: super-plan, real data as co-primary (P-B)`
 
 #### Step 8: P-C, window W and the age term on real data (effort XS)
 
