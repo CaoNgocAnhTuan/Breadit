@@ -6,6 +6,7 @@ The Claude Code setup for the thesis. Three commands, two files per task, three 
 .claude/
   commands/   task, bugfix, approve
   hooks/      the hooks, task.cjs (task helper), verify.sh, run-safe.sh, test-hooks.cjs
+  rules/      loaded only when Claude works on matching paths (see below)
   templates/  task.md and bug.md (the design.md of a task), plan.md
   state/      local only: the active task and the run-safe pid and log
 ```
@@ -39,6 +40,19 @@ Task state lives in status lines: `Spec status:` and `Design status:` in `design
 | `session-start.cjs` | at start and after `/clear` | Branch, changes, Docker, active task and its next step |
 
 `/approve` is for the author only because its command file has `disable-model-invocation: true`.
+
+## Rules (`rules/`)
+
+Each rule loads only when Claude works on files that match its `paths`.
+
+| Rule | Paths | What it is for |
+|---|---|---|
+| `task-docs.md` | `.docs/works/**` | How to write `design.md` and `plan.md`: reuse existing code, the failure-mode checklist, tests first |
+| `backend.md` | `apps/backend/**` | Fastify, guard order, DTOs, version-based cache, blocking, soft delete, migrations, tests |
+| `determinism.md` | `eval/**`, `packages/ranking/**`, `apps/backend/src/ranking/**` | Super-plan §2: no wall clock, seeded randomness, integer scores, total sort order |
+| `evaluation.md` | `eval/**`, `packages/ranking/**` | Super-plan §5: split, as-of features, pool, metrics, statistics, tuning |
+
+Rules for writing the thesis report are not here. Reports are written outside tasks.
 
 ## Scripts
 
