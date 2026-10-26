@@ -1,37 +1,42 @@
 # Plan: {{TITLE}}
 
 Status: draft · {{DATE}}
-Spec: [spec.md](spec.md) · Design: [design.md](design.md) · Folder: `.docs/works/{{FOLDER}}/`
+Design: [design.md](design.md) · Folder: `.docs/works/{{FOLDER}}/`
 
 <!--
-Rules for the plan (delete the comments when done):
-- Small steps (each S or smaller). A step that changes behavior starts with a failing test (TC id).
-- Every test case of the design is in a step. Every "Done when" row is checked in a step.
-- Each step ends with a command that proves it, and one commit (on test-app, never pushed).
+Maximum 600 lines. Delete these comments when done.
+- Steps in the order they must be done. Each step is one short paragraph: what to do, in which file or module,
+  and which part of design.md it comes from ("Design: Code files, likes.service.ts").
+- Do not write exact commands. The implementer knows how to run tests and the build. The plan only sets the order
+  and points back to the design.
+- Say where commits go: one per step, or several steps in one. Commits are on test-app and never pushed.
   Approving this plan also approves the commits it lists.
-- After approval, only ticking boxes and writing Result are allowed. Any other change reopens the plan.
+- Tests come first. Every DW of the spec is covered by a test or an acceptance item.
+- Schema changes go through a real migration, never `db push`.
 -->
 
 ## Steps
 
-### Step 1: <name> (effort ?)
+<!-- Sonnet ticks these. -->
 
-- [ ] Test first: <file and test name> (TC1). Run `<command>`; it fails because <reason>
-- [ ] Change: <files>
-- [ ] Verify: `<command>` gives <expected>
-- [ ] Commit: `<type>: <message>`
+- [ ] 1. <what to do> (Design: <section, file>). Commit: `<type>: <message>`
+- [ ] 2.
 
-### Step 2: Record (effort XS)
+## Tests
 
-- [ ] Update the docs this task changes (Bugs Report row, super-plan change log, CLAUDE.md commands)
-- [ ] Run `bash .claude/hooks/verify.sh`; every check passes
-- [ ] Commit: `docs: <message>`
+<!-- Written before the code they test. Level: unit (apps/backend/src/**/*.spec.ts) or IT (apps/backend/test/it, needs db and redis). -->
+
+| ID | Covers | Level | What it checks |
+|---|---|---|---|
+| TC1 | DW1 | | |
+
+## Acceptance
+
+<!-- Behaviors to check by hand after the code is done (curl against the backend from run-safe.sh, a script, the UI).
+     Say what to check and the expected result, not the command. Claude ticks these. -->
+
+- [ ] <behavior> → <expected result>
 
 ## Result
 
-<!-- Filled in during /implement: what was done, test counts, hashes, and anything that went
-     differently from the plan (and why). -->
-
-## Review notes
-
-<!-- The gate-reviewer agent writes here before the author reviews. -->
+<!-- Claude fills this in at the end: what was done, test counts, commits, and anything that differed from the plan (and why). -->

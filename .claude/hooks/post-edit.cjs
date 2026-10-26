@@ -3,10 +3,10 @@
 /**
  * PostToolUse hook for Edit, Write and MultiEdit.
  *
- * - In eval/ and apps/backend/src/ranking/ (not tests): reports code that breaks the determinism
- *   contract of super-plan §2 (wall clock, unseeded randomness, unstable sorts, locale functions).
+ * - In eval/ and ranking code (not tests): reports code that breaks the determinism contract of
+ *   super-plan §2 (wall clock, unseeded randomness, unstable sorts, locale functions).
  *   A line can opt out with "// harness-allow: <reason>".
- * - In task files: lists the template sections the file does not have yet.
+ * - In task files: design.md may have at most 800 lines, plan.md at most 600.
  */
 const fs = require('fs');
 const path = require('path');
@@ -41,14 +41,15 @@ if (h.DETERMINISM_SCOPE_RE.test(rel) && h.CODE_EXT_RE.test(rel) && !h.TEST_FILE_
 
 const taskFile = h.TASK_FILE_RE.exec(rel);
 if (taskFile) {
-  const task = h.loadTask(taskFile[1]);
-  const missing = h.missingSections(taskFile[2], task, text);
-  if (missing.length) {
+  const kind = taskFile[2];
+  const limit = h.LINE_LIMITS[kind];
+  const lines = text.replace(/\n$/, '').split('\n').length;
+  if (lines > limit) {
     h.done({
-      hookSpecificOutput: {
-        hookEventName: 'PostToolUse',
-        additionalContext: `[harness] ${rel} does not have these template sections yet: ${missing.join(', ')}. Template: .claude/templates/${h.templateFor(taskFile[2], task)}.`,
-      },
+      decision: 'block',
+      reason:
+        `[harness] ${rel} has ${lines} lines. The limit for ${kind}.md is ${limit}. ` +
+        'Shorten it: cut repeated text, long code, and detail the code itself already shows.',
     });
   }
 }

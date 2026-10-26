@@ -5,11 +5,10 @@
  *
  * 1. File guard: refuses edits to frozen or secret files (docs/, Latex/, .env, committed
  *    migrations, datasets/humans_v1.sql, the results manifest).
- * 2. Task files (.docs/works/<task>/{spec,design,plan}.md):
- *    - Claude never writes "Status: approved" (only the author's /approve does);
- *    - design.md needs an approved spec, plan.md an approved design;
- *    - an approved spec or design is read-only (reopen it first);
- *    - an approved plan only allows ticking boxes and writing the Result section.
+ * 2. Task files (.docs/works/<task>/{design,plan}.md):
+ *    - Claude never writes an "approved" status line (only the author's /approve does);
+ *    - the Design section cannot start before the spec is approved;
+ *    - plan.md needs an approved design.
  * 3. Approval gate: code and config edits ask the author unless the active task's plan is approved.
  */
 const h = require('./lib.cjs');
@@ -32,14 +31,14 @@ if (h.isGated(rel)) {
     const where = task ? `active task ${task.folder}: ${h.statusLine(task)}` : 'no active task';
     h.ask(
       `${rel} is code or config, and no plan is approved (${where}). ` +
-        'The workflow is /task or /bugfix, then /design, /plan and /implement. ' +
+        'The workflow is /task or /bugfix, then /approve three times (spec, design, plan). ' +
         'Allow this only if the author wants the edit outside the workflow.',
     );
   }
 }
 h.done();
 
-/** The old and new text of each change this tool call makes. */
+/** The new text of each change this tool call makes (with the old text, when there is one). */
 function changes() {
   if (input.tool_name === 'Write') return [{ old: null, neu: ti.content || '' }];
   if (Array.isArray(ti.edits)) return ti.edits.map((e) => ({ old: e.old_string || '', neu: e.new_string || '' }));
@@ -47,47 +46,25 @@ function changes() {
   return [];
 }
 
-function untick(s) {
-  return (s || '').replace(/\[[xX ]\]/g, '[ ]');
-}
-
 function checkTaskFile(folder, stage) {
-  const task = h.loadTask(folder) || { folder, files: {}, light: false, type: 'feature' };
+  const task = h.loadTask(folder);
   const list = changes();
 
   for (const c of list) {
     if (h.APPROVED_LINE_RE.test(c.neu) && !(c.old && h.APPROVED_LINE_RE.test(c.old))) {
-      h.deny('only the author approves, by typing /approve. Claude never writes "Status: approved".');
+      h.deny('only the author approves, by typing /approve. Claude never writes an "approved" status line.');
     }
   }
+  if (!task) return; // an old folder, or a task that is not started yet
 
-  if (stage === 'design' || stage === 'plan') {
-    if (task.light) h.deny(`${folder} is a light task: spec, design and plan all live in spec.md.`);
-    const before = stage === 'design' ? 'spec' : 'design';
-    const status = task.files[before] ? task.files[before].status : 'none';
-    if (!h.isApproved(status)) {
-      h.deny(`${stage}.md needs an approved ${before}.md first (now: ${status}). The author reviews ${before}.md and types /approve.`);
+  if (stage === 'design' && task.status.spec !== 'approved') {
+    for (const c of list) {
+      if (/^Design status:[ \t]*(draft|approved)\b/im.test(c.neu) && !(c.old && /^Design status:[ \t]*draft\b/im.test(c.old))) {
+        h.deny(`the Design section needs an approved spec first (Spec status: ${task.status.spec}). The author reviews Spec and Impact and types /approve.`);
+      }
     }
   }
-
-  const current = task.files[stage];
-  if (!current || !h.isApproved(current.status)) return;
-
-  const reopen = `node .claude/hooks/task.cjs reopen ${stage}`;
-  const planLike = stage === 'plan' || (stage === 'spec' && task.light);
-  if (!planLike || input.tool_name === 'Write') {
-    h.deny(`${rel} is ${current.status}. To change it, run \`${reopen}\` (it goes back to draft), edit it, and ask the author to /approve again.`);
-  }
-  const resultAt = current.text.search(/^##[ \t]+Result\b/m);
-  for (const c of list) {
-    const tickOnly = untick(c.old) === untick(c.neu);
-    const at = current.text.indexOf(c.old);
-    const inResult = resultAt >= 0 && at >= resultAt;
-    if (!tickOnly && !inResult) {
-      h.deny(
-        `${rel} is ${current.status}: only ticking boxes and writing the Result section are allowed. ` +
-          `To change a step, run \`${reopen}\`, explain the change to the author, and wait for /approve.`,
-      );
-    }
+  if (stage === 'plan' && task.status.design !== 'approved') {
+    h.deny(`plan.md needs an approved design first (Design status: ${task.status.design}). The author reviews the Design section and types /approve.`);
   }
 }

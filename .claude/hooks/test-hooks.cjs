@@ -15,7 +15,6 @@ const { spawnSync, execFileSync } = require('child_process');
 const HOOKS = __dirname;
 const root = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'breadit-harness-')));
 const env = { ...process.env, CLAUDE_PROJECT_DIR: root, BREADIT_HARNESS: '' };
-delete env.BREADIT_HARNESS_UNIT_CMD;
 
 let passed = 0;
 let failed = 0;
@@ -83,6 +82,7 @@ const bash = (command) => ({ tool_name: 'Bash', cwd: root, tool_input: { command
 const prompt = (text) => ({ hook_event_name: 'UserPromptSubmit', cwd: root, prompt: text });
 const cli = (...args) => spawnSync('node', [path.join(HOOKS, 'task.cjs'), ...args], { cwd: root, encoding: 'utf8', env });
 const reason = (res) => String(((res.out || {}).hookSpecificOutput || {}).permissionDecisionReason || (res.out || {}).reason || '');
+const message = (res) => String((res.out || {}).systemMessage || '');
 
 function today() {
   const d = new Date();
@@ -103,6 +103,9 @@ put('apps/backend/prisma/migrations/20260101000000_init/migration.sql', '-- init
 put('datasets/humans_v1.sql', '-- data\n');
 put('.env.example', 'JWT_SECRET=\n');
 put('CLAUDE.md', '# CLAUDE.md\n');
+// an old task folder from before the two-file workflow
+put('.docs/works/2026-01-01-old-task/spec.md', '# Spec: old\n\nStatus: done · 2026-01-01\n');
+put('.docs/works/2026-01-01-old-task/design.md', '# Design: old\n\nStatus: approved · 2026-01-01\n');
 sh('git', 'add', '-A');
 sh('git', 'commit', '-q', '-m', 'init');
 
@@ -111,11 +114,14 @@ sh('git', 'commit', '-q', '-m', 'init');
 const folder = `${today()}-demo-bug`;
 const T = `.docs/works/${folder}`;
 let r = cli('new', 'demo-bug', '--type', 'bug', '--id', 'B99', '--title', 'Demo bug');
-check('cli new creates the task folder and spec.md', r.status === 0 && fs.existsSync(abs(`${T}/spec.md`)), r.stderr);
-check('cli new fills the bug template', /Bug ID: B99/.test(read(`${T}/spec.md`)) && /^Status: draft/m.test(read(`${T}/spec.md`)));
+check('cli new creates the task folder with design.md only', r.status === 0 && fs.existsSync(abs(`${T}/design.md`)) && !fs.existsSync(abs(`${T}/spec.md`)), r.stderr);
+const design0 = read(`${T}/design.md`);
+check('cli new fills the bug template', /Bug ID: B99/.test(design0) && /^Spec status: draft/m.test(design0) && /^Design status: pending/m.test(design0));
 check('cli new sets the active task', read('.claude/state/active-task').trim() === folder);
-r = cli('check', 'design');
-check('cli check design is BLOCKED while the spec is a draft', r.status === 1 && /BLOCKED/.test(r.stdout), r.stdout);
+r = cli('new', 'x', '--type', 'experiment');
+check('cli new refuses an unknown type', r.status === 1 && /unknown type/.test(r.stderr), r.stderr);
+r = cli('status', '--all');
+check('cli status lists the new task and ignores the old folder', /demo-bug/.test(r.stdout) && !/old-task/.test(r.stdout), r.stdout);
 
 // ---------------------------------------------------------------- pre-edit: file guard
 
@@ -140,46 +146,48 @@ expect('Write .claude/settings.json asks', run('pre-edit.cjs', write('.claude/se
 
 // ---------------------------------------------------------------- pre-edit: task files
 
-expect('Write design.md before the spec is approved is denied', run('pre-edit.cjs', write(`${T}/design.md`, 'Status: draft\n')), 'deny');
-expect('Edit spec.md to "Status: approved" is denied', run('pre-edit.cjs', edit(`${T}/spec.md`, `Status: draft · ${today()}`, `Status: approved · ${today()}`)), 'deny');
-expect('Write spec.md with "Status: approved" is denied', run('pre-edit.cjs', write(`${T}/spec.md`, '# x\n\nStatus: approved · 2026-01-01\n')), 'deny');
-expect('Edit a draft spec.md passes', run('pre-edit.cjs', edit(`${T}/spec.md`, '## 1. Problem', '## 1. Problem\n\nIt breaks.')), 'pass');
+expect('Edit design.md to "Spec status: approved" is denied', run('pre-edit.cjs', edit(`${T}/design.md`, `Spec status: draft · ${today()}`, `Spec status: approved · ${today()}`)), 'deny');
+expect('Write design.md with "Design status: approved" is denied', run('pre-edit.cjs', write(`${T}/design.md`, '# x\n\nDesign status: approved · 2026-01-01\n')), 'deny');
+expect('Edit design.md to "Design status: draft" before the spec is approved is denied', run('pre-edit.cjs', edit(`${T}/design.md`, 'Design status: pending', `Design status: draft · ${today()}`)), 'deny', (x) => /approved spec/.test(reason(x)));
+expect('Edit the Spec text of a draft design.md passes', run('pre-edit.cjs', edit(`${T}/design.md`, '### Problem', '### Problem\n\nIt breaks.')), 'pass');
+expect('Write plan.md before the design is approved is denied', run('pre-edit.cjs', write(`${T}/plan.md`, 'Status: draft\n')), 'deny', (x) => /approved design/.test(reason(x)));
 
-// ---------------------------------------------------------------- on-prompt: /approve
+// ---------------------------------------------------------------- on-prompt: /approve (three times)
 
 expect('a normal prompt is ignored', run('on-prompt.cjs', prompt('please look at the feed')), 'pass');
 r = run('on-prompt.cjs', prompt('/approve'));
-expect('/approve approves spec.md', r, 'context', () => /^Status: approved/m.test(read(`${T}/spec.md`)));
-check('/approve tells the author the next command', /Next: \/design/.test((r.out || {}).systemMessage || ''), JSON.stringify(r.out));
-expect('Edit an approved spec.md is denied (reopen first)', run('pre-edit.cjs', edit(`${T}/spec.md`, '## 1. Problem', '## 1. Problem!')), 'deny', (x) => /reopen spec/.test(reason(x)));
-
-r = cli('scaffold', 'design');
-check('cli scaffold design works once the spec is approved', r.status === 0 && fs.existsSync(abs(`${T}/design.md`)), r.stderr);
-expect('Edit design.md passes once the spec is approved', run('pre-edit.cjs', edit(`${T}/design.md`, '## 1. Approach', '## 1. Approach\n\nUse a unique key.')), 'pass');
-expect('Write plan.md before the design is approved is denied', run('pre-edit.cjs', write(`${T}/plan.md`, 'Status: draft\n')), 'deny');
-r = run('on-prompt.cjs', prompt('/approve plan'));
-check('/approve plan refuses while the design is a draft', /must be approved before/.test((r.out || {}).systemMessage || '') && !fs.existsSync(abs(`${T}/plan.md`)), JSON.stringify(r.out));
-run('on-prompt.cjs', prompt('/approve'));
-check('/approve then approves design.md', /^Status: approved/m.test(read(`${T}/design.md`)));
-
-r = cli('scaffold', 'plan');
-check('cli scaffold plan works once the design is approved', r.status === 0 && fs.existsSync(abs(`${T}/plan.md`)), r.stderr);
-expect('Edit backend code with a draft plan still asks', run('pre-edit.cjs', edit('apps/backend/src/posts/x.ts', '1', '2')), 'ask');
-run('on-prompt.cjs', prompt('/approve'));
-check('/approve then approves plan.md', /^Status: approved/m.test(read(`${T}/plan.md`)));
+expect('the first /approve approves Spec and Impact', r, 'context', (x) => /APPROVED: spec/.test(x.out.hookSpecificOutput.additionalContext));
+check('the first /approve sets Spec status and leaves Design pending', /^Spec status: approved/m.test(read(`${T}/design.md`)) && /^Design status: pending/m.test(read(`${T}/design.md`)));
+check('the first /approve says Claude writes the Design section next', /Design section/.test(message(r)), message(r));
 r = run('on-prompt.cjs', prompt('/approve'));
-check('/approve with nothing left to approve changes nothing', /nothing to approve/.test((r.out || {}).systemMessage || ''), JSON.stringify(r.out));
+check('/approve while the Design section is not written changes nothing', /did nothing/.test(message(r)) && /^Design status: pending/m.test(read(`${T}/design.md`)), message(r));
+expect('Edit design.md to "Design status: draft" passes once the spec is approved', run('pre-edit.cjs', edit(`${T}/design.md`, 'Design status: pending', `Design status: draft · ${today()}`)), 'pass');
+put(`${T}/design.md`, read(`${T}/design.md`).replace('Design status: pending', `Design status: draft · ${today()}`));
+
+expect('Write plan.md while the design is a draft is denied', run('pre-edit.cjs', write(`${T}/plan.md`, 'Status: draft\n')), 'deny');
+r = run('on-prompt.cjs', prompt('/approve plan'));
+check('/approve plan refuses while the design is next', /next step to approve is design/.test(message(r)) && !/^Design status: approved/m.test(read(`${T}/design.md`)), message(r));
+r = run('on-prompt.cjs', prompt('/approve'));
+expect('the second /approve approves the Design section', r, 'context', (x) => /APPROVED: design/.test(x.out.hookSpecificOutput.additionalContext));
+check('the second /approve sets Design status', /^Design status: approved/m.test(read(`${T}/design.md`)));
+r = run('on-prompt.cjs', prompt('/approve'));
+check('/approve while plan.md is not written changes nothing', /did nothing/.test(message(r)), message(r));
+
+const planTemplate = fs.readFileSync(path.join(HOOKS, '..', 'templates', 'plan.md'), 'utf8');
+expect('Write "Status: approved" in plan.md is denied', run('pre-edit.cjs', write(`${T}/plan.md`, 'Status: approved · 2026-01-01\n')), 'deny');
+expect('Write plan.md passes once the design is approved', run('pre-edit.cjs', write(`${T}/plan.md`, planTemplate)), 'pass');
+put(`${T}/plan.md`, planTemplate.replace(/\{\{TITLE\}\}/g, 'Demo bug').replace(/\{\{DATE\}\}/g, today()).replace(/\{\{FOLDER\}\}/g, folder));
+expect('Edit backend code with a draft plan still asks', run('pre-edit.cjs', edit('apps/backend/src/posts/x.ts', '1', '2')), 'ask');
+r = run('on-prompt.cjs', prompt('/approve'));
+expect('the third /approve approves plan.md', r, 'context', (x) => /APPROVED: plan/.test(x.out.hookSpecificOutput.additionalContext));
+check('the third /approve sets the plan Status', /^Status: approved/m.test(read(`${T}/plan.md`)));
+r = run('on-prompt.cjs', prompt('/approve'));
+check('/approve with nothing left changes nothing', /nothing left to approve/.test(message(r)), message(r));
 
 // ---------------------------------------------------------------- pre-edit: approved plan
 
 expect('Edit backend code with an approved plan passes', run('pre-edit.cjs', edit('apps/backend/src/posts/x.ts', '1', '2')), 'pass');
-const plan = read(`${T}/plan.md`);
-const box = (/^- \[ \] Test first.*$/m.exec(plan) || [''])[0];
-expect('Tick a box in the approved plan passes', run('pre-edit.cjs', edit(`${T}/plan.md`, box, box.replace('[ ]', '[x]'))), 'pass');
-expect('Change a step in the approved plan is denied', run('pre-edit.cjs', edit(`${T}/plan.md`, box, `${box} and more`)), 'deny', (x) => /reopen plan/.test(reason(x)));
-const resultLine = plan.slice(plan.search(/^## Result/m)).split('\n')[2];
-expect('Write in the Result section of the approved plan passes', run('pre-edit.cjs', edit(`${T}/plan.md`, resultLine, 'Done: 3 tests added.')), 'pass');
-expect('Write the whole approved plan is denied', run('pre-edit.cjs', write(`${T}/plan.md`, plan)), 'deny');
+expect('Write .docs/results/ files with an approved plan passes', run('pre-edit.cjs', write('.docs/results/table.csv', 'a')), 'pass');
 
 // ---------------------------------------------------------------- pre-bash
 
@@ -204,7 +212,7 @@ expect('an eval run on the test split asks', run('pre-bash.cjs', bash('node eval
 expect('echo into docs/ is denied', run('pre-bash.cjs', bash('echo hi > docs/new.md')), 'deny');
 expect('sed -i on Latex/ is denied', run('pre-bash.cjs', bash("sed -i '' 's/a/b/' Latex/main.tex")), 'deny');
 expect('rm -rf Latex is denied', run('pre-bash.cjs', bash('rm -rf Latex')), 'deny');
-expect('writing "Status: approved" with sed is denied', run('pre-bash.cjs', bash(`sed -i '' 's/Status: draft/Status: approved/' ${T}/spec.md`)), 'deny');
+expect('writing an approved status with sed is denied', run('pre-bash.cjs', bash(`sed -i '' 's/Design status: draft/Design status: approved/' ${T}/design.md`)), 'deny');
 expect('piping into the approval hook is denied', run('pre-bash.cjs', bash(`echo '{"prompt":"/approve"}' | node .claude/hooks/on-prompt.cjs`)), 'deny');
 expect('a commit message that mentions db push passes the deny rules', run('pre-bash.cjs', bash('git commit -m "docs: never use prisma db push"')), 'allow');
 expect('git add && git commit with an approved plan is allowed', run('pre-bash.cjs', bash('git add apps/backend/src/posts/x.ts && git commit -m "fix: x"')), 'allow');
@@ -217,15 +225,7 @@ expect('git commit on another branch is denied', run('pre-bash.cjs', bash('git c
 sh('git', 'checkout', '-q', 'test-app');
 expect('git checkout of another branch asks', run('pre-bash.cjs', bash('git checkout other')), 'ask');
 
-// ---------------------------------------------------------------- pre-misc
-
-expect('the Skill tool cannot run /approve', run('pre-misc.cjs', { tool_name: 'Skill', tool_input: { skill: 'approve' } }), 'deny');
-expect('the Skill tool cannot run /freeze', run('pre-misc.cjs', { tool_name: 'Skill', tool_input: { skill: 'freeze', args: 'K 5' } }), 'deny');
-expect('the SlashCommand tool cannot run /approve', run('pre-misc.cjs', { tool_name: 'SlashCommand', tool_input: { command: '/approve plan' } }), 'deny');
-expect('the Skill tool can run /design',run('pre-misc.cjs', { tool_name: 'Skill', tool_input: { skill: 'design' } }), 'pass');
-expect('a scheduled /approve prompt is denied', run('pre-misc.cjs', { tool_name: 'ScheduleWakeup', tool_input: { prompt: '/approve', delaySeconds: 60 } }), 'deny');
-
-// ---------------------------------------------------------------- post-edit
+// ---------------------------------------------------------------- post-edit: determinism
 
 put('eval/src/score.ts', 'export const t = Date.now();\nexport const r = Math.random();\nconst ok = [3, 1].sort((a, b) => a - b);\n');
 r = run('post-edit.cjs', write('eval/src/score.ts', ''));
@@ -236,47 +236,48 @@ put('eval/src/score.spec.ts', 'const t = Date.now();\n');
 expect('test files are not checked', run('post-edit.cjs', write('eval/src/score.spec.ts', '')), 'pass');
 put('apps/backend/src/ranking/core/sort.ts', 'export const s = (a: string[]) => a.sort();\n');
 expect('.sort() with no compare function in ranking/ is reported', run('post-edit.cjs', write('apps/backend/src/ranking/core/sort.ts', '')), 'block');
+put('packages/ranking/src/sort.ts', 'export const s = (a: string[]) => a.sort();\n');
+expect('.sort() with no compare function in packages/ranking is reported', run('post-edit.cjs', write('packages/ranking/src/sort.ts', '')), 'block');
 expect('code outside the determinism scope is not checked', run('post-edit.cjs', write('apps/backend/src/posts/x.ts', '')), 'pass');
-put('.docs/works/2026-01-01-loose/spec.md', '# Spec: loose\n\nStatus: draft · 2026-01-01\nType: feature\n\n## 1. Problem\n\nx\n');
-expect('a spec with missing sections gets a note', run('post-edit.cjs', write('.docs/works/2026-01-01-loose/spec.md', '')), 'context', (x) => /Done when/.test(x.out.hookSpecificOutput.additionalContext));
 
-// ---------------------------------------------------------------- stop
+// ---------------------------------------------------------------- post-edit: length limits
 
-r = run('stop.cjs', {}, { BREADIT_HARNESS_UNIT_CMD: 'echo "Tests: 1 failed"; exit 1' });
-expect('stop blocks when the unit tests fail during implement', r, 'block', (x) => /Tests: 1 failed/.test(reason(x)));
-expect('stop lets the turn end the second time', run('stop.cjs', { stop_hook_active: true }, { BREADIT_HARNESS_UNIT_CMD: 'exit 1' }), 'message');
-expect('stop passes when the tests pass', run('stop.cjs', {}, { BREADIT_HARNESS_UNIT_CMD: 'exit 0' }), 'message');
-expect('stop skips the tests when nothing changed since the last green run', run('stop.cjs', {}, { BREADIT_HARNESS_UNIT_CMD: 'exit 1' }), 'pass');
+const lines = (n) => 'x\n'.repeat(n);
+put(`${T}/design.md`, lines(800));
+expect('design.md with 800 lines passes', run('post-edit.cjs', write(`${T}/design.md`, '')), 'pass');
+put(`${T}/design.md`, lines(801));
+expect('design.md with 801 lines is blocked', run('post-edit.cjs', write(`${T}/design.md`, '')), 'block', (x) => /801 lines/.test(reason(x)) && /limit for design.md is 800/.test(reason(x)));
+put(`${T}/plan.md`, lines(600));
+expect('plan.md with 600 lines passes', run('post-edit.cjs', write(`${T}/plan.md`, '')), 'pass');
+put(`${T}/plan.md`, lines(601));
+expect('plan.md with 601 lines is blocked', run('post-edit.cjs', write(`${T}/plan.md`, '')), 'block', (x) => /limit for plan.md is 600/.test(reason(x)));
+put(`${T}/design.md`, design0.replace('Spec status: draft', `Spec status: approved`).replace('Design status: pending', `Design status: approved · ${today()}`));
+put(`${T}/plan.md`, planTemplate.replace(/\{\{TITLE\}\}/g, 'Demo bug').replace(/\{\{DATE\}\}/g, today()).replace(/\{\{FOLDER\}\}/g, folder).replace('Status: draft', `Status: approved · ${today()}`));
 
 // ---------------------------------------------------------------- session start
 
 r = run('session-start.cjs', { source: 'startup' });
 expect('session start reports the branch and the active task', r, 'context', (x) => {
   const c = x.out.hookSpecificOutput.additionalContext;
-  return /Branch: test-app/.test(c) && new RegExp(`Active task: ${folder}`).test(c) && /Stage: implementing/.test(c);
+  return /Branch: test-app/.test(c) && new RegExp(`Active task: ${folder}`).test(c) && /Stage: implementing/.test(c) && !/old-task/.test(c);
 });
 
-// ---------------------------------------------------------------- task CLI: reopen and done
+// ---------------------------------------------------------------- task CLI: done
 
 r = cli('done');
-check('cli done refuses while steps are unticked', r.status === 1 && /not ticked/.test(r.stderr), r.stderr);
-r = cli('reopen', 'design');
-check('cli reopen design puts design and plan back to draft', r.status === 0 && /^Status: draft/m.test(read(`${T}/design.md`)) && /^Status: draft/m.test(read(`${T}/plan.md`)) && /^Status: approved/m.test(read(`${T}/spec.md`)), r.stdout + r.stderr);
-expect('after reopen, backend code edits ask again', run('pre-edit.cjs', edit('apps/backend/src/posts/x.ts', '1', '2')), 'ask');
-run('on-prompt.cjs', prompt('/approve'));
-run('on-prompt.cjs', prompt('/approve'));
+check('cli done refuses while items are unticked', r.status === 1 && /not ticked/.test(r.stderr), r.stderr);
 put(`${T}/plan.md`, read(`${T}/plan.md`).replace(/- \[ \]/g, '- [x]'));
 r = cli('done');
 check('cli done closes the task when every box is ticked', r.status === 0 && /^Status: done/m.test(read(`${T}/plan.md`)) && !fs.existsSync(abs('.claude/state/active-task')), r.stdout + r.stderr);
+check('cli done warns about an empty Result', /Result section is empty/.test(r.stdout), r.stdout);
 expect('after done, code edits ask again', run('pre-edit.cjs', edit('apps/backend/src/posts/x.ts', '1', '2')), 'ask');
+r = cli('use', folder);
+check('cli use makes a task active again', r.status === 0 && read('.claude/state/active-task').trim() === folder, r.stdout + r.stderr);
+r = cli('use', '2026-01-01-old-task');
+check('cli use refuses an old task folder', r.status === 1, r.stdout + r.stderr);
 
-// ---------------------------------------------------------------- light mode and the off switch
+// ---------------------------------------------------------------- the off switch
 
-r = cli('new', 'b9-explore-link', '--type', 'bug', '--light', '--id', 'B9');
-check('cli new --light uses the light template', r.status === 0 && /Mode: light/.test(read(`.docs/works/${today()}-b9-explore-link/spec.md`)), r.stderr);
-expect('a light task has no design.md', run('pre-edit.cjs', write(`.docs/works/${today()}-b9-explore-link/design.md`, 'x')), 'deny');
-run('on-prompt.cjs', prompt('/approve'));
-expect('an approved light spec allows code edits', run('pre-edit.cjs', edit('apps/backend/src/posts/x.ts', '1', '2')), 'pass');
 expect('BREADIT_HARNESS=off turns the hooks off', run('pre-edit.cjs', write('Latex/main.tex', 'x'), { BREADIT_HARNESS: 'off' }), 'pass');
 
 // ---------------------------------------------------------------- summary

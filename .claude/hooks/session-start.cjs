@@ -12,8 +12,9 @@ if (h.HARNESS_OFF) h.done({ systemMessage: '[harness] off (BREADIT_HARNESS=off)'
 
 const lines = [
   'Breadit harness (.claude/). Every feature, super-plan item or bug fix follows the author\'s workflow: ' +
-    '/task or /bugfix writes spec.md → the author types /approve → /design (designer agent, Opus) → /approve → ' +
-    '/plan → /approve → /implement. Code edits ask the author unless the active task has an approved plan.',
+    '/task or /bugfix writes Spec and Impact in design.md → the author types /approve → Claude writes the Design section → ' +
+    '/approve → Claude writes plan.md → /approve → Sonnet implements, Claude verifies. ' +
+    'Code edits ask the author unless the active task has an approved plan.',
 ];
 
 const branch = h.currentBranch();
@@ -52,7 +53,7 @@ h.done({
 function dockerLine() {
   const r = spawnSync('docker', ['ps', '--format', '{{.Names}}'], { encoding: 'utf8', timeout: 2500 });
   if (r.error || r.status !== 0) {
-    return 'Docker: not reachable. Integration tests and /run-safe need `docker compose up db redis -d`.';
+    return 'Docker: not reachable. Integration tests and run-safe.sh need `docker compose up db redis -d`.';
   }
   const names = r.stdout.split('\n');
   const db = names.some((n) => /(^|[-_])db([-_]\d+)?$/.test(n));

@@ -4,9 +4,11 @@
  * Node built-ins only. A hook reads one JSON object on stdin (the Claude Code hook input)
  * and prints at most one JSON object on stdout.
  *
- * The author's workflow: spec.md → /approve → design.md → /approve → plan.md → /approve → code.
- * Each task is one folder in .docs/works/. The first "Status:" line of each file holds its state:
- * draft, approved or done. Only the author's /approve (hook on-prompt.cjs) writes "approved".
+ * The author's workflow: /task or /bugfix writes Spec + Impact in design.md → /approve →
+ * Design section of design.md → /approve → plan.md → /approve → Sonnet implements, Opus verifies.
+ * Each task is one folder in .docs/works/ with two files: design.md and plan.md.
+ * State lives in status lines: "Spec status:" and "Design status:" in design.md, "Status:" in plan.md.
+ * Only the author's /approve (hook on-prompt.cjs) writes "approved".
  */
 const fs = require('fs');
 const path = require('path');
@@ -16,7 +18,8 @@ const HARNESS_OFF = process.env.BREADIT_HARNESS === 'off';
 const TEMPLATES = path.join(__dirname, '..', 'templates');
 const WORKS = '.docs/works';
 const STAGES = ['spec', 'design', 'plan'];
-const TASK_TYPES = ['feature', 'bug', 'experiment', 'writing'];
+const TASK_TYPES = ['feature', 'bug'];
+const LINE_LIMITS = { design: 800, plan: 600 };
 
 // ---------------------------------------------------------------- paths
 
@@ -85,7 +88,7 @@ function isGated(rel) {
   return true;
 }
 
-const TASK_FILE_RE = /^\.docs\/works\/([^/]+)\/(spec|design|plan)\.md$/;
+const TASK_FILE_RE = /^\.docs\/works\/([^/]+)\/(design|plan)\.md$/;
 
 // ---------------------------------------------------------------- hook output
 
@@ -164,22 +167,30 @@ function today() {
 
 // ---------------------------------------------------------------- task files
 
-const STATUS_RE = /^Status:[ \t]*([A-Za-z]+)/m;
-const APPROVED_LINE_RE = /^Status:[ \t]*approved\b/im;
+/** The label of each status line, and the file it lives in. */
+const STATUS_LABEL = { spec: 'Spec status', design: 'Design status', plan: 'Status' };
+const STATUS_FILE = { spec: 'design', design: 'design', plan: 'plan' };
+const ANY_STATUS_LINE_RE = /^(?:Spec status|Design status|Status):.*$/gm;
 
-function statusOf(text) {
-  const m = STATUS_RE.exec(text || '');
-  return m ? m[1].toLowerCase() : 'missing';
+/** Matches a status line that says "approved". Only the author's /approve may write one. */
+const APPROVED_LINE_RE = /^(?:Spec status|Design status|Status):[ \t]*approved\b/im;
+
+const statusRe = (stage) => new RegExp(`^${STATUS_LABEL[stage]}:[ \\t]*([A-Za-z]+)`, 'm');
+
+/** The status word of a stage ("draft", "approved", ...), or null if the line is missing. */
+function statusOf(stage, text) {
+  const m = statusRe(stage).exec(text || '');
+  return m ? m[1].toLowerCase() : null;
 }
-const isApproved = (status) => status === 'approved' || status === 'done';
 
-/** Replace the status line. Returns null if the text has none. */
-function setStatus(text, status, date) {
-  if (!STATUS_RE.test(text)) return null;
-  return text.replace(/^Status:.*$/m, `Status: ${status} · ${date}`);
+/** Replace the status line of a stage. Returns null if the text has none. */
+function setStatus(stage, text, status, date) {
+  const re = new RegExp(`^${STATUS_LABEL[stage]}:.*$`, 'm');
+  if (!re.test(text)) return null;
+  return text.replace(re, `${STATUS_LABEL[stage]}: ${status} · ${date}`);
 }
 
-/** A header field such as "Type: bug · Mode: light". */
+/** A header field such as "Type: bug · Bug ID: T6". */
 function field(text, name) {
   const m = new RegExp(`(?:^|·)[ \\t]*${name}:[ \\t]*([A-Za-z][\\w-]*)`, 'mi').exec(text || '');
   return m ? m[1].toLowerCase() : null;
@@ -187,30 +198,37 @@ function field(text, name) {
 
 const taskDir = (folder) => path.join(projectDir(), WORKS, folder);
 
+/**
+ * One task folder, or null. Folders from before the two-file workflow (no "Spec status:" line
+ * in design.md) are old records and are ignored.
+ */
 function loadTask(folder) {
   if (!folder) return null;
   const dir = taskDir(folder);
+  let designText;
   try {
     if (!fs.statSync(dir).isDirectory()) return null;
+    designText = fs.readFileSync(path.join(dir, 'design.md'), 'utf8');
   } catch {
     return null;
   }
-  const files = {};
-  for (const stage of STAGES) {
-    const file = path.join(dir, `${stage}.md`);
-    if (fs.existsSync(file)) {
-      const text = fs.readFileSync(file, 'utf8');
-      files[stage] = { file, text, status: statusOf(text) };
-    }
-  }
-  const spec = files.spec ? files.spec.text : '';
-  const type = field(spec, 'Type');
+  if (!statusOf('spec', designText)) return null;
+  const planFile = path.join(dir, 'plan.md');
+  const planText = fs.existsSync(planFile) ? fs.readFileSync(planFile, 'utf8') : null;
+  const type = field(designText, 'Type');
   return {
     folder,
     dir,
-    files,
-    light: field(spec, 'Mode') === 'light',
+    designFile: path.join(dir, 'design.md'),
+    planFile,
+    designText,
+    planText,
     type: TASK_TYPES.includes(type) ? type : 'feature',
+    status: {
+      spec: statusOf('spec', designText),
+      design: statusOf('design', designText) || 'pending',
+      plan: planText === null ? 'none' : statusOf('plan', planText) || 'draft',
+    },
   };
 }
 
@@ -223,55 +241,35 @@ function listTasks() {
   } catch {
     return [];
   }
-  return names
-    .sort()
-    .map(loadTask)
-    .filter((t) => t && t.files.spec);
+  return names.sort().map(loadTask).filter(Boolean);
 }
 
-/** True while code may be edited: the plan (or a light spec) is approved and not yet done. */
-function canImplement(task) {
-  if (!task) return false;
-  const f = task.light ? task.files.spec : task.files.plan;
-  return Boolean(f) && f.status === 'approved';
-}
+/** True while code may be edited: the plan is approved and the task is not done. */
+const canImplement = (task) => Boolean(task) && task.status.plan === 'approved';
 
 function nextStep(text) {
   const m = /^[ \t]*[-*][ \t]+\[ \][ \t]+(.+)$/m.exec(text || '');
   return m ? m[1].trim().slice(0, 160) : null;
 }
 
-const statusLine = (task) =>
-  STAGES.filter((s) => task.files[s])
-    .map((s) => `${s} ${task.files[s].status}`)
-    .join(' · ') + (task.light ? ' (light)' : '');
+const statusLine = (task) => `spec ${task.status.spec} · design ${task.status.design} · plan ${task.status.plan}`;
 
 /** Where the task stands and what comes next. */
 function describe(task) {
-  const f = task.files;
-  const st = (s) => (f[s] ? f[s].status : 'none');
-  const waiting = (s) => `the author reviews ${s}.md and types /approve`;
-  if (!f.spec) return { stage: 'new', next: 'write spec.md' };
-  if (!isApproved(st('spec'))) return { stage: 'spec draft', next: waiting('spec') };
-  if (task.light) {
-    if (st('spec') === 'done') return { stage: 'done', next: null };
-    return { stage: 'implementing (light)', next: nextStep(f.spec.text) || 'fill Result, then `node .claude/hooks/task.cjs done`' };
-  }
-  if (!f.design) return { stage: 'spec approved', next: '/design' };
-  if (!isApproved(st('design'))) return { stage: 'design draft', next: waiting('design') };
-  if (!f.plan) return { stage: 'design approved', next: '/plan' };
-  if (st('plan') === 'done') return { stage: 'done', next: null };
-  if (st('plan') !== 'approved') return { stage: 'plan draft', next: waiting('plan') };
-  return { stage: 'implementing', next: nextStep(f.plan.text) || 'fill Result, then `node .claude/hooks/task.cjs done`' };
+  const s = task.status;
+  if (s.spec !== 'approved') return { stage: 'spec draft', next: 'the author reviews Spec and Impact in design.md and types /approve' };
+  if (s.design === 'pending') return { stage: 'spec approved', next: 'Claude writes the Design section of design.md' };
+  if (s.design !== 'approved') return { stage: 'design draft', next: 'the author reviews the Design section and types /approve' };
+  if (s.plan === 'none') return { stage: 'design approved', next: 'Claude writes plan.md' };
+  if (s.plan === 'done') return { stage: 'done', next: null };
+  if (s.plan !== 'approved') return { stage: 'plan draft', next: 'the author reviews plan.md and types /approve' };
+  return {
+    stage: 'implementing',
+    next: nextStep(task.planText) || 'fill Result in plan.md, then `node .claude/hooks/task.cjs done`',
+  };
 }
 
 // ---------------------------------------------------------------- templates
-
-function templateFor(stage, task) {
-  if (stage === 'spec') return task && task.light ? 'spec-light.md' : `spec-${task ? task.type : 'feature'}.md`;
-  if (stage === 'design') return task && task.type === 'writing' ? 'design-writing.md' : 'design.md';
-  return 'plan.md';
-}
 
 function readTemplate(name) {
   return fs.readFileSync(path.join(TEMPLATES, name), 'utf8');
@@ -281,29 +279,9 @@ function fillTemplate(name, values) {
   return readTemplate(name).replace(/\{\{([A-Z_]+)\}\}/g, (m, key) => (key in values ? values[key] : m));
 }
 
-const firstWord = (heading) =>
-  heading
-    .replace(/^\d+\.\s*/, '')
-    .toLowerCase()
-    .split(/[^a-z]+/)
-    .filter(Boolean)[0] || '';
-
-/** `##` sections of the stage's template that the text does not have (matched by first word). */
-function missingSections(stage, task, text) {
-  let tpl;
-  try {
-    tpl = readTemplate(templateFor(stage, task));
-  } catch {
-    return [];
-  }
-  const want = [...tpl.matchAll(/^##[ \t]+(.+?)[ \t]*$/gm)].map((m) => m[1].replace(/^\d+\.\s*/, ''));
-  const have = new Set([...(text || '').matchAll(/^#{2,3}[ \t]+(.+?)[ \t]*$/gm)].map((m) => firstWord(m[1])));
-  return want.filter((w) => !have.has(firstWord(w)));
-}
-
 // ---------------------------------------------------------------- determinism (super-plan §2)
 
-const DETERMINISM_SCOPE_RE = /^(eval\/|apps\/backend\/src\/ranking\/)/;
+const DETERMINISM_SCOPE_RE = /^(eval\/|packages\/ranking\/|apps\/backend\/src\/ranking\/)/;
 const CODE_EXT_RE = /\.[cm]?[jt]sx?$/;
 const TEST_FILE_RE = /[.-](spec|test)\.[cm]?[jt]sx?$|\/__tests__\//;
 
@@ -336,8 +314,11 @@ module.exports = {
   WORKS,
   STAGES,
   TASK_TYPES,
+  LINE_LIMITS,
+  STATUS_FILE,
   TASK_FILE_RE,
   APPROVED_LINE_RE,
+  ANY_STATUS_LINE_RE,
   DETERMINISM_SCOPE_RE,
   CODE_EXT_RE,
   TEST_FILE_RE,
@@ -359,7 +340,6 @@ module.exports = {
   clearState,
   today,
   statusOf,
-  isApproved,
   setStatus,
   field,
   taskDir,
@@ -370,9 +350,7 @@ module.exports = {
   nextStep,
   statusLine,
   describe,
-  templateFor,
   readTemplate,
   fillTemplate,
-  missingSections,
   determinismFindings,
 };

@@ -26,16 +26,16 @@ The author reads English as a second language (upper-intermediate). This applies
 
 ## Workflow
 
-Every feature, super-plan item or bug fix goes through three approvals before any code. Each task is one folder `.docs/works/YYYY-MM-DD-<slug>/`.
+Every feature, super-plan item or bug fix goes through three approvals before any code. Each task is one folder `.docs/works/YYYY-MM-DD-<slug>/` with two files: `design.md` (max 800 lines) and `plan.md` (max 600 lines). The main model is Opus.
 
-1. `/task <item>` or `/bugfix <ID>` investigates and writes `spec.md`. The author reviews it and types `/approve`.
-2. `/design` starts the `designer` agent (Opus), which writes `design.md`. Then `/approve`.
-3. `/plan` writes `plan.md`. Then `/approve`. Approving the plan also approves the commits it lists.
-4. `/implement` does the plan steps test first, ticks them, fills the Result section and closes the task.
+1. `/task <item>` or `/bugfix <ID>` investigates and writes Spec and Impact in `design.md`. The author reviews it and types `/approve`.
+2. Claude writes the Design section of `design.md`: workflows, sequence diagrams, failure modes with how to resolve them, and the code files with their purpose. The author types `/approve`.
+3. Claude writes `plan.md`: ordered steps that point back to the design, tests, acceptance checks. The author types `/approve`. Approving the plan also approves the commits it lists.
+4. Claude starts a Sonnet agent to implement the plan (tests first, commits). Then Claude runs `verify.sh` and the acceptance checks, fills Result and closes the task.
 
 **Git.** Commit every change on the current branch, `test-app`. Never create a new branch for a change: no feature, task, fix or thesis branches. Tags, pushes and any change to `main` need the author's OK.
 
-Only the author runs `/approve` and `/freeze`. The hooks in `.claude/hooks/` enforce the rest: code edits ask the author unless the active task's plan is approved, `docs/`, `Latex/`, `.env` and committed migrations cannot be edited, and commits go on `test-app` only. Other commands: `/verify`, `/run-safe`. See `.claude/README.md` for the full map.
+Only the author runs `/approve`. The hooks in `.claude/hooks/` enforce the rest: code edits ask the author unless the active task's plan is approved, `docs/`, `Latex/`, `.env` and committed migrations cannot be edited, and commits go on `test-app` only. Thesis reports are written separately, not inside a task. A frozen value (super-plan §7) changes only when the author asks, with a line in the super-plan change log. See `.claude/README.md` for the full map.
 
 ## Commands
 
