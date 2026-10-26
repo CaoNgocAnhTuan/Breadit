@@ -70,10 +70,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-26-p1-dataset-sel
 
 ### Step 6: Super-plan references and literature notes (effort XS)
 
-- [ ] In `.docs/super-plan.md` §10, add the datasets we used as references 45 and up (the dataset page, and the paper for each). "Verified" only for pages we opened. Add the change-log line 0.8. Do not change phase text, §1, §5 or §7 (Design: Code files, Open question 7).
-- [ ] In `.docs/literature.md`, replace "does not exist yet" in the entries [19] and [20] and in D6 with a pointer to `datasets.md`. Add an entry only for a dataset paper that we cite.
-- [ ] Verify: TC5 to TC7 pass.
-- [ ] Commit: `docs: add datasets to super-plan references, update literature notes`
+- [x] In `.docs/super-plan.md` §10, add the datasets we used as references 45 and up (the dataset page, and the paper for each). "Verified" only for pages we opened. Add the change-log line 0.8. Do not change phase text, §1, §5 or §7 (Design: Code files, Open question 7).
+- [x] In `.docs/literature.md`, replace "does not exist yet" in the entries [19] and [20] and in D6 with a pointer to `datasets.md`. Add an entry only for a dataset paper that we cite.
+- [x] Verify: TC5 to TC7 pass.
+- [x] Commit: `docs: add datasets to super-plan references, update literature notes`
 
 ## Tests
 

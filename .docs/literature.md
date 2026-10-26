@@ -299,7 +299,7 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
   - [23] index record: the title names influence and correlation in social networks. The text was not read, so the details of its shuffle test are not used here.
 - What a W1 win means: in W1, follows and interactions both come from shared interests, and there is no influence (super-plan §7). If the hybrid beats BL2 in W1, the social term predicts better. That is prediction, not influence. Whether follows influence what users do cannot be read from W1.
 - The shuffle test checks the test, not the generator: a pass or a fail of the timestamp shuffle (E5) says whether the evaluation reacts to time order. It does not say whether the generator built the social signal into the data. This is our reading; [23] was not read.
-- RQ2 thresholds: they are "in generator units" until they are calibrated to real data (task `p1-dataset-selection`, `.docs/datasets.md`, which does not exist yet).
+- RQ2 thresholds: they are "in generator units" until they are calibrated to real data (task `p1-dataset-selection`, `.docs/datasets.md`: the generator targets are in its section 6, mean followees 12.89 and mean favorites per user 13.51 from Flickr WWW 2009; the thresholds stay "not calibrated" until P3 and the author decide).
 - Against: [24] says what can happen under stated assumptions, and it models a feedback loop between a recommender and its logged data. Our worlds make interactions from interests, follows and memberships, not from a ranking algorithm, so a feedback loop is not modelled. Real data may differ. [42] (abstract only) is a field experiment on X; it shows effects on behaviour that an offline test on synthetic data cannot show.
 - Label: by analogy (abstract only)
 - Choice: option (a), with W0, W1 and the shuffle in E5. By analogy with [24]: a simulation shows what can happen under its assumptions, not what happens in a real system.
@@ -403,11 +403,11 @@ Could not be opened on 2026-10-24. This guide is from the abstract only.
 
 ### [19] Epinions and Ciao (Tang 2011)
 - Opened: 2026-10-24, index record [Internet Archive copy of the page, snapshot 20240824170049; the live page at cse.msu.edu did not answer on 2026-10-24] · Cited in: not cited
-- Says: trust data sets crawled from the review sites Epinions and Ciao in May 2011. The Epinions data has user profiles, ratings with their time points and trust relations; only parts are released. For us: a candidate for P4; the details go to `.docs/datasets.md`, which does not exist yet because `p1-dataset-selection` has not run.
+- Says: trust data sets crawled from the review sites Epinions and Ciao in May 2011. The Epinions data has user profiles, ratings with their time points and trust relations; only parts are released. For us: a candidate for P4; the details are in `.docs/datasets.md` (checked 2026-10-26: the live host refused the connection; an Internet Archive copy of the page was read; trust links are directed with 11 time values, products have no user author).
 
 ### [20] Digg data (Lerman 2009)
 - Opened: 2026-10-24, index record [the downloads page of Kristina Lerman at isi.edu] · Cited in: not cited
-- Says: the voting records of 3553 stories promoted to the front page of Digg over one month in 2009, each with the voter id and the vote time, plus friendship links of the voters. For us: the first candidate for P4 (super-plan, change log 0.3); the details go to `.docs/datasets.md`, which does not exist yet because `p1-dataset-selection` has not run.
+- Says: the voting records of 3553 stories promoted to the front page of Digg over one month in 2009, each with the voter id and the vote time, plus friendship links of the voters. For us: the first candidate for P4 (super-plan, change log 0.3); the details are in `.docs/datasets.md` (checked 2026-10-26: its live download links are dead; the Internet Archive copy of the page shows directed friend links with a Unix date on the same clock as the votes; the two zip files were not opened).
 
 ### [21] Significance tests (Smucker 2007)
 - Opened: 2026-10-24, index record [Crossref record of DOI 10.1145/1321440.1321528: Mark D. Smucker, James Allan and Ben Carterette, CIKM 2007, pp. 623-632] · Cited in: not cited
