@@ -30,6 +30,11 @@ These rules come from super-plan P1 Step 2. They were committed before the candi
 - If no set has at least "partial" on both 1 and 2, write "no candidate passes criteria 1 and 2". Then P4 is dropped and the thesis uses synthetic data only (super-plan §8).
 - A "partial" on criterion 1 is allowed, because the super-plan already accepts a fixed graph as a stated limitation.
 
+**Three more rules (added on 2026-10-27, before any Digg file was opened).** The levels above are not exact on three points. The numbers below are our own choice, not from a source. They are written first, so the Digg numbers cannot bend them (design F13).
+- **Criterion 1, spread of dates.** A follow date counts as "dated" only if it has a real spread: the most common UTC day holds at most 50% of the links. If more than 50% of the links share one day, the date is the crawl day, not the day of the follow, and criterion 1 is "partial".
+- **Criterion 2, author known.** The author of a story is its first voter. Take the share of stories whose first voter is a user in the friend table. At least 80% is "pass". From 20% up to 80% is "partial". Below 20% is "fail".
+- **Ties.** If two votes of one story have the same `vote_date`, the file order breaks the tie. We report the share of stories with a tie at the first vote. Above 10%, the author answer is "unclear" and criterion 2 is at most "partial".
+
 **Source marks.** "page opened" means we opened the page and read it on that date. "search only" means we saw only a search snippet. "not checked" means we could not check it, and the reason is written. A search snippet is never used as a fact (super-plan §10 rule).
 
 ## 3. Candidate table
