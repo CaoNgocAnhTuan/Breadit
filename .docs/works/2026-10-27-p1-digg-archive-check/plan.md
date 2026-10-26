@@ -42,17 +42,17 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-digg-archiv
 
 #### Step 2: Fetch and check the two zips (effort S)
 
-- [ ] Ask the Internet Archive index (CDX) for the capture time and byte length of `digg_votes.zip` and `digg_friends.zip` under `isi.edu/~lerman/downloads/`. Fetch each capture in the raw `id_` form, one request at a time (Design: Approach, step B).
-- [ ] Check each file: size against the index (F3), the first two bytes `PK` (F2), the zip test (F4), the member list with sizes (F5). Record the SHA-256 of each zip.
-- [ ] If a zip cannot be fetched or opened after the retries of the rules above, write "not opened: <reason>, <date>" and go to Step 5 with the decision unchanged. Skip Steps 3 and 4 for the missing zip. Do not look for another source.
-- [ ] Commit: none. The result goes into the commit of Step 5.
+- [x] Ask the Internet Archive index (CDX) for the capture time and byte length of `digg_votes.zip` and `digg_friends.zip` under `isi.edu/~lerman/downloads/`. Fetch each capture in the raw `id_` form, one request at a time (Design: Approach, step B).
+- [x] Check each file: size against the index (F3), the first two bytes `PK` (F2), the zip test (F4), the member list with sizes (F5). Record the SHA-256 of each zip.
+- [x] If a zip cannot be fetched or opened after the retries of the rules above, write "not opened: <reason>, <date>" and go to Step 5 with the decision unchanged. Skip Steps 3 and 4 for the missing zip. Do not look for another source.
+- [x] Commit: none. The result goes into the commit of Step 5.
 
 #### Step 3: The script, with a fixture check first (effort S)
 
-- [ ] Test first (TC2): write `check_digg_stats.py` in the task folder. It builds a tiny fixture of both zips with `zipfile` in a temporary folder (a few votes, a tie at a first vote, links on two days and on one day, a mutual link, a duplicate pair, a self-link, a voter not in the friend table). It holds the expected numbers written by hand. Run it before the script exists: it fails.
-- [ ] Change: write `digg_stats.py` in the task folder (Design: Code files). Standard library only, run with `-I`, two zip paths as arguments, reads members as text, extracts nothing, writes no file. It prints the five groups of Design: Approach, step D.
-- [ ] Verify: TC2 passes on the fixture. The script stops with a clear message on a member that is too large, a missing column, or a non-integer id (F5, F6).
-- [ ] Commit: `docs: digg_stats.py with a fixture check`
+- [x] Test first (TC2): write `check_digg_stats.py` in the task folder. It builds a tiny fixture of both zips with `zipfile` in a temporary folder (a few votes, a tie at a first vote, links on two days and on one day, a mutual link, a duplicate pair, a self-link, a voter not in the friend table). It holds the expected numbers written by hand. Run it before the script exists: it fails.
+- [x] Change: write `digg_stats.py` in the task folder (Design: Code files). Standard library only, run with `-I`, two zip paths as arguments, reads members as text, extracts nothing, writes no file. It prints the five groups of Design: Approach, step D.
+- [x] Verify: TC2 passes on the fixture. The script stops with a clear message on a member that is too large, a missing column, or a non-integer id (F5, F6).
+- [x] Commit: `docs: digg_stats.py with a fixture check`
 
 #### Step 4: Run on the real zips (effort XS)
 
