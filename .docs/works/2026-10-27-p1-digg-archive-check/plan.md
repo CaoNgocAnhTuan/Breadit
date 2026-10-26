@@ -56,17 +56,17 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-digg-archiv
 
 #### Step 4: Run on the real zips (effort XS)
 
-- [ ] Run `digg_stats.py` on the two zips. Keep the output text. Print the first rows of each member too, to show the real columns (F6).
-- [ ] Compare the counts with the page numbers: 3,018,197 votes, 3,553 stories, 139,409 voters, 1,731,658 links, 71,367 users. Every difference is listed with a reason or "not explained".
-- [ ] Commit: none. The result goes into the commit of Step 5.
+- [x] Run `digg_stats.py` on the two zips. Keep the output text. Print the first rows of each member too, to show the real columns (F6).
+- [x] Compare the counts with the page numbers: 3,018,197 votes, 3,553 stories, 139,409 voters, 1,731,658 links, 71,367 users. Every difference is listed with a reason or "not explained".
+- [x] Commit: none. The result goes into the commit of Step 5.
 
 #### Step 5: Update `datasets.md` (effort S)
 
-- [ ] In `.docs/datasets.md`: the Digg row in §3, the evidence in §4 (zip URLs with capture time, sizes, SHA-256, members, the count table, the criterion 1 and 2 answers with the numbers of the Spec DW3 to DW5), what Digg can and cannot test in §5, the new targets in §6 (the rows that were "not computed" for Flickr get Digg numbers, with the file name, and the share of voters with 0 to 4 votes is marked "all votes, not cut by T"), and the pool limit (small, one month, only front-page stories).
-- [ ] Apply the rules of §2 to Digg and Flickr and write the §1 Decision: the winner and the deciding criterion. If a zip was "not opened", §1 stays as it is.
-- [ ] In §7: write the corrected P4 sentence for Digg, update P-B, P-C and P-D to the new decision, each with the super-plan section it would change, and mark P-A done. Nothing in the super-plan changes (DW8, DW9).
-- [ ] Verify: TC3 to TC9 pass.
-- [ ] Commit: `docs: datasets.md Digg archive check, evidence, targets and decision`
+- [x] In `.docs/datasets.md`: the Digg row in §3, the evidence in §4 (zip URLs with capture time, sizes, SHA-256, members, the count table, the criterion 1 and 2 answers with the numbers of the Spec DW3 to DW5), what Digg can and cannot test in §5, the new targets in §6 (the rows that were "not computed" for Flickr get Digg numbers, with the file name, and the share of voters with 0 to 4 votes is marked "all votes, not cut by T"), and the pool limit (small, one month, only front-page stories).
+- [x] Apply the rules of §2 to Digg and Flickr and write the §1 Decision: the winner and the deciding criterion. If a zip was "not opened", §1 stays as it is.
+- [x] In §7: write the corrected P4 sentence for Digg, update P-B, P-C and P-D to the new decision, each with the super-plan section it would change, and mark P-A done. Nothing in the super-plan changes (DW8, DW9).
+- [x] Verify: TC3 to TC9 pass.
+- [x] Commit: `docs: datasets.md Digg archive check, evidence, targets and decision`
 
 #### Step 6: STOP (checkpoint)
 

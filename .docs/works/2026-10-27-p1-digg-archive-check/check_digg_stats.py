@@ -74,6 +74,10 @@ EXPECTED_A = {
     # group 2: links
     "friend_date_min": T0 - DAY,
     "friend_date_min_utc": "2009-06-29T00:00:00Z",
+    "friend_date_zero_rows": 0,
+    "friend_date_zero_share": 0.0,
+    "friend_date_min_nonzero": T0 - DAY,
+    "friend_date_min_nonzero_utc": "2009-06-29T00:00:00Z",
     "friend_date_max": T0 + 3 * DAY + 1,
     "friend_date_max_utc": "2009-07-03T00:00:01Z",
     "friend_distinct_days": 4,
@@ -159,6 +163,25 @@ EXPECTED_B = {
     "first_vote_tie_share": 0.0,
 }
 
+# ---------------------------------------------------------------- fixture C
+# one link has friend_date 0 (the real friends file has such rows); votes are the ones of B
+FRIENDS_C = [(0, 0, 1, 2), (0, T0 + 3600, 2, 1), (0, T0 + 7200, 3, 1)]
+EXPECTED_C = {
+    "friend_date_min": 0,
+    "friend_date_min_utc": "1970-01-01T00:00:00Z",
+    "friend_date_zero_rows": 1,
+    "friend_date_zero_share": 1 / 3,
+    "friend_date_min_nonzero": T0 + 3600,
+    "friend_date_min_nonzero_utc": "2009-06-30T01:00:00Z",
+    "friend_distinct_days": 2,
+    "friend_top_day": "2009-06-30",
+    "friend_top_day_links": 2,
+    "friend_top_day_share": 2 / 3,
+    "friend_before_votes_share": 1 / 3,
+    "friend_inside_votes_share": 0.0,
+    "friend_after_votes_share": 2 / 3,
+}
+
 failures = []
 
 
@@ -230,6 +253,14 @@ def main():
         else:
             compare("B", parse(r.stdout), EXPECTED_B)
 
+        fc = os.path.join(tmp, "c_friends.zip")
+        make_zip(fc, "digg_friends.csv", quote_rows(FRIENDS_C, "\n"))
+        r = run([vb, fc])
+        if r.returncode != 0:
+            fail("fixture C: exit code %s, stderr: %s" % (r.returncode, r.stderr.strip()[:300]))
+        else:
+            compare("C", parse(r.stdout), EXPECTED_C)
+
         # error cases: a clear message on stderr, exit code 2, no traceback
         def expect_error(label, args, words):
             r = run(args)
@@ -290,7 +321,7 @@ def main():
 
         # the script must not write files next to itself or into the fixture folder
         left = sorted(set(os.listdir(tmp)) - {"a_votes.zip", "a_friends.zip", "b_votes.zip", "b_friends.zip",
-                                               "c_votes.zip", "d_votes.zip", "e_votes.zip", "f_votes.zip",
+                                               "c_votes.zip", "c_friends.zip", "d_votes.zip", "e_votes.zip", "f_votes.zip",
                                                "enc", "enc_votes.zip", "enc_friends.zip"})
         if left:
             fail("the script wrote files: %s" % left)

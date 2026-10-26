@@ -205,6 +205,8 @@ def main():
     link_days = Counter()
     fmin = fmax = None
     before = inside = after = 0
+    zero_rows = 0
+    fmin_nonzero = None
     head = 0
     for line_no, (mutual, fdate, uid, fid) in rows_of(args.friends_zip, "friends", 4, args.max_friends_rows,
                                                        args.max_member_bytes, args.password):
@@ -227,6 +229,10 @@ def main():
         link_days[fdate // DAY] += 1
         fmin = fdate if fmin is None else min(fmin, fdate)
         fmax = fdate if fmax is None else max(fmax, fdate)
+        if fdate == 0:
+            zero_rows += 1
+        else:
+            fmin_nonzero = fdate if fmin_nonzero is None else min(fmin_nonzero, fdate)
         if fdate < vmin:
             before += 1
         elif fdate > vmax:
@@ -256,6 +262,10 @@ def main():
     top_day, top_links = link_days.most_common(1)[0]
     out("friend_date_min", fmin)
     out("friend_date_min_utc", utc_time(fmin))
+    out("friend_date_zero_rows", zero_rows)
+    out("friend_date_zero_share", zero_rows / link_rows)
+    out("friend_date_min_nonzero", fmin_nonzero if fmin_nonzero is not None else "n/a")
+    out("friend_date_min_nonzero_utc", utc_time(fmin_nonzero) if fmin_nonzero is not None else "n/a")
     out("friend_date_max", fmax)
     out("friend_date_max_utc", utc_time(fmax))
     out("friend_distinct_days", len(link_days))
