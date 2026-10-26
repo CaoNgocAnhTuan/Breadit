@@ -1,6 +1,6 @@
 # Plan: P1 Digg archive check and plan proposals
 
-Status: approved · 2026-10-27
+Status: done · 2026-10-27
 Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-digg-archive-check/`
 
 ---
@@ -125,14 +125,40 @@ All checks are on documents or on the script, so they are read, grep or script c
 
 ## Acceptance
 
-- [ ] Read `.docs/datasets.md` §1 → the winner and the deciding criterion come first, in a few lines, in simple English (DW7).
-- [ ] `git log` → the commit with the three rules comes before every commit with Digg evidence (F13).
-- [ ] The count table and the criterion 1 and 2 answers show real numbers from the files, not the page numbers copied (DW2 to DW5).
-- [ ] The checkpoint report names the zips' SHA-256 and the winner, and lists P-B, P-C, P-D and the P4 sentence for the author (DW10).
-- [ ] After Stage 2, the super-plan diff matches the list the author chose, with one commit per proposal (DW11, F14).
-- [ ] `git status` is clean except for `refs-manual/` → no zip, no raw data, no scratchpad file in the repo (F17).
-- [ ] The corrected P4 sentence and the change-log line 0.9 are in simple English (DW12).
+- [x] Read `.docs/datasets.md` §1 → the winner and the deciding criterion come first, in a few lines, in simple English (DW7).
+- [x] `git log` → the commit with the three rules comes before every commit with Digg evidence (F13).
+- [x] The count table and the criterion 1 and 2 answers show real numbers from the files, not the page numbers copied (DW2 to DW5).
+- [x] The checkpoint report names the zips' SHA-256 and the winner, and lists P-B, P-C, P-D and the P4 sentence for the author (DW10).
+- [x] After Stage 2, the super-plan diff matches the list the author chose, with one commit per proposal (DW11, F14).
+- [x] `git status` is clean except for `refs-manual/` → no zip, no raw data, no scratchpad file in the repo (F17).
+- [x] The corrected P4 sentence and the change-log line 0.9 are in simple English (DW12).
 
 ## Result
 
-<!-- Claude fills this in at the end: what was done, test counts, commits, and anything that differed from the plan (and why). -->
+**Done 2026-10-27.** Stage 1 and Stage 2 were done by two Sonnet runs. Claude checked the commits, the diffs and the numbers, and ran `verify.sh --no-it`: shared build, frontend typecheck and lint, backend build all PASS, backend unit tests 99 of 99 PASS, integration tests skipped (no code changed, Docker not used). TC2 (`check_digg_stats.py`, three fixtures) passes. The other checks are read, grep or git checks and pass. Claude also ran `digg_stats.py` again on the real zips: every number matches the report. The SHA-256 of both zips was recomputed and matches.
+
+**Commits** (on `test-app`, not pushed):
+- `56917c5` rules for date spread, author known and ties (also adds design.md and plan.md)
+- `fe1cc6b` digg_stats.py with a fixture check
+- `461829e` datasets.md Digg archive check, evidence, targets and decision
+- `0933a0c` super-plan, real data as co-primary (P-B)
+- `eccb6ad` super-plan, name the generator targets (P-D)
+- `eb9a801` super-plan, correct the P4 sentence about Digg timestamps
+- `597edd2` super-plan 0.9, references and change log for the Digg check
+
+**Result of the check.** Digg 2009 (Internet Archive copy of 2013-08-26) is "pass" on criteria 1 and 2, so it wins over Flickr ("partial" and "partial"). The counts match the dataset page exactly. 1,434 UTC days of follows, the most common day holds 0.49% (the rule needs at most 50%). 98.2% of stories have their first voter in the friend table (the rule needs 80%). No tie at a first vote. Follows against the vote window: 89.35% before, 10.04% inside, 0.61% after. The community term stays synthetic-only (Digg has no groups).
+
+**Files opened (DW1).** Both zips, whole (no extraction). Fetched from the Internet Archive on 2026-10-26 (18:33 to 18:39 UTC):
+- `digg_votes.zip`, capture 2013-08-26 05:35:17 UTC, 22,547,243 bytes, SHA-256 `55bba035e08d31f14022aeef1f57b24322d2c0bea1fb241e3c99b0af59aafda1`
+- `digg_friends.zip`, capture 2013-08-26 05:35:27 UTC, 15,007,610 bytes, SHA-256 `4d5d3189c66d0606dc09aa919444cfc2377613a8011766af6f0ea9f3359c3bba`
+
+**The author's decision at the checkpoint (2026-10-27).** Digg as the main real set. P-B applied, P-D applied (names the targets, no number), the P4 sentence corrected. P-C not applied, because Digg has real Unix dates (Step 8 skipped, its boxes stay open on purpose). Super-plan section 5 and section 7 are byte-identical to before (hash checked), no line with "freeze at" changed, and no file outside `.docs/` changed.
+
+**Differences from the plan, and what was not checked.**
+- The two zips are password protected. The plan did not expect it. The agent used the password that the dataset page itself publishes, and `datasets.md` records it. `digg_stats.py` got a `--password` option and limit options.
+- After the first real run the script was extended for 1,670 links with `friend_date` 0 (four new keys and a third fixture). This went into the commit `461829e`, not into the script commit.
+- Fetch rules were not followed exactly in Stage 1: one CDX retry came after about 10 seconds, not 60, and two comparison fetches were sent in parallel (both got HTTP 429 and were dropped). So there is no second fetch to compare the two zips. The hashes were recomputed on the saved files.
+- Stage 2 also changed the P4 row of the phase table in §4 ("(stretch)" to "(Digg 2009)"), one sentence in P1 Step 2, and the P3 intro. These were needed so the text does not contradict P-B, and they are listed in change-log line 0.9.
+- Not checked: whether the first voter is the real submitter, why 1,670 links have date 0, why 7,299 vote rows repeat, what the Internet Archive index length counts, the paper of Hogg and Lerman (2012) (`[50]` stays "search only"). The grade of Digg on criterion 4 ("partial") was given by the agent and was not discussed with the author.
+- Stale text left on purpose (outside the allowed places): §1 H1 still names the middle cell of synthetic W2 as the primary test, P1 Step 4 and P8 still say "if P4 works" and "if P4 is in". They should be tidied in a later task.
+- The `plan.md` check script for Stage 2 and the fixture builder live in the scratchpad, not in the repo.
