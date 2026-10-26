@@ -100,10 +100,10 @@ Do only the steps the author marked "apply". Skip the others and write "not appl
 
 #### Step 11: References, version and change log (effort XS)
 
-- [ ] Change in `.docs/super-plan.md`: references [49] and [50] in §10 say what was opened (Digg zips opened, SHA-256, archive URL), with "verified" only for what was opened. Header version 0.9. Change-log line 0.9: every applied proposal, the places it changed, and the proposals not applied. Update the P1 status paragraph for Step 2.
-- [ ] In `.docs/datasets.md` §7: mark each proposal "applied" or "not applied", with the date.
-- [ ] Verify: TC10 and TC11 pass.
-- [ ] Commit: `docs: super-plan 0.9, references and change log for the Digg check`
+- [x] Change in `.docs/super-plan.md`: references [49] and [50] in §10 say what was opened (Digg zips opened, SHA-256, archive URL), with "verified" only for what was opened. Header version 0.9. Change-log line 0.9: every applied proposal, the places it changed, and the proposals not applied. Update the P1 status paragraph for Step 2.
+- [x] In `.docs/datasets.md` §7: mark each proposal "applied" or "not applied", with the date.
+- [x] Verify: TC10 and TC11 pass.
+- [x] Commit: `docs: super-plan 0.9, references and change log for the Digg check`
 
 ## Tests
 
