@@ -62,11 +62,11 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-26-p1-dataset-sel
 
 ### Step 5: Decision, tests, targets, proposals (effort S)
 
-- [ ] Fill the Decision section by applying the rules of Step 1 to the evidence of Steps 2 to 4. Name the criterion that decided it. If no candidate has at least "partial" on criteria 1 and 2, write exactly "no candidate passes criteria 1 and 2" (DW2).
-- [ ] Fill "What it can and cannot test": H1, H2, follow term, author term, community term, cold-start buckets. Each is testable, partly testable or not testable, with the reason. Say that influence cannot be tested on observational data, as in D6 of `.docs/literature.md` (DW3, F14).
-- [ ] Fill the Calibration targets (Design: Approach, Step D): numbers printed on the dataset page or in the dataset paper, each with its source. A mean from two printed totals says "mean over all users". Skew, follower and followee distributions and the share of users with 0 to 4 earlier positives say "not computed, P4 computes them" (DW4).
-- [ ] Fill "Proposed changes to the plan": the conditional co-primary proposal (Q1), the time-axis rule (Q3 and Q6), the community term on real data (Q2), favorite = like (Q4), the license words and who must confirm (Q5). Each proposal says which super-plan section it would change. Nothing is changed in the super-plan here.
-- [ ] Commit: `docs: datasets.md decision, targets and proposed changes`
+- [x] Fill the Decision section by applying the rules of Step 1 to the evidence of Steps 2 to 4. Name the criterion that decided it. If no candidate has at least "partial" on criteria 1 and 2, write exactly "no candidate passes criteria 1 and 2" (DW2).
+- [x] Fill "What it can and cannot test": H1, H2, follow term, author term, community term, cold-start buckets. Each is testable, partly testable or not testable, with the reason. Say that influence cannot be tested on observational data, as in D6 of `.docs/literature.md` (DW3, F14).
+- [x] Fill the Calibration targets (Design: Approach, Step D): numbers printed on the dataset page or in the dataset paper, each with its source. A mean from two printed totals says "mean over all users". Skew, follower and followee distributions and the share of users with 0 to 4 earlier positives say "not computed, P4 computes them" (DW4).
+- [x] Fill "Proposed changes to the plan": the conditional co-primary proposal (Q1), the time-axis rule (Q3 and Q6), the community term on real data (Q2), favorite = like (Q4), the license words and who must confirm (Q5). Each proposal says which super-plan section it would change. Nothing is changed in the super-plan here.
+- [x] Commit: `docs: datasets.md decision, targets and proposed changes`
 
 ### Step 6: Super-plan references and literature notes (effort XS)
 

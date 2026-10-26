@@ -1,10 +1,17 @@
 # Datasets for P1 (task `p1-dataset-selection`)
 
-Date: 2026-10-26 · Status: draft, waiting for the author's `/approve`
+Checked on 2026-10-26 and 2026-10-27 · Status: draft, waiting for the author's `/approve`
 
 ## 1. Decision
 
-Pending. It is filled in Step 5, after the evidence is collected.
+**Chosen: Flickr WWW 2009 (links, photos, favorite markings).** The IMC 2007 group files are an add-on that is not proven. The deciding criterion is 4 (practical), then 1 and 2.
+
+- Digg 2009 is stronger on criteria 1 and 2 (pass and pass). The graph has a Unix date for each follow and the votes use the same clock. But its download links are dead (tested 2026-10-26). Under the plan (design F2) we take the next set.
+- Flickr is "partial" on all four criteria. The follow dates are calendar days and the favorites have only an order. Time axes answer: no. So the graph is treated as fixed and a later follow can leak into the past.
+- Epinions and Ciao are also partial on 1 and 2, but a product has no user author, no group exists, and the host was down. Weibo has no follower graph in the sets we opened.
+- "No candidate passes criteria 1 and 2" does not apply, so P4 stays a stretch.
+
+**One thing for the author.** The Internet Archive lists copies of both Digg zips (37.6 MB together). We did not open them. If they match the archived page, Digg would be the better fit for the follow term, because its follows are dated on the same clock as its votes. See proposal P-A in section 7. Also, the P4 text in the super-plan says the Digg graph "may have no timestamps (not confirmed)". The archived page shows that it has them (`friend_date`).
 
 ## 2. Rules (written before any candidate was judged)
 
@@ -91,16 +98,67 @@ Photo upload time and favorite time look like one sequence. In the samples, the 
 
 ## 5. What it can and cannot test
 
-(Filled in Step 5.)
+On Flickr WWW 2009 (section 4). Words: testable, partly testable, not testable.
+
+- **Follow term: partly testable.** The graph is one final snapshot, because follows and favorites are not on one axis. A follow made after a favorite can help to predict it. The result is an upper bound for the follow signal.
+- **Author term: partly testable.** The photo owner is `author(p)` and the owner ids look like link ids (id join "likely", section 4). The term uses the same fixed graph, so it has the same leak.
+- **Community term: not testable on real data.** The groups come from another crawl and the id join is not proven. Decided 2026-10-26: the community term is tested on synthetic data only.
+- **Cold-start buckets: partly testable.** A favorite is a positive action. The size of the buckets 0, 1-4, 5-19, 20 or more is not computed, so we do not know how many test users the bucket 0-4 keeps. P4 counts them.
+- **H1: partly testable.** It can test the follow and author parts for users with 0-4 earlier favorites, without the community term. The primary test stays on the synthetic world W2 (super-plan §1).
+- **H2: partly testable.** Social density (number of followees) can be read from the graph and the gain can be tabulated by density. Nobody sets the influence level, so this shows a relation, not a cause.
+- **H0 (null world): not testable.** It needs a world with no social influence, which only we can build.
+- **Influence: not testable.** Observational data cannot separate influence from similar taste (`.docs/literature.md` D6). A win means better prediction.
+
+Limits that follow from Q3, Q4 and Q6 (section 7): the only positive action is a favorite; the comment count in the photo file is not used; the age term of BL2 needs a new definition; the window W is replaced by the N_max newest photos. A deleted favorite or a private photo is not in the data (paper §2.4).
 
 ## 6. Calibration targets for the generator (P3)
 
-(Filled in Step 5.)
+All numbers are printed in the dataset paper, or are computed by us from two printed totals. None comes from the samples. "Final graph" means the last snapshot (2,570,535 users, 33,140,018 links).
+
+| Target | Number | How computed | Source |
+|---|---|---|---|
+| Mean followees per user | 12.89 | 33,140,018 links / 2,570,535 users. Mean over all users of the final graph, not over active users. The paper prints "average outdegree was 14" and the gap is not explained. | Paper Table 1 and §3.1 (opened 2026-10-27) |
+| Shape of followees per user | 55% of users have 1 outgoing link; 90% have fewer than 10; the maximum is 26,342 | Printed in the paper | Paper §3.1 |
+| Mean followers per user | 12.89 | Same links / same users, so equal to the mean followees. Shape is "similar", with a smaller maximum. 68% of links are two-way; in-degree and out-degree correlate at 0.76 (printed). | Paper Table 1 and §3.1 |
+| Mean interactions (favorites) per user | 13.51 | 34,734,221 favorites / 2,570,535 users. Mean over all users of the final graph. Users with no favorite are in the count and their number is not known. | Paper Table 1 |
+| Mean favorites per photo | 3.10 | 34,734,221 / 11,195,144 photos (the page gives 11,267,320 photos: 3.08). The photos are those favorited by at least one user. | Paper Table 1, dataset page |
+| Photo popularity skew | 88% of 3,055,361 photos have at most 5 favorites; 3,685 photos have more than 100 | Printed. Photos uploaded in the 104 days of the crawl only. | Paper §6.1 and §6.3 |
+| Activity skew (share of favorites by the top 20% of users) | not computed | Needs the full `flickr-all-photo-favorite-markings` file (294,755,254 bytes). P4 computes it. | File on the dataset page |
+| Followee and follower distributions | not computed | Needs the full `flickr-growth` file. P4 computes them. | File on the dataset page |
+| Share of users with 0-4 earlier positives | not computed | Needs the full favorites file and the cut-time rule (P2). P4 computes it. | File on the dataset page |
+
+Flickr is a photo site and the unit is a favorite, not a post. The generator should calibrate the mean followees and the mean interactions per user, and say which other values are chosen.
 
 ## 7. Proposed changes to the plan
 
-(Filled in Step 5. Nothing here is applied to the super-plan. The author decides.)
+**Decided by the author on 2026-10-26** (answers to the open questions of the design). Nothing here changes a frozen value (super-plan §7).
+- **Q1.** Real data becomes co-primary for RQ1 and the follow term, but only if the graph and the favorites can be used together. Synthetic keeps W0, the influence sweep and the community term.
+- **Q2.** The community term is tested on synthetic data only. This is a stated limit. Even if the id join is "likely", it is not used before P4 proves it.
+- **Q3 and Q6.** The order of events is the time axis. If the link dates and the favorite order cannot be aligned, criterion 1 is "partial", the follow graph is treated as fixed, and the leak is a stated limit. On real data the window W becomes "the N_max newest posts in order", and the age term of BL2 needs another definition.
+- **Q4.** A favorite is a like and the only positive on real data. The comment count in the photo file is not used, because it counts events after the test time (leakage).
+- **Q5.** Use the data, cite the paper, keep raw files out of git. The question about the missing license goes into the supervisor note (`p1-supervisor-note`). We write no sentence that says the data is "allowed".
+- **Q7.** This task edits only super-plan §10 and adds change-log line 0.8. All other changes below are proposals.
+
+**Result of the checks.** Q3 and Q6: the time axes answer is "no", so criterion 1 is "partial" and the graph is fixed. Q1: the condition is met only in a weak form. Ids look the same and favorites have owners, but a follow made after a favorite can leak into it.
+
+| ID | Proposal (not applied) | Would change | Needs |
+|---|---|---|---|
+| P-A | Open the Digg zips from the Internet Archive with the same small sample (N = 50,000). If they match the archived page, rerun the decision. Digg would pass 1 and 2. Fix the P4 sentence "may have no timestamps". | Section 1 here, P4 text | Author's OK to use an archive copy |
+| P-B | Make Flickr co-primary for RQ1 and the follow term (Q1). My advice: only if the author accepts the future-follow leak, or if Digg (P-A) fails. Otherwise keep real data as outside evidence. | §1, P3, P4, §8 | Author |
+| P-C | On real data, replace W by the N_max newest photos in upload order. Define age as the number of pool photos uploaded after the photo (a rank), and let BL2t tune its weight on a grid of its own, because "0.25 per hour" has no hours here. | §5 pool, §5 BL2t, §7 grids | Author (`/freeze`) |
+| P-D | Use section 6 as the targets for `synthetic-v1.json`: mean followees 12.89 and mean favorites per user 13.51; mark the rest as chosen. | P3 | Author |
+
+**License words, copied on 2026-10-26.** Flickr pages: "© Copyright by Max Planck Institute for Software Systems 2018. All rights reserved." Anonymization: 'For the data we make available, we use a "best effort" anonymization.' The pages ask to cite the paper. Digg (archive copy): "This data is made available to the community for research purposes only. If you use the data in a publication, please cite: Hogg, T. and Lerman, K. (2012) Social Dynamics of Digg. EPJ Data Science 1(5)." (text without the HTML tags). The supervisor must confirm what the missing license means for a thesis.
 
 ## 8. Sources
 
-(Filled in Steps 2 to 5.)
+"Page opened" = read in full on that date. "Search only" = a search snippet. Dates are 2026-10-26 unless stated.
+
+- Flickr WWW 2009 page: https://socialnetworks.mpi-sws.org/data-www2009.html (page opened; file URLs on it: `http://socialnetworks.mpi-sws.mpg.de/data/<file>.txt.gz`).
+- Flickr IMC 2007 page: https://socialnetworks.mpi-sws.org/data-imc2007.html (page opened).
+- Cha, Mislove, Gummadi (2009), WWW 2009: https://people.mpi-sws.org/~gummadi/papers/www09-cha.pdf (opened 2026-10-27, first 10 pages as text; DOI 10.1145/1526709.1526806 is from a search result, search only).
+- Mislove, Marcon, Gummadi, Druschel, Bhattacharjee (2007), IMC 2007: citation read on the IMC page (the paper was not opened).
+- Lerman downloads page: https://www.isi.edu/people-lerman/research/downloads/ (page opened). Digg page, Internet Archive snapshot: http://web.archive.org/web/20221130205157id_/https://www.isi.edu/~lerman/downloads/digg2009.html (page opened). Zip index: Internet Archive CDX for `isi.edu/~lerman/downloads/digg_votes.zip` and `digg_friends.zip` (index read; the files were not opened).
+- Hogg, Lerman (2012), Social Dynamics of Digg, EPJ Data Science 1(5): named on the Digg page (the paper was not opened).
+- Tang, Epinions and Ciao: https://www.cse.msu.edu/~tangjili/datasetcode/truststudy.htm (live host refused the connection; Internet Archive snapshot 20260913164449 opened). Trust README in the same snapshot: `README_trust_timestamp.txt` (opened 2026-10-27).
+- Weibo: https://ieee-dataport.org/node/13574 (page opened); https://openi.pcl.ac.cn/GuhuangAI/TransHawkes (page opened); https://lists.aoir.org/archives/list/air-l@lists.aoir.org/thread/M5G6GPRDYFS6YLPTK4PJ45BIZB2YSJBV/ (page opened). Not opened: https://datahub.hku.hk/articles/dataset/Weiboscope_Open_Data/16674565 (HTTP 403 and a bot check), https://service.tib.eu/ldmservice/dataset/weiboscope-dataset (bot check page). Web search results for Weibo sets: search only.
