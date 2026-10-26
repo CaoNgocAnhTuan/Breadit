@@ -36,12 +36,12 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-26-p1-dataset-sel
 
 ### Step 2: Web check of the four candidates (effort S)
 
-- [ ] Fill one row per candidate: Digg 2009, Epinions and Ciao, Flickr (WWW 2009 links and favorites, IMC 2007 groups), Weibo sets. Start from the table in the Spec, and fill every gap in it (Design: Approach, Step B).
-- [ ] Open the Digg download link and say if it works. For Epinions and Ciao, retry the MSU page, and use the Internet Archive copy if the host is still down (F1). For Weibo, open each set found (Weiboscope, the IEEE DataPort rumor set, the cascade sets) and record only what its own page says.
-- [ ] Each cell gets the page URL, the date opened, and one of "page opened" or "search only". Copy the exact words of the license or terms line (F9). If two sources give different numbers, write both (F10).
-- [ ] Add at most two extra candidates, only if all four listed ones fail criterion 1 or 2 after this step, and at most three searches each (F12).
-- [ ] Verify: TC1 passes. No cell is blank.
-- [ ] Commit: `docs: datasets.md candidate table with sources`
+- [x] Fill one row per candidate: Digg 2009, Epinions and Ciao, Flickr (WWW 2009 links and favorites, IMC 2007 groups), Weibo sets. Start from the table in the Spec, and fill every gap in it (Design: Approach, Step B).
+- [x] Open the Digg download link and say if it works. For Epinions and Ciao, retry the MSU page, and use the Internet Archive copy if the host is still down (F1). For Weibo, open each set found (Weiboscope, the IEEE DataPort rumor set, the cascade sets) and record only what its own page says.
+- [x] Each cell gets the page URL, the date opened, and one of "page opened" or "search only". Copy the exact words of the license or terms line (F9). If two sources give different numbers, write both (F10).
+- [x] Add at most two extra candidates, only if all four listed ones fail criterion 1 or 2 after this step, and at most three searches each (F12).
+- [x] Verify: TC1 passes. No cell is blank.
+- [x] Commit: `docs: datasets.md candidate table with sources`
 
 ### Step 3: Liveness of the leading candidate's files (effort XS)
 
