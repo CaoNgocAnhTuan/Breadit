@@ -1,6 +1,6 @@
 # Plan: P1 dataset selection
 
-Status: approved · 2026-10-26
+Status: done · 2026-10-27
 Design: [design.md](design.md) · Folder: `.docs/works/2026-10-26-p1-dataset-selection/`
 
 ---
@@ -92,14 +92,50 @@ All checks are on documents, so they are read or grep checks. Write each as a sh
 
 ## Acceptance
 
-- [ ] Read `.docs/datasets.md` from the top → the decision comes first, in a few lines, and is easy to understand in simple English (DW2).
-- [ ] The Rules section has an earlier commit than the candidate table → `git log` shows the skeleton commit first (F13).
-- [ ] Each of the author's answers to questions 1 to 7 (top of this plan) appears in `datasets.md` as decided, with its date → none is silently dropped, and none is turned into a change of the super-plan.
-- [ ] The time-axis answer (F4) and the id-join answer (F5) are written with the evidence and the sample size → they are "yes / no / unknown" and "no / likely / unknown", not "ok" or "joins".
-- [ ] The license words are copied exactly, with the date → no sentence says the data is "allowed".
-- [ ] `git status` is clean except for `refs-manual/` → no scratchpad file, no raw data in the repo.
-- [ ] `datasets.md` is about 200 lines and has no word a reader at upper-intermediate level would not know without a one-sentence explanation.
+- [x] Read `.docs/datasets.md` from the top → the decision comes first, in a few lines, and is easy to understand in simple English (DW2).
+- [x] The Rules section has an earlier commit than the candidate table → `git log` shows the skeleton commit first (F13).
+- [x] Each of the author's answers to questions 1 to 7 (top of this plan) appears in `datasets.md` as decided, with its date → none is silently dropped, and none is turned into a change of the super-plan.
+- [x] The time-axis answer (F4) and the id-join answer (F5) are written with the evidence and the sample size → they are "yes / no / unknown" and "no / likely / unknown", not "ok" or "joins".
+- [x] The license words are copied exactly, with the date → no sentence says the data is "allowed".
+- [x] `git status` is clean except for `refs-manual/` → no scratchpad file, no raw data in the repo.
+- [x] `datasets.md` is about 200 lines and has no word a reader at upper-intermediate level would not know without a one-sentence explanation.
 
 ## Result
 
-<!-- Claude fills this in at the end: what was done, test counts, commits, and anything that differed from the plan (and why). -->
+**Done 2026-10-27.** All 6 steps were done by a Sonnet agent. Claude checked the commits, the diff scope and the text of `.docs/datasets.md` (164 lines), and ran `verify.sh --no-it`: shared build, frontend typecheck and lint, backend build all PASS, backend unit tests 99 of 99 PASS, integration tests skipped (no code changed, Docker not used). The document checks TC1 to TC8 were run as read/grep scripts by the agent, each first seen to fail, now all pass.
+
+**Commits** (on `test-app`, not pushed):
+- `dee57c9` datasets.md skeleton with pass levels and decision rule (also adds design.md and plan.md)
+- `a77ee9a` datasets.md candidate table with sources
+- `dd54171` datasets.md file evidence from small samples
+- `4a9ebdb` datasets.md decision, targets and proposed changes
+- `52ddf9a` datasets added to super-plan references, literature notes updated
+
+**Decision.** Flickr WWW 2009 (links, photos, favorite markings), partial on all four criteria. The IMC 2007 groups are an unproven add-on. P4 stays a stretch.
+- Time axes (follows against favorites): **no**. The follow date is a calendar day and the favorite time is a sequence number. Criterion 1 is partial and the graph is treated as fixed.
+- Id join (IMC 2007 groups against WWW 2009): **likely**, not proven. P4 must prove it on the full files.
+- Digg 2009 is stronger on criteria 1 and 2 (pass, pass), but its live downloads are dead. The plan (design F2) says to take the next set. The Digg zips exist on the Internet Archive and were not opened. This is proposal P-A for the author.
+
+**Files opened (DW8).** Flickr WWW 2009 and IMC 2007: HEAD request on all 8 files, then the first 50,000 lines of each (N = 50,000, no full file saved, nothing in git). Samples are in the scratchpad. SHA-256 of each sample:
+
+| File | SHA-256 |
+|---|---|
+| `flickr-growth` | `6b64a6fb27f1615c7764a4df7015c7a22bd850b1a5ac5fc11694ebcd72126b63` |
+| `flickr-all-photos` | `b518d0dc552264ca41e0d1c938995d2a223307e7e0d32f535cc837090a82fb13` |
+| `flickr-all-photo-favorite-markings` | `3c1bb767463a8849b83e6ea749e3a680cf7f888d8bb6268a1d29a3c21d6d6047` |
+| `flickr-photo-favorite-markings` | `ac5d8beb966144eb7946de720a0aff180d944493fbdf5530f089ea21d05a7f4f` |
+| `flickr-links` | `9e8f229dc70c731d167990ff0850450702aabbbbd92fb2745e4c89ae0e198c33` |
+| `flickr-users` | `0ba292f7e600d0dfe3f050098be212e7a3f46613747a0b33997b29e95482faae` |
+| `flickr-groups` | `44969d026ed4164dbe77d48d4d359e98ac4057008cafd61723be72bff83e5fd4` |
+| `flickr-groupmemberships` | `030ee049b9fefb074940cb3e64e2b94f8550354faa703ecaa0030aa79156aa4b` |
+
+No Digg, Epinions, Ciao or Weibo data file was opened.
+
+**Differences from the plan, and what was not checked.**
+- Digg and Epinions/Ciao pages were read from Internet Archive copies (marked "archive copy"). The HKU DataHub and TIB Weibo pages gave HTTP 403 or a bot check: "not checked".
+- The agent read the first 10 pages of the WWW 2009 paper as text to get the printed totals for the calibration targets. This is a little more than "scan for the idea". Super-plan [45] says so.
+- The super-plan header still says version 0.7, because the plan allowed only §10 and the change log. Change-log line 0.8 is dated 2026-10-27.
+- Entries [47] and [50] are "search only": the IMC 2007 and Digg papers were not opened.
+- Not computed (need full files, P4): activity skew, follower and followee distributions, share of users with 0 to 4 earlier positives.
+- Two numbers could not be explained: three Flickr file sizes on the page are larger than the header sizes, and the paper's average outdegree (14) differs from links divided by users (12.89).
+- `datasets.md` has 164 lines, below the 200 lines in the plan. Some table cells in section 3 are long.
