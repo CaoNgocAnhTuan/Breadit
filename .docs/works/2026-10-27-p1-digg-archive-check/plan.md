@@ -90,8 +90,8 @@ Do only the steps the author marked "apply". Skip the others and write "not appl
 
 #### Step 9: P-D, names of the generator targets (effort XS)
 
-- [ ] Change: in P3, name the targets (followees per user, followers per user, activity skew, votes per user). P3 already says "calibrate to `.docs/datasets.md`". Copy no number.
-- [ ] Commit: `docs: super-plan, name the generator targets (P-D)`
+- [x] Change: in P3, name the targets (followees per user, followers per user, activity skew, votes per user). P3 already says "calibrate to `.docs/datasets.md`". Copy no number.
+- [x] Commit: `docs: super-plan, name the generator targets (P-D)`
 
 #### Step 10: The P4 sentence (effort XS)
 
