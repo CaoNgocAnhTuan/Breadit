@@ -43,7 +43,51 @@ Notes on the table:
 
 ## 4. File evidence
 
-(Filled in Steps 3 and 4.)
+**Which set was opened.** After the web check (section 3), Digg leads on criteria 1 and 2 (pass, pass). We tested its links first (design F2). Both zips answer with an HTML page, so Digg fails the live-link test, and the next set, Flickr, was opened. The Digg files on the Internet Archive were not opened (the plan says to take the next candidate).
+
+**Liveness (HEAD requests, 2026-10-26).** Flickr files: `http://` redirects twice to `https://socialnetworks.mpi-sws.org/data/<file>`, then HTTP 200, `application/x-gzip`.
+
+| File | Bytes | Last-Modified | Size on the page |
+|---|---|---|---|
+| `flickr-growth.txt.gz` | 147,532,958 | 2008-05-01 | 147 MB |
+| `flickr-all-photos.txt.gz` | 132,484,925 | 2012-01-02 17:32 GMT | 154 MB |
+| `flickr-all-photo-favorite-markings.txt.gz` | 294,755,254 | 2012-01-02 17:23 GMT | 346 MB |
+| `flickr-photo-favorite-markings.txt.gz` | 116,670,395 | 2012-01-02 17:44 GMT | 135 MB |
+| `flickr-links.txt.gz` (IMC) | 76,313,030 | 2007-09-18 | 76 MB |
+| `flickr-users.txt.gz` (IMC) | 3,934,676 | 2007-09-18 | 3.9 MB |
+| `flickr-groups.txt.gz` (IMC) | 223,459 | 2007-09-18 | 223 KB |
+| `flickr-groupmemberships.txt.gz` (IMC) | 27,357,385 | 2007-09-18 | 27.3 MB |
+
+- Digg: `digg_votes.zip` and `digg_friends.zip` on `www.isi.edu` answer HTTP 200 with `text/html` (a redirect to the Lerman home page). Criterion 4 fails for the live links.
+- The three files with a timestamp fix have `Last-Modified` on 2012-01-02, not before it. The page asks people who downloaded between 2010-05-17 and 2012-01-02 to download again. The header cannot show that a file is the fixed version, so the order check in the samples (below) is the only test we have.
+- Three sizes on the page are larger than the header sizes (154, 346, 135 MB against 132.5, 294.8, 116.7 MB). The reason is not known. We use the header sizes.
+
+**Samples.** N = 50,000 lines, the first lines of each file, taken on 2026-10-26 with `curl | gunzip | head -n 50000`. No full file was saved. Each sample is in its own folder in the scratchpad and is not in git. The head of a file is not random, so the samples give only formats and id rules (F3). No mean or skew comes from them.
+
+| File | Lines read | SHA-256 of the sample | Columns (tab separated) |
+|---|---|---|---|
+| `flickr-growth` | 50,000 | `6b64a6fb27f1615c7764a4df7015c7a22bd850b1a5ac5fc11694ebcd72126b63` | user, user, date `YYYY-MM-DD` |
+| `flickr-all-photos` | 50,000 | `b518d0dc552264ca41e0d1c938995d2a223307e7e0d32f535cc837090a82fb13` | photo, upload time, owner, views, comments, favorites |
+| `flickr-all-photo-favorite-markings` | 50,000 | `3c1bb767463a8849b83e6ea749e3a680cf7f888d8bb6268a1d29a3c21d6d6047` | user, photo, time |
+| `flickr-photo-favorite-markings` | 50,000 | `ac5d8beb966144eb7946de720a0aff180d944493fbdf5530f089ea21d05a7f4f` | user, photo, time |
+| `flickr-links` (IMC) | 50,000 | `9e8f229dc70c731d167990ff0850450702aabbbbd92fb2745e4c89ae0e198c33` | user, user |
+| `flickr-users` (IMC) | 50,000 | `0ba292f7e600d0dfe3f050098be212e7a3f46613747a0b33997b29e95482faae` | user |
+| `flickr-groups` (IMC) | 50,000 | `44969d026ed4164dbe77d48d4d359e98ac4057008cafd61723be72bff83e5fd4` | group |
+| `flickr-groupmemberships` (IMC) | 50,000 | `030ee049b9fefb074940cb3e64e2b94f8550354faa703ecaa0030aa79156aa4b` | user, group |
+
+All 50,000 lines of every sample had the same number of columns, so no line was cut. A small script (kept outside the repo) printed the types and the min and max of each column.
+
+**Question 1: columns and types.** All ids are plain integers. The link date in `flickr-growth` is a real date with day precision. The photo upload time and the favorite time are plain integers (sequence numbers). In the sample, all links have the date 2006-11-02; the file is sorted by the first user, so the head says nothing about the spread of dates (full range: not computed, P4). The page says a link "was observed" on the date. Our reading: an old link gets the first crawl day as its date, so the date is not the day the follow was made. `flickr-all-photo-favorite-markings` is sorted by time (14,417 to 128,418 in the sample). `flickr-photo-favorite-markings` is sorted by photo id (times 20,386,495 to 28,954,131).
+
+**Question 2: time axes (F4).** Time axes answer: **no** for follows against favorites. The link date is a calendar day. The favorite time is a sequence number with no calendar anchor in the files or on the page. We found no rule that maps one to the other, so we cannot tell if a follow came before a favorite. Criterion 1 stays "partial", the graph is treated as fixed, and a future follow can leak into the past.
+Photo upload time and favorite time look like one sequence. In the samples, the favorite time is later than the upload time of the same photo in 984 of 999 rows (all-favorites) and in 49,967 of 50,000 rows (subset). The other 15 and 33 rows are earlier, never equal. This is about 1.5% and 0.07%. The reason is not known (the 2012 timestamp fix may not be perfect, or the sample is biased).
+
+**Question 3: id rules and join (F5).** Id join answer: **likely**, not proven.
+- Photo owners: 14,345 distinct owners in the photo sample, ids 2 to 2,145,902. This is below the 2,570,535 users of the final graph (paper Table 1). Of these owners, 6,858 also occur among the 29,207 ids of the `flickr-growth` sample. So the owner looks like an id of the same space as the links. The growth sample is small and biased, so this is not a proof.
+- Favoriting users: in `flickr-photo-favorite-markings`, 4,524 of 26,645 users occur among the ids of the `flickr-growth` sample (user ids in that file: 1 to 2,238,976).
+- IMC against WWW 2009: both crawls number users from 1. For the 150 source users that are complete in both link samples, the out-lists overlap strongly (Jaccard median 0.963, lowest 0.579). User 1 starts with 2, 3, 4, 5, 6, 7, 8, 9 in both files. Of the 397 users in the group-membership sample, all 397 are in the IMC users sample and 374 are in the IMC links sample. It is likely that the two crawls use one id space, because the same small ids have nearly the same friends. The two files are from different crawls (2006-2007 against 2007), so the lists are not equal. P4 must prove it on the full files.
+
+**Not checked.** The full date range of links; the share of users with favorites; the number of users in the group file (the groups sample has 50,000 groups, the file was not read to its end); license text beyond the copyright line.
 
 ## 5. What it can and cannot test
 

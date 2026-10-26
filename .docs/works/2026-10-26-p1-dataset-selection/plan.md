@@ -45,20 +45,20 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-26-p1-dataset-sel
 
 ### Step 3: Liveness of the leading candidate's files (effort XS)
 
-- [ ] For each file of the leading candidate (expected: the four Flickr WWW 2009 and IMC 2007 files), send a HEAD request. Record status, size and `Last-Modified` in the File evidence section (Design: Approach, Step C.4).
-- [ ] A status other than 200, or an HTML page instead of gzip, makes criterion 4 "fail" for that file (F2). A `Last-Modified` before 2012-01-02 on a favorites or photos file means that file is not used (F6).
-- [ ] If the leading candidate fails here, go back to the decision rule and take the next candidate. Repeat this step for it.
-- [ ] Commit: none. The result goes into the commit of Step 4.
+- [x] For each file of the leading candidate (expected: the four Flickr WWW 2009 and IMC 2007 files), send a HEAD request. Record status, size and `Last-Modified` in the File evidence section (Design: Approach, Step C.4).
+- [x] A status other than 200, or an HTML page instead of gzip, makes criterion 4 "fail" for that file (F2). A `Last-Modified` before 2012-01-02 on a favorites or photos file means that file is not used (F6).
+- [x] If the leading candidate fails here, go back to the decision rule and take the next candidate. Repeat this step for it.
+- [x] Commit: none. The result goes into the commit of Step 4.
 
 ### Step 4: Small sample of the leading candidate (effort S)
 
-- [ ] Stream the first N lines (N fixed once, the same for every file) of each file into its own scratchpad folder. Do not save the full file. Write the script that prints the columns, the value types and the min and max of each id column in a different folder.
-- [ ] Answer the three questions of Design: Approach, Step C and write each answer, with the sample line count and the SHA-256 of the sample file, in File evidence:
+- [x] Stream the first N lines (N fixed once, the same for every file) of each file into its own scratchpad folder. Do not save the full file. Write the script that prints the columns, the value types and the min and max of each id column in a different folder.
+- [x] Answer the three questions of Design: Approach, Step C and write each answer, with the sample line count and the SHA-256 of the sample file, in File evidence:
   1. Columns and separators, and whether a "date" is a real date or an integer.
   2. **Time axes (F4).** Can the link dates and the favorite times be put on one axis? Check the type of the photo upload time too. The answer is yes, no or unknown, with the reason.
   3. **Id rules and join (F5).** Is the photo owner an id from the links file (range check)? Compare the Flickr groups ids with the WWW 2009 ids. The answer is "no", "likely" or "unknown", never "joins".
-- [ ] If a gzip stream breaks twice, write "not opened" for that file (F7).
-- [ ] Commit: `docs: datasets.md file evidence from small samples`
+- [x] If a gzip stream breaks twice, write "not opened" for that file (F7).
+- [x] Commit: `docs: datasets.md file evidence from small samples`
 
 ### Step 5: Decision, tests, targets, proposals (effort S)
 
