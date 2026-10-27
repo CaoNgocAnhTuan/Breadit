@@ -60,8 +60,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-related-wor
 
 #### Step 6: Self-review and report (effort XS)
 
-- [ ] Read the lists the checker prints. For each sentence that cites an abstract-only paper, check by eye that it gives an aim or a method and no result. For each full-text paper, check one number against the entry of `literature.md`. Fix what you find, and commit as `docs: related-work fixes after the self-review` only if something changed.
-- [ ] Stop. Report to Claude: the word count, the output of the checker, the commits, and anything in the outline you could not follow and why. Do not work around a step that cannot be done as written.
+- [x] Read the lists the checker prints. For each sentence that cites an abstract-only paper, check by eye that it gives an aim or a method and no result. For each full-text paper, check one number against the entry of `literature.md`. Fix what you find, and commit as `docs: related-work fixes after the self-review` only if something changed.
+- [x] Stop. Report to Claude: the word count, the output of the checker, the commits, and anything in the outline you could not follow and why. Do not work around a step that cannot be done as written.
 
 ## Tests
 
