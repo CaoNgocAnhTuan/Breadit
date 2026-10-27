@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.10 · 2026-10-27 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.11 · 2026-10-27 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -22,7 +22,7 @@ Four decisions are already made:
 
 Hypotheses are frozen before the first test-split run (section 7). If one changes later, add a dated line to the change log at the end.
 
-- **H1 (RQ1).** For users with 0–4 earlier interactions, the hybrid has higher NDCG@10 than BL2. It passes if the paired 95% confidence interval of the difference is above 0 after Holm correction. Primary test: the middle cell of synthetic world W2 (section 7), size M. The other two cells are reported as a sweep. Digg 2009 (P4) is a second test of H1 on real data, with the same pass rule, if its pool at the cut time T keeps enough users with 0–4 earlier interactions (P2 checks this).
+- **H1 (RQ1).** For users with 0–4 earlier interactions, the hybrid has higher NDCG@10 than BL2. It passes if the paired 95% confidence interval of the difference is above 0 after Holm correction. Two co-primary tests, each with this pass rule and each reported on its own. Test 1 is on synthetic data: the middle cell of world W2 (section 7), size M. The other two W2 cells are reported as a sweep. Test 2 is on real data: Digg 2009 (P4), if its pool at the cut time T keeps enough users with 0–4 earlier interactions (P2 checks this).
 - **H2 (RQ2).** The gain over BL2 grows with social density (number of followees, amount of friend engagement in the pool). It is about zero when the user follows nobody and has no community.
 - **H0 (sanity).** In the null world W0 (no social influence) the hybrid must not beat BL2. If it does, there is a bug or a leak. Stop and fix before any other result is used.
 
@@ -437,3 +437,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.8 · 2026-10-27 · Task `p1-dataset-selection`: new references [45] to [50] in §10, the datasets checked in `.docs/datasets.md` (Flickr WWW 2009 and IMC 2007, and the Digg 2009 page). No phase text, §1, §5 or §7 changed. The proposed changes (P-A to P-D) are in `.docs/datasets.md` §7 and wait for the author. The header version stays 0.7 until the author applies them.
 - 0.9 · 2026-10-27 · Task `p1-digg-archive-check`. The two Digg zips were opened from the Internet Archive and read in full (`.docs/datasets.md`), and the author chose Digg 2009 as the main real set. Applied: **P-B**, real data co-primary for RQ1 and the follow term (the Data decision at the top; the candidate sentence in P1 Step 2; the P4 row in the phase table and the P4 heading, which are no longer "stretch"; P3; P4 text and gate; §8: the first risk, "No public dataset" as a fallback risk, a new risk with the Digg limits, and the cut order, where P4 moves from first to last). **P-D**, the names of the generator targets (P3, no number copied). **The P4 sentence** (Digg dates are real; the page states a use rule, not "no license"). Also: references [49] and [50] in §10 (marks), the P1 status paragraph and the header version. Not applied: **P-C** (window W and the age term, §5 and two notes in §7), by the author's decision, because Digg has real Unix dates; P2 checks that the pool at time T is not too small. No frozen value changed, no row of §7 was edited, and §5 is unchanged.
 - 0.10 · 2026-10-27 · P1 Step 5: the related-work survey is written (`.docs/related-work.md`). Stale P4 text fixed in P1 Step 4 and P8. H1 now names Digg 2009 as a second test. The primary cell of H1 is unchanged (§7).
+- 0.11 · 2026-10-27 · H1 text: Digg 2009 is a co-primary test next to the W2 middle cell, no longer a "second test". This matches the Data decision (0.9). The primary W2 cell is unchanged (§7). No frozen value changed.
