@@ -35,10 +35,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-related-wor
 
 #### Step 2: The checker (effort S)
 
-- [ ] Write `check_survey.py` in the task folder (Design: Approach, step 4). Standard library only. `main(survey_path, superplan_path, literature_path)` and a command line with the same three paths. It prints PASS or FAIL for DW1, DW2, DW3 (machine half), DW4, DW6, DW7 and Refs, then these lists for the reviewer: sentences that cite an abstract-only or index-record paper, sentences with no `[n]` and no "C2" or "our design", the five longest sentences, and numbers not found. It reads three files and writes nothing.
-- [ ] Parse §10 by line: number, then the word after the first " · ". Parse the `literature.md` §1 table by its columns (Ref, Short name, Type, Verified, Read). A `[n]` that is not in the §1 table is a FAIL for DW3.
-- [ ] All of TC1 to TC11 pass. TC11 (the clean text) passes every check.
-- [ ] Commit: `docs: check_survey.py for the related-work survey`
+- [x] Write `check_survey.py` in the task folder (Design: Approach, step 4). Standard library only. `main(survey_path, superplan_path, literature_path)` and a command line with the same three paths. It prints PASS or FAIL for DW1, DW2, DW3 (machine half), DW4, DW6, DW7 and Refs, then these lists for the reviewer: sentences that cite an abstract-only or index-record paper, sentences with no `[n]` and no "C2" or "our design", the five longest sentences, and numbers not found. It reads three files and writes nothing.
+- [x] Parse §10 by line: number, then the word after the first " · ". Parse the `literature.md` §1 table by its columns (Ref, Short name, Type, Verified, Read). A `[n]` that is not in the §1 table is a FAIL for DW3.
+- [x] All of TC1 to TC11 pass. TC11 (the clean text) passes every check.
+- [x] Commit: `docs: check_survey.py for the related-work survey`
 
 #### Step 3: Draft parts 1 and 2 (effort M)
 

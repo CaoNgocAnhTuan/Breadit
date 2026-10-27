@@ -191,6 +191,13 @@ class Base(unittest.TestCase):
             handle.write(text)
         return path
 
+    def snapshot(self):
+        out = {}
+        for name in os.listdir(self.dir):
+            with open(os.path.join(self.dir, name), "rb") as handle:
+                out[name] = handle.read()
+        return out
+
     def survey_path(self, text):
         return self._write("related-work.md", text)
 
@@ -490,16 +497,10 @@ class TC11_Clean(Base):
 
     def test_checker_writes_nothing(self):
         path = self.survey_path(build_survey())
-        before = {
-            name: open(os.path.join(self.dir, name), "rb").read()
-            for name in os.listdir(self.dir)
-        }
+        before = self.snapshot()
         with contextlib.redirect_stdout(io.StringIO()):
             self.cs.main(path, self.superplan_path, self.literature_path)
-        after = {
-            name: open(os.path.join(self.dir, name), "rb").read()
-            for name in os.listdir(self.dir)
-        }
+        after = self.snapshot()
         self.assertEqual(before, after)
 
     def test_command_line(self):
