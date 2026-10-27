@@ -28,7 +28,33 @@ C2 is in the spirit of RealGraph [5]. C2 weights a followed account by a simple 
 
 ## 3. Recent work and what C2 adds
 
+For C2, the search ran on 2026-10-24 with six fixed queries on WebSearch and OpenAlex and with four group searches. It also used the lists of papers that cite [2], [5] and [9], and the abstracts of the papers found were read. The search found twelve recent papers from 2022 or later, and our design is to state only what each abstract says.
+
+The abstract of Zhou, Li, Jiang and Zhang (2024) describes a matrix factorization model for rating prediction, which defines an interaction strength between users and links it to social relations and to group-participation features [33]. By its abstract, [33] learns latent features to predict ratings, while C2 ranks posts with a fixed score that adds follow trust and community affinity to engagement.
+
+The abstract of Jaspal, Dalwani and Ramineni (arXiv preprint, 2025) describes a two-stage retrieval framework for cold-start items on platforms with a social graph [31]. According to the abstract, stage one shows a new item to the connections of its creator, and stage two uses early engagement and learned user embeddings [31]. By the abstract, [31] works on new items in two retrieval stages, while C2 puts follow and community signals into one score.
+
+The abstract of Weyl and co-authors (arXiv preprint, 2025) says that platforms use the social fabric as an input and may erode it [32]. The abstract adds that the authors propose a platform model where the social fabric is also an explicit output [32]. C2 is a concrete scoring rule that is tested offline, while the abstract of [32] names a platform model, no ranking rule and no test.
+
+The abstract of Cinus, Gionis and Bonchi (CIKM 2023) says that the approach re-weights the importance of the accounts that a user follows, to balance relevance and diversity and so reduce polarization [39]. C2 also weights followed accounts, but by the past engagement of the user, and the abstract of [39] does not say that its weights use past engagement.
+
+The abstract of Chen and co-authors (arXiv preprint, 2026) describes a feed ranker that scores candidates with a value model, a weighted sum of engagement predictions [40]. The abstract adds debiasing terms for the viewer, the item and the request [40]. By the abstract, [40] adds debiasing terms to a value model of engagement predictions, while C2 adds terms for follow trust and community to engagement.
+
+In our design, other recent papers are named here only by what their abstracts say they study. The abstract of [34] is about recommending communities and not posts [34]. The abstracts of [35] and [37] study trust in recommendation, with a similarity measure for social trust in [35] and a trust graph next to item ratings in [37]. The abstract of [38] tests an algorithm on cold-start users as a separate group [38]. The abstracts of [36], [41] and [42] study effects of ranking algorithms. The abstracts name a simulation of visibility in [36], an audit of the engagement-based ranking of Twitter in [41], and a field experiment on the feed of X in [42].
+
+For C2, the search of 2026-10-24 found, by the abstracts, no paper from 2022 or later that adds follow trust and community affinity to engagement in one feed ranking, but this is not proof. C2 therefore claims no more than this: the search can miss papers, because every entry rests on an abstract and four pages did not open.
+
 ## 4. Offline evaluation of recommenders
+
+Meng and co-authors (RecSys 2020) compare split strategies on two grocery data sets with seven recommenders [13]. The ranking of the models changes with the split, and Kendall's tau between pairs of strategies is only moderate, 0.5284 to 0.7630 [13]. They advise the global temporal split as the default [13]. According to the preprint of Ji and co-authors (2023), training on data from the future changes the reported accuracy by as much as 89.5% [14]. There is no particular pattern, and the order of the models changes [14].
+
+Krichene and Rendle (KDD 2020) show that metrics computed on a small random sample of items can disagree with the exact metrics, even on average [15]. Only AUC stays consistent [15]. So C2 ranks the full pool of each user and reports no sampled metric, which is our design.
+
+Ferrari Dacrema, Cremonesi and Jannach (RecSys 2019) tried to reproduce 18 recent neural methods and could do so for 7 [25]. In 6 of the 7, the neural method did not consistently beat simple baselines that were well tuned [25]. This is a warning for C2, because BL0 to BL5 are not tuned and not personalised. Our design tunes BL2, BL4 and BL5 on a small validation grid and adds BL6, a count baseline with every trust weight set to 1. There is no learned baseline in our design, and this is a named limitation.
+
+Chaney, Stewart and Engelhardt (RecSys 2018) simulate 100 users over 1,000 time intervals with six recommendation methods [24]. They show that repeated training on data that a recommender helped create makes users more alike, without a gain in utility [24]. A simulation shows what can happen under stated assumptions, and our design reads a synthetic win in that way. Our design makes worlds from interests, follows and memberships, and it has no feedback loop.
+
+Our design follows these papers on one point: for each user, nothing after the test time is used. In our design, the test item is the last positive of the user, with one global cut time T for all users. Features are taken as of the test time, which is our own rule, and [14] has no case about features built from future data.
 
 ## Citation table
 

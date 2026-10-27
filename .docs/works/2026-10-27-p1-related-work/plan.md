@@ -48,9 +48,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-related-wor
 
 #### Step 4: Draft parts 3 and 4 (effort M)
 
-- [ ] Write parts 3 and 4 from paragraphs 3.1 to 3.4 and 4.1 to 4.5. For the five nearest works (`[33]`, `[31]`, `[32]`, `[39]`, `[40]`) copy the idea of the "How C2 differs" line of `literature.md` §7, in your own simple words, and keep the "the abstract says" form. Paragraphs 1.5, 2.5 and 4.5 are positions: they say what C2 does and mark it "our design".
-- [ ] Same checks as Step 3.
-- [ ] Commit: `docs: related-work survey, parts 3 and 4`
+- [x] Write parts 3 and 4 from paragraphs 3.1 to 3.4 and 4.1 to 4.5. For the five nearest works (`[33]`, `[31]`, `[32]`, `[39]`, `[40]`) copy the idea of the "How C2 differs" line of `literature.md` §7, in your own simple words, and keep the "the abstract says" form. Paragraphs 1.5, 2.5 and 4.5 are positions: they say what C2 does and mark it "our design".
+- [x] Same checks as Step 3.
+- [x] Commit: `docs: related-work survey, parts 3 and 4`
 
 #### Step 5: Citation table and references (effort S)
 
