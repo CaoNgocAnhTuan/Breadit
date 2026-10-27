@@ -42,9 +42,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-related-wor
 
 #### Step 3: Draft parts 1 and 2 (effort M)
 
-- [ ] Create `.docs/related-work.md` with the title block (one line on what the file is, the date, "draft", and one sentence on what C2 is) and the headings of the layout (Design: Approach, step 2). Write parts 1 and 2 from paragraphs 1.1 to 1.5 and 2.1 to 2.5 of the outline, in order, inside the word budgets.
-- [ ] Run the checker. DW1 and Refs may fail now, because the text is not complete. DW2, DW3, DW4, DW6 and DW7 must pass for the text written so far. Fix the text, not the checker.
-- [ ] Commit: `docs: related-work survey, parts 1 and 2`
+- [x] Create `.docs/related-work.md` with the title block (one line on what the file is, the date, "draft", and one sentence on what C2 is) and the headings of the layout (Design: Approach, step 2). Write parts 1 and 2 from paragraphs 1.1 to 1.5 and 2.1 to 2.5 of the outline, in order, inside the word budgets.
+- [x] Run the checker. DW1 and Refs may fail now, because the text is not complete. DW2, DW3, DW4, DW6 and DW7 must pass for the text written so far. Fix the text, not the checker.
+- [x] Commit: `docs: related-work survey, parts 1 and 2`
 
 #### Step 4: Draft parts 3 and 4 (effort M)
 
