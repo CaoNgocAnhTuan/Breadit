@@ -1,6 +1,6 @@
 # Plan: P1 Step 5: related-work survey for Chapter 2
 
-Status: approved · 2026-10-27
+Status: done · 2026-10-27
 Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-related-work/`
 
 ---
@@ -111,7 +111,7 @@ Claude ticks these.
 - [x] DW5: check the four parts and, for `[5]`, `[7]`, `[33]`, `[31]`, `[32]`, one "how C2 differs" sentence each; check the D4 (1 hop) and D5 (baselines) arguments; check the gap sentence is hedged as claim 10 says → all present
 - [x] DW6 by hand: pick five numbers from the full-text parts (for example 84, 2,151, 0.5284, 0.7630, 89.5%) and find each in `literature.md` and in its entry's source section → all match
 - [x] F6: compare part 2.3 with the section "Web Curation and Social Feed Ranking Algorithms" of `Latex/chapters/literature_review.tex` → no copied text
-- [ ] DW7: the author reads the survey → readable without a dictionary for most sentences (the author's comment is recorded in the Result)
+- [ ] DW7: the author reads the survey → readable without a dictionary for most sentences (the author's comment is recorded in the Result). Not done: the author closed the task before reading it. The script half of DW7 passed.
 - [x] F10: the Result states that, for Chapter 2, abstract-only papers are cited at the level of aim and method, and that rule 75 of `literature.md` was not edited
 - [x] Closing edit: the table above is applied and the SHA-256 of super-plan §5 and §7 is the same before and after → byte-identical, and `git diff` shows only the six places
 - [x] DW8: `git diff --stat` from the commit before this task to the last commit → only `.docs/related-work.md`, files in the task folder, and `.docs/super-plan.md`
@@ -135,8 +135,8 @@ Claude ticks these.
 **Rule 75 of `literature.md`** ("a cited row must be verified and not abstract only") was not edited. For Chapter 2, abstract-only papers (`[1]`, `[2]`, `[9]`, `[31]` to `[44]`) are cited at the level of aim and method, with "the abstract says" and no result. This follows the author's decision of 2026-10-27.
 
 **Open points.**
-- The author has not yet read the survey, so the DW7 box stays open. Their comments come next.
+- The author has not yet read the survey. They asked to close the task first, so the DW7 box stays open and the task is closed with it unchecked. Their comments will be handled as a small edit of `.docs/related-work.md`, outside this task.
 - Before the committee, the author should still read in full: Tang `[1]`, SoRec `[2]`, Sedhain `[9]` (full texts are missing), RealGraph `[5]` and Krichene and Rendle `[15]`. The survey says no more about `[1]`, `[2]` and `[9]` than their abstracts do.
 - P2 needs the cut-time rule T and a check that the Digg pool at T keeps enough users with 0 to 4 earlier interactions (only about 27% of voters are low-activity and in the friend table). The H1 sentence about Digg depends on this check.
-- The Vietnamese copy at the end of `.docs/supervisor-note.md` is still uncommitted. `docs/supervisor-note.md` is an untracked copy that Claude did not make.
+- The Vietnamese copy at the end of `.docs/supervisor-note.md` is committed (`21754f0`). `docs/supervisor-note.md` is an untracked copy that Claude did not make; `docs/` is locked, so it was left alone.
 - The survey should go to the supervisor with or after the note. Parts 3.1 and 3.4 name the search of 2026-10-24.
