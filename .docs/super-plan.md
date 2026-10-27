@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.9 · 2026-10-27 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.10 · 2026-10-27 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -22,7 +22,7 @@ Four decisions are already made:
 
 Hypotheses are frozen before the first test-split run (section 7). If one changes later, add a dated line to the change log at the end.
 
-- **H1 (RQ1).** For users with 0–4 earlier interactions, the hybrid has higher NDCG@10 than BL2. It passes if the paired 95% confidence interval of the difference is above 0 after Holm correction. Primary test: the middle cell of synthetic world W2 (section 7), size M. The other two cells are reported as a sweep.
+- **H1 (RQ1).** For users with 0–4 earlier interactions, the hybrid has higher NDCG@10 than BL2. It passes if the paired 95% confidence interval of the difference is above 0 after Holm correction. Primary test: the middle cell of synthetic world W2 (section 7), size M. The other two cells are reported as a sweep. Digg 2009 (P4) is a second test of H1 on real data, with the same pass rule, if its pool at the cut time T keeps enough users with 0–4 earlier interactions (P2 checks this).
 - **H2 (RQ2).** The gain over BL2 grows with social density (number of followees, amount of friend engagement in the pool). It is about zero when the user follows nobody and has no community.
 - **H0 (sanity).** In the null world W0 (no social influence) the hybrid must not beat BL2. If it does, there is a bug or a leak. Stop and fix before any other result is used.
 
@@ -129,11 +129,11 @@ Candidates to check: Digg 2009 [20], Epinions and Ciao [19], the Flickr favorite
 | How do we split and measure without bias? | Meng [13], Ji [14], Krichene [15], Cañamares [16], Ge [17], McSherry [18] | The protocol (§5) |
 | How do we show the result is not built into the data? | Anagnostopoulos [23], Chaney [24] | Worlds W0 and W1, the shuffle test (P3, E5) |
 
-**Step 4: lock the decisions ★** (task `p1-supervisor-note`). Write the one-page note from the Orientation's week-0 checklist: direction A and why, the new contribution C2, the metrics. Add the data choice from `.docs/datasets.md` (synthetic worlds, as the Orientation allows when there are no real users, plus the chosen public dataset if P4 works), the design decisions from Step 3, and the scope cuts in §9. The supervisor confirms them all at once.
+**Step 4: lock the decisions ★** (task `p1-supervisor-note`). Write the one-page note from the Orientation's week-0 checklist: direction A and why, the new contribution C2, the metrics. Add the data choice from `.docs/datasets.md` (synthetic worlds, as the Orientation allows when there are no real users, plus Digg 2009 (P4, last in the cut order of §8)), the design decisions from Step 3, and the scope cuts in §9. The supervisor confirms them all at once.
 
 **Step 5: write the survey** (task `p1-related-work`). The Orientation asks for a 3–4 page survey. It becomes the core of Chapter 2.
 
-**Status (2026-10-27).** The task `p1-literature` is done: Steps 1 and 3, in `.docs/literature.md` (44 references, decisions D1 to D7, 10 claims, and proposed changes PC1 to PC10). Step 2 is done: the tasks `p1-dataset-selection` (2026-10-26) and `p1-digg-archive-check` (2026-10-27) are in `.docs/datasets.md`. The two Digg zips were opened from the Internet Archive and read in full. Digg 2009 is the main real set and Flickr WWW 2009 is the second one. On 2026-10-27 the author applied P-B, P-D and the P4 sentence, and did not apply P-C (version 0.9). Steps 4 and 5 are not started. The author decided the proposed changes PC2 to PC10 on 2026-10-24 (version 0.7). The open points are in §11, item 6.
+**Status (2026-10-27).** The task `p1-literature` is done: Steps 1 and 3, in `.docs/literature.md` (44 references, decisions D1 to D7, 10 claims, and proposed changes PC1 to PC10). Step 2 is done: the tasks `p1-dataset-selection` (2026-10-26) and `p1-digg-archive-check` (2026-10-27) are in `.docs/datasets.md`. The two Digg zips were opened from the Internet Archive and read in full. Digg 2009 is the main real set and Flickr WWW 2009 is the second one. On 2026-10-27 the author applied P-B, P-D and the P4 sentence, and did not apply P-C (version 0.9). Step 4 is written (the note is `.docs/supervisor-note.md`, with a Vietnamese copy at the end) and waits for the supervisor. Step 5 is written (`.docs/related-work.md`, task `p1-related-work`, 2026-10-27). The author decided the proposed changes PC2 to PC10 on 2026-10-24 (version 0.7). The open points are in §11, item 6.
 
 **Who reads what.** The author deep-reads the core papers, because the committee will ask the author about them: Tang [1], SoRec [2], RealGraph [5], Sedhain [9], and Krichene and Rendle [15]. Claude prepares the notes on the others, searches for recent work, and checks every reference. RealGraph [5] and the Twitter blog [7] are now verified in full text (task `p1-literature`, notes in `.docs/literature.md`). The blog [7] was read through an Internet Archive copy. The full texts of [1], [2], [8], [9], [16], [21], [23] and [28] are still missing. Until they are read, cite [21] (the test comparison) and [23] (the timestamp shuffle) by name only, and do not describe what they found.
 
@@ -215,7 +215,7 @@ E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, d
 
 ### P8: Repro package and freeze
 
-**Do.** Add `npm run thesis:repro`. It needs `npm ci` and Docker db and redis. It generates the datasets, runs the adapter (if P4 is in), runs all experiments, writes the tables and macros, and compares every hash with `.docs/results/manifest.json`. It fails on any difference. Tag the result `v2-thesis-experiments` (the author approves the tag).
+**Do.** Add `npm run thesis:repro`. It needs `npm ci` and Docker db and redis. It generates the datasets, runs the Digg adapter (P4, unless the cut order of §8 dropped it), runs all experiments, writes the tables and macros, and compares every hash with `.docs/results/manifest.json`. It fails on any difference. Tag the result `v2-thesis-experiments` (the author approves the tag).
 
 **Done when.** The command passes on a clean clone.
 
@@ -436,3 +436,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.7 · 2026-10-24 · The author decided the proposed changes PC2 to PC10 of P1 (`.docs/literature.md` §9). §5: the global cut time T, BL6, tuned BL2t, BL4 and BL5, left-out users per history bucket, the larger-pool run E8, and two wording fixes ([14] and [21]). §7: three new rows with no numbers yet (cut time T, larger pool, baseline grids), to be set in P5. §4 and §8: E8, the cut order, and [23] cited by name. No existing frozen value changed.
 - 0.8 · 2026-10-27 · Task `p1-dataset-selection`: new references [45] to [50] in §10, the datasets checked in `.docs/datasets.md` (Flickr WWW 2009 and IMC 2007, and the Digg 2009 page). No phase text, §1, §5 or §7 changed. The proposed changes (P-A to P-D) are in `.docs/datasets.md` §7 and wait for the author. The header version stays 0.7 until the author applies them.
 - 0.9 · 2026-10-27 · Task `p1-digg-archive-check`. The two Digg zips were opened from the Internet Archive and read in full (`.docs/datasets.md`), and the author chose Digg 2009 as the main real set. Applied: **P-B**, real data co-primary for RQ1 and the follow term (the Data decision at the top; the candidate sentence in P1 Step 2; the P4 row in the phase table and the P4 heading, which are no longer "stretch"; P3; P4 text and gate; §8: the first risk, "No public dataset" as a fallback risk, a new risk with the Digg limits, and the cut order, where P4 moves from first to last). **P-D**, the names of the generator targets (P3, no number copied). **The P4 sentence** (Digg dates are real; the page states a use rule, not "no license"). Also: references [49] and [50] in §10 (marks), the P1 status paragraph and the header version. Not applied: **P-C** (window W and the age term, §5 and two notes in §7), by the author's decision, because Digg has real Unix dates; P2 checks that the pool at time T is not too small. No frozen value changed, no row of §7 was edited, and §5 is unchanged.
+- 0.10 · 2026-10-27 · P1 Step 5: the related-work survey is written (`.docs/related-work.md`). Stale P4 text fixed in P1 Step 4 and P8. H1 now names Digg 2009 as a second test. The primary cell of H1 is unchanged (§7).
