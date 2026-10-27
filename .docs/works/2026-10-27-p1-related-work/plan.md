@@ -106,17 +106,37 @@ These are done by Claude, not by Sonnet. They are listed here so that the author
 
 Claude ticks these.
 
-- [ ] DW1 to DW4, DW6, DW7: run `check_survey.py` again on the final file → every check PASS, and the word count is between 1,500 and 2,200
-- [ ] DW3, the reading half: read every sentence that cites an abstract-only or index-record paper, and its entry in `literature.md` → each gives an aim or a method (or a name), no result, no judgment; `[21]`, `[23]`, `[28]`, `[22]` appear by name only or not at all
-- [ ] DW5: check the four parts and, for `[5]`, `[7]`, `[33]`, `[31]`, `[32]`, one "how C2 differs" sentence each; check the D4 (1 hop) and D5 (baselines) arguments; check the gap sentence is hedged as claim 10 says → all present
-- [ ] DW6 by hand: pick five numbers from the full-text parts (for example 84, 2,151, 0.5284, 0.7630, 89.5%) and find each in `literature.md` and in its entry's source section → all match
-- [ ] F6: compare part 2.3 with the section "Web Curation and Social Feed Ranking Algorithms" of `Latex/chapters/literature_review.tex` → no copied text
+- [x] DW1 to DW4, DW6, DW7: run `check_survey.py` again on the final file → every check PASS, and the word count is between 1,500 and 2,200
+- [x] DW3, the reading half: read every sentence that cites an abstract-only or index-record paper, and its entry in `literature.md` → each gives an aim or a method (or a name), no result, no judgment; `[21]`, `[23]`, `[28]`, `[22]` appear by name only or not at all
+- [x] DW5: check the four parts and, for `[5]`, `[7]`, `[33]`, `[31]`, `[32]`, one "how C2 differs" sentence each; check the D4 (1 hop) and D5 (baselines) arguments; check the gap sentence is hedged as claim 10 says → all present
+- [x] DW6 by hand: pick five numbers from the full-text parts (for example 84, 2,151, 0.5284, 0.7630, 89.5%) and find each in `literature.md` and in its entry's source section → all match
+- [x] F6: compare part 2.3 with the section "Web Curation and Social Feed Ranking Algorithms" of `Latex/chapters/literature_review.tex` → no copied text
 - [ ] DW7: the author reads the survey → readable without a dictionary for most sentences (the author's comment is recorded in the Result)
-- [ ] F10: the Result states that, for Chapter 2, abstract-only papers are cited at the level of aim and method, and that rule 75 of `literature.md` was not edited
-- [ ] Closing edit: the table above is applied and the SHA-256 of super-plan §5 and §7 is the same before and after → byte-identical, and `git diff` shows only the six places
-- [ ] DW8: `git diff --stat` from the commit before this task to the last commit → only `.docs/related-work.md`, files in the task folder, and `.docs/super-plan.md`
-- [ ] `bash .claude/hooks/verify.sh --no-it` → passes (no code changed)
+- [x] F10: the Result states that, for Chapter 2, abstract-only papers are cited at the level of aim and method, and that rule 75 of `literature.md` was not edited
+- [x] Closing edit: the table above is applied and the SHA-256 of super-plan §5 and §7 is the same before and after → byte-identical, and `git diff` shows only the six places
+- [x] DW8: `git diff --stat` from the commit before this task to the last commit → only `.docs/related-work.md`, files in the task folder, and `.docs/super-plan.md`
+- [x] `bash .claude/hooks/verify.sh --no-it` → passes (no code changed)
 
 ## Result
 
-<!-- Claude fills this in at the end: what was done, test counts, commits, and anything that differed from the plan (and why). -->
+**Delivered 2026-10-27.** `.docs/related-work.md`: a 1,979-word survey (body), a citation table of 32 references and the reference list. Four parts: social recommendation, feed ranking and communities in industry, recent work and what C2 adds, offline evaluation. Nothing is pushed.
+
+**Checks.** `test_check_survey.py`: 45 tests (TC1 to TC11) pass, and before `check_survey.py` existed all 45 failed with the missing file, not a typo. `check_survey.py` on the final file: DW1 (1,979 words), DW2, DW3, DW4, DW6, DW7 and Refs all PASS. The longest sentence has 35 words. `verify.sh --no-it`: shared build, frontend typecheck and lint, backend build and 99 backend unit tests pass. Integration tests were skipped because no code changed. Claude checked by hand: five numbers (84, 2,151, 0.5284, 0.7630, 89.5%) against `literature.md`, the sentences on abstract-only papers (aims and methods only, no results), the "how C2 differs" sentences for `[5]`, `[7]`, `[33]`, `[31]`, `[32]`, the D4 and D5 arguments and the hedged gap sentence. Part 2.3 has no text from the old `literature_review.tex`. The SHA-256 of super-plan §5 (`5ad65fef5d219240`) and §7 (`535d55f3bad60ffa`) is the same before and after the closing edit.
+
+**Commits** (test-app): `4be5e8a` tests, `1f0eaa8` checker, `2bfc5a5` parts 1 and 2, `3fac782` parts 3 and 4, `f4edafc` citation table and references, `591a7e0` fixes after the self-review (all Sonnet), `4925f4e` three wording fixes by Claude, `54e2f77` super-plan 0.10.
+
+**Differences from the plan.**
+- The tests run as `python3 -I test_check_survey.py`. The form `python3 -I -m unittest <path>` in the Design does not work, because `-I` drops the working folder from the import path.
+- Sonnet wrote the whole text in one pass and committed it in two stages. At the Step 3 commit DW3 and DW4 also failed, because the table and the gap sentence did not exist yet. The final state passes.
+- Sonnet made the citation table and the reference list with a scratch script outside the repo, from `literature.md` and super-plan section 10. The wording of the "What the survey says" column is Sonnet's.
+- Claude changed three things after the review (`4925f4e`). The sentence that said the Twitter blog "gives no formula" is not in `literature.md`, so it now only says how C2 differs from `[7]`. "Four pages" became "four papers were dropped when no abstract or page opened" (claim 10). BL0 to BL5 are now said to be defined in Chapter 3.
+- The H1 edit of the super-plan adds a sentence (Digg as a second test) instead of making Digg the primary test, as the plan explained, because section 7 freezes the middle W2 cell as primary.
+
+**Rule 75 of `literature.md`** ("a cited row must be verified and not abstract only") was not edited. For Chapter 2, abstract-only papers (`[1]`, `[2]`, `[9]`, `[31]` to `[44]`) are cited at the level of aim and method, with "the abstract says" and no result. This follows the author's decision of 2026-10-27.
+
+**Open points.**
+- The author has not yet read the survey, so the DW7 box stays open. Their comments come next.
+- Before the committee, the author should still read in full: Tang `[1]`, SoRec `[2]`, Sedhain `[9]` (full texts are missing), RealGraph `[5]` and Krichene and Rendle `[15]`. The survey says no more about `[1]`, `[2]` and `[9]` than their abstracts do.
+- P2 needs the cut-time rule T and a check that the Digg pool at T keeps enough users with 0 to 4 earlier interactions (only about 27% of voters are low-activity and in the friend table). The H1 sentence about Digg depends on this check.
+- The Vietnamese copy at the end of `.docs/supervisor-note.md` is still uncommitted. `docs/supervisor-note.md` is an untracked copy that Claude did not make.
+- The survey should go to the supervisor with or after the note. Parts 3.1 and 3.4 name the search of 2026-10-24.
