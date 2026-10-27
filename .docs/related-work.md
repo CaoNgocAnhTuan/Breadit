@@ -58,4 +58,72 @@ Our design follows these papers on one point: for each user, nothing after the t
 
 ## Citation table
 
+| Ref | Depth | What the survey says |
+|---|---|---|
+| [1] | abstract only | Review of social recommender systems. The abstract: definitions, memory-based and model-based, findings and directions. Background only. |
+| [2] | abstract only | SoRec. The abstract: probabilistic matrix factorization that uses the social network and the ratings. No link formula. |
+| [3] | full text | DiffNet. Mixes a user with the average of trusted users for K steps. K = 2 is best on Yelp and Flickr (HR@10, 2.50% and 2.96%). |
+| [4] | full text | Survey of graph models for social recommendation. 84 of 2,151 papers. Oversmoothing as a known issue (Table 5). |
+| [5] | full text | RealGraph. Weight of a one-way tie as the probability of a future interaction, logistic regression, AUC per feature group, small survey called preliminary. |
+| [6] | full text | Twitter code of 2023. RealGraph scores of followed users (top 1000) and pair features as inputs. Ranker weights are not in the files. |
+| [7] | full text | Twitter blog of 2023. Real Graph is the most important component in In-Network ranking. No formula. |
+| [8] | index record | SocialMF. Name only. |
+| [9] | abstract only | Social collaborative filtering for cold start. The abstract: users who bought nothing yet but share side information. No formula. |
+| [10] | full text | Orkut communities. ARM and LDA, 492,104 users, 118,002 communities, one withheld plus 1000 random communities. Membership as 1 or 0. |
+| [11] | full text | Reddit hot sort. Net votes combined with the time of a post. |
+| [12] | full text | Hacker News score. Votes divided by a power of the age of a post. |
+| [13] | full text | Splitting strategies. The model ranking changes with the split (tau 0.5284 to 0.7630). Global temporal split as default. |
+| [14] | full text | Data leakage. Training on future data changes accuracy by as much as 89.5% (preprint). |
+| [15] | full text | Sampled metrics. Sampled metrics can disagree with exact ones. Only AUC stays consistent. |
+| [24] | full text | Algorithmic confounding. Simulation of 100 users over 1,000 intervals. Repeated training makes users more alike. |
+| [25] | full text | Are we making progress. 18 neural methods, 7 reproduced, in 6 the neural method did not consistently beat tuned simple baselines. |
+| [30] | full text | X For You code of 2026. No RealGraph file in the tree. All posts ranked with a transformer. |
+| [31] | abstract only | SocRipple. The abstract: two-stage retrieval for cold-start items. How C2 differs: one score with follow and community signals. |
+| [32] | abstract only | Community by Design. The abstract: platform model with the social fabric as an output. How C2 differs: a tested scoring rule. |
+| [33] | abstract only | Interaction strength. The abstract: matrix factorization for rating prediction with interaction strength and group participation. How C2 differs: fixed score for post ranking. |
+| [34] | abstract only | Community-aware community recommendation. The abstract: recommends communities, not posts. |
+| [35] | abstract only | Social trust and recommender performance. The abstract: a similarity measure for social trust. Group sentence. |
+| [36] | abstract only | Social media visibility simulation. The abstract: a simulation of visibility. Group sentence. |
+| [37] | abstract only | Trust-based recommendation. The abstract: item ratings, item similarity and a trust graph. Group sentence. |
+| [38] | abstract only | Social relationships and historical behaviors. The abstract: cold-start users as a separate group. Group sentence. |
+| [39] | abstract only | Rebalancing social feed. The abstract: re-weights followed accounts to reduce polarization. How C2 differs: weights come from past engagement. |
+| [40] | abstract only | Instagram feed debiasing. The abstract: value model with debiasing terms. How C2 differs: follow trust and community terms. |
+| [41] | abstract only | Engagement and divisive content. The abstract: an audit of Twitter engagement-based ranking. Group sentence. |
+| [42] | abstract only | X feed algorithm field experiment. The abstract: a field experiment on the feed of X. Group sentence. |
+| [43] | abstract only | SimClusters. The abstract: community-based representations at Twitter. Described by the abstract only. |
+| [44] | abstract only | TwHIN. The abstract: knowledge-graph embeddings of the Twitter network. Described by the abstract only. |
+
 ## References
+
+1. Tang, Hu, Liu (2013). Social recommendation: a review. *Social Network Analysis and Mining* 3(4). https://doi.org/10.1007/s13278-013-0141-9
+2. Ma, Yang, Lyu, King (2008). SoRec: Social recommendation using probabilistic matrix factorization. *CIKM*. https://doi.org/10.1145/1458082.1458205
+3. Wu et al. (2019). A neural influence diffusion model for social recommendation (DiffNet). *SIGIR*. https://arxiv.org/abs/1904.10322
+4. Sharma et al. (2024). A survey of graph neural networks for social recommender systems. *ACM Computing Surveys* 56(10). https://doi.org/10.1145/3661821
+5. Kamath, Sharma, Wang, Yin (2014). RealGraph: User interaction prediction at Twitter. *UEO '14 workshop, New York*. https://www.ueo-workshop.com/wp-content/uploads/2014/04/sig-alternate.pdf
+6. Twitter (2023). the-algorithm (source code). https://github.com/twitter/the-algorithm
+7. Twitter Engineering (2023). Twitter's recommendation algorithm (blog). https://blog.twitter.com/engineering/en_us/topics/open-source/2023/twitter-recommendation-algorithm
+8. Jamali, Ester (2010). A matrix factorization technique with trust propagation (SocialMF). *RecSys*. https://doi.org/10.1145/1864708.1864736
+9. Sedhain, Sanner, Braziunas, Xie, Christensen (2014). Social collaborative filtering for cold-start recommendations. *RecSys*. https://researchportalplus.anu.edu.au/en/publications/social-collaborative-filtering-for-cold-start-recommendations/
+10. Chen et al. (2009). Collaborative filtering for Orkut communities. *WWW*. https://doi.org/10.1145/1526709.1526801
+11. Reddit (archived). `_sorts.pyx`, the "hot" function. https://github.com/reddit-archive/reddit/blob/master/r2/r2/lib/db/_sorts.pyx
+12. Shirriff (2013). How Hacker News ranking really works. https://www.righto.com/2013/11/how-hacker-news-ranking-really-works.html
+13. Meng, McCreadie, Macdonald, Ounis (2020). Exploring data splitting strategies for the evaluation of recommendation models. *RecSys*. https://arxiv.org/abs/2007.13237
+14. Ji, Sun, Zhang, Li (2023). A critical study on data leakage in recommender system offline evaluation. *ACM TOIS* 41(3). https://doi.org/10.1145/3569930
+15. Krichene, Rendle (2020). On sampled metrics for item recommendation. *KDD*. https://doi.org/10.1145/3394486.3403226
+24. Chaney, Stewart, Engelhardt (2018). How algorithmic confounding in recommendation systems increases homogeneity and decreases utility. *RecSys*. https://arxiv.org/abs/1710.11214
+25. Ferrari Dacrema, Cremonesi, Jannach (2019). Are we really making much progress? *RecSys*. https://arxiv.org/abs/1907.06902
+30. xai-org (2026). x-algorithm (source code of the For You feed on X). https://github.com/xai-org/x-algorithm
+31. Jaspal, Dalwani, Ramineni (2025). SocRipple: A two-stage framework for cold-start video recommendations. *arXiv preprint*. https://arxiv.org/abs/2508.07241
+32. Weyl et al. (2025). Community by design. *arXiv preprint*. https://arxiv.org/abs/2502.10834
+33. Zhou, Li, Jiang, Zhang (2024). Improving social recommendation algorithm via incorporating interaction strength. *Application Research of Computers* 41(1). https://doi.org/10.19734/j.issn.1001-3695.2023.05.0280
+34. Jiang, Yang, Lin (2025). Community-aware social community recommendation. *CIKM*. https://doi.org/10.1145/3746252.3761373
+35. Dadgar, Hamzeh (2022). How to boost the performance of recommender systems by social trust? Studying the challenges and proposing a solution. *IEEE Access*. https://doi.org/10.1109/ACCESS.2022.3147955
+36. Akpinar, Fazelpour (2025). Authenticity and exclusion: a simulation study of how social media algorithms shape visibility in epistemic communities. *Synthese*. https://doi.org/10.1007/s11229-025-05293-z
+37. Stefanopoulos, Chatterjee, Zehmakan (2025). A first principles approach to trust-based recommendation systems in social networks. *Online Social Networks and Media*. https://doi.org/10.1016/j.osnem.2025.100315
+38. Lee, Zhou, Yang, Du, Pan (2022). Personalized recommendation system based on social relationships and historical behaviors. *arXiv preprint*. https://arxiv.org/abs/2206.13072
+39. Cinus, Gionis, Bonchi (2023). Rebalancing social feed to minimize polarization and disagreement. *CIKM*. https://doi.org/10.1145/3583780.3615025
+40. Chen et al. (2026). Baseline and incremental: user, item, and request debiasing in Instagram feed ranking. *arXiv preprint*. https://arxiv.org/abs/2610.27423
+41. Milli, Carroll, Wang, Pandey, Zhao, Dragan (2025). Engagement, user satisfaction, and the amplification of divisive content on social media. *PNAS Nexus*. https://doi.org/10.1093/pnasnexus/pgaf062
+42. Gauthier, Hodler, Widmer, Zhuravskaya (2026). The political effects of X's feed algorithm. *Nature*. https://doi.org/10.1038/s41586-026-10098-2
+43. Satuluri et al. (2020). SimClusters: community-based representations for heterogeneous recommendations at Twitter. *KDD*. https://doi.org/10.1145/3394486.3403370
+44. El-Kishky et al. (2022). TwHIN: embedding the Twitter heterogeneous information network for personalized recommendation. *KDD*. https://doi.org/10.1145/3534678.3539080

@@ -54,9 +54,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-27-p1-related-wor
 
 #### Step 5: Citation table and references (effort S)
 
-- [ ] Add `## Citation table` after part 4. One row per cited reference: `| Ref | Depth | What the survey says |`. The depth is copied from `literature.md` §1. Add `## References` after it, with the cited references only, each line copied from super-plan §10 up to the " · verified" part, numbers kept, in number order.
-- [ ] Run all checks. Every check must PASS now, including DW1 (1,500 to 2,200 words) and Refs. If the count is over 2,200, cut 3.3 first and then 2.3 (Design: F5).
-- [ ] Commit: `docs: related-work citation table and references`
+- [x] Add `## Citation table` after part 4. One row per cited reference: `| Ref | Depth | What the survey says |`. The depth is copied from `literature.md` §1. Add `## References` after it, with the cited references only, each line copied from super-plan §10 up to the " · verified" part, numbers kept, in number order.
+- [x] Run all checks. Every check must PASS now, including DW1 (1,500 to 2,200 words) and Refs. If the count is over 2,200, cut 3.3 first and then 2.3 (Design: F5).
+- [x] Commit: `docs: related-work citation table and references`
 
 #### Step 6: Self-review and report (effort XS)
 
