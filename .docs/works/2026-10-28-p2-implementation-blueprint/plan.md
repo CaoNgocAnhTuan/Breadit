@@ -46,10 +46,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p2-implementat
 
 #### Step 4: Run on the real Digg files (effort S)
 
-- [ ] Run the script on the two zips in `datasets/raw/digg2009/`, with the window and the pool cap from super-plan §7. Save the output as `cut_time_output.txt` in the task folder.
-- [ ] Run it a second time and compare the SHA-256 of the two outputs. They must be equal (DW5). If they differ, stop and report.
-- [ ] In blueprint section 3, replace the placeholder line with the numbers for each `q`: `n`, T in UTC, users with a test item, and per bucket (0, 1–4, 0–4, 5–19, ≥20) the test users, kept, left out and kept with at least one followee; the pool size at T and the median pool size. Then write the chosen `q` by the rule. Copy the numbers from the output file; type none by hand.
-- [ ] Commit: `docs: Digg cut-time counts in the blueprint`
+- [x] Run the script on the two zips in `datasets/raw/digg2009/`, with the window and the pool cap from super-plan §7. Save the output as `cut_time_output.txt` in the task folder.
+- [x] Run it a second time and compare the SHA-256 of the two outputs. They must be equal (DW5). If they differ, stop and report.
+- [x] In blueprint section 3, replace the placeholder line with the numbers for each `q`: `n`, T in UTC, users with a test item, and per bucket (0, 1–4, 0–4, 5–19, ≥20) the test users, kept, left out and kept with at least one followee; the pool size at T and the median pool size. Then write the chosen `q` by the rule. Copy the numbers from the output file; type none by hand.
+- [x] Commit: `docs: Digg cut-time counts in the blueprint`
 
 #### Step 5: Module map and data contracts (effort M)
 
