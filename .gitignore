@@ -61,3 +61,5 @@ datasets/raw/
 .claude/state/*
 !.claude/state/.gitkeep
 .claude/settings.local.json
+# Local copies of reference papers (copyrighted, not for the repo)
+refs-manual/
