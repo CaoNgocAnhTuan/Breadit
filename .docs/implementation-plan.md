@@ -172,7 +172,7 @@ H1 passes on a dataset when, for the F1 row (NDCG@10, group 0–4), both hold:
 - the Holm-adjusted p of the randomization test is below the Holm level (§7, row "Confidence level / Holm level"), and
 - the lower end of the bootstrap confidence interval (same row) is above 0.
 
-The super-plan says "the paired 95% confidence interval of the difference is above 0 after Holm correction". Holm adjusts p-values, not intervals. So this is the closest standard reading.
+The super-plan (§1) asks for the paired confidence interval of the difference to be above 0 after Holm correction. Holm adjusts p-values, not intervals. So this is the closest standard reading.
 
 ### 3.5 H0 gate
 
@@ -230,7 +230,7 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 | E5 † | H0 | is the result built into the data? | `syn-W0-M`, `syn-W1-M`, the three W2 cells; shuffle on `syn-W2M-M` | H, BL2 | `summary.csv`, `compare.csv` (no family) | table | 5, 6 |
 | E6 † | RQ1 | do ties matter? | `syn-W2M-M`, `digg2009` | all | `summary.csv` with reversed tie-break | table | 5 |
 | E7 | — | what does the new feed cost? (Class R) | live app with `syn-W2M-M` loaded | `chrono`, `engagement`, `social` | `latency.csv`, query count | table | 5 |
-| E8 | RQ1 | does pool size matter? | `syn-W2M-M` | H, BL2, the baseline with the best validation NDCG@10, K = 10 | `summary.csv` with the larger pool of §7 | table | 5 |
+| E8 | RQ1 | does pool size matter? | `syn-W2M-M` | H, BL2, the baseline with the best validation NDCG@10; K as in the E8 row of super-plan P7 | `summary.csv` with the larger pool of §7 | table | 5 |
 
 `leftout.csv` and `tuning.csv` come with every run. They feed Chapter 3 (protocol) and the appendix.
 

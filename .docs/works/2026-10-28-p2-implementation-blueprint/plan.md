@@ -65,9 +65,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p2-implementat
 
 #### Step 7: Self-check and report (effort XS)
 
-- [ ] Count lines (at most 400). Grep the blueprint for the §7 values listed under "Rules" and check each hit has "§7" in its sentence or table header. Check that every hand-off H-a to H-e has a contract, and that the measurement table names E1 to E8.
-- [ ] Fix what you find. Commit as `docs: blueprint fixes after the self-check` only if something changed.
-- [ ] Stop. Report to Claude: the line count, the chosen `q` and the bucket 0–4 counts, the commits, and anything in the design you could not follow and why. Do not work around a step that cannot be done as written.
+- [x] Count lines (at most 400). Grep the blueprint for the §7 values listed under "Rules" and check each hit has "§7" in its sentence or table header. Check that every hand-off H-a to H-e has a contract, and that the measurement table names E1 to E8.
+- [x] Fix what you find. Commit as `docs: blueprint fixes after the self-check` only if something changed.
+- [x] Stop. Report to Claude: the line count, the chosen `q` and the bucket 0–4 counts, the commits, and anything in the design you could not follow and why. Do not work around a step that cannot be done as written.
 
 ### Claude's part (after Step 7)
 
