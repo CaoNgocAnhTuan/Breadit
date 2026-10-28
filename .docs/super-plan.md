@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.11 · 2026-10-27 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.12 · 2026-10-28 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -85,15 +85,15 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | P1 Literature, RQ and data lock ★ | `literature.md`, `datasets.md`, one-page note, Chapter 2 survey | The supervisor confirms the RQs, the data and the design decisions | `p1-literature`, `p1-dataset-selection`, `p1-supervisor-note`, `p1-related-work` |
 | P2 Implementation blueprint | `implementation-plan.md` | The author approves it, and it names every later task | `p2-implementation-blueprint` |
 | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator`, `p3-postgres-loader` |
-| P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-dataset-adapter` |
+| P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` |
 | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package`, `p5-eval-harness` |
 | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
-| P7 Experiments ★ | E1–E7 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark` |
+| P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark` |
 | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
-| P9 Writing ★ | Thesis chapters | Every number comes from a CSV | One writing task per chapter group |
+| P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
 | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-defense-package` |
 
-The Tasks column for P3–P10 is a first guess. The P2 blueprint sets the final task list.
+The Tasks column comes from the P2 blueprint. Its task list (`.docs/implementation-plan.md` §5) gives the order, the dependencies, a day budget per task and a trigger date for each cut of §8.
 
 ### P0: Baseline freeze
 
@@ -153,6 +153,8 @@ The super plan says what we build and in what order. The blueprint says how the 
 
 **Done when.** The author approves the blueprint. Every hand-off has a contract: generator → loader, generator and adapter → harness, `packages/ranking` → backend, harness → report → macros. Every later task has a row in the task list.
 
+**Status (2026-10-28).** Written as `.docs/implementation-plan.md` version 1.0 (task `p2-implementation-blueprint`). It also sets the rule for the cut time T and the Holm families (open item 6). The T rule was checked on the Digg files: at the chosen share, 20,644 test users in the history bucket 0–4 keep their test post in the pool, above the threshold of 100 that was fixed before the count. The reading of H1 in its §3.4 waits for the author's confirmation.
+
 ### P3: Synthetic generator
 
 **Do.** Decide D1 first (Bugs Report §4), because it decides who can post into a community. Create the `eval/` workspace (`@breadit/eval`) and add `eval` to the root `workspaces`. Write a versioned config `eval/config/synthetic-v1.json`. The generator is one of two main sources (see "Data" at the top). It is the only source for W0, the influence sweep W2 and the community term. Calibrate its parameters to the targets in `.docs/datasets.md` where they exist, and say in the config which values are calibrated and which are chosen. The targets are: followees per user, followers per user, activity skew (the share of actions made by the top 20% of users), and votes per user. They are computed from the Digg files (`.docs/datasets.md` section 6a). The numbers stay in that file and are not copied here. The generator has five stages, each with its own PRNG stream: users (with hidden interests and Pareto activity, about 20% of users make 80% of actions), follow graph, communities and memberships, posts, interactions. It writes canonical CSV and a `manifest.json`. The generator does not run the feed, so interactions never depend on a ranking and there is no feedback loop in the data [24].
@@ -178,7 +180,7 @@ A loader writes the same data into Postgres with explicit IDs, so the live app c
 
 ### P5: Ranking package and evaluation harness ★
 
-**Do, part 1: `packages/ranking` (`@breadit/ranking`).** Pure code: no Nest, Prisma or Redis imports. Move `computeExploreScoreFixed` from `posts.service.ts` into it and make the backend import it, so BL2 in the evaluation is the production code. Add the baselines BL0–BL6, with a grid for BL2t, BL4 and BL5 (section 5), the hybrid (section 6) and the shared `buildPool` (section 5). The author cap `applyExploreDiversity` is a page-level filter and stays in Explore. Point the harness determinism check and rule (`.claude/hooks/lib.cjs`, `.claude/rules/determinism.md`, the `leakage-auditor` and `designer` agents) at `packages/ranking/` instead of `apps/backend/src/ranking/`.
+**Do, part 1: `packages/ranking` (`@breadit/ranking`).** Pure code: no Nest, Prisma or Redis imports. Move `computeExploreScoreFixed` from `posts.service.ts` into it and make the backend import it, so BL2 in the evaluation is the production code. Add the baselines BL0–BL6, with a grid for BL2t, BL4 and BL5 (section 5), the hybrid (section 6) and the shared `buildPool` (section 5). The author cap `applyExploreDiversity` is a page-level filter and stays in Explore. The harness determinism check and rule (`.claude/hooks/lib.cjs`, `.claude/rules/determinism.md`) already cover `packages/ranking/`.
 
 **Do, part 2: the harness.** Build the protocol in section 5 in `eval/src/` (`harness`, `metrics`, `stats`, `report`). Baselines are pure functions that take the same pool. Statistics are written in TypeScript, then cross-checked once against scipy on a small fixture. The fixture result is committed.
 
@@ -421,7 +423,7 @@ The thesis results do not need the schema migration: generated data has no dupli
 3. **D1.** Can a non-member post into a community (Bugs Report §4)? Decide before P3. The recommendation is to require membership.
 4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval.
 5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `Latex/` and `docs/` needs the author's request.
-6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family.
+6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. Set in P2: `.docs/implementation-plan.md` §3.1 and §3.2, checked on Digg in its §3.7; the P3 check is in its §3.6. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family. Set in P2: `.docs/implementation-plan.md` §3.3 (families F1 and F2 per dataset).
 
 ---
 
@@ -438,3 +440,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.9 · 2026-10-27 · Task `p1-digg-archive-check`. The two Digg zips were opened from the Internet Archive and read in full (`.docs/datasets.md`), and the author chose Digg 2009 as the main real set. Applied: **P-B**, real data co-primary for RQ1 and the follow term (the Data decision at the top; the candidate sentence in P1 Step 2; the P4 row in the phase table and the P4 heading, which are no longer "stretch"; P3; P4 text and gate; §8: the first risk, "No public dataset" as a fallback risk, a new risk with the Digg limits, and the cut order, where P4 moves from first to last). **P-D**, the names of the generator targets (P3, no number copied). **The P4 sentence** (Digg dates are real; the page states a use rule, not "no license"). Also: references [49] and [50] in §10 (marks), the P1 status paragraph and the header version. Not applied: **P-C** (window W and the age term, §5 and two notes in §7), by the author's decision, because Digg has real Unix dates; P2 checks that the pool at time T is not too small. No frozen value changed, no row of §7 was edited, and §5 is unchanged.
 - 0.10 · 2026-10-27 · P1 Step 5: the related-work survey is written (`.docs/related-work.md`). Stale P4 text fixed in P1 Step 4 and P8. H1 now names Digg 2009 as a second test. The primary cell of H1 is unchanged (§7).
 - 0.11 · 2026-10-27 · H1 text: Digg 2009 is a co-primary test next to the W2 middle cell, no longer a "second test". This matches the Data decision (0.9). The primary W2 cell is unchanged (§7). No frozen value changed.
+- 0.12 · 2026-10-28 · Task `p2-implementation-blueprint`: `.docs/implementation-plan.md` 1.0 is written. §4: the Tasks column comes from its task list (P4 task renamed `p4-digg-adapter`, P9 written by the author outside tasks), "E1–E7" corrected to "E1–E8", a P2 status paragraph, and the P5 sentence no longer names the removed agents. §11 item 6: (a) and (c) point to the blueprint. §5, §6 and §7 are byte-identical; no frozen value changed.

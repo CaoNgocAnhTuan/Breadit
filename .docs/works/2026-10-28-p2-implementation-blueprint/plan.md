@@ -71,10 +71,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p2-implementat
 
 ### Claude's part (after Step 7)
 
-- [ ] Before the edit, record the SHA-256 of super-plan §5, §6 and §7 (each from its heading to the next `## ` heading).
-- [ ] Do the Acceptance items below.
-- [ ] Edit `.docs/super-plan.md` (design: Code files): the P2 status, the Tasks column of §4 from the blueprint task list, "E1–E7" to "E1–E8" in the phase table, the P5 sentence on the `leakage-auditor` and `designer` agents, open item 6 (a) and (c) pointing to the blueprint, header version 0.12, one change-log line. Then compare the three hashes again.
-- [ ] Commit: `docs: super-plan 0.12, P2 implementation blueprint written`
+- [x] Before the edit, record the SHA-256 of super-plan §5, §6 and §7 (each from its heading to the next `## ` heading).
+- [x] Do the Acceptance items below.
+- [x] Edit `.docs/super-plan.md` (design: Code files): the P2 status, the Tasks column of §4 from the blueprint task list, "E1–E7" to "E1–E8" in the phase table, the P5 sentence on the `leakage-auditor` and `designer` agents, open item 6 (a) and (c) pointing to the blueprint, header version 0.12, one change-log line. Then compare the three hashes again.
+- [x] Commit: `docs: super-plan 0.12, P2 implementation blueprint written`
 
 ## Tests
 
@@ -98,16 +98,38 @@ All tests are in `test_check_cut_time.py` and run with `python3 -I -m unittest` 
 
 Claude checks these after Step 7.
 
-- [ ] DW1: the blueprint has the four parts (module map, data contracts, measurement plan, task list) and at most 400 lines → pass.
-- [ ] DW2: the hand-off table has H-a to H-e. Each points to a contract that names columns or signatures, types, units and sort order → pass.
-- [ ] DW3: the measurement table has rows for H0, H1 test 1, H1 test 2, H2, and E1 to E8 appear in its Row column. Each row names an output file and a chapter → pass.
-- [ ] DW4: the task list has rows for P0 and P3 to P10, each with depends-on and days. The last task ends on or before 2026-11-18. Each cut of super-plan §8 points to a task → pass.
-- [ ] DW5: `git log` shows the Step 1 commit (rule) before the Step 4 commit (counts). The two runs had equal output hashes. Every Digg number in the blueprint is in `cut_time_output.txt`. All tests pass when Claude reruns them → pass.
-- [ ] DW6: `shasum -a 256` of both zips in `datasets/raw/digg2009/` equals `.docs/datasets.md` §4, and `git status` does not list them → pass.
-- [ ] DW7: the blueprint lists F1 and F2 with their comparisons, and super-plan open item 6(c) points to it after the closing edit → pass.
-- [ ] DW8: the SHA-256 of super-plan §5, §6 and §7 is the same before and after the closing edit. Each §7 value in the blueprint has "§7" in its sentence or table header → pass.
-- [ ] DW9: `git diff --stat` over the task commits lists only `.docs/implementation-plan.md`, the task folder, `.docs/super-plan.md` and `.gitignore` → pass.
-- [ ] Claude reads the blueprint once against design §3.2 to §3.8 and fixes any place where it differs from the design.
+- [x] DW1: the blueprint has the four parts (module map, data contracts, measurement plan, task list) and at most 400 lines → pass.
+- [x] DW2: the hand-off table has H-a to H-e. Each points to a contract that names columns or signatures, types, units and sort order → pass.
+- [x] DW3: the measurement table has rows for H0, H1 test 1, H1 test 2, H2, and E1 to E8 appear in its Row column. Each row names an output file and a chapter → pass.
+- [x] DW4: the task list has rows for P0 and P3 to P10, each with depends-on and days. The last task ends on or before 2026-11-18. Each cut of super-plan §8 points to a task → pass.
+- [x] DW5: `git log` shows the Step 1 commit (rule) before the Step 4 commit (counts). The two runs had equal output hashes. Every Digg number in the blueprint is in `cut_time_output.txt`. All tests pass when Claude reruns them → pass.
+- [x] DW6: `shasum -a 256` of both zips in `datasets/raw/digg2009/` equals `.docs/datasets.md` §4, and `git status` does not list them → pass.
+- [x] DW7: the blueprint lists F1 and F2 with their comparisons, and super-plan open item 6(c) points to it after the closing edit → pass.
+- [x] DW8: the SHA-256 of super-plan §5, §6 and §7 is the same before and after the closing edit. Each §7 value in the blueprint has "§7" in its sentence or table header → pass.
+- [x] DW9: `git diff --stat` over the task commits lists only `.docs/implementation-plan.md`, the task folder, `.docs/super-plan.md` and `.gitignore` → pass.
+- [x] Claude reads the blueprint once against design §3.2 to §3.8 and fixes any place where it differs from the design.
 
 ## Result
 
+Done on 2026-10-28. `.docs/implementation-plan.md` 1.0 is written (280 lines) and the super-plan is at 0.12.
+
+**What was done.** Sonnet did Steps 1 to 7, Claude did its part and the Acceptance. All DW1 to DW9 pass.
+- The T rule and the Holm families were committed at 17:02. The first real Digg run wrote its output at 17:07 (DW5, design F3).
+- Chosen `q` = 0.8. At `q` = 0.8, bucket 0–4 has 22,028 test users, 20,644 kept and 1,384 left out, far above the threshold of 100. 9,400 of the kept users (0.455) have a followee at `t_u`. For the others, H and BL2 give the same score on Digg, so the H1 test 2 gain can only come from these 9,400.
+- Two runs gave the same output hash (`5e5f2ac2…8559`). Both zip hashes equal `.docs/datasets.md` §4. The counts agree with that file: 3,018,197 votes, 7,299 repeated rows, 3,553 stories, 1,731,658 links (1,670 with date 0, 5 self-links).
+- Tests: 35 in `test_check_cut_time.py` (TC1 to TC11), all pass on Claude's rerun.
+- Super-plan §5, §6 and §7: SHA-256 equal before and after the closing edit.
+
+**Commits** (on `test-app`, not pushed): `30c2c71`, `2992838`, `eda5dac`, `7a478ef`, `b1b35a4`, `42c9ab6`, `e15f1f2` (self-check fixes: a "95%" and a "K = 10" now cite §7), and the closing commit `docs: super-plan 0.12, P2 implementation blueprint written`.
+
+**Differences from the plan, none of them a new decision.**
+- `in_pool` and `pool_size` take no `user` argument (unused). Extra helpers in the script: `history_count`, `earlier_events`, `followees_at`, `story_index`, `pool_size`, `choose_q`.
+- The output has `pool_at_T_window` (no cap) next to `pool_at_T` (with cap). They are equal, so the cap does not bind on Digg.
+- The measurement table has one more column, "RQ and H", filled from super-plan §1.
+- In the super-plan, the P4 task name is now `p4-digg-adapter` (the name used in the blueprint) and P9 says "written by the author, outside tasks".
+- `verify.sh` was not run: the task changed no code. The pre-commit hook ran the frontend typecheck on every commit.
+
+**Open points.**
+- The reading of H1 (blueprint §3.4) waits for the author's confirmation.
+- The supervisor has not answered the P1 note. The rows marked † in the blueprint depend on it.
+- Next task by the blueprint: `p0-baseline-freeze`, then `p3-synthetic-generator`.
