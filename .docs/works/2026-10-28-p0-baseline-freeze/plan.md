@@ -36,13 +36,13 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p0-baseline-fr
 
 #### Step 3: The pins (effort S)
 
-- [ ] Resolve the multi-arch **index** digest of `node:22-alpine` and of the Dockerfile syntax image (`docker/dockerfile:1.7`) (design §3 part 1). Check that each is an index (a manifest list), not a single-platform manifest (design F8). Run `node -v` and `npm -v` inside the pinned Node image and note both.
-- [ ] Write `.nvmrc` with that `node -v`. Install and use it with nvm.
-- [ ] Root `package.json`: add `engines` (design §3 part 2). Refresh the lockfile with the lockfile-only install and `--legacy-peer-deps`. Check the diff of `package-lock.json`: only the root `engines` block may change (F3).
-- [ ] Add `.npmrc` with `engine-strict=true`, then run `npm ci` in the repo under the pinned Node. If it stops with `EBADENGINE`, remove `.npmrc` and note it for the report (F4).
-- [ ] Both Dockerfiles: the `# syntax=` line and the three `FROM` lines get the full pinned reference (design §3 part 3). `docker-compose.yml`: `db` and `redis` get the digests in design §3 part 1.
-- [ ] Run `check_pins.sh`. All seven checks PASS (TC2).
-- [ ] Commit: `build: pin Node 22 and the base images by digest (P0)`. The message body lists the three digests and the date they were taken (2026-10-28).
+- [x] Resolve the multi-arch **index** digest of `node:22-alpine` and of the Dockerfile syntax image (`docker/dockerfile:1.7`) (design §3 part 1). Check that each is an index (a manifest list), not a single-platform manifest (design F8). Run `node -v` and `npm -v` inside the pinned Node image and note both.
+- [x] Write `.nvmrc` with that `node -v`. Install and use it with nvm.
+- [x] Root `package.json`: add `engines` (design §3 part 2). Refresh the lockfile with the lockfile-only install and `--legacy-peer-deps`. Check the diff of `package-lock.json`: only the root `engines` block may change (F3).
+- [x] Add `.npmrc` with `engine-strict=true`, then run `npm ci` in the repo under the pinned Node. If it stops with `EBADENGINE`, remove `.npmrc` and note it for the report (F4).
+- [x] Both Dockerfiles: the `# syntax=` line and the three `FROM` lines get the full pinned reference (design §3 part 3). `docker-compose.yml`: `db` and `redis` get the digests in design §3 part 1.
+- [x] Run `check_pins.sh`. All seven checks PASS (TC2).
+- [x] Commit: `build: pin Node 22 and the base images by digest (P0)`. The message body lists the three digests and the date they were taken (2026-10-28).
 
 #### Step 4: Clean clone and engine test (effort S)
 
