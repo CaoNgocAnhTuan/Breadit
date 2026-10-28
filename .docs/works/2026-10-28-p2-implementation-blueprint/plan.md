@@ -1,6 +1,6 @@
 # Plan: Implementation blueprint
 
-Status: approved · 2026-10-28
+Status: done · 2026-10-28
 Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 ---
