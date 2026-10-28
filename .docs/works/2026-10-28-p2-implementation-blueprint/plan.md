@@ -31,9 +31,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p2-implementat
 
 #### Step 2: Tests for the check script, first (effort S)
 
-- [ ] Write `test_check_cut_time.py` in the task folder with TC1 to TC11 below. Fixtures are small Python lists of rows, plus two tiny zip files made in a `tempfile` folder for TC10.
-- [ ] Run it before `check_cut_time.py` exists. It must fail because the module is missing, not because of a typo in the test.
-- [ ] Commit: `docs: tests for the Digg cut-time check`
+- [x] Write `test_check_cut_time.py` in the task folder with TC1 to TC11 below. Fixtures are small Python lists of rows, plus two tiny zip files made in a `tempfile` folder for TC10.
+- [x] Run it before `check_cut_time.py` exists. It must fail because the module is missing, not because of a typo in the test.
+- [x] Commit: `docs: tests for the Digg cut-time check`
 
 #### Step 3: The check script (effort M)
 
