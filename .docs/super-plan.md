@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.12 · 2026-10-28 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.13 · 2026-10-28 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -99,9 +99,11 @@ The Tasks column comes from the P2 blueprint. Its task list (`.docs/implementati
 
 **Already done.** The tag `v1-prethesis` on `6f7b884`. `CLAUDE.md` and `.docs/` are committed on `test-app`, the single working branch.
 
-**Do.** Pin Node 20, the same as the Docker image, with `.nvmrc` and `engines`. A clean clone runs the Docker image, and the manifest records the Node version, so local runs must use the same major version. Run the backend tests and the harness tests on Node 20. Pin `postgres:16-alpine`, `redis:7-alpine` and `node:20-alpine` (both Dockerfiles) by digest. The four pre-thesis text corrections stay listed in Bugs Report §7 and are fixed in the new thesis text (open item 5). Fast-forwarding `main` to `test-app` needs the author's approval.
+**Do.** Pin Node 22, the same as the Docker image, with `.nvmrc` and `engines`. Node 22, not Node 20: Node 20 reached end of life on 2026-04-30, and Node 22 is supported until 2027-04-30. A clean clone runs the Docker image, and the manifest records the Node version, so local runs must use the same version. Run the backend tests and the harness tests on Node 22. Pin `postgres:16-alpine`, `redis:7-alpine` and `node:22-alpine` (both Dockerfiles) by digest. The four pre-thesis text corrections stay listed in Bugs Report §7 and are fixed in the new thesis text (open item 5). Fast-forwarding `main` to `test-app` needs the author's approval.
 
-**Done when.** A clean clone passes `npm ci`, `prisma migrate deploy`, the seed and `npm run typecheck` on Node 20.
+**Done when.** A clean clone passes `npm ci`, `prisma migrate deploy`, the seed and `npm run typecheck` on Node 22.
+
+**Status (2026-10-28, done).** Task `p0-baseline-freeze`. Node v22.23.4 (npm 10.9.9) in `.nvmrc`, `engines.node` `>=22 <23` in the root `package.json`, and `.npmrc` with `engine-strict=true` (a Node 24 `npm ci` stops with `EBADENGINE`). Digests taken 2026-10-28, all multi-platform indexes: `node:22-alpine@sha256:fe4f6d74…9914`, `docker/dockerfile:1.7@sha256:a57df69d…a33e`, `postgres:16-alpine@sha256:721873c3…80ea`, `redis:7-alpine@sha256:858f009f…3499`. The clean clone passed with 18 migrations (not 19), and the full Docker stack serves. The checks are `check_pins.sh` and `check_clean_clone.sh` in the task folder.
 
 ### P1: Literature, RQ and data lock ★
 
@@ -441,3 +443,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.10 · 2026-10-27 · P1 Step 5: the related-work survey is written (`.docs/related-work.md`). Stale P4 text fixed in P1 Step 4 and P8. H1 now names Digg 2009 as a second test. The primary cell of H1 is unchanged (§7).
 - 0.11 · 2026-10-27 · H1 text: Digg 2009 is a co-primary test next to the W2 middle cell, no longer a "second test". This matches the Data decision (0.9). The primary W2 cell is unchanged (§7). No frozen value changed.
 - 0.12 · 2026-10-28 · Task `p2-implementation-blueprint`: `.docs/implementation-plan.md` 1.0 is written. §4: the Tasks column comes from its task list (P4 task renamed `p4-digg-adapter`, P9 written by the author outside tasks), "E1–E7" corrected to "E1–E8", a P2 status paragraph, and the P5 sentence no longer names the removed agents. §11 item 6: (a) and (c) point to the blueprint. §5, §6 and §7 are byte-identical; no frozen value changed.
+- 0.13 · 2026-10-28 · Task `p0-baseline-freeze`: P0 now pins Node 22, not Node 20 (Node 20 end of life 2026-04-30), in "Do" and "Done when", and a P0 status paragraph with the versions and the digest date. §5, §6 and §7 are byte-identical; no frozen value changed.

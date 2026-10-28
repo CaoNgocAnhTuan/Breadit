@@ -52,10 +52,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p0-baseline-fr
 
 #### Step 5: Tests and the full stack (effort S)
 
-- [ ] Under the pinned Node, with `db` and `redis` up, run `bash .claude/hooks/verify.sh`. Every check passes (TC8). Save the summary lines for the report.
-- [ ] Run `docker compose up --build -d`. Both images build. When the backend is healthy, `/api/health` answers 200 (TC9). Count the `public` rows of `User`, `Post`, `Like`, `Follow` and compare with Step 4 (F7).
-- [ ] Stop the `backend` and `app` containers afterwards, so ports 4000 and 3000 are free for local work. Leave `db` and `redis` running. Do not remove volumes.
-- [ ] No commit in this step unless a file changed (none should).
+- [x] Under the pinned Node, with `db` and `redis` up, run `bash .claude/hooks/verify.sh`. Every check passes (TC8). Save the summary lines for the report.
+- [x] Run `docker compose up --build -d`. Both images build. When the backend is healthy, `/api/health` answers 200 (TC9). Count the `public` rows of `User`, `Post`, `Like`, `Follow` and compare with Step 4 (F7).
+- [x] Stop the `backend` and `app` containers afterwards, so ports 4000 and 3000 are free for local work. Leave `db` and `redis` running. Do not remove volumes.
+- [x] No commit in this step unless a file changed (none should).
 
 #### Step 6: CLAUDE.md (effort XS)
 
@@ -64,14 +64,14 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p0-baseline-fr
 
 #### Step 7: Report (effort XS)
 
-- [ ] Stop. Report to Claude: the commits, the Node version and the three digests, whether `.npmrc` stayed, the engine-test result, the `check_pins.sh` and `check_clean_clone.sh` results, the `verify.sh` summary with test counts, the Docker result, and anything you could not do as written and why. Do not work around a step that cannot be done as written.
+- [x] Stop. Report to Claude: the commits, the Node version and the three digests, whether `.npmrc` stayed, the engine-test result, the `check_pins.sh` and `check_clean_clone.sh` results, the `verify.sh` summary with test counts, the Docker result, and anything you could not do as written and why. Do not work around a step that cannot be done as written.
 
 ### Claude's part (after Step 7)
 
-- [ ] Record the SHA-256 of super-plan §5, §6 and §7 before the edit.
-- [ ] Do the Acceptance items below.
-- [ ] Edit `.docs/super-plan.md`, P0 only (design §3 part 7): Node 22 and why, the "Done when" on Node 22, a P0 status paragraph with the versions and digest date, header version 0.13, a change-log line. Compare the three hashes again.
-- [ ] Commit: `docs: super-plan 0.13, P0 baseline freeze done`
+- [x] Record the SHA-256 of super-plan §5, §6 and §7 before the edit.
+- [x] Do the Acceptance items below.
+- [x] Edit `.docs/super-plan.md`, P0 only (design §3 part 7): Node 22 and why, the "Done when" on Node 22, a P0 status paragraph with the versions and digest date, header version 0.13, a change-log line. Compare the three hashes again.
+- [x] Commit: `docs: super-plan 0.13, P0 baseline freeze done`
 
 ## Tests
 
@@ -93,14 +93,43 @@ The "tests" of a configuration task are the two check scripts and the project ch
 
 Claude checks these after Step 7.
 
-- [ ] DW1: `.nvmrc` holds one exact version, and `node -v` in the pinned image equals it (Claude reruns `check_pins.sh`) → pass.
-- [ ] DW2: the root `package.json` has `engines.node` for the Node 22 major. The engine-test result is recorded (stop or "warn only") → pass.
-- [ ] DW3: every `FROM`, `# syntax=` and `image:` line has a tag and `@sha256:` with 64 hex characters. Claude checks by hand that the Node and syntax digests are index digests → pass.
-- [ ] DW4: `clean_clone_output.txt` shows every clean-clone step with exit 0 and 19 migrations → pass.
-- [ ] DW5: the `public` counts are equal in the output, `p0_clean` does not exist in the dev Postgres, and the counts after Step 5 are still equal → pass.
-- [ ] DW6: Claude reruns `verify.sh` under the pinned Node and every check passes → pass.
-- [ ] DW7: the Step 5 report shows both images built and `/api/health` 200. Claude checks the running images are the pinned digests → pass.
-- [ ] DW8: `git diff --stat` over the task commits lists only the files of design §3 "Code files" (plus `clean_clone_output.txt`) → pass.
+- [x] DW1: `.nvmrc` holds one exact version, and `node -v` in the pinned image equals it (Claude reruns `check_pins.sh`) → pass.
+- [x] DW2: the root `package.json` has `engines.node` for the Node 22 major. The engine-test result is recorded (stop or "warn only") → pass.
+- [x] DW3: every `FROM`, `# syntax=` and `image:` line has a tag and `@sha256:` with 64 hex characters. Claude checks by hand that the Node and syntax digests are index digests → pass.
+- [x] DW4: `clean_clone_output.txt` shows every clean-clone step with exit 0 and 19 migrations → pass.
+- [x] DW5: the `public` counts are equal in the output, `p0_clean` does not exist in the dev Postgres, and the counts after Step 5 are still equal → pass.
+- [x] DW6: Claude reruns `verify.sh` under the pinned Node and every check passes → pass.
+- [x] DW7: the Step 5 report shows both images built and `/api/health` 200. Claude checks the running images are the pinned digests → pass.
+- [x] DW8: `git diff --stat` over the task commits lists only the files of design §3 "Code files" (plus `clean_clone_output.txt`) → pass.
 
 ## Result
+
+**Delivered 2026-10-28.** Every DW passes.
+
+**What was done.**
+- Node v22.23.4 (npm 10.9.9, Alpine 3.24.3) is pinned: `.nvmrc`, `engines.node` `>=22 <23` in the root `package.json` and its lockfile copy (3 lines), and `.npmrc` with `engine-strict=true`. `.npmrc` stayed: `npm ci` passes with it on Node 22 (F4 did not happen). The Node 24 engine test stopped `npm ci` with `EBADENGINE`, so the root `engines` is enforced (F5 did not happen).
+- Digests taken 2026-10-28. All four are multi-platform indexes (`application/vnd.oci.image.index.v1+json`):
+  - `node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914`
+  - `docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e`
+  - `postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea`
+  - `redis:7-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499`
+- `check_pins.sh`: 7 of 7 FAIL before the pins, 7 of 7 PASS after.
+- `check_clean_clone.sh --engine-test`: every step exits 0, 18 of 18 migrations finished, `p0_clean` dropped. `public` counts (User, Post, Like, Follow) are 106, 890, 2001, 488 before, after, and after the Docker run.
+- `verify.sh` on v22.23.4: all PASS. Unit tests 99 of 99, integration tests 108 of 108; `eval verify` SKIP (no eval workspace yet).
+- Docker: both images run `NODE_VERSION=22.23.4`. The backend runs `migrate deploy` ("No pending migrations"), `/api/health` answers 200, and the frontend `/sign-in` answers 200. `backend` and `app` were stopped afterwards; `db` and `redis` still run.
+- Super-plan 0.13: P0 text, status and change log. The SHA-256 of §5, §6 and §7 is the same before and after.
+
+**Commits.** `27bfa9e` check_pins.sh · `6a2f4e5` check_clean_clone.sh · `c5d2a45` the pins · `64ca9ce` clean-clone output and script fixes · `98206e2` CLAUDE.md · the super-plan commit closes the task.
+
+**Differences from the plan.**
+- **18 migrations, not 19.** The repo has 18 migration folders. "19" in the Spec, TC5 and DW4 was a counting mistake. The script now reads the count from the clone.
+- **Script fixes found by the first real run.** The clean clone needs `prisma generate` before the seed (`npm ci` does not run it). `docker compose exec` must run from the repo root, not the clone.
+- **The first frontend image crash-looped.** It had only `@next/swc-linux-arm64-gnu`; the musl package was missing, so `next start` could not load `next.config.ts`. The cause was not Node 22. A fresh `npm ci` in the pinned image installs both packages. The musl download most likely failed during a slow build (about 45 minutes), and npm skips a failed optional package without an error. A rebuild without cache fixed it, with no file change.
+- **Who did what.** Sonnet stopped after Step 5 because of that crash, as the rules say. Claude did the rebuild, Step 6 and the rest of Step 5.
+- **Working copy.** After `npm ci` in the repo, `node_modules/.prisma` was gone. `npx prisma generate` brought it back.
+
+**Open points.**
+- On the Mac, run `nvm install` once, then `nvm use`. The default Node is still 22.14.0. `engine-strict` allows it (same major), but `check_pins.sh` `local-node` fails on it.
+- A silent optional-package failure can produce a broken frontend image again. A later task could add a build-time check that `@next/swc-linux-*-musl` exists. Not in P0 scope.
+- The pinned digests get no security fixes by themselves. Bump them on purpose in a later task.
 
