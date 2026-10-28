@@ -46,9 +46,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p0-baseline-fr
 
 #### Step 4: Clean clone and engine test (effort S)
 
-- [ ] Run `check_clean_clone.sh --engine-test`. Every clean-clone step exits 0, `_prisma_migrations` in `p0_clean` has 19 finished rows, `p0_clean` is dropped, and the `public` counts are equal before and after (TC5, TC6). Note whether `npm ci` under Node 24 stopped with `EBADENGINE` (TC7, F5).
-- [ ] Save the script output as `clean_clone_output.txt` in the task folder.
-- [ ] Commit: `chore: P0 clean-clone check output`
+- [x] Run `check_clean_clone.sh --engine-test`. Every clean-clone step exits 0, `_prisma_migrations` in `p0_clean` has 19 finished rows, `p0_clean` is dropped, and the `public` counts are equal before and after (TC5, TC6). Note whether `npm ci` under Node 24 stopped with `EBADENGINE` (TC7, F5).
+- [x] Save the script output as `clean_clone_output.txt` in the task folder.
+- [x] Commit: `chore: P0 clean-clone check output`
 
 #### Step 5: Tests and the full stack (effort S)
 

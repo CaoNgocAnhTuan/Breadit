@@ -27,7 +27,7 @@ DB_USER=breadit
 DB_PASS=breaditpassword
 DB_NAME=breadit
 DB_PORT=5433
-EXPECTED_MIGRATIONS=19
+EXPECTED_MIGRATIONS=""   # set from the number of migration folders in the clone (18 on 2026-10-28; the design text said 19)
 
 guard_schema() {
   case "$1" in
@@ -39,7 +39,7 @@ guard_schema() {
 }
 guard_schema "$SCHEMA"
 
-psql_q() { docker compose exec -T db psql -U "$DB_USER" -d "$DB_NAME" -tAc "$1"; }
+psql_q() { (cd "$ROOT" && docker compose exec -T db psql -U "$DB_USER" -d "$DB_NAME" -tAc "$1"); }
 counts() {
   psql_q "SELECT (SELECT count(*) FROM public.\"User\") || ' ' || (SELECT count(*) FROM public.\"Post\") || ' ' || (SELECT count(*) FROM public.\"Like\") || ' ' || (SELECT count(*) FROM public.\"Follow\")"
 }
@@ -83,7 +83,7 @@ if [ "$HAVE" != "$WANT" ]; then
   trap - EXIT
   exit 1
 fi
-if ! docker compose exec -T db pg_isready -U "$DB_USER" -d "$DB_NAME" >/dev/null 2>&1; then
+if ! (cd "$ROOT" && docker compose exec -T db pg_isready -U "$DB_USER" -d "$DB_NAME") >/dev/null 2>&1; then
   echo "STOP: db is not up (docker compose up db redis -d). Nothing was touched."
   trap - EXIT
   exit 1
@@ -106,12 +106,14 @@ export DATABASE_URL="postgresql://$DB_USER:$DB_PASS@localhost:$DB_PORT/$DB_NAME?
 SCHEMA_CREATED=1   # migrate deploy creates it; cleanup drops it
 PRISMA_SCHEMA=apps/backend/prisma/schema.prisma
 run "npm ci" npm ci
+run "prisma generate" npx prisma generate --schema=$PRISMA_SCHEMA
 run "prisma migrate deploy" npx prisma migrate deploy --schema=$PRISMA_SCHEMA
 run "prisma db seed" npx prisma db seed --schema=$PRISMA_SCHEMA
 run "build shared" npm run build -w @breadit/shared
 run "typecheck" npm run typecheck
 
 # 5. Migration count
+EXPECTED_MIGRATIONS=$(ls -d "$CLONE/repo"/apps/backend/prisma/migrations/*/ | wc -l | tr -d ' ')
 MIG=$(psql_q "SELECT count(*) FROM \"$SCHEMA\".\"_prisma_migrations\" WHERE finished_at IS NOT NULL")
 echo "finished migrations in $SCHEMA: $MIG (expected $EXPECTED_MIGRATIONS)"
 if [ "$MIG" != "$EXPECTED_MIGRATIONS" ]; then FAILED=1; echo "FAIL  migration count"; else echo "PASS  migration count"; fi

@@ -1,0 +1,190 @@
+node v22.23.4, npm 10.9.9, db is up
+public counts before (User Post Like Follow): 106 890 2001 488
+---- git clone --branch test-app
+exit 0  git clone --branch test-app
+clone HEAD: c5d2a45
+---- npm ci
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated nestjs-throttler-storage-redis@0.5.1: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+> breadit@0.1.0 prepare
+> husky
+
+
+added 1012 packages, and audited 1016 packages in 11s
+
+232 packages are looking for funding
+  run `npm fund` for details
+
+62 vulnerabilities (14 low, 20 moderate, 25 high, 3 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+exit 0  npm ci
+---- prisma generate
+Prisma schema loaded from apps/backend/prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.2.1) to ./node_modules/@prisma/client in 123ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
+
+exit 0  prisma generate
+---- prisma migrate deploy
+Prisma schema loaded from apps/backend/prisma/schema.prisma
+Datasource "db": PostgreSQL database "breadit", schema "p0_clean" at "localhost:5433"
+
+18 migrations found in prisma/migrations
+
+Applying migration `20260427160701_init`
+Applying migration `20260428041727_add_post_deleted_at`
+Applying migration `20260428171032_add_follow_notify`
+Applying migration `20260429041029_add_hashtags`
+Applying migration `20260429055535_add_notification`
+Applying migration `20260429062512_add_block_report`
+Applying migration `20260430103304_add_dm`
+Applying migration `20260430132754_add_post_media`
+Applying migration `20260501050939_add_communities`
+Applying migration `20260501060654_add_community_bans`
+Applying migration `20260501082428_add_admin_role_and_ban`
+Applying migration `20260501085924_add_report_notification`
+Applying migration `20260501150000_add_community_notifications`
+Applying migration `20260506132400_add_comment_tables`
+Applying migration `20260506140800_add_mentions`
+Applying migration `20260507092900_add_comment_media`
+Applying migration `20260507160000_data_humans_v1`
+Applying migration `20260507163500_data_humans_v1_personal_posts`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20260427160701_init/
+    └─ migration.sql
+  └─ 20260428041727_add_post_deleted_at/
+    └─ migration.sql
+  └─ 20260428171032_add_follow_notify/
+    └─ migration.sql
+  └─ 20260429041029_add_hashtags/
+    └─ migration.sql
+  └─ 20260429055535_add_notification/
+    └─ migration.sql
+  └─ 20260429062512_add_block_report/
+    └─ migration.sql
+  └─ 20260430103304_add_dm/
+    └─ migration.sql
+  └─ 20260430132754_add_post_media/
+    └─ migration.sql
+  └─ 20260501050939_add_communities/
+    └─ migration.sql
+  └─ 20260501060654_add_community_bans/
+    └─ migration.sql
+  └─ 20260501082428_add_admin_role_and_ban/
+    └─ migration.sql
+  └─ 20260501085924_add_report_notification/
+    └─ migration.sql
+  └─ 20260501150000_add_community_notifications/
+    └─ migration.sql
+  └─ 20260506132400_add_comment_tables/
+    └─ migration.sql
+  └─ 20260506140800_add_mentions/
+    └─ migration.sql
+  └─ 20260507092900_add_comment_media/
+    └─ migration.sql
+  └─ 20260507160000_data_humans_v1/
+    └─ migration.sql
+  └─ 20260507163500_data_humans_v1_personal_posts/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+exit 0  prisma migrate deploy
+---- prisma db seed
+Running seed command `ts-node --project apps/backend/tsconfig.json apps/backend/prisma/seed.ts` ...
+50 users ready.
+220 hashtags ready.
+500 posts created.
+1597 post tags created.
+488 follows created.
+2000 likes created.
+Comments and replies created.
+81 reposts created.
+500 saved posts created.
+
+🌱  The seed command has been executed.
+exit 0  prisma db seed
+---- build shared
+
+> @breadit/shared@0.1.0 build
+> tsc
+
+exit 0  build shared
+---- typecheck
+
+> breadit@0.1.0 typecheck
+> npm run typecheck -w @breadit/frontend
+
+
+> @breadit/frontend@0.1.0 typecheck
+> tsc --noEmit
+
+exit 0  typecheck
+finished migrations in p0_clean: 18 (expected 18)
+PASS  migration count
+seed rows in p0_clean (User Post Like Follow): 101 881 2000 488
+NOTICE:  drop cascades to 30 other objects
+DETAIL:  drop cascades to table p0_clean._prisma_migrations
+drop cascades to table p0_clean."User"
+drop cascades to table p0_clean."Account"
+drop cascades to table p0_clean."Session"
+drop cascades to table p0_clean."VerificationToken"
+drop cascades to table p0_clean."Post"
+drop cascades to table p0_clean."Like"
+drop cascades to table p0_clean."SavedPosts"
+drop cascades to table p0_clean."Follow"
+drop cascades to table p0_clean."Hashtag"
+drop cascades to table p0_clean."PostTag"
+drop cascades to type p0_clean."NotificationType"
+drop cascades to table p0_clean."Notification"
+drop cascades to type p0_clean."ReportStatus"
+drop cascades to table p0_clean."Block"
+drop cascades to table p0_clean."Report"
+drop cascades to table p0_clean."Conversation"
+drop cascades to table p0_clean."ConversationMember"
+drop cascades to table p0_clean."Message"
+drop cascades to table p0_clean."PostMedia"
+drop cascades to type p0_clean."CommunityRole"
+drop cascades to table p0_clean."Community"
+drop cascades to table p0_clean."CommunityMember"
+drop cascades to table p0_clean."CommunityRule"
+drop cascades to table p0_clean."CommunityBannedUser"
+drop cascades to type p0_clean."Role"
+drop cascades to table p0_clean."Comment"
+drop cascades to table p0_clean."CommentLike"
+drop cascades to table p0_clean."Mention"
+drop cascades to table p0_clean."CommentMedia"
+PASS  schema p0_clean dropped
+public counts after  (User Post Like Follow): 106 890 2001 488
+PASS  public counts equal
+removed clone folder
+---- engine test: npm ci under Node v24.14.1
+Running node v24.14.1 (npm v11.11.0)
+v24.14.1
+npm error code EBADENGINE
+npm error engine Unsupported engine
+npm error engine Not compatible with your version of node/npm: breadit@0.1.0
+npm error notsup Not compatible with your version of node/npm: breadit@0.1.0
+npm error notsup Required: {"node":">=22 <23"}
+npm error notsup Actual:   {"node":"v24.14.1","npm":"11.11.0"}
+npm error A complete log of this run can be found in: /Users/hung/.npm/_logs/2026-10-28T12_48_10_793Z-debug-0.log
+ENGINE-TEST: npm ci under Node 24 STOPPED with EBADENGINE (exit 1): engines are enforced
+RESULT: ALL PASS
+cleanup: removed /var/folders/wk/wqg1xf3130g_tcp6099t3kjh0000gp/T//breadit-p0-engine.bTQefN
