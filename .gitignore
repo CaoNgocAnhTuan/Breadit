@@ -54,6 +54,9 @@ apps/frontend/public/uploads/*
 
 /Latex/docx/
 
+# raw public datasets (downloaded by hand, recorded by SHA-256 in .docs/datasets.md)
+datasets/raw/
+
 # Claude Code harness: local state (active task, backend pid and log) and personal settings
 .claude/state/*
 !.claude/state/.gitkeep
