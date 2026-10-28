@@ -53,9 +53,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p2-implementat
 
 #### Step 5: Module map and data contracts (effort M)
 
-- [ ] Write blueprint section 1 from design §3.2 and section 2 from design §3.3: the module table and its rules, the hand-off table H-a to H-e, the canonical dataset files, dataset ids, the manifest, the PRNG stage names, the user id rule, the `packages/ranking` signatures, the results files, the macros, and the parity sample.
-- [ ] The signatures block may be shortened, but every name in design §3.3 stays (`AsOf`, `Post`, `Positive`, `PoolParams`, `buildPool`, `UserFeatures`, `PostFeatures`, `MethodId`, `ScoreContext`, `Scorer`, `scorer`, `rankPool`) with the visibility rule of `AsOf`.
-- [ ] Commit: `docs: blueprint module map and data contracts`
+- [x] Write blueprint section 1 from design §3.2 and section 2 from design §3.3: the module table and its rules, the hand-off table H-a to H-e, the canonical dataset files, dataset ids, the manifest, the PRNG stage names, the user id rule, the `packages/ranking` signatures, the results files, the macros, and the parity sample.
+- [x] The signatures block may be shortened, but every name in design §3.3 stays (`AsOf`, `Post`, `Positive`, `PoolParams`, `buildPool`, `UserFeatures`, `PostFeatures`, `MethodId`, `ScoreContext`, `Scorer`, `scorer`, `rankPool`) with the visibility rule of `AsOf`.
+- [x] Commit: `docs: blueprint module map and data contracts`
 
 #### Step 6: Measurement plan, task list, assumptions (effort S)
 
