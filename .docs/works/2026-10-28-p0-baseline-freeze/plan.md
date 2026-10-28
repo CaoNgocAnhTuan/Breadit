@@ -59,8 +59,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p0-baseline-fr
 
 #### Step 6: CLAUDE.md (effort XS)
 
-- [ ] Add one line at the top of the "Commands" code block in `CLAUDE.md` (design §3 part 7).
-- [ ] Commit: `docs: CLAUDE.md, nvm use for the pinned Node`
+- [x] Add one line at the top of the "Commands" code block in `CLAUDE.md` (design §3 part 7).
+- [x] Commit: `docs: CLAUDE.md, nvm use for the pinned Node`
 
 #### Step 7: Report (effort XS)
 

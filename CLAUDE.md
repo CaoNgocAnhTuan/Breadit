@@ -42,6 +42,7 @@ Only the author runs `/approve`. The hooks in `.claude/hooks/` enforce the rest:
 Root `npm run dev|build|start|lint|typecheck` only targets the **frontend**. Use `-w @breadit/backend` for the backend.
 
 ```bash
+nvm use                                # Node version from .nvmrc (Node 22, pinned in P0)
 docker compose up db redis -d          # Postgres on :5433, Redis on :6378
 npm install                            # install first so npx uses the pinned Prisma 6, not the latest
 npm run dev                            # frontend on :3000
