@@ -37,12 +37,12 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p2-implementat
 
 #### Step 3: The check script (effort M)
 
-- [ ] Write `check_cut_time.py` in the task folder (design §3.9). The core functions take plain lists: `dedupe_votes`, `stories`, `positives`, `follows`, `cut_time`, `test_items`, `bucket`, `in_pool`, `report`. The command line takes the two zip paths, `--password`, `--window-days`, `--max-posts` and `--q` (default `0.7,0.8,0.9`).
-- [ ] Before it reads any row, it checks the SHA-256 of both zips against the two values in `.docs/datasets.md` §4 and stops with exit code 2 on a mismatch.
-- [ ] It reads the rows with `rows_of` from `digg_stats.py`. If that import does not work, copy the function into the script, say so at the top of the file, and say it in the report (design F14).
-- [ ] Output: `key = value` lines, sorted by key, shares with 6 decimals, times in UTC. It ends with the chosen `q` and, if needed, the word "underpowered" (design §3.4).
-- [ ] All of TC1 to TC11 pass.
-- [ ] Commit: `docs: check_cut_time.py for the Digg cut time`
+- [x] Write `check_cut_time.py` in the task folder (design §3.9). The core functions take plain lists: `dedupe_votes`, `stories`, `positives`, `follows`, `cut_time`, `test_items`, `bucket`, `in_pool`, `report`. The command line takes the two zip paths, `--password`, `--window-days`, `--max-posts` and `--q` (default `0.7,0.8,0.9`).
+- [x] Before it reads any row, it checks the SHA-256 of both zips against the two values in `.docs/datasets.md` §4 and stops with exit code 2 on a mismatch.
+- [x] It reads the rows with `rows_of` from `digg_stats.py`. If that import does not work, copy the function into the script, say so at the top of the file, and say it in the report (design F14).
+- [x] Output: `key = value` lines, sorted by key, shares with 6 decimals, times in UTC. It ends with the chosen `q` and, if needed, the word "underpowered" (design §3.4).
+- [x] All of TC1 to TC11 pass.
+- [x] Commit: `docs: check_cut_time.py for the Digg cut time`
 
 #### Step 4: Run on the real Digg files (effort S)
 
