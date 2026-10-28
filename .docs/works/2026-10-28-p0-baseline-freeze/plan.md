@@ -29,10 +29,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p0-baseline-fr
 
 #### Step 2: `check_clean_clone.sh` (effort S)
 
-- [ ] Write `check_clean_clone.sh` in the task folder (design §3 Approach, part 5, steps 1 to 9): the Node check, the `public` counts, the fresh clone in `$TMPDIR`, `npm ci`, migrate deploy and seed into schema `p0_clean`, shared build, typecheck, the 19-row check of `_prisma_migrations`, drop of `p0_clean`, the second count and compare, removal of the clone, and the `--engine-test` option with Node v24.14.1.
-- [ ] The schema name is a constant. The script refuses `public` and `it_test` (TC4).
-- [ ] Run it now: it must stop at its first step, because there is no `.nvmrc` yet (TC3). Do not run the rest before Step 4.
-- [ ] Commit: `chore: P0 check_clean_clone.sh`
+- [x] Write `check_clean_clone.sh` in the task folder (design §3 Approach, part 5, steps 1 to 9): the Node check, the `public` counts, the fresh clone in `$TMPDIR`, `npm ci`, migrate deploy and seed into schema `p0_clean`, shared build, typecheck, the 19-row check of `_prisma_migrations`, drop of `p0_clean`, the second count and compare, removal of the clone, and the `--engine-test` option with Node v24.14.1.
+- [x] The schema name is a constant. The script refuses `public` and `it_test` (TC4).
+- [x] Run it now: it must stop at its first step, because there is no `.nvmrc` yet (TC3). Do not run the rest before Step 4.
+- [x] Commit: `chore: P0 check_clean_clone.sh`
 
 #### Step 3: The pins (effort S)
 
