@@ -186,7 +186,7 @@ The same rule. P3 must print the same bucket table for `syn-W2M-M`. Proposal for
 
 Counted on 2026-10-28 by `check_cut_time.py` on the two Digg zips (SHA-256 as in `.docs/datasets.md` §4). Full output: `.docs/works/2026-10-28-p2-implementation-blueprint/cut_time_output.txt`. Two runs gave the same output hash. Window and pool cap were passed from §7, row "Window W / pool cap N_max".
 
-What the check did with the Digg data: 3,018,197 vote rows, of which 7,299 repeat a (voter, story) pair and are dropped; 3,553 stories; 3,007,345 positives (the first vote of each story is the author's post). Of 1,731,658 links, 1,670 have date 0 and 5 are self-links; both kinds are dropped. P4 decides these choices for real.
+What the check did with the Digg data: 3,018,197 vote rows, of which 7,299 repeat a (voter, story) pair and are dropped; 3,553 stories; 3,007,345 positives (the first vote of each story is the author's post). Of 1,731,658 links, 1,670 have date 0 and 5 are self-links; both kinds are dropped. A repeated row keeps its earliest vote. A story's `created_at` is the time of its first vote. A follow counts at `t_u` when its date is before `t_u`. Votes are `like`. Events are numbered by `(t, voter_id, story_id)`. P4 decides these choices for real.
 
 **q = 0.8.** `n` = 3,007,345 positives. T = 2009-06-27T02:04:57Z (unix 1246068297). Users with a test item: 68,120. Pool at T: 823 stories; median pool over kept test users: 783.
 
@@ -216,12 +216,65 @@ Reading: kept test users with at least one followee are 0.455 of the kept users 
 
 ## 4. Measurement plan
 
-To be written (Step 6 of the P2 plan).
+One table links RQ, hypothesis, experiment, output file, table and chapter. Methods are tuned per dataset on its own validation items (super-plan §5). On Digg the community term is always 0, so β has no effect and the tie rule picks the smallest β. A dagger (†) marks a row that depends on the supervisor's answer on Digg (section 6).
+
+| Row | RQ and H | Question | Data | Methods | Output | Thesis | Chapter |
+|---|---|---|---|---|---|---|---|
+| Baseline table ★ | — | baseline table for the supervisor | `syn-W0-S`, `syn-W1-S`, `syn-W2M-S`, validation | BL0–BL5 | `summary.csv` | — | — |
+| H0 / E5 | H0 | does the hybrid win where it must not? | `syn-W0-M` | H, BL2 | `compare.csv` (no family) | gate | 5 |
+| H1 test 1 / E2 | RQ1, H1 | cold-start gain, synthetic | `syn-W2M-M` | H, BL2 | `compare.csv`, family F1 | table | 5 |
+| H1 test 2 / E2 † | RQ1, H1 | cold-start gain, real | `digg2009` | H, BL2 | `compare.csv`, family F1 | table | 5 |
+| H2 / E3 † | RQ2, H2 | gain against social density | `syn-W2L-M`, `syn-W2M-M`, `syn-W2H-M`, `digg2009` | H, BL2 | `density.csv` | figure | 5, 6 |
+| E1 † | RQ1 | how do all methods compare? | `syn-W2M-M`, `digg2009` (W0 and W1 are in E5) | all, tuned | `summary.csv`, `coverage.csv`, `compare.csv` family F2 | table | 5 |
+| E4 † | RQ1 | which term matters? | `syn-W2M-M`; `digg2009` without H-comm | H, H-follow, H-comm, H-noauthor, H-noengager, H with each `m` of §7 | `summary.csv` | table | 5 |
+| E5 † | H0 | is the result built into the data? | `syn-W0-M`, `syn-W1-M`, the three W2 cells; shuffle on `syn-W2M-M` | H, BL2 | `summary.csv`, `compare.csv` (no family) | table | 5, 6 |
+| E6 † | RQ1 | do ties matter? | `syn-W2M-M`, `digg2009` | all | `summary.csv` with reversed tie-break | table | 5 |
+| E7 | — | what does the new feed cost? (Class R) | live app with `syn-W2M-M` loaded | `chrono`, `engagement`, `social` | `latency.csv`, query count | table | 5 |
+| E8 | RQ1 | does pool size matter? | `syn-W2M-M` | H, BL2, the baseline with the best validation NDCG@10, K = 10 | `summary.csv` with the larger pool of §7 | table | 5 |
+
+`leftout.csv` and `tuning.csv` come with every run. They feed Chapter 3 (protocol) and the appendix.
 
 ## 5. Task list
 
-To be written (Step 6 of the P2 plan).
+Today is 2026-10-28. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
+
+| # | Task | Phase | Depends on | Scope (short) | Days | Ends | Bugs placed here |
+|---|---|---|---|---|---|---|---|
+| 1 | `p2-implementation-blueprint` | P2 | P1 | this task | 2 | 10-29 | — |
+| 2 | `p0-baseline-freeze` | P0 | — | `.nvmrc`, `engines`, image digests, clean clone check | 0.5 | 10-30 | — |
+| 3 | `p3-synthetic-generator` | P3 | 1, 2, D1 | `eval/` workspace, `rng.ts`, canonical writer, config, worlds, bucket table (section 3) | 2.5 | 11-01 | — |
+| 4 | `p4-digg-adapter` † | P4 | 3 (canonical writer) | adapter, the real Digg choices, the same bucket table | 2 | 11-03 | — |
+| 5 | `p5-ranking-package` | P5 | 1 | `packages/ranking`, move `computeExploreScoreFixed`, backend imports it, Dockerfile build order | 3 | 11-06 | T4 (score takes `asOf`) |
+| 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
+| 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
+| 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
+| 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
+| 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
+| 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, tag proposal | 1 | 11-15 | — |
+| 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
+| 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
+
+Spare days: 11-19 and 11-20. P0 is not done yet (no `.nvmrc`, Docker images pinned by tag), so it is task 2 and runs right after this task, before P3 writes the first manifest. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
+
+**Cut triggers.** Order of super-plan §8, each tied to a date.
+
+| Cut | Removes | Trigger |
+|---|---|---|
+| 1, shuffle | the shuffle part of E5 in task 9 | task 6 not done on 11-09 |
+| 2, E8 | E8 in task 9 | task 6 not done on 11-09 |
+| 3, finer E4 | H-noauthor, H-noengager and the `m` sweep in task 9 | task 9 not started on 11-12 |
+| 4, E7 smaller | the `engagement` row in task 10 | task 10 not started on 11-14 |
+| 5, toggle | the frontend part of task 8 | task 8 not started on 11-10 |
+| 6, Digg | task 4 and H1 test 2 | only if task 4 fails its gate |
+
+The supervisor checkpoints (★) are sends, not stops. The next task starts, and an answer that changes the plan comes back as a change to this file.
 
 ## 6. Assumptions and open points
 
-To be written (Step 6 of the P2 plan).
+- **D1.** A community post needs membership (author's decision, 2026-10-28). The generator follows it. The product rule in the backend is in task 8.
+- **Supervisor.** No answer yet to the P1 note. Rows that depend on the answer are marked †: task 4, H1 test 2, the Digg rows of E1 to E6. If the answer changes the data choice, only these rows change, and a line is added to the change log.
+- **P4 choices.** The Digg check in section 3 uses the simple choices listed there. Task 4 decides them for real, reruns the bucket table, and states any change. The reading of H1 in section 3 is for the author to confirm.
+
+## Change log
+
+- 1.0 · 2026-10-28 · Task `p2-implementation-blueprint`. First version.

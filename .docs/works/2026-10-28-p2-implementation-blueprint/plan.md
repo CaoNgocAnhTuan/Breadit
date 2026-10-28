@@ -59,9 +59,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-10-28-p2-implementat
 
 #### Step 6: Measurement plan, task list, assumptions (effort S)
 
-- [ ] Write section 4 from design §3.6, section 5 from design §3.7 (task table, spare days, cut triggers, the note on checkpoints), and section 6 from design §3.8. Mark the rows that depend on the supervisor's answer (task 4, H1 test 2, the Digg rows of E1 to E6).
-- [ ] Add `## Change log` with one line: version 1.0, 2026-10-28, task `p2-implementation-blueprint`.
-- [ ] Commit: `docs: blueprint measurement plan and task list`
+- [x] Write section 4 from design §3.6, section 5 from design §3.7 (task table, spare days, cut triggers, the note on checkpoints), and section 6 from design §3.8. Mark the rows that depend on the supervisor's answer (task 4, H1 test 2, the Digg rows of E1 to E6).
+- [x] Add `## Change log` with one line: version 1.0, 2026-10-28, task `p2-implementation-blueprint`.
+- [x] Commit: `docs: blueprint measurement plan and task list`
 
 #### Step 7: Self-check and report (effort XS)
 
