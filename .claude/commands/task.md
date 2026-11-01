@@ -18,6 +18,7 @@ Request: $ARGUMENTS
 2. **Investigate before you write.** Read:
    - the code the task touches (file and function names; use the Explore agent for wide searches);
    - `.docs/super-plan.md`: the phase in §4, and §2, §5, §7 when the task touches ranking or evaluation;
+   - `.docs/implementation-plan.md` when the task has a row in its §5 task list: that row (scope, depends on, days, bugs placed here), the §2 contracts the task reads or writes, and §3 and §4 when the task touches the data, the cut time T or the experiments. The Spec links to these sections. A change to a contract goes under Open questions;
    - `.docs/Bugs Report.md`: open bugs in the same code;
    - `CLAUDE.md` for the architecture rules (guards, cache versions, blocking, soft delete).
 
