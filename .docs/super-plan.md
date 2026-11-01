@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.13 · 2026-10-28 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.14 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -79,19 +79,21 @@ These facts were checked in the code on 2026-10-22, after the bug sweep (Bugs Re
 
 The phases are in dependency order. Each phase becomes one or more tasks (column "Tasks", started with `/task` or `/bugfix`). A phase is done when its "Done when" passes. ★ marks a supervisor checkpoint: send the result and wait for the answer before the next phase depends on it.
 
-| Phase | Output | Done when | Tasks |
-|---|---|---|---|
-| P0 Baseline freeze | Node pinned, image digests | A clean clone passes install, migrate, seed, typecheck | `p0-baseline-freeze` |
-| P1 Literature, RQ and data lock ★ | `literature.md`, `datasets.md`, one-page note, Chapter 2 survey | The supervisor confirms the RQs, the data and the design decisions | `p1-literature`, `p1-dataset-selection`, `p1-supervisor-note`, `p1-related-work` |
-| P2 Implementation blueprint | `implementation-plan.md` | The author approves it, and it names every later task | `p2-implementation-blueprint` |
-| P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator`, `p3-postgres-loader` |
-| P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` |
-| P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package`, `p5-eval-harness` |
-| P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
-| P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark` |
-| P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
-| P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
-| P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-defense-package` |
+**Status marks.** ✅ done (its "Done when" passes). 🟡 every output is written, but the "Done when" waits for someone else. ⬜ not started. "Late" means the planned end date in `.docs/implementation-plan.md` §5 has passed. A ✅ next to a task name means that task folder is closed. Last updated: 2026-11-02.
+
+| Status | Phase | Output | Done when | Tasks |
+|---|---|---|---|---|
+| ✅ 10-28 | P0 Baseline freeze | Node pinned, image digests | A clean clone passes install, migrate, seed, typecheck | `p0-baseline-freeze` ✅ |
+| 🟡 waits for the supervisor | P1 Literature, RQ and data lock ★ | `literature.md`, `datasets.md`, one-page note, Chapter 2 survey | The supervisor confirms the RQs, the data and the design decisions | `p1-literature` ✅, `p1-dataset-selection` ✅, `p1-supervisor-note` ✅, `p1-related-work` ✅ |
+| ✅ 10-28 | P2 Implementation blueprint | `implementation-plan.md` | The author approves it, and it names every later task | `p2-implementation-blueprint` ✅ |
+| ⬜ late (plan 11-01) | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator`, `p3-postgres-loader` |
+| ⬜ | P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` |
+| ⬜ | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package`, `p5-eval-harness` |
+| ⬜ | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
+| ⬜ | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark` |
+| ⬜ | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
+| ⬜ | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
+| ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-defense-package` |
 
 The Tasks column comes from the P2 blueprint. Its task list (`.docs/implementation-plan.md` §5) gives the order, the dependencies, a day budget per task and a trigger date for each cut of §8.
 
@@ -444,3 +446,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.11 · 2026-10-27 · H1 text: Digg 2009 is a co-primary test next to the W2 middle cell, no longer a "second test". This matches the Data decision (0.9). The primary W2 cell is unchanged (§7). No frozen value changed.
 - 0.12 · 2026-10-28 · Task `p2-implementation-blueprint`: `.docs/implementation-plan.md` 1.0 is written. §4: the Tasks column comes from its task list (P4 task renamed `p4-digg-adapter`, P9 written by the author outside tasks), "E1–E7" corrected to "E1–E8", a P2 status paragraph, and the P5 sentence no longer names the removed agents. §11 item 6: (a) and (c) point to the blueprint. §5, §6 and §7 are byte-identical; no frozen value changed.
 - 0.13 · 2026-10-28 · Task `p0-baseline-freeze`: P0 now pins Node 22, not Node 20 (Node 20 end of life 2026-04-30), in "Do" and "Done when", and a P0 status paragraph with the versions and the digest date. §5, §6 and §7 are byte-identical; no frozen value changed.
+- 0.14 · 2026-11-02 · §4: a Status column in the phase table, with a legend (✅ done, 🟡 waits for someone else, ⬜ not started, "late"), and a ✅ after each closed task. P0 and P2 are ✅. P1 is 🟡 because the supervisor has not answered the note. P3 is late (planned end 11-01). No other text changed; §5, §6 and §7 are byte-identical; no frozen value changed.
