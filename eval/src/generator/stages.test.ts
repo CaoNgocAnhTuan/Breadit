@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { loadConfig, makeParams } from "./config.ts";
 import type { GenParams } from "./config.ts";
-import { genUsers } from "./users.ts";
+import { activityCap, genUsers } from "./users.ts";
 import { genFollows } from "./follows.ts";
 import { genCommunities } from "./communities.ts";
 import { genPosts } from "./posts.ts";
@@ -36,7 +36,7 @@ test("users: ids 1..N, joined times in the time range, main topic in range", () 
     assert.equal(u.userId, i + 1);
     assert.ok(Number.isInteger(u.joinedAt) && u.joinedAt >= 0 && u.joinedAt < p.spanEnd);
     assert.ok(u.mainTopic >= 0 && u.mainTopic < p.topics);
-    assert.ok(u.activityWeight >= 1 && u.popularity >= 1 && u.postingWeight >= 1);
+    assert.ok(u.actionCount >= 1 && u.popularity >= 1 && u.postingWeight >= 1);
   });
 });
 
@@ -231,13 +231,53 @@ test("interactions: influence changes the rows when there are follows", () => {
   assert.notDeepEqual(other.interactions, s.interactions);
 });
 
-test("interactions: the total is near mean x users, and the stage is deterministic", () => {
+test("interactions: each user gets exactly their count, minus skipped actions, and the stage is deterministic", () => {
   const p = params({ nUsers: 150, nPosts: 1200 });
   const a = stages(p);
   const b = stages(p);
   assert.deepEqual(a.interactions, b.interactions);
-  const target = Math.round(p.interactionsPerUserMean * p.nUsers);
-  assert.equal(a.interactions.length + a.skipped, target);
+  const per = new Map<number, number>();
+  for (const e of a.interactions) per.set(e.userId, (per.get(e.userId) ?? 0) + 1);
+  let lost = 0;
+  for (const u of a.users) {
+    const got = per.get(u.userId) ?? 0;
+    assert.ok(got <= u.actionCount, `user ${u.userId}: ${got} > ${u.actionCount}`);
+    lost += u.actionCount - got;
+  }
+  assert.equal(lost, a.skipped);
+});
+
+// TC15
+test("activity: bin shares are near the config, every count is at least 1 and at most the cap", () => {
+  const p = params({ nUsers: 20000 });
+  const users = genUsers(rng(frozen.masterSeed, "users"), p);
+  const cap = activityCap(p);
+  assert.equal(cap, Math.floor(p.maxUserActionShare * p.interactionsPerUserMean * p.nUsers));
+  const counts = users.map((u) => u.actionCount);
+  assert.ok(counts.every((c) => Number.isInteger(c) && c >= 1 && c <= cap));
+  const share = (f: (c: number) => boolean) => counts.filter(f).length / counts.length;
+  const [s1, s2, s3, s4] = p.activityBinShares as [number, number, number, number];
+  assert.ok(Math.abs(share((c) => c === 1) - s1) < 0.01);
+  assert.ok(Math.abs(share((c) => c >= 2 && c <= 4) - s2) < 0.01);
+  assert.ok(Math.abs(share((c) => c >= 5 && c <= 19) - s3) < 0.01);
+  assert.ok(Math.abs(share((c) => c >= 20) - s4) < 0.01);
+  assert.ok(Math.abs(s1 + s2 + s3 + s4 - 1) < 1e-9);
+});
+
+test("activity: counts inside the 2-4 and 5-19 bins fall with k", () => {
+  const p = params({ nUsers: 20000 });
+  const users = genUsers(rng(frozen.masterSeed, "users"), p);
+  const n = (k: number) => users.filter((u) => u.actionCount === k).length;
+  assert.ok(n(2) > n(3) && n(3) > n(4), `${n(2)} ${n(3)} ${n(4)}`);
+  assert.ok(n(5) > n(10) && n(10) > n(19), `${n(5)} ${n(10)} ${n(19)}`);
+});
+
+test("activity: the tail is capped, and a lower tail alpha gives a heavier tail", () => {
+  const heavy = params({ nUsers: 5000, activityTailAlpha: 0.7 });
+  const light = params({ nUsers: 5000, activityTailAlpha: 2 });
+  const maxOf = (q: GenParams) => Math.max(...genUsers(rng(frozen.masterSeed, "users"), q).map((u) => u.actionCount));
+  assert.equal(maxOf(heavy), activityCap(heavy));
+  assert.ok(maxOf(light) < maxOf(heavy));
 });
 
 test("a world changes only what its knobs change: W1 and W2M share users, follows, communities, posts", () => {

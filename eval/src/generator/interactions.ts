@@ -1,6 +1,5 @@
 import type { Follow, Interaction, Membership } from "../canonical/dataset.ts";
 import type { Rng } from "../rng.ts";
-import { allocate } from "./alloc.ts";
 import type { GenParams } from "./config.ts";
 import { interestMain, interestOther } from "./interest.ts";
 import type { GenPost } from "./posts.ts";
@@ -23,7 +22,7 @@ function firstAtLeast(times: Float64Array, x: number): number {
   return lo;
 }
 
-// Stage 5. Each user gets a number of actions from the activity weights; the total is the mean x N.
+// Stage 5. Each user makes the number of actions drawn in stage 1.
 // All actions are processed in (t, user_id, k) order. At each action the user picks one post from the
 // candidates (created in [t - W_gen, t), not their own, not already acted on) with one draw over the weights:
 //
@@ -43,12 +42,10 @@ export function genInteractions(
   const n = users.length;
   const nPosts = posts.length;
 
-  const total = Math.round(p.interactionsPerUserMean * n);
-  const counts = allocate(total, users.map((u) => u.activityWeight));
   const actions: Action[] = [];
-  users.forEach((u, i) => {
+  users.forEach((u) => {
     const from = Math.max(p.spanStart, u.joinedAt);
-    for (let k = 0; k < (counts[i] as number); k++) actions.push({ t: from + r.int(p.spanEnd - from), user: u.userId, k });
+    for (let k = 0; k < u.actionCount; k++) actions.push({ t: from + r.int(p.spanEnd - from), user: u.userId, k });
   });
   actions.sort((a, b) => a.t - b.t || a.user - b.user || a.k - b.k);
 

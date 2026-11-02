@@ -1,21 +1,105 @@
 {
   "version": 1,
   "params": {
-    "activityParetoAlpha": {
-      "value": 0.875,
+    "activityTailAlpha": {
+      "value": 1.06,
       "kind": "calibrated",
-      "note": "Start value 1.125 (population top 20% share 0.2^(1 - 1/alpha) = 0.836). With 1,000 users the sample has a lighter tail than the law, so the measured skew was 0.674 and the median 9. Calibration round 1 moved it to 0.875.",
+      "note": "Tail of the action count in the bin 20 or more: floor(20 x Pareto(alpha)), capped. Amendment 1 start value.",
       "targets": [
-        { "key": "activitySkewTop20", "value": 0.8364, "row": "Activity skew (share of votes by the top 20% of voters)", "file": "digg_votes1.csv" },
-        { "key": "votesPerUserMedian", "value": 4, "row": "Votes per voter (median)", "file": "digg_votes1.csv" }
+        {
+          "key": "votesPerUserP90",
+          "value": 45,
+          "row": "Votes per voter (90th percentile)",
+          "file": "digg_votes1.csv"
+        },
+        {
+          "key": "votesPerUserP99",
+          "value": 287,
+          "row": "Votes per voter (99th percentile)",
+          "file": "digg_votes1.csv"
+        },
+        {
+          "key": "activitySkewTop20",
+          "value": 0.8364,
+          "row": "Activity skew (share of votes by the top 20% of voters)",
+          "file": "digg_votes1.csv"
+        }
       ]
+    },
+    "activityBinShare1": {
+      "value": 0.278,
+      "kind": "calibrated",
+      "note": "Share of users with exactly 1 action.",
+      "targets": [
+        {
+          "key": "shareUsers1",
+          "value": 0.278,
+          "row": "Share of voters by number of votes (1 vote)",
+          "file": "digg_votes1.csv"
+        }
+      ]
+    },
+    "activityBinShare2to4": {
+      "value": 0.2562,
+      "kind": "calibrated",
+      "note": "Share of users with 2 to 4 actions. Inside the bin, count k has weight 1/k (chosen).",
+      "targets": [
+        {
+          "key": "shareUsers2to4",
+          "value": 0.2562,
+          "row": "Share of voters by number of votes (2-4)",
+          "file": "digg_votes1.csv"
+        },
+        {
+          "key": "votesPerUserMedian",
+          "value": 4,
+          "row": "Votes per voter (median)",
+          "file": "digg_votes1.csv"
+        }
+      ]
+    },
+    "activityBinShare5to19": {
+      "value": 0.2686,
+      "kind": "calibrated",
+      "note": "Share of users with 5 to 19 actions. Inside the bin, count k has weight 1/k (chosen).",
+      "targets": [
+        {
+          "key": "shareUsers5to19",
+          "value": 0.2686,
+          "row": "Share of voters by number of votes (5-19)",
+          "file": "digg_votes1.csv"
+        }
+      ]
+    },
+    "activityBinShare20plus": {
+      "value": 0.1972,
+      "kind": "calibrated",
+      "note": "Share of users with 20 or more actions.",
+      "targets": [
+        {
+          "key": "shareUsers20plus",
+          "value": 0.1972,
+          "row": "Share of voters by number of votes (20 or more)",
+          "file": "digg_votes1.csv"
+        }
+      ]
+    },
+    "maxUserActionShare": {
+      "value": 0.05,
+      "kind": "chosen",
+      "note": "Cap on one user's actions: floor(share x mean x users). Digg's top voter has about 0.35%."
     },
     "interactionsPerUserMean": {
       "value": 21.65,
       "kind": "calibrated",
-      "note": "Total actions = mean x users, so the mean is met by construction.",
+      "note": "Target of the overall mean. The mean is met within the tolerance, not by construction. Also sets the cap with maxUserActionShare.",
       "targets": [
-        { "key": "votesPerUserMean", "value": 21.65, "row": "Votes per voter (mean)", "file": "digg_votes1.csv" }
+        {
+          "key": "votesPerUserMean",
+          "value": 21.65,
+          "row": "Votes per voter (mean)",
+          "file": "digg_votes1.csv"
+        }
       ]
     },
     "followeesMean": {
@@ -23,53 +107,175 @@
       "kind": "calibrated",
       "note": "Mean list length of users with a list, capped at users - 1. Start value 24.26. Returned links give a list to almost every user, so the measured mean was 17.5. Calibration round 1 moved it to 34.",
       "targets": [
-        { "key": "followeesMean", "value": 24.26, "row": "Followees per user (users with at least 1 followee)", "file": "digg_friends.csv" }
+        {
+          "key": "followeesMean",
+          "value": 24.26,
+          "row": "Followees per user (users with at least 1 followee)",
+          "file": "digg_friends.csv"
+        }
       ]
     },
-    "followListShare": { "value": 0.5, "kind": "chosen", "note": "Near the 51.19% of Digg voters with a list (.docs/datasets.md section 4)." },
-    "twoWayShare": { "value": 0.5, "kind": "chosen", "note": "Near the 51.18% mutual rows (.docs/datasets.md section 6a)." },
-    "followInSpanShare": { "value": 0.2, "kind": "chosen", "note": "Share of links dated inside the activity span. The rest are dated before it." },
-    "secondaryParetoAlpha": { "value": 2, "kind": "chosen", "note": "Tail of list length, popularity and posting weights." },
-    "topics": { "value": 20, "kind": "chosen", "note": "Topics = communities." },
-    "interestSpread": { "value": 0.3, "kind": "chosen", "note": "Share of a user's interest that is spread over all topics. The rest sits on the main topic." },
-    "noMembershipShare": { "value": 0.3, "kind": "chosen", "note": "Users with no community." },
-    "maxMembershipsPerUser": { "value": 4, "kind": "chosen", "note": "Other users have 1 to this many memberships." },
-    "communityPostShare": { "value": 0.3, "kind": "chosen", "note": "Share of posts that go to a community of the author." },
-    "spanDays": { "value": 70, "kind": "chosen", "note": "Activity span. About 2,000 posts per 7 days at size M." },
-    "beforeDays": { "value": 180, "kind": "chosen", "note": "Time before the span, for joins and early links." },
-    "lateJoinerShare": { "value": 0.2, "kind": "chosen", "note": "Users who join inside the span (real cold-start users)." },
-    "candidateWindowDays": { "value": 7, "kind": "chosen", "note": "W_gen: a user picks a post created in this window." },
-    "freshnessTauHours": { "value": 24, "kind": "chosen", "note": "fresh(p, t) = 1 / (1 + age hours / tau)." },
-    "popularityPi": { "value": 1, "kind": "chosen", "note": "Weight (1 + pi x actions on the post so far). In every world." },
-    "typeShareLike": { "value": 0.75, "kind": "chosen", "note": "Type mix of actions." },
-    "typeShareComment": { "value": 0.15, "kind": "chosen", "note": "Type mix of actions." },
-    "typeShareRepost": { "value": 0.1, "kind": "chosen", "note": "Type mix of actions." }
+    "followListShare": {
+      "value": 0.5,
+      "kind": "chosen",
+      "note": "Near the 51.19% of Digg voters with a list (.docs/datasets.md section 4)."
+    },
+    "twoWayShare": {
+      "value": 0.5,
+      "kind": "chosen",
+      "note": "Near the 51.18% mutual rows (.docs/datasets.md section 6a)."
+    },
+    "followInSpanShare": {
+      "value": 0.2,
+      "kind": "chosen",
+      "note": "Share of links dated inside the activity span. The rest are dated before it."
+    },
+    "secondaryParetoAlpha": {
+      "value": 2,
+      "kind": "chosen",
+      "note": "Tail of list length, popularity and posting weights."
+    },
+    "topics": {
+      "value": 20,
+      "kind": "chosen",
+      "note": "Topics = communities."
+    },
+    "interestSpread": {
+      "value": 0.3,
+      "kind": "chosen",
+      "note": "Share of a user's interest that is spread over all topics. The rest sits on the main topic."
+    },
+    "noMembershipShare": {
+      "value": 0.3,
+      "kind": "chosen",
+      "note": "Users with no community."
+    },
+    "maxMembershipsPerUser": {
+      "value": 4,
+      "kind": "chosen",
+      "note": "Other users have 1 to this many memberships."
+    },
+    "communityPostShare": {
+      "value": 0.3,
+      "kind": "chosen",
+      "note": "Share of posts that go to a community of the author."
+    },
+    "spanDays": {
+      "value": 70,
+      "kind": "chosen",
+      "note": "Activity span. About 2,000 posts per 7 days at size M."
+    },
+    "beforeDays": {
+      "value": 180,
+      "kind": "chosen",
+      "note": "Time before the span, for joins and early links."
+    },
+    "lateJoinerShare": {
+      "value": 0.2,
+      "kind": "chosen",
+      "note": "Users who join inside the span (real cold-start users)."
+    },
+    "candidateWindowDays": {
+      "value": 7,
+      "kind": "chosen",
+      "note": "W_gen: a user picks a post created in this window."
+    },
+    "freshnessTauHours": {
+      "value": 24,
+      "kind": "chosen",
+      "note": "fresh(p, t) = 1 / (1 + age hours / tau)."
+    },
+    "popularityPi": {
+      "value": 1,
+      "kind": "chosen",
+      "note": "Weight (1 + pi x actions on the post so far). In every world."
+    },
+    "typeShareLike": {
+      "value": 0.75,
+      "kind": "chosen",
+      "note": "Type mix of actions."
+    },
+    "typeShareComment": {
+      "value": 0.15,
+      "kind": "chosen",
+      "note": "Type mix of actions."
+    },
+    "typeShareRepost": {
+      "value": 0.1,
+      "kind": "chosen",
+      "note": "Type mix of actions."
+    }
   },
   "worlds": {
     "W0": {
-      "homophily": { "value": 0, "kind": "chosen" },
-      "influenceSocial": { "value": 0, "kind": "chosen" },
-      "influenceCommunity": { "value": 0, "kind": "chosen" }
+      "homophily": {
+        "value": 0,
+        "kind": "chosen"
+      },
+      "influenceSocial": {
+        "value": 0,
+        "kind": "chosen"
+      },
+      "influenceCommunity": {
+        "value": 0,
+        "kind": "chosen"
+      }
     },
     "W1": {
-      "homophily": { "value": 0.7, "kind": "chosen" },
-      "influenceSocial": { "value": 0, "kind": "chosen" },
-      "influenceCommunity": { "value": 0, "kind": "chosen" }
+      "homophily": {
+        "value": 0.7,
+        "kind": "chosen"
+      },
+      "influenceSocial": {
+        "value": 0,
+        "kind": "chosen"
+      },
+      "influenceCommunity": {
+        "value": 0,
+        "kind": "chosen"
+      }
     },
     "W2L": {
-      "homophily": { "value": 0.7, "kind": "chosen" },
-      "influenceSocial": { "value": 0.5, "kind": "chosen" },
-      "influenceCommunity": { "value": 0.5, "kind": "chosen" }
+      "homophily": {
+        "value": 0.7,
+        "kind": "chosen"
+      },
+      "influenceSocial": {
+        "value": 0.5,
+        "kind": "chosen"
+      },
+      "influenceCommunity": {
+        "value": 0.5,
+        "kind": "chosen"
+      }
     },
     "W2M": {
-      "homophily": { "value": 0.7, "kind": "chosen" },
-      "influenceSocial": { "value": 2, "kind": "chosen" },
-      "influenceCommunity": { "value": 2, "kind": "chosen" }
+      "homophily": {
+        "value": 0.7,
+        "kind": "chosen"
+      },
+      "influenceSocial": {
+        "value": 2,
+        "kind": "chosen"
+      },
+      "influenceCommunity": {
+        "value": 2,
+        "kind": "chosen"
+      }
     },
     "W2H": {
-      "homophily": { "value": 0.7, "kind": "chosen" },
-      "influenceSocial": { "value": 8, "kind": "chosen" },
-      "influenceCommunity": { "value": 8, "kind": "chosen" }
+      "homophily": {
+        "value": 0.7,
+        "kind": "chosen"
+      },
+      "influenceSocial": {
+        "value": 8,
+        "kind": "chosen"
+      },
+      "influenceCommunity": {
+        "value": 8,
+        "kind": "chosen"
+      }
     }
   }
 }

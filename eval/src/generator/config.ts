@@ -71,7 +71,10 @@ export interface GenParams {
   /** Activity span, seconds from the base epoch. */
   spanStart: number;
   spanEnd: number;
-  activityParetoAlpha: number;
+  activityTailAlpha: number;
+  /** Shares of users with 1, 2-4, 5-19 and 20 or more actions. */
+  activityBinShares: number[];
+  maxUserActionShare: number;
   interactionsPerUserMean: number;
   followeesMean: number;
   followListShare: number;
@@ -110,7 +113,9 @@ export function makeParams(c: SyntheticConfig, f: Frozen, world: WorldId, size: 
     nPosts: f.sizes[size].posts,
     spanStart,
     spanEnd: spanStart + v("spanDays") * DAY,
-    activityParetoAlpha: v("activityParetoAlpha"),
+    activityTailAlpha: v("activityTailAlpha"),
+    activityBinShares: [v("activityBinShare1"), v("activityBinShare2to4"), v("activityBinShare5to19"), v("activityBinShare20plus")],
+    maxUserActionShare: v("maxUserActionShare"),
     interactionsPerUserMean: v("interactionsPerUserMean"),
     followeesMean: v("followeesMean"),
     followListShare: v("followListShare"),

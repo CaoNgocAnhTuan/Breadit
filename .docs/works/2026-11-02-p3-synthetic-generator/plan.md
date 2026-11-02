@@ -93,9 +93,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 11: Activity model (effort S)
 
-- [ ] Tests first (TC15): on a large tiny-config draw (for example 20,000 users), the four bin shares are within 1 point of the config; every count is at least 1; no count is above the cap; counts in 2–4 and 5–19 fall with `k`. Stage 5 gives each user exactly their count, minus skipped actions, and no longer calls `allocate`.
-- [ ] Change `eval/src/generator/users.ts`, `interactions.ts`, `config.ts`, and the config params `activityTailAlpha`, `activityBinShares`, `maxUserActionShare` (design §4 "Activity", "Config"). Remove `activityParetoAlpha`.
-- [ ] Commit: `feat: eval activity counts drawn by Digg bins with a capped tail`
+- [x] Tests first (TC15): on a large tiny-config draw (for example 20,000 users), the four bin shares are within 1 point of the config; every count is at least 1; no count is above the cap; counts in 2–4 and 5–19 fall with `k`. Stage 5 gives each user exactly their count, minus skipped actions, and no longer calls `allocate`.
+- [x] Change `eval/src/generator/users.ts`, `interactions.ts`, `config.ts`, and the config params `activityTailAlpha`, `activityBinShares`, `maxUserActionShare` (design §4 "Activity", "Config"). Remove `activityParetoAlpha`.
+- [x] Commit: `feat: eval activity counts drawn by Digg bins with a capped tail`
 
 #### Step 12: Follow rule and span (effort XS)
 

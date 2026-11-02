@@ -13,7 +13,7 @@ import type { SizeId, WorldId } from "./config.ts";
 import { genFollows } from "./follows.ts";
 import { genInteractions } from "./interactions.ts";
 import { genPosts } from "./posts.ts";
-import { genUsers } from "./users.ts";
+import { activityCap, genUsers } from "./users.ts";
 
 export type DatasetId = `syn-${WorldId}-${SizeId}`;
 
@@ -120,6 +120,7 @@ export function generateDataset(id: string, outDir: string): Manifest {
       world,
       size,
       skippedActions: skipped,
+      activityCap: activityCap(p),
     },
     masterSeed: seed,
     epoch: { iso: frozen.baseEpoch.iso, seconds: frozen.baseEpoch.seconds },
