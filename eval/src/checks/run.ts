@@ -7,7 +7,9 @@ import { loadFrozen } from "../frozen.ts";
 import { configSha256, loadConfig, loadTargets } from "../generator/config.ts";
 import { datasetIds } from "../generator/generate.ts";
 import { bucketReport, KEPT_THRESHOLD } from "./buckets.ts";
+import type { BucketReport } from "./buckets.ts";
 import { calibrate } from "./calibration.ts";
+import type { CalibrationLimits } from "./calibration.ts";
 import { checkFormat } from "./format.ts";
 import { computeLift } from "./lift.ts";
 
@@ -46,12 +48,35 @@ function sizeM(data: Dataset): boolean {
   return data.manifest.source.kind === "synthetic" && data.manifest.source.size === "M";
 }
 
+/**
+ * The lines and the verdict of the bucket table (DW6, amended): at least 100 kept test users in bucket 0-4
+ * and at least one kept test user in bucket 0.
+ */
+export function bucketVerdict(b: BucketReport, epochSeconds: number): { pass: boolean; lines: string[] } {
+  const iso = new Date((epochSeconds + b.cutTime) * 1000).toISOString();
+  const lines: string[] = [];
+  lines.push(`buckets (q ${b.q}): positives ${b.n}, T ${b.cutTime} (${iso}), test users ${b.testUsers}`);
+  lines.push(`  pool at T: ${b.poolAtT} (window only: ${b.poolAtTWindow}), median pool over kept test users ${f6(b.poolMedian)}`);
+  lines.push(
+    ...table(
+      ["bucket", "test_users", "kept", "left_out", "kept_with_followee"],
+      b.rows.map((r) => [r.bucket, String(r.testUsers), String(r.kept), String(r.leftOut), String(r.keptWithFollowee)]),
+    ),
+  );
+  lines.push(`  kept test users in bucket 0-4: ${b.kept04} (threshold ${KEPT_THRESHOLD}): ${b.meetsThreshold ? "pass" : "FAIL"}`);
+  const zero = b.rows.find((r) => r.bucket === "0");
+  const keptZero = zero ? zero.kept : 0;
+  lines.push(`  kept test users in bucket 0: ${keptZero} (at least 1): ${keptZero >= 1 ? "pass" : "FAIL"}`);
+  return { pass: b.meetsThreshold && keptZero >= 1, lines };
+}
+
 // The checks read only the canonical files of each dataset folder (design: "Checks read only the canonical files").
 export function checkAll(dataDir: string): CheckAllResult {
   const frozen = loadFrozen();
   const windowSec = frozen.windowDays * DAY;
   const cfgSha = configSha256();
-  const targets = loadTargets(loadConfig());
+  const config = loadConfig();
+  const targets = loadTargets(config);
   const lines: string[] = [];
   let pass = true;
 
@@ -95,7 +120,11 @@ export function checkAll(dataDir: string): CheckAllResult {
 
     if (!sizeM(data)) continue;
 
-    const cal = calibrate(data, targets);
+    const maxShare = config.params.maxUserActionShare?.value;
+    const cap = data.manifest.source.activityCap;
+    const limits: CalibrationLimits | undefined =
+      maxShare === undefined ? undefined : { maxUserActionShare: maxShare, ...(typeof cap === "number" ? { cap } : {}) };
+    const cal = calibrate(data, targets, limits);
     if (!cal.pass) pass = false;
     lines.push(`calibration: ${cal.pass ? "pass" : "FAIL"}`);
     lines.push(
@@ -103,6 +132,11 @@ export function checkAll(dataDir: string): CheckAllResult {
         ["value", "generated", "target", "tolerance", "result"],
         cal.rows.map((r) => [r.name, f6(r.generated), f6(r.target), r.tolerance, r.pass ? "pass" : "FAIL"]),
       ),
+    );
+
+    lines.push(
+      `top user: ${cal.topUserActions} actions (${f6(cal.topUserShare)} of all)` +
+        (cal.usersAtCap === null ? "" : `, users at the cap: ${cal.usersAtCap}`),
     );
 
     const lift = computeLift(data, windowSec);
@@ -114,17 +148,9 @@ export function checkAll(dataDir: string): CheckAllResult {
 
     if (id === "syn-W2M-M") {
       const b = bucketReport(data, Q, windowSec, frozen.poolCap);
-      const iso = new Date((data.manifest.epoch.seconds + b.cutTime) * 1000).toISOString();
-      lines.push(`buckets (q ${b.q}): positives ${b.n}, T ${b.cutTime} (${iso}), test users ${b.testUsers}`);
-      lines.push(`  pool at T: ${b.poolAtT} (window only: ${b.poolAtTWindow}), median pool over kept test users ${f6(b.poolMedian)}`);
-      lines.push(
-        ...table(
-          ["bucket", "test_users", "kept", "left_out", "kept_with_followee"],
-          b.rows.map((r) => [r.bucket, String(r.testUsers), String(r.kept), String(r.leftOut), String(r.keptWithFollowee)]),
-        ),
-      );
-      lines.push(`  kept test users in bucket 0-4: ${b.kept04} (threshold ${KEPT_THRESHOLD}): ${b.meetsThreshold ? "pass" : "FAIL"}`);
-      if (!b.meetsThreshold) pass = false;
+      const v = bucketVerdict(b, data.manifest.epoch.seconds);
+      lines.push(...v.lines);
+      if (!v.pass) pass = false;
     }
   }
 

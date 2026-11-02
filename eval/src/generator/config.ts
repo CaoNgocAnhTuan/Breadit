@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import type { CalibrationTargets } from "../checks/calibration.ts";
+import type { CalibrationKey, CalibrationTargets } from "../checks/calibration.ts";
 import type { Frozen } from "../frozen.ts";
 
 export const WORLDS = ["W0", "W1", "W2L", "W2M", "W2H"] as const;
@@ -9,7 +9,7 @@ export const SIZES = ["S", "M"] as const;
 export type SizeId = (typeof SIZES)[number];
 
 export interface Target {
-  key: keyof CalibrationTargets;
+  key: CalibrationKey;
   value: number;
   row: string;
   file: string;
@@ -58,7 +58,7 @@ export function loadTargets(c: SyntheticConfig): CalibrationTargets {
   for (const p of Object.values(c.params)) {
     for (const t of p.targets ?? []) out[t.key] = t.value;
   }
-  const keys: Array<keyof CalibrationTargets> = ["votesPerUserMean", "votesPerUserMedian", "activitySkewTop20", "followeesMean"];
+  const keys: CalibrationKey[] = ["votesPerUserMean", "votesPerUserMedian", "activitySkewTop20", "followeesMean"];
   for (const k of keys) if (out[k] === undefined) throw new Error(`no calibration target for ${k}`);
   return out as CalibrationTargets;
 }

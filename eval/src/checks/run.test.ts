@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { checkAll } from "./run.ts";
+import { checkAll, bucketVerdict } from "./run.ts";
+import type { BucketReport } from "./buckets.ts";
 import { generateDataset, datasetDir } from "../generator/generate.ts";
 import { tempDir } from "./fixture.ts";
 
@@ -61,4 +62,27 @@ test("the gen command writes one line per dataset", () => {
   const lines = text.trim().split("\n");
   assert.equal(lines.length, 2);
   assert.match(lines[0] as string, /^syn-W0-S .*[0-9a-f]{64}$/);
+});
+
+test("TC14: the bucket check fails when bucket 0 has no kept test user", () => {
+  const report = (kept0: number, test0: number): BucketReport => ({
+    q: "0.8", n: 1000, cutTime: 100, testUsers: 300, poolAtT: 10, poolAtTWindow: 10, poolMedian: 10,
+    rows: [
+      { bucket: "0", testUsers: test0, kept: kept0, leftOut: test0 - kept0, keptWithFollowee: 0 },
+      { bucket: "1-4", testUsers: 200, kept: 190, leftOut: 10, keptWithFollowee: 100 },
+      { bucket: "0-4", testUsers: 200 + test0, kept: 190 + kept0, leftOut: 10, keptWithFollowee: 100 },
+      { bucket: "5-19", testUsers: 50, kept: 50, leftOut: 0, keptWithFollowee: 30 },
+      { bucket: "20+", testUsers: 50, kept: 50, leftOut: 0, keptWithFollowee: 30 },
+    ],
+    kept04: 190 + kept0,
+    meetsThreshold: 190 + kept0 >= 100,
+  });
+  const good = bucketVerdict(report(12, 14), 0);
+  assert.equal(good.pass, true);
+  assert.match(good.lines.join("\n"), /kept test users in bucket 0: 12/);
+  const empty = bucketVerdict(report(0, 0), 0);
+  assert.equal(empty.pass, false);
+  assert.match(empty.lines.join("\n"), /bucket 0: 0.*FAIL/);
+  // bucket 0-4 above 100 does not hide an empty bucket 0
+  assert.equal(report(0, 0).meetsThreshold, true);
 });

@@ -87,9 +87,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 10: New calibration values and the bucket 0 line (effort S)
 
-- [ ] Tests first (TC13): `calibration.ts` measures the 90th and 99th percentiles (nearest rank), the four shares of users by action count, the share of users with at least one followee, and the top user's share of all actions, with the tolerances of design §4 "Changed Spec". The share limit fails when one user is above `maxUserActionShare`. In `run.ts`, the bucket check fails when bucket 0 has no kept test user (TC14).
-- [ ] Change `eval/src/checks/calibration.ts` and `eval/src/checks/run.ts` (design §4 "Checks").
-- [ ] Commit: `feat: eval calibration adds percentiles, bins, list share and the user cap`
+- [x] Tests first (TC13): `calibration.ts` measures the 90th and 99th percentiles (nearest rank), the four shares of users by action count, the share of users with at least one followee, and the top user's share of all actions, with the tolerances of design §4 "Changed Spec". The share limit fails when one user is above `maxUserActionShare`. In `run.ts`, the bucket check fails when bucket 0 has no kept test user (TC14).
+- [x] Change `eval/src/checks/calibration.ts` and `eval/src/checks/run.ts` (design §4 "Checks").
+- [x] Commit: `feat: eval calibration adds percentiles, bins, list share and the user cap`
 
 #### Step 11: Activity model (effort S)
 
