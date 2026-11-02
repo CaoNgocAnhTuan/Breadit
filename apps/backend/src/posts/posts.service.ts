@@ -12,6 +12,7 @@ import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { POST_DESC_MAX, isTooLong } from '../common/limits';
 import { engagementSelect } from './engagement';
+import { computeExploreScoreFixed } from '@breadit/ranking';
 
 // Feed page size (posts per batch). Increase for better UX.
 const LIMIT = 10;
@@ -51,12 +52,6 @@ function parseExploreCursor(cursorRaw: string): { scoreFixed: number; id: number
 
 function makeExploreCursor(item: { scoreFixed: number; id: number }): string {
   return `${item.scoreFixed}:${item.id}`;
-}
-
-function computeExploreScoreFixed(input: { likes: number; comments: number; reposts: number; ageHours: number }): number {
-  // score = likes*1 + comments*2 + reposts*3 - ageHours*0.25
-  const score = input.likes + input.comments * 2 + input.reposts * 3 - input.ageHours * 0.25;
-  return Math.floor(score * 100);
 }
 
 function applyExploreDiversity<T extends { userId: string }>(

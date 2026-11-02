@@ -85,9 +85,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 #### Step 7: Backend uses the package (effort S)
 
-- [ ] Add `"@breadit/ranking": "0.1.0"` to `apps/backend/package.json` dependencies, and install. Delete the private `computeExploreScoreFixed` from `posts.service.ts` and import it from `@breadit/ranking`. Change nothing else in the file (design: Approach "The backend change is one import").
-- [ ] Build the package, then run the backend build, the unit tests and the integration tests (db and redis up). All must pass, including the Explore test in `counts.it-spec.ts`. Check that `grep` finds no definition of `computeExploreScoreFixed` in `apps/backend/src` (DW2).
-- [ ] Commit: `refactor: backend Explore imports computeExploreScoreFixed from @breadit/ranking`
+- [x] Add `"@breadit/ranking": "0.1.0"` to `apps/backend/package.json` dependencies, and install. Delete the private `computeExploreScoreFixed` from `posts.service.ts` and import it from `@breadit/ranking`. Change nothing else in the file (design: Approach "The backend change is one import").
+- [x] Build the package, then run the backend build, the unit tests and the integration tests (db and redis up). All must pass, including the Explore test in `counts.it-spec.ts`. Check that `grep` finds no definition of `computeExploreScoreFixed` in `apps/backend/src` (DW2).
+- [x] Commit: `refactor: backend Explore imports computeExploreScoreFixed from @breadit/ranking`
 
 #### Step 8: Cross-check with the P3 pool rule (effort S)
 
