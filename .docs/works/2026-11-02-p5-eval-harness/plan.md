@@ -42,9 +42,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 1: Frozen values in code (effort XS)
 
-- [ ] Tests first (TC1): extend `frozen.test.ts` so it reads the three §7 rows of Step 0 and compares them with `frozen-v1.json`. For "Cut time T", every dataset id must have its value.
-- [ ] Add `cutTimes`, `poolLarge` and `baselineGrids` to `eval/config/frozen-v1.json`, and to the `Frozen` type and `loadFrozen` in `eval/src/frozen.ts` (design: Approach "T is checked against §7").
-- [ ] Commit: `feat: eval frozen values for P5 (T, larger pool, baseline grids)`
+- [x] Tests first (TC1): extend `frozen.test.ts` so it reads the three §7 rows of Step 0 and compares them with `frozen-v1.json`. For "Cut time T", every dataset id must have its value.
+- [x] Add `cutTimes`, `poolLarge` and `baselineGrids` to `eval/config/frozen-v1.json`, and to the `Frozen` type and `loadFrozen` in `eval/src/frozen.ts` (design: Approach "T is checked against §7").
+- [x] Commit: `feat: eval frozen values for P5 (T, larger pool, baseline grids)`
 
 #### Step 2: Metrics (effort XS)
 

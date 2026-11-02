@@ -1,7 +1,27 @@
 {
+  "alphaBetaGrid": [0, 1, 2, 4, 8, 16],
   "baseEpoch": {
     "iso": "2026-01-01T00:00:00Z",
     "seconds": 1767225600
+  },
+  "baselineGrids": {
+    "BL2t": [0.0625, 0.125, 0.25, 0.5, 1],
+    "BL4": [11250, 22500, 45000, 90000, 180000],
+    "BL5": [1.2, 1.5, 1.8, 2.1, 2.4]
+  },
+  "bootstrapResamples": 10000,
+  "confidenceLevel": 0.95,
+  "cutQuantile": 0.8,
+  "cutTimes": {
+    "digg2009": 1246068297,
+    "syn-W0-M": 21412417,
+    "syn-W0-S": 21393508,
+    "syn-W1-M": 21412417,
+    "syn-W1-S": 21393508,
+    "syn-W2H-M": 21412417,
+    "syn-W2L-M": 21412417,
+    "syn-W2M-M": 21412417,
+    "syn-W2M-S": 21393508
   },
   "historyBuckets": [
     { "label": "0", "min": 0, "max": 0 },
@@ -9,8 +29,13 @@
     { "label": "5-19", "min": 5, "max": 19 },
     { "label": "20+", "min": 20, "max": null }
   ],
+  "holmLevel": 0.05,
+  "k": [5, 10, 20],
   "masterSeed": 20261014,
+  "permutations": 10000,
   "poolCap": 2000,
+  "poolLarge": { "windowDays": 14, "poolCap": 4000 },
+  "priorStrength": 5,
   "sizes": {
     "M": { "posts": 20000, "users": 1000 },
     "S": { "posts": 4000, "users": 200 }

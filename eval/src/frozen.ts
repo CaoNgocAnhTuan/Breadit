@@ -7,10 +7,28 @@ export interface HistoryBucket {
 }
 
 export interface Frozen {
+  /** Super-plan section 7, row "alpha, beta grid". */
+  alphaBetaGrid: number[];
   baseEpoch: { iso: string; seconds: number };
+  /** Row "Baseline grids": the tuning grid of each tuned baseline. */
+  baselineGrids: { BL2t: number[]; BL4: number[]; BL5: number[] };
+  bootstrapResamples: number;
+  confidenceLevel: number;
+  /** The q of row "Cut time T" (blueprint section 3.1). */
+  cutQuantile: number;
+  /** Row "Cut time T": dataset id to T. The harness stops when its own T differs. */
+  cutTimes: Record<string, number>;
   historyBuckets: HistoryBucket[];
+  holmLevel: number;
+  /** Row "K". */
+  k: number[];
   masterSeed: number;
+  permutations: number;
   poolCap: number;
+  /** Row "Larger pool (W_L, N_L) for E8". */
+  poolLarge: { windowDays: number; poolCap: number };
+  /** Row "Prior strength m". */
+  priorStrength: number;
   sizes: { M: { posts: number; users: number }; S: { posts: number; users: number } };
   windowDays: number;
 }
