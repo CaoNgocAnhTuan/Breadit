@@ -44,9 +44,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 4: Canonical files (effort S)
 
-- [ ] Tests first (TC4): `writeTable` sorts by the keys of blueprint §2.2, writes a header, LF, UTF-8, no trailing spaces, and an empty `community_id` as empty; it throws on a non-integer id or time, on a missing column and on an unknown table. `readTable` reads back the same rows. `writeManifest` gives sorted keys, two-space JSON and a final LF, with the keys of blueprint §2.3 (`schemaVersion`, `datasetId`, `source`, `masterSeed`, `epoch`, `node`, `files`). The SHA-256 in `files` equals the SHA-256 of the file on disk.
-- [ ] Write `eval/src/canonical/schema.ts`, `csv.ts`, `manifest.ts` (design: Code files).
-- [ ] Commit: `feat: eval canonical CSV and manifest writers`
+- [x] Tests first (TC4): `writeTable` sorts by the keys of blueprint §2.2, writes a header, LF, UTF-8, no trailing spaces, and an empty `community_id` as empty; it throws on a non-integer id or time, on a missing column and on an unknown table. `readTable` reads back the same rows. `writeManifest` gives sorted keys, two-space JSON and a final LF, with the keys of blueprint §2.3 (`schemaVersion`, `datasetId`, `source`, `masterSeed`, `epoch`, `node`, `files`). The SHA-256 in `files` equals the SHA-256 of the file on disk.
+- [x] Write `eval/src/canonical/schema.ts`, `csv.ts`, `manifest.ts` (design: Code files).
+- [x] Commit: `feat: eval canonical CSV and manifest writers`
 
 #### Step 5: The four checks (effort M)
 
