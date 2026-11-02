@@ -1,6 +1,6 @@
 # Plan: Digg 2009 adapter to the canonical format
 
-Status: draft · 2026-11-02
+Status: approved · 2026-11-02
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapter/`
 
 ---
@@ -24,9 +24,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapte
 
 #### Step 1: Source config (effort XS)
 
-- [ ] Tests first (TC1): `loadDiggConfig()` returns both zips. A test reads the zip table of `.docs/datasets.md` §4 and checks that each zip's capture URL, SHA-256, member name and member size equal the config. It also checks that the password equals the one quoted in §4.
-- [ ] Write `eval/config/digg2009.json` and `loadDiggConfig()` in `eval/src/adapters/digg.ts` (design: Approach "One config file for the source", Code files). Choices: `dropZeroDateLinks: true`, `addMutualReverse: false`, `idSource: "digg"`, `joinedAt: "firstAppearance"` (Spec Open questions 1, 2, 4, 5).
-- [ ] Commit: `feat: eval digg2009 source config checked against datasets.md`
+- [x] Tests first (TC1): `loadDiggConfig()` returns both zips. A test reads the zip table of `.docs/datasets.md` §4 and checks that each zip's capture URL, SHA-256, member name and member size equal the config. It also checks that the password equals the one quoted in §4.
+- [x] Write `eval/config/digg2009.json` and `loadDiggConfig()` in `eval/src/adapters/digg.ts` (design: Approach "One config file for the source", Code files). Choices: `dropZeroDateLinks: true`, `addMutualReverse: false`, `idSource: "digg"`, `joinedAt: "firstAppearance"` (Spec Open questions 1, 2, 4, 5).
+- [x] Commit: `feat: eval digg2009 source config checked against datasets.md`
 
 #### Step 2: Zip reader (effort S)
 

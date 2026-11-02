@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "datasetId": "digg2009",
+  "page": {
+    "url": "http://web.archive.org/web/20221130205157id_/https://www.isi.edu/~lerman/downloads/digg2009.html",
+    "citation": "Hogg, T. and Lerman, K. (2012) Social Dynamics of Digg. EPJ Data Science 1(5)."
+  },
+  "password": "digg2009_user",
+  "zips": {
+    "votes": {
+      "file": "digg_votes.zip",
+      "url": "http://web.archive.org/web/20130826053517id_/http://www.isi.edu/~lerman/downloads/digg_votes.zip",
+      "capturedAt": "2013-08-26T05:35:17Z",
+      "sha256": "55bba035e08d31f14022aeef1f57b24322d2c0bea1fb241e3c99b0af59aafda1",
+      "member": "digg_votes1.csv",
+      "memberBytes": 85563349
+    },
+    "friends": {
+      "file": "digg_friends.zip",
+      "url": "http://web.archive.org/web/20130826053527id_/http://www.isi.edu/~lerman/downloads/digg_friends.zip",
+      "capturedAt": "2013-08-26T05:35:27Z",
+      "sha256": "4d5d3189c66d0606dc09aa919444cfc2377613a8011766af6f0ea9f3359c3bba",
+      "member": "digg_friends.csv",
+      "memberBytes": 61202706
+    }
+  },
+  "choices": {
+    "dropZeroDateLinks": true,
+    "addMutualReverse": false,
+    "idSource": "digg",
+    "joinedAt": "firstAppearance"
+  }
+}
