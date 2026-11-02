@@ -2,9 +2,9 @@
   "version": 1,
   "params": {
     "activityParetoAlpha": {
-      "value": 1.125,
+      "value": 0.875,
       "kind": "calibrated",
-      "note": "For a Pareto law the top 20% share is 0.2^(1 - 1/alpha). 1.125 gives 0.836. Median over mean is then about 0.21.",
+      "note": "Start value 1.125 (population top 20% share 0.2^(1 - 1/alpha) = 0.836). With 1,000 users the sample has a lighter tail than the law, so the measured skew was 0.674 and the median 9. Calibration round 1 moved it to 0.875.",
       "targets": [
         { "key": "activitySkewTop20", "value": 0.8364, "row": "Activity skew (share of votes by the top 20% of voters)", "file": "digg_votes1.csv" },
         { "key": "votesPerUserMedian", "value": 4, "row": "Votes per voter (median)", "file": "digg_votes1.csv" }
@@ -19,9 +19,9 @@
       ]
     },
     "followeesMean": {
-      "value": 24.26,
+      "value": 34,
       "kind": "calibrated",
-      "note": "Mean list length of users with a list. Capped at users - 1.",
+      "note": "Mean list length of users with a list, capped at users - 1. Start value 24.26. Returned links give a list to almost every user, so the measured mean was 17.5. Calibration round 1 moved it to 34.",
       "targets": [
         { "key": "followeesMean", "value": 24.26, "row": "Followees per user (users with at least 1 followee)", "file": "digg_friends.csv" }
       ]

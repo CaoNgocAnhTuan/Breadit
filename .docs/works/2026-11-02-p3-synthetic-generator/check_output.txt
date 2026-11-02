@@ -1,0 +1,116 @@
+synthetic-v1.json sha256 3d54d5850e88ae326b65854fc032bab221e1dbb2a54fd3d8826f85f3a8adba0d
+window W 7 days, pool cap N_max 2000, q 0.8
+
+== syn-W0-S ==
+manifest sha256 3bff0c720826b671c26ef1ec578bb14343c9c2be8b04cc2dd6aba65f792d47dd
+rows communities=20 follows=4589 interactions=4328 memberships=370 posts=4000 users=200
+skipped actions (no candidate): 2
+format: pass
+
+== syn-W1-S ==
+manifest sha256 31247972adb9ad10135349d9db964e62db5fcfa27914e2718680fe3aea11c99b
+rows communities=20 follows=4613 interactions=4328 memberships=370 posts=4000 users=200
+skipped actions (no candidate): 2
+format: pass
+
+== syn-W2M-S ==
+manifest sha256 5551b119668ed55b0bccf78dd1043964d08eb6a327677ddb6df4122ced0fc8ca
+rows communities=20 follows=4613 interactions=4328 memberships=370 posts=4000 users=200
+skipped actions (no candidate): 2
+format: pass
+
+== syn-W0-M ==
+manifest sha256 addbf03c9b30290bd733cb220488724588ce4a0ff348a708b94c96f960910d37
+rows communities=20 follows=24330 interactions=21648 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 2
+format: pass
+calibration: pass
+               value  generated     target  tolerance  result
+    votesPerUserMean  21.648000  21.650000        10%    pass
+  votesPerUserMedian   4.000000   4.000000        10%    pass
+   activitySkewTop20   0.847469   0.836400   5 points    pass
+       followeesMean  24.378758  24.260000        10%    pass
+lift: 1.054062 (actions 21648, on exposed posts 500, expected exposed 474.355386)
+
+== syn-W1-M ==
+manifest sha256 f30703d04dcd5e1cb937ca530ded5ec39c6967713581ed9c326ed43f123a8acc
+rows communities=20 follows=24275 interactions=21648 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 2
+format: pass
+calibration: pass
+               value  generated     target  tolerance  result
+    votesPerUserMean  21.648000  21.650000        10%    pass
+  votesPerUserMedian   4.000000   4.000000        10%    pass
+   activitySkewTop20   0.847469   0.836400   5 points    pass
+       followeesMean  24.323647  24.260000        10%    pass
+lift: 1.637104 (actions 21648, on exposed posts 781, expected exposed 477.061897)
+
+== syn-W2L-M ==
+manifest sha256 bf476fc6922df57551734e5adf926d408b8c57271aa325edba9560a9155714c2
+rows communities=20 follows=24275 interactions=21648 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 2
+format: pass
+calibration: pass
+               value  generated     target  tolerance  result
+    votesPerUserMean  21.648000  21.650000        10%    pass
+  votesPerUserMedian   4.000000   4.000000        10%    pass
+   activitySkewTop20   0.847469   0.836400   5 points    pass
+       followeesMean  24.323647  24.260000        10%    pass
+lift: 2.088188 (actions 21648, on exposed posts 992, expected exposed 475.053074)
+
+== syn-W2M-M ==
+manifest sha256 0dd52422608f9b66e43b9339fce85e13349fe67932ec464117ac78cfd76fb95f
+rows communities=20 follows=24275 interactions=21648 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 2
+format: pass
+calibration: pass
+               value  generated     target  tolerance  result
+    votesPerUserMean  21.648000  21.650000        10%    pass
+  votesPerUserMedian   4.000000   4.000000        10%    pass
+   activitySkewTop20   0.847469   0.836400   5 points    pass
+       followeesMean  24.323647  24.260000        10%    pass
+lift: 3.477411 (actions 21648, on exposed posts 1603, expected exposed 460.975093)
+buckets (q 0.8): positives 21648, T 20835066 (2026-08-30T03:31:06.000Z), test users 571
+  pool at T: 2000 (window only: 2274), median pool over kept test users 2000.000000
+  bucket  test_users  kept  left_out  kept_with_followee
+       0           0     0         0                   0
+     1-4         264   226        38                 224
+     0-4         264   226        38                 224
+    5-19         194   171        23                 170
+     20+         113    98        15                  98
+  kept test users in bucket 0-4: 226 (threshold 100): pass
+
+== syn-W2H-M ==
+manifest sha256 e05d1c8442f276145cb975aca74643f6a8e638d9a6b607027d45382f3e16fde2
+rows communities=20 follows=24275 interactions=21648 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 2
+format: pass
+calibration: pass
+               value  generated     target  tolerance  result
+    votesPerUserMean  21.648000  21.650000        10%    pass
+  votesPerUserMedian   4.000000   4.000000        10%    pass
+   activitySkewTop20   0.847469   0.836400   5 points    pass
+       followeesMean  24.323647  24.260000        10%    pass
+lift: 6.780122 (actions 21648, on exposed posts 2954, expected exposed 435.685372)
+
+== lift per size M world ==
+  world      lift
+     W0  1.054062
+     W1  1.637104
+    W2L  2.088188
+    W2M  3.477411
+    W2H  6.780122
+lift order (W0 lowest, W2L < W2M < W2H): pass
+
+result: pass
+
+== double run (DW3) ==
+second gen into a folder outside the repo; manifest.json SHA-256 and all files compared with the first run
+syn-W0-M equal all files identical
+syn-W0-S equal all files identical
+syn-W1-M equal all files identical
+syn-W1-S equal all files identical
+syn-W2H-M equal all files identical
+syn-W2L-M equal all files identical
+syn-W2M-M equal all files identical
+syn-W2M-S equal all files identical

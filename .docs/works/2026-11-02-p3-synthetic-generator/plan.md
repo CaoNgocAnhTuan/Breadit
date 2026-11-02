@@ -78,12 +78,12 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 9: Generate, check and calibrate (effort M)
 
-- [ ] Run `gen` into `eval/data`, then `check`. Read the report: format (all eight), calibration (the M datasets), lift order (DW7), buckets for `syn-W2M-M` (DW6).
-- [ ] If calibration fails (design F5), change only the parameter whose target failed, in `synthetic-v1.json`. If buckets fail (F6, F7), change only a value marked `chosen` (late joiners, τ, span). Never change a homophily or influence value to pass DW7: if the lift order is wrong, stop and report (it is a bug). At most 5 rounds; if a check still fails, stop and report the last output.
-- [ ] Write each change (parameter, old value, new value, why) in a short list at the end of the Step 9 report, for the Result section.
-- [ ] Run `gen` a second time into a second folder outside the repo and compare the eight manifests with the first run (DW3).
-- [ ] Save the final `check` output, with the SHA-256 of each manifest and of `synthetic-v1.json`, as `check_output.txt` in this task folder.
-- [ ] Commit: `chore: P3 synthetic data generated and checked`
+- [x] Run `gen` into `eval/data`, then `check`. Read the report: format (all eight), calibration (the M datasets), lift order (DW7), buckets for `syn-W2M-M` (DW6).
+- [x] If calibration fails (design F5), change only the parameter whose target failed, in `synthetic-v1.json`. If buckets fail (F6, F7), change only a value marked `chosen` (late joiners, τ, span). Never change a homophily or influence value to pass DW7: if the lift order is wrong, stop and report (it is a bug). At most 5 rounds; if a check still fails, stop and report the last output.
+- [x] Write each change (parameter, old value, new value, why) in a short list at the end of the Step 9 report, for the Result section.
+- [x] Run `gen` a second time into a second folder outside the repo and compare the eight manifests with the first run (DW3).
+- [x] Save the final `check` output, with the SHA-256 of each manifest and of `synthetic-v1.json`, as `check_output.txt` in this task folder.
+- [x] Commit: `chore: P3 synthetic data generated and checked`
 
 ## Claude's part
 
