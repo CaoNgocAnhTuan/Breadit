@@ -9,7 +9,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 - **New code only.** Everything goes into the new `eval/` workspace, plus the root `package.json`, `package-lock.json` and `.gitignore`. Do not touch `apps/`, `packages/`, the Prisma schema, `docs/`, `Latex/`, `.env` or `.claude/`.
 - **Needs:** the pinned Node. In a non-interactive shell, load nvm from `~/.nvm/nvm.sh`, then `nvm use` in the repo root, so `node -v` prints the `.nvmrc` version. The default shell has v22.14.0, and `.ts` files do not load on it (design F1). Every Node command and every commit (the husky hook runs the frontend typecheck) runs under the pinned Node. No Docker and no network are needed for Steps 1 to 9.
-- **Who does what.** Sonnet does Steps 1 to 9. Claude does "Claude's part" and the Acceptance. Sonnet does not edit `.docs/super-plan.md`, `.docs/Bugs Report.md`, `CLAUDE.md` or `design.md`.
+- **Who does what.** Sonnet does Steps 1 to 13 (Steps 10 to 13 come from design §4, Amendment 1). Claude does "Claude's part" and the Acceptance. Sonnet does not edit `.docs/super-plan.md`, `.docs/Bugs Report.md`, `CLAUDE.md` or `design.md`.
 - **Rules for every step.**
   - Tests first: write the test, run it, see it fail for the right reason, then write the code.
   - Follow `.claude/rules/determinism.md`: no `Date.now`, `new Date()` with no argument, `performance.now`, `Math.random`, `crypto.randomUUID`, `localeCompare`, `toLocaleString`, `Intl`, and no `.sort()` without a compare function. The post-edit hook reports them.
@@ -85,6 +85,31 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 - [x] Save the final `check` output, with the SHA-256 of each manifest and of `synthetic-v1.json`, as `check_output.txt` in this task folder.
 - [x] Commit: `chore: P3 synthetic data generated and checked`
 
+#### Step 10: New calibration values and the bucket 0 line (effort S)
+
+- [ ] Tests first (TC13): `calibration.ts` measures the 90th and 99th percentiles (nearest rank), the four shares of users by action count, the share of users with at least one followee, and the top user's share of all actions, with the tolerances of design §4 "Changed Spec". The share limit fails when one user is above `maxUserActionShare`. In `run.ts`, the bucket check fails when bucket 0 has no kept test user (TC14).
+- [ ] Change `eval/src/checks/calibration.ts` and `eval/src/checks/run.ts` (design §4 "Checks").
+- [ ] Commit: `feat: eval calibration adds percentiles, bins, list share and the user cap`
+
+#### Step 11: Activity model (effort S)
+
+- [ ] Tests first (TC15): on a large tiny-config draw (for example 20,000 users), the four bin shares are within 1 point of the config; every count is at least 1; no count is above the cap; counts in 2–4 and 5–19 fall with `k`. Stage 5 gives each user exactly their count, minus skipped actions, and no longer calls `allocate`.
+- [ ] Change `eval/src/generator/users.ts`, `interactions.ts`, `config.ts`, and the config params `activityTailAlpha`, `activityBinShares`, `maxUserActionShare` (design §4 "Activity", "Config"). Remove `activityParetoAlpha`.
+- [ ] Commit: `feat: eval activity counts drawn by Digg bins with a capped tail`
+
+#### Step 12: Follow rule and span (effort XS)
+
+- [ ] Tests first (TC16): a user without a list has no followee; a returned link always goes to a user with a list; the share of users with a followee equals the share of list holders.
+- [ ] Change `eval/src/generator/follows.ts`. In `synthetic-v1.json`: `followListShare` becomes calibrated (target 51.19%, `.docs/datasets.md` §4), `followeesMean` start 19.4, `spanDays` 80 (design §4 "Follows", "Span").
+- [ ] Commit: `feat: eval returned links only between list holders, span 80 days`
+
+#### Step 13: Generate, check and calibrate again (effort M)
+
+- [ ] Same as Step 9, with the DW5 and DW6 of design §4. Calibration may move only `activityTailAlpha`, `followeesMean` and `followListShare`. Buckets may move only `lateJoinerShare`, `freshnessTauHours` or `spanDays`. At most 5 rounds, then stop and report. Never change homophily or influence.
+- [ ] Report the top user's share, the number of users at the cap, the bucket 0 count and the median pool size, with every parameter change.
+- [ ] Two runs into two folders: all eight manifests equal. Replace `check_output.txt`.
+- [ ] Commit: `chore: P3 synthetic data regenerated after amendment 1`
+
 ## Claude's part
 
 - [ ] Read the commits and the diff against the design. Check that `package-lock.json` changed only by the workspace link.
@@ -110,14 +135,18 @@ All tests are unit tests in `eval/src/**/*.test.ts`, run by `node --test` under 
 | TC10 | DW3 | unit | Two runs of `syn-W2M-S` are byte-identical |
 | TC11 | design Approach | unit | `syn-W1-S` and `syn-W2M-S` share the first four stages' files; F10 folder rules |
 | TC12 | DW8 | unit | No forbidden pattern in `eval/src` |
+| TC13 | DW5 (amended) | unit | New calibration values, tolerances and the user cap |
+| TC14 | DW6 (amended) | unit | Bucket check fails when bucket 0 is empty |
+| TC15 | DW5 (amended) | unit | Activity counts follow the bins, at least 1, at most the cap |
+| TC16 | DW5 (amended) | unit | No followee without a list; returns only between holders |
 
 ## Acceptance
 
 - [ ] `npm ci` at the root, then `npm run verify -w @breadit/eval` under the pinned Node → both exit 0 (DW1)
 - [ ] `check` on `eval/data` → format passes for all eight datasets (DW4)
 - [ ] Two `gen` runs into two empty folders → every `manifest.json` pair has the same SHA-256 (DW3)
-- [ ] Calibration table for the five M datasets → every calibrated value within its tolerance (DW5)
-- [ ] Bucket table for `syn-W2M-M` at `q` = 0.8 → at least 100 kept test users in bucket 0–4 (DW6)
+- [ ] Calibration table for the five M datasets → every calibrated value of design §4 within its tolerance, and no user above `maxUserActionShare` (DW5, amended)
+- [ ] Bucket table for `syn-W2M-M` at `q` = 0.8 → at least 100 kept test users in bucket 0–4, and at least one in bucket 0 (DW6, amended)
 - [ ] Lift per M world → W0 lowest, and W2L < W2M < W2H (DW7)
 - [ ] grep `eval/src` for the forbidden patterns → no match without `// harness-allow:` (DW8)
 - [ ] `bash .claude/hooks/verify.sh` with db and redis up, and `docker compose build` → all pass (DW9)

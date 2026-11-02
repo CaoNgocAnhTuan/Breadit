@@ -1,7 +1,7 @@
 # Seeded synthetic generator and eval workspace
 
 Spec status: approved · 2026-11-02
-Design status: draft · 2026-11-02
+Design status: approved · 2026-11-02
 Type: feature · Folder: `.docs/works/2026-11-02-p3-synthetic-generator/`
 
 ## 1. Spec
@@ -245,3 +245,46 @@ Blocked users, soft deletes, pending posts, banned users and caches do not exist
 ### Data, schema and cache changes
 
 None in Postgres or Redis. The app is not touched. New files go only to `eval/data/<datasetId>/` (git-ignored, rebuilt from the seed): six CSV files and one `manifest.json` per dataset.
+
+## 4. Amendment 1 (2026-11-02)
+
+Agreed by the author in chat on 2026-11-02: fix the three problems below with the recommended changes. This section changes DW5 and DW6 and parts of section 3. Where it differs from sections 1 to 3, this section wins.
+
+### Why
+
+Steps 1 to 9 passed every DW, but `syn-W2M-M` (checked on 2026-11-02, before the freeze) had three problems that DW5 did not catch, because DW5 checked only the mean, the median, the skew and the followee mean:
+- **One user made 35.8% of all actions** (user 868, 7,754 of 21,648, on 38.8% of all posts). The cause was calibration round 1, which moved the Pareto shape to 0.875 (below 1) to meet the median and the skew with 1,000 users. Digg's top voter has about 0.35%.
+- **Bucket 0 was empty.** Every user had at least 2 actions, so no test user had zero history. Family F1 (blueprint §3.3) tests the group 0 on its own. Digg has 27.80% of voters with exactly one vote (§6a).
+- **99.8% of users had a followee**, because returned links gave a list to almost everyone. Digg: 51.19% of voters have a list (`.docs/datasets.md` §4). H2 needs users who follow nobody.
+
+### Changed Spec
+
+- **DW5** (replaces the row). The calibration table for each size M dataset. Calibrated values and tolerances: votes per user mean and median (10%); the 90th and 99th percentiles of votes per user (25%, because a tail percentile is noisy with 1,000 users); the four shares of users with 1, 2–4, 5–19 and 20 or more actions (5 points each); the activity skew (5 points); the mean followees of users with at least one followee (10%); the share of users with at least one followee (5 points, target 51.19% from `.docs/datasets.md` §4). Plus one limit: no user has more than `maxUserActionShare` of all actions.
+- **DW6** (adds a line). Bucket 0 has at least one kept test user, and the table prints its count.
+
+### Changed Design
+
+**Activity (stages 1 and 5).** The Pareto activity weight and the proportional split (`allocate` in stage 5) go away. Stage 1 draws each user's action count directly:
+- one bin by the four calibrated shares (1; 2–4; 5–19; 20 or more);
+- inside the bins 2–4 and 5–19, a count `k` with weight `1/k` (chosen; Digg gives no finer shape);
+- in the bin 20 or more, `floor(20 · Pareto(α_tail))`, capped at `floor(maxUserActionShare · mean · N)`.
+
+Every user has at least one action, as every Digg voter does. The total is no longer fixed, so the mean is met within the tolerance, not by construction. Stage 5 uses these counts instead of `allocate`. A count is drawn from the `users` stream, so the RNG streams keep their names.
+
+Start values: `α_tail` = 1.06 (calibrated). With the bin means (1, about 2.77, about 10.24) and the cap, it gives a tail mean of about 91, so the overall mean is about 21.65. It also gives a 90th percentile of about 38 and a 99th of about 330, against Digg's 45 and 287. `maxUserActionShare` = 0.05 (chosen). The calibration step may move `α_tail`.
+
+**Follows (stage 2).** A link is returned only when the followee also has a list. So users without a list follow nobody, and their share stays near `followListShare`. `followListShare` is now calibrated, with the target 51.19%. `followeesMean` is the mean length of the forward list. Returns add about one quarter on top, so its start value is 19.4 (calibrated against the measured mean of 24.26).
+
+**Span.** `spanDays` goes from 70 to 80 (chosen), so the 7-day window at T has about 2,000 posts or fewer, and the cap N_max does not bind (F7).
+
+**Config.** `activityParetoAlpha` is replaced by `activityTailAlpha`, `activityBinShares` (four calibrated values with their §6a row) and `maxUserActionShare`. Each target sits in its parameter's `targets`, so the checks still hold no Digg number.
+
+**Checks.** `calibration.ts` measures the new values. `run.ts` adds the bucket 0 line of DW6 and the share limit of DW5.
+
+**New failure modes.**
+
+| # | What can go wrong | How we notice | How we resolve it |
+|---|---|---|---|
+| F14 | The cap lets several users sit at 5% each | The calibration table prints the top user's share and the number of users at the cap | Expected for 1 to 4 users at size M. If more, raise `α_tail` (a lighter tail) and check the mean again |
+| F15 | The tail percentiles miss the 25% tolerance while the mean passes | DW5 | Move `α_tail` only. If the mean and the 99th percentile cannot both pass, stop and report: the tail law is wrong for 1,000 users |
+| F16 | Bucket 0 is still empty, because users with one action act before T | DW6 | Raise `lateJoinerShare` (chosen) |
