@@ -37,9 +37,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapte
 
 #### Step 3: Strict parser (effort S)
 
-- [ ] Tests first (TC3): `parseVotes` and `parseFriends` on small buffers with CR, LF and CR LF line ends, one empty last line, and quoted values. Each bad case stops with the line number: a missing quote, an extra field, a missing field, a non-digit, a negative sign, an empty field.
-- [ ] Write `eval/src/adapters/digg-parse.ts` (design: Approach "Parse strictly", F4). Rows go into typed arrays.
-- [ ] Commit: `feat: eval strict Digg CSV parser`
+- [x] Tests first (TC3): `parseVotes` and `parseFriends` on small buffers with CR, LF and CR LF line ends, one empty last line, and quoted values. Each bad case stops with the line number: a missing quote, an extra field, a missing field, a non-digit, a negative sign, an empty field.
+- [x] Write `eval/src/adapters/digg-parse.ts` (design: Approach "Parse strictly", F4). Rows go into typed arrays.
+- [x] Commit: `feat: eval strict Digg CSV parser`
 
 #### Step 4: Transform (effort S)
 
