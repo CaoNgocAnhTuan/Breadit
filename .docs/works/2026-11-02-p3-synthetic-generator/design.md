@@ -191,7 +191,7 @@ sequenceDiagram
         C->>K: format, calibration (M only), lift (M only), buckets (syn-W2M-M)
         K-->>C: tables with pass or fail
     end
-    C-->>A: report; exit 1 if any check fails
+    C-->>A: report, and exit 1 if any check fails
 ```
 
 ### Failure modes
