@@ -10,12 +10,19 @@ Breadit is an X/Twitter clone built as an npm-workspaces monorepo:
 - `apps/backend` (`@breadit/backend`): NestJS 10 on **Fastify** (not Express), Prisma 6, PostgreSQL 16, Redis 7, Socket.IO
 - `packages/shared` (`@breadit/shared`): shared TS types imported by the frontend. Its `types` point at `dist/`, so run `npm run build -w @breadit/shared` before typechecking or building the frontend.
 - `packages/ranking` (`@breadit/ranking`): the pure ranking code of the thesis (pool, as-of features, every scorer, `computeExploreScoreFixed`), used by the backend's Explore and by `eval/`. It is CommonJS built to `dist/`, so run `npm run build -w @breadit/ranking` before the backend build, the backend tests or `eval` (`verify.sh` and the backend Dockerfile do this). Its tests: `npm run test -w @breadit/ranking`.
+- `eval` (`@breadit/eval`): the thesis evaluation (synthetic generator, Digg 2009 adapter, harness, metrics, statistics). ESM; the `.ts` files run directly on the pinned Node, and it never touches Postgres, Redis or HTTP (only the planned loader writes to Postgres). Nothing imports it. Commands are under "Commands" below.
 
-`docs/Pre-thesis/` and `Latex/` hold the pre-thesis report and design material (ADRs, use cases, ERDs, k6 perf scripts). Do not move or edit them. Thesis-phase docs go in `.docs/` at the repo root. The root of `docs/` holds thesis docs for the supervisor and the defense, such as `docs/System_Architecture.md` (the proposed system and the annotated directory tree). No application code lives in any of these folders.
+`docs/Pre-thesis/` and `Latex/` hold the pre-thesis report and design material (ADRs, use cases, ERDs, k6 perf scripts). Do not move or edit them. Thesis working docs (plans, task folders, results) go in `.docs/` at the repo root. The root of `docs/` holds thesis docs for the supervisor, reviewers and the defense:
+- `docs/System_Architecture.md`: the proposed system, its diagrams and the annotated directory tree.
+- `docs/Guidance-Manual/`: a study guide in 10 topics, each in `en/` and `vi/` with the same content. English is the reference; if the two differ, fix the Vietnamese one.
+
+No application code lives in any of these folders.
+
+**Keep the docs in step with the code.** When a task changes the architecture, the feed, the ranking, the data or the evaluation, update `docs/System_Architecture.md` and the Guidance Manual files on that topic (both languages) in the same task, and change their 🔜 or "(after P7)" marks when the planned part is built. The Result section of the task names the files it updated.
 
 ## How to write
 
-The author reads English as a second language (upper-intermediate). This applies to chat replies and to every doc you write or change (new thesis docs go in `.docs/`). In chat, talk like a thesis supervisor: explain, brainstorm, give an opinion.
+The author reads English as a second language (upper-intermediate). This applies to chat replies and to every doc you write or change (thesis working docs go in `.docs/`, docs for the supervisor and reviewers in the root of `docs/`). In chat, talk like a thesis supervisor: explain, brainstorm, give an opinion.
 
 - Short and direct. Give the answer first, then the reason. Add detail only when asked.
 - Simple everyday words. If a word is rare or formal, use a simpler one.
@@ -125,6 +132,13 @@ Read-heavy endpoints cache JSON in Redis under `prefix:part:part…`. Invalidati
 - When you add a cached read, include the relevant version in the key and bump that version on every write that affects it.
 
 `getOrSetJson` adds a stampede lock. Setting `REDIS_HTTP_CACHE_ENABLED=false` disables the JSON cache.
+
+### Feeds and ranking (`src/posts/posts.service.ts`, `packages/ranking`)
+
+- `GET /api/posts` → `PostsService.findAll` picks the mode from `feed`, `user` and `communityId`: For You (you and your followees, no community posts, newest first), `following`, `communities`, `explore`, a profile, a community, or the guest feed. Pages have 10 posts and live 10 s in the cache under `feed:...:<v:user>`.
+- Explore takes the 400 newest posts of 7 days, scores them with `computeExploreScoreFixed` from `@breadit/ranking` (this is BL2 of the thesis), sorts by `(scoreFixed desc, id desc)` and caps posts per author. Its own `Date.now()` is Bugs Report T4, fixed in task `p6-social-feed`.
+- All ranking logic belongs in `@breadit/ranking`, never in the backend. The package is pure: no Nest, Prisma, Redis, clock or randomness. The backend loads plain arrays, calls `buildPool`, the as-of feature builders, `scorer(method)` and `rankPool`, and gets back ordered post ids. `eval/` calls the same functions, so offline numbers describe the live feed.
+- Task `p6-social-feed` (planned) adds `apps/backend/src/feed/` (`FeedService`), the `algo` option (`chrono`, `engagement`, `social`) in the controller, `findAll` and the cache key, a default `algo` from an env variable (unset = today's For You), a test-only `asOf` flag, and a parity test. Any change or speed-up of the feed must keep the parity test passing: the live order must equal the harness order. The details are in `docs/Guidance-Manual/en/08-system-and-feed.md`.
 
 ### Other cross-cutting pieces
 

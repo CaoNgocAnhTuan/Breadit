@@ -14,10 +14,10 @@ How the report was made: first I read the code and listed 26 suspected problems.
 |---|---|
 | Findings in the review | 36 (T1–T10, S1–S6, B1–B10, N1–N10) |
 | **Resolved** | **14** |
-| **Still open** | **22 of the 36, plus 6 found later (R1–R6) = 28** |
+| **Still open** | **22 of the 36, plus 7 found later (R1–R7) = 29** |
 | Open decision | 0 (D1 decided on 2026-10-28, section 4) |
 
-Open items by priority: **P1 = 6, P2 = 6, P3 = 8, P4 = 8.** What the levels mean is in section 2.
+Open items by priority: **P1 = 6, P2 = 6, P3 = 8, P4 = 9.** What the levels mean is in section 2.
 
 The fixes were checked like this:
 - The same curl script ran on the unfixed code (**42 passed, 53 failed**) and on the final code on a freshly seeded database (**95 passed, 0 failed**). Output: [works/2026-10-21-bugs-sweep/sweep-before.txt](works/2026-10-21-bugs-sweep/sweep-before.txt) and [works/2026-10-21-bugs-sweep/sweep-after.txt](works/2026-10-21-bugs-sweep/sweep-after.txt).
@@ -96,6 +96,7 @@ Code locations use function and file names, because line numbers moved during th
 | **N10** | One user can report the same post many times, and each report notifies every admin. | carol's two reports on one post made 2 rows and 2 notifications. | Unique key on (reporter, post) with an upsert (fits the schema migration). | S |
 | **R4** | Dead code and unused config: the `Account` and `Session` models, `Post.parentPostId` and its relation (queries still filter `parentPostId: null`), the `resend` npm package, the env names `STORAGE_DRIVER`, `RESEND_API_KEY` and `EMAIL_FROM`, and frontend lint warnings (unused variables in six components). | From code and `npm run lint` (warnings only, 0 errors). | Remove them. The schema parts belong in the schema migration. | S–M |
 | **R5** | `getConnectUsers` builds the whole user list in memory and slices it. Fine now, slow at 5,000 users. | Code only. The connect list had 9 pages for 107 users. | Page in the database. | M |
+| **R7** | `npm run dev:reset` (root script, defined in `apps/frontend/package.json`) runs `prisma db push --force-reset` and then the seed. `db push` builds the schema without the migrations, so the `*_data_humans_v1*` data migrations never run and the database can drift from what Docker deploys with `migrate deploy`. The old README told new developers to use it, and the harness hook refuses `db push`. | Code only (found 2026-11-02 while updating the README). The README now uses `prisma migrate deploy` and `prisma db seed`. | Change the script to `prisma migrate reset --force` (drops the database, applies every migration, runs the seed) with `--schema`, or remove it. | XS |
 
 ---
 
