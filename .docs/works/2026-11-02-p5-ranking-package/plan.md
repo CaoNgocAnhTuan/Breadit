@@ -1,6 +1,6 @@
 # Plan: Shared ranking package (@breadit/ranking)
 
-Status: draft · 2026-11-02
+Status: approved · 2026-11-02
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-package/`
 
 ---
@@ -27,9 +27,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 #### Step 1: Package skeleton (effort XS)
 
-- [ ] Create `packages/ranking/package.json` (`@breadit/ranking`, 0.1.0, `main` `dist/index.js`, `types` `dist/index.d.ts`, scripts `build` and `test`), `tsconfig.json` (CommonJS, ES2021, strict, `src` only, test files excluded from the build) and `jest.config.js` (ts-jest, `src/**/*.spec.ts`) (design: Approach "A CommonJS package", Code files).
-- [ ] One placeholder spec so `test` runs. Install so the lockfile gets the link, and check that nothing else changed in it. `build` and `test` must exit 0 (DW1).
-- [ ] Commit: `build: packages/ranking workspace (@breadit/ranking)`
+- [x] Create `packages/ranking/package.json` (`@breadit/ranking`, 0.1.0, `main` `dist/index.js`, `types` `dist/index.d.ts`, scripts `build` and `test`), `tsconfig.json` (CommonJS, ES2021, strict, `src` only, test files excluded from the build) and `jest.config.js` (ts-jest, `src/**/*.spec.ts`) (design: Approach "A CommonJS package", Code files).
+- [x] One placeholder spec so `test` runs. Install so the lockfile gets the link, and check that nothing else changed in it. `build` and `test` must exit 0 (DW1).
+- [x] Commit: `build: packages/ranking workspace (@breadit/ranking)`
 
 #### Step 2: Move the Explore score (package side) (effort XS)
 
