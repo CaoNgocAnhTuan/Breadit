@@ -1,7 +1,7 @@
 # Evaluation harness, metrics, statistics and the baseline table
 
 Spec status: approved · 2026-11-02
-Design status: draft · 2026-11-02
+Design status: approved · 2026-11-02
 Type: feature · Folder: `.docs/works/2026-11-02-p5-eval-harness/`
 
 ## 1. Spec

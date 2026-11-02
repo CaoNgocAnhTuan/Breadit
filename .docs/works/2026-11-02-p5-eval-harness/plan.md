@@ -33,12 +33,12 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 0 (Claude): the approved §7 values (effort XS)
 
-- [ ] **The §7 rows.** In `.docs/super-plan.md` §7, fill three rows:
+- [x] **The §7 rows.** In `.docs/super-plan.md` §7, fill three rows:
   - **"Larger pool (W_L, N_L) for E8":** 14 days / 4,000.
   - **"Baseline grids":** BL2t age weight 0.0625, 0.125, 0.25, 0.5, 1 per hour; BL4 time divisor 11,250, 22,500, 45,000, 90,000, 180,000 s; BL5 gravity 1.2, 1.5, 1.8, 2.1, 2.4.
   - **"Cut time T":** `q` = 0.8. The S datasets get 21393508, the M datasets 21412417 (both in seconds from the base epoch), and `digg2009` 1246068297 (Unix seconds). These values were computed on 2026-11-02 with `cutTime` of `eval/src/checks/buckets.ts`.
-- [ ] **The change log.** Add a line, and give each of the three rows "frozen 2026-11-02".
-- [ ] Commit: `docs: super-plan §7, the P5 frozen values (grids, larger pool, T)`
+- [x] **The change log.** Add a line, and give each of the three rows "frozen 2026-11-02".
+- [x] Commit: `docs: super-plan §7, the P5 frozen values (grids, larger pool, T)`
 
 #### Step 1: Frozen values in code (effort XS)
 
