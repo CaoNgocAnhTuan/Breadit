@@ -37,10 +37,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 3: The RNG (effort S)
 
-- [ ] Tests first (TC2): equal seed and stage give equal sequences in two child processes (1,000 values); `users` and `follows` give different sequences; `float()` is in [0, 1); `int(n)` stays in [0, n) and rejects `n` ≤ 0; a stage name outside the list of blueprint §2.4 is a type error and a runtime error; a known-answer vector of the first 8 `next()` values of `rng(masterSeed, "users")`.
-- [ ] Write `eval/src/rng.ts` (design: Code files, `rng.ts`): sfc32, state from the first 16 bytes of `sha256("<masterSeed>:<stage>")` read as four big-endian uint32 (a, b, c, counter), first 12 outputs dropped, `int(n)` by rejection.
-- [ ] Get the known-answer vector from a separate Python sfc32 (`sfc32_check.py` in this task folder, standard library only, run with `python3 -I`). The TS and Python values must be equal before the vector goes into the test.
-- [ ] Commit: `feat: eval rng (sfc32 seeded from sha256, one stream per stage)`
+- [x] Tests first (TC2): equal seed and stage give equal sequences in two child processes (1,000 values); `users` and `follows` give different sequences; `float()` is in [0, 1); `int(n)` stays in [0, n) and rejects `n` ≤ 0; a stage name outside the list of blueprint §2.4 is a type error and a runtime error; a known-answer vector of the first 8 `next()` values of `rng(masterSeed, "users")`.
+- [x] Write `eval/src/rng.ts` (design: Code files, `rng.ts`): sfc32, state from the first 16 bytes of `sha256("<masterSeed>:<stage>")` read as four big-endian uint32 (a, b, c, counter), first 12 outputs dropped, `int(n)` by rejection.
+- [x] Get the known-answer vector from a separate Python sfc32 (`sfc32_check.py` in this task folder, standard library only, run with `python3 -I`). The TS and Python values must be equal before the vector goes into the test.
+- [x] Commit: `feat: eval rng (sfc32 seeded from sha256, one stream per stage)`
 
 #### Step 4: Canonical files (effort S)
 
