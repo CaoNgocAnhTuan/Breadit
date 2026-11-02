@@ -1,7 +1,7 @@
 # Shared ranking package (@breadit/ranking)
 
-Spec status: draft · 2026-11-02
-Design status: pending
+Spec status: approved · 2026-11-02
+Design status: draft · 2026-11-02
 Type: feature · Folder: `.docs/works/2026-11-02-p5-ranking-package/`
 
 ## 1. Spec
@@ -90,30 +90,178 @@ What exists today (checked on 2026-11-02):
 
 ### Approach
 
+The author decided the four open questions on 2026-11-02, each by its recommendation:
+1. BL5 is scored as the natural log of the HN formula, with the frozen score unit.
+2. The grids, the larger pool and T are frozen in task 6.
+3. The package is CommonJS, built by `tsc`.
+4. The package is clock-free now, and Explore's `Date.now()` goes in task 8.
+
+**A CommonJS package, tested with the backend's tools.** `packages/ranking` copies `packages/shared`:
+- `"main": "dist/index.js"` and `"types": "dist/index.d.ts"`;
+- `tsc` with `module: commonjs`, `target: ES2021`, `strict: true`;
+- `src/index.ts` re-exports by name (`export { … } from "./pool"`), never with `export *`.
+
+Unit tests use Jest with `ts-jest` on the source, the same versions as the backend (`jest ^29.7.0`, `ts-jest ^29.4.15`, `@types/jest ^29.5.14`), so the lockfile gains no new package.
+
+Checked on 2026-11-02 on Node v22.23.4: a `.ts` ES module imports named functions from a `tsc`-built CommonJS package (`import { buildPool, K } from "pkg"` printed the right values). So `eval/` can use the package with no wrapper.
+
+**The backend change is one import.** In `posts.service.ts` the private `computeExploreScoreFixed` is deleted, and `import { computeExploreScoreFixed } from '@breadit/ranking'` takes its place. The function moves unchanged: same input object, same formula, same `Math.floor(score * 100)`. Everything else in Explore stays as it is:
+- the 7-day window and `Date.now()`;
+- `CANDIDATE_TAKE`;
+- the sort and `applyExploreDiversity`;
+- the cursor and the cache key.
+
+`apps/backend/package.json` gets `"@breadit/ranking": "0.1.0"` in `dependencies`. npm links the workspace, and Jest and `nest build` resolve it from `node_modules` like any package. That is why the package must be built first (F1).
+
+**Time is always an argument.** No file in the package reads a clock or a random source. The `AsOf` rule of blueprint §2.6 is one function, `visibleAt(e, asOf)`. It is used for positives (with the event id) and, through `t < asOf.t`, for follows and memberships, which have no event id. Post age is `(asOf.t − createdAt) / 3600` hours.
+
+**Feature builders (the module map's "as-of feature functions").** Two pure functions take plain arrays, so the harness (from CSV) and the feed module (from Prisma) only differ in how they load the arrays:
+- `userFeaturesAsOf` gives `UserFeatures`:
+  - followees and communities with a date before `asOf.t`, distinct and sorted;
+  - `nByAuthor` and `nByCommunity` count the user's visible positives by the post's author and community;
+  - `nTotal` is the user's total of visible positives.
+- `postFeaturesAsOf` gives `PostFeatures`: visible likes, comments and reposts, and `engagedBy`, the users with a visible positive on the post, distinct and sorted.
+
+**`buildPool` (super-plan §5).**
+1. Keep a candidate only if all of these hold:
+   - it is not deleted and is approved;
+   - `t − windowSec ≤ createdAt < asOf.t`;
+   - its author is not blocked and is not the user;
+   - its id is not in `earlierPositives`.
+2. Sort by `(createdAt desc, id desc)`.
+3. Keep the first `maxPosts`.
+
+The caller passes only root posts (the `Post` contract has no parent field). This is the same rule as `inPool` in `eval/src/checks/buckets.ts`, which DW5 checks.
+
+**Scorers.** Notation:
+- `age` is `ageHours`;
+- `eng(w) = likes + 2·comments + 3·reposts − w·age` is the engagement score with age weight `w`;
+- `F(x) = floor(x · 100)` is the frozen score unit.
+
+Each scorer returns one integer:
+
+| Method | `scoreFixed` | Params |
+|---|---|---|
+| BL0 | `[author ∈ followees] · 2^32 + createdAt` (followee posts first, then newest first) | — |
+| BL1 | `createdAt` | — |
+| BL2 | `computeExploreScoreFixed({ likes, comments, reposts, ageHours: age })`, the moved production code | — |
+| BL2t | `F(eng(ageWeight))` | `ageWeight` |
+| BL3 | `F(likes)` | — |
+| BL4 | `F(sign · log10(max(likes, 1)) + (createdAt − asOf.t) / divisor)`, `sign` = 1 if likes > 0, else 0 | `divisor` |
+| BL5 | likes = 0: the lowest band `−2^31`; else `F(0.8 · ln(likes) − gravity · ln(age + 2))` | `gravity` |
+| BL6 | `F(eng(0.25) + α · ([author ∈ followees] + |engagedBy ∩ followees|))` | `alpha` |
+| H | `F(eng(0.25) + α · social + β · community)` (super-plan §6) | `alpha`, `beta`, `m` |
+| H-follow, H-comm | H with β = 0, and H with α = 0 | as H |
+| H-noauthor, H-noengager | H without the author term, and H without the engager sum | as H |
+
+Notes on the table:
+- **BL2 and BL2t.** BL2t at `ageWeight` = 0.25 must give BL2's values (a test).
+- **BL4.** The Reddit epoch is replaced by `asOf.t`. That adds the same constant to every post in the pool, so the order is the published one. It also keeps the numbers small and needs no epoch for synthetic data.
+- **BL5.** `P − 1` is likes, as the Spec decided.
+- **H.** `trust(f) = (nByAuthor[f] + m / |F_u|) / (nTotal + m)`. `social` is `[author ∈ followees] · trust(author)` plus the sum of `trust(f)` over `f` in `engagedBy ∩ followees`, summed in `engagedBy` order. `community` is `(nByCommunity[c] + m · [c ∈ communities] / |M_u|) / (nTotal + m)`, and 0 for a post with no community.
+- **Zero cases.** With `|F_u|` = 0 the prior part of `trust` is 0, and likewise for `|M_u|` = 0. With `nTotal + m` = 0 (E4 runs `m` = 0) a term is 0, not 0/0.
+
+`scorer(method)` throws on an unknown method or a missing param, so a typo cannot fall back to a default. `rankPool` sorts by `(scoreFixed desc, postId desc)`.
+
+**Build order.**
+- **Backend Dockerfile.** The `deps` stage copies `packages/ranking/package.json`. The `builder` stage copies `packages/ranking/` and builds it before the backend. The `runner` stage copies `packages/ranking/package.json` and `dist/` to the same paths, so the `node_modules/@breadit/ranking` link copied from `deps` points at them.
+- **`verify.sh`.** It gets two steps after "shared build": "ranking build" and "ranking tests". That way the backend build, its tests and `eval verify` see a built package.
+- **The frontend Dockerfile is not changed.** In P3, `npm ci` passed with a workspace it does not copy. DW9 checks it again.
+
 **Rejected options:**
 
 | Option | Why not |
 |---|---|
-| | |
+| An ES module package | The backend is CommonJS. Jest's module system does not load ES modules without an experimental flag (Spec Open question 3) |
+| `node --test` with type stripping for the package's tests | The package's `.ts` files would need `.ts` import extensions and ES module syntax under a CommonJS `package.json`. Jest with `ts-jest` already runs the backend's tests, with no new dependency |
+| Point Jest and Nest at the package's `src` through path aliases | Two ways to load the same code: the tests would pass on source while Docker runs `dist`. Building first is what Docker does |
+| Make BL0 a two-key sort | Every method must go through the same `rankPool` (super-plan §5, "all methods rank the same pool"). One integer with `2^32` keeps BL0 inside that rule |
+| Move `applyExploreDiversity` too | It is a page-level filter, not part of the evaluation (super-plan P5) |
 
 ### Workflow and sequence diagrams
 
+Live Explore after the change (only the score call moves):
+
 ```mermaid
 sequenceDiagram
-    participant C as Client
-    participant B as Backend
+    participant FE as Frontend
+    participant PS as PostsService.findAll
+    participant DB as Prisma
+    participant R as @breadit/ranking
+    FE->>PS: GET /api/posts?feed=explore
+    PS->>DB: posts of the last 7 days (Date.now, as before), up to 400
+    DB-->>PS: rows with counts
+    loop each row
+        PS->>R: computeExploreScoreFixed(likes, comments, reposts, ageHours)
+        R-->>PS: scoreFixed
+    end
+    PS->>PS: sort, applyExploreDiversity, cursor, cache (unchanged)
+    PS-->>FE: page
+```
+
+Offline ranking of one test user (how task 6 will call the package; DW5 uses the pool part):
+
+```mermaid
+sequenceDiagram
+    participant H as eval harness (task 6)
+    participant R as @breadit/ranking
+    H->>R: userFeaturesAsOf(user, asOf, follows, memberships, positives, posts)
+    R-->>H: UserFeatures
+    H->>R: buildPool(user, asOf, candidates, blocked, earlierPositives, W and N_max)
+    R-->>H: pool
+    loop each post in the pool
+        H->>R: postFeaturesAsOf(post, asOf, its positives)
+        H->>R: scorer(method)(ctx, post, features)
+    end
+    H->>R: rankPool(pool, score)
+    R-->>H: post ids in order
 ```
 
 ### Failure modes
 
 | # | What can go wrong | How we notice | How we resolve it |
 |---|---|---|---|
-| F1 | | | |
+| F1 | The backend build or Jest cannot find `@breadit/ranking`, because it is not built | `nest build` or `ts-jest` fails with "Cannot find module" | `verify.sh` and the Dockerfile build the package first. `CLAUDE.md` names the build command |
+| F2 | The Docker runner image has the link but no `dist/` | The backend container exits on start, so DW9 fails | The runner copies `packages/ranking/package.json` and `dist/` to the same paths |
+| F3 | Explore results change | DW2 (golden test against the old function) and the Explore IT test | The function moves byte-for-byte; the old function's text is pasted into the golden test as the reference |
+| F4 | `eval/` cannot import a named export | DW5 fails to load | Explicit `export { … } from` in `index.ts` (the form checked on 2026-11-02) |
+| F5 | 0/0 at `m` = 0 with no history, or no followee or community | A scorer test returns `NaN` | Defined as 0 (Approach, notes under the scorer table). A test runs every method at `m` = 0 with an empty history |
+| F6 | `ln(0)` in BL5 | `-Infinity` | Likes = 0 gets the fixed lowest band `−2^31` |
+| F7 | BL0 overflows a safe integer | A test with a large `createdAt` | `2^32 + createdAt` stays far below `2^53` for any Unix second before the year 2106 |
+| F8 | A typo in a method name or param falls back to a default | Silent wrong numbers | `scorer` throws on an unknown method and on a missing param |
+| F9 | A float sum in a different order | A double-run in task 6 | `engagedBy` and `followees` are sorted; sums run in that order (super-plan §2) |
+| F10 | A post created at exactly `asOf.t`, or a follow at exactly `asOf.t` | `buildPool` and feature tests | Both are excluded: the rule is strictly before `t` for items without an event id |
+| F11 | The lockfile pulls new packages | `git diff package-lock.json` | devDependencies use the backend's exact ranges; anything more is reverted and reported |
+| F12 | Blocked users, deleted or unapproved posts | `buildPool` tests | Filtered in `buildPool` from the fields of `Post` and the `blocked` set. Explore keeps its own Prisma filters |
+
+The cache (`v:user`, the 10-second feed cache) and the database are not touched: Explore's query and cache key stay the same.
 
 ### Code files
 
 | File | New or changed | Purpose |
 |---|---|---|
-| | | |
+| `packages/ranking/package.json`, `tsconfig.json`, `jest.config.js` | new | `@breadit/ranking` 0.1.0, scripts `build` (`tsc`) and `test` (Jest) |
+| `packages/ranking/src/types.ts` | new | The types of blueprint §2.6 |
+| `packages/ranking/src/asof.ts` | new | `visibleAt(e: { id: number; t: Sec }, asOf: AsOf): boolean`, `ageHours(createdAt: Sec, asOf: AsOf): number` |
+| `packages/ranking/src/features.ts` | new | `userFeaturesAsOf(user, asOf, data: { follows; memberships; positives; postInfo }): UserFeatures`, `postFeaturesAsOf(postId, asOf, positives: readonly Positive[]): PostFeatures` |
+| `packages/ranking/src/pool.ts` | new | `buildPool` as in blueprint §2.6 |
+| `packages/ranking/src/explore.ts` | new | `computeExploreScoreFixed` (moved, unchanged) |
+| `packages/ranking/src/scorers.ts` | new | `scorer(method: MethodId): Scorer` for the 12 method ids |
+| `packages/ranking/src/rank.ts` | new | `rankPool` |
+| `packages/ranking/src/index.ts` | new | Named re-exports only |
+| `packages/ranking/src/*.spec.ts` | new | DW2 (golden), DW3 (one case per method), DW4, DW6, DW7 (including the grep for forbidden patterns and for imports outside `node:`) |
+| `eval/src/checks/pool-crosscheck.test.ts`, `eval/package.json` | new, changed | DW5: `buildPool` against `inPool` on random fixtures from `rng`. `@breadit/ranking` becomes a dependency of `eval` (allowed by the module map) |
+| `apps/backend/src/posts/posts.service.ts` | changed | Delete the private `computeExploreScoreFixed`, import it from `@breadit/ranking` |
+| `apps/backend/package.json` | changed | Dependency `@breadit/ranking` |
+| `apps/backend/Dockerfile` | changed | Copy and build the package (Approach, "Build order") |
+| `package.json` (root), `package-lock.json` | changed | `packages/*` already covers the new folder; the lockfile gains the link and the backend and eval dependencies |
+| `.claude/hooks/verify.sh` | changed | Steps "ranking build" and "ranking tests" after "shared build" |
+| `CLAUDE.md` | changed | Overview line for `packages/ranking`, and its build before the backend |
+| `.docs/implementation-plan.md` | changed | §2.6: the two feature-builder signatures, so tasks 6 and 8 use the same ones |
+| `.docs/super-plan.md`, `.docs/Bugs Report.md` | changed | P5 part 1 status, change-log line; T4 "score part done (task 5); `Date.now()` in Explore goes in task 8" |
+
+**Note for DW10 (a gap in the Spec).** The DW10 list does not name two files this design changes: `eval/package.json`, because the cross-check test of DW5 imports the package, and `.docs/implementation-plan.md`, for the feature-builder signatures. The plan's DW10 check accepts the Spec list plus these two.
 
 ### Data, schema and cache changes
+
+None. No Prisma model, no migration, no cache key or version change. Explore's query and cache key are the same as before.
