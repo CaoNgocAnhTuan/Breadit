@@ -72,9 +72,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 8: The two commands and the grep test (effort S)
 
-- [ ] Tests first (TC12): a test that scans every `.ts` file under `eval/src` for the forbidden patterns of the determinism rule and fails on a match without `// harness-allow:` (DW8). The test file's own pattern list is the only allowed exception.
-- [ ] Write `eval/src/cli/generate.ts` (out dir argument, default `eval/data`; one line per dataset with id, row counts and manifest SHA-256) and `eval/src/cli/check.ts` (data dir argument; checks each dataset as in the design's Check diagram; exit 1 on any failure). Both call `checkNode()` first.
-- [ ] Commit: `feat: eval gen and check commands`
+- [x] Tests first (TC12): a test that scans every `.ts` file under `eval/src` for the forbidden patterns of the determinism rule and fails on a match without `// harness-allow:` (DW8). The test file's own pattern list is the only allowed exception.
+- [x] Write `eval/src/cli/generate.ts` (out dir argument, default `eval/data`; one line per dataset with id, row counts and manifest SHA-256) and `eval/src/cli/check.ts` (data dir argument; checks each dataset as in the design's Check diagram; exit 1 on any failure). Both call `checkNode()` first.
+- [x] Commit: `feat: eval gen and check commands`
 
 #### Step 9: Generate, check and calibrate (effort M)
 
