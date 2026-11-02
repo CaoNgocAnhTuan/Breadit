@@ -13,4 +13,6 @@ export type {
   UserId,
 } from './types';
 export { ageHours, visibleAt } from './asof';
+export type { Follow, Membership, PostInfo, UserFeatureData } from './features';
+export { postFeaturesAsOf, userFeaturesAsOf } from './features';
 export { computeExploreScoreFixed } from './explore';

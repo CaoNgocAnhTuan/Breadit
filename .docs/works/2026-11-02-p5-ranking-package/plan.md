@@ -45,12 +45,12 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 #### Step 4: Feature builders (effort S)
 
-- [ ] Tests first (TC6, part 2), on small hand-made arrays:
+- [x] Tests first (TC6, part 2), on small hand-made arrays:
   - `userFeaturesAsOf`: followees and communities dated before `asOf.t`, distinct and sorted. A follow or membership at exactly `asOf.t` or later is out (design F10). `nByAuthor`, `nByCommunity` and `nTotal` count only the user's visible positives.
   - `postFeaturesAsOf`: counts by type, and `engagedBy` distinct and sorted, from visible positives only.
   - Adding any event after `asOf` changes neither result.
-- [ ] Write `src/features.ts` (design: Approach "Feature builders").
-- [ ] Commit: `feat: ranking as-of feature builders`
+- [x] Write `src/features.ts` (design: Approach "Feature builders").
+- [x] Commit: `feat: ranking as-of feature builders`
 
 #### Step 5: `buildPool` (effort S)
 
