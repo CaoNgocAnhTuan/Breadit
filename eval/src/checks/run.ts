@@ -16,6 +16,8 @@ import { computeLift } from "./lift.ts";
 const DAY = 86400;
 /** One q for every dataset (blueprint section 3.1). */
 const Q = "0.8";
+/** The datasets that get the bucket table: size M world W2M, and the real set digg2009 (task p4-digg-adapter). */
+const BUCKET_TABLE_IDS: readonly string[] = ["syn-W2M-M", "digg2009"];
 
 export interface CheckAllResult {
   pass: boolean;
@@ -118,7 +120,19 @@ export function checkAll(dataDir: string): CheckAllResult {
     }
     lines.push("format: pass");
 
-    if (!sizeM(data)) continue;
+    const bucketTable = (): void => {
+      if (!BUCKET_TABLE_IDS.includes(id)) return;
+      const b = bucketReport(data, Q, windowSec, frozen.poolCap);
+      const v = bucketVerdict(b, data.manifest.epoch.seconds);
+      lines.push(...v.lines);
+      if (!v.pass) pass = false;
+    };
+
+    // Calibration and lift are synthetic checks (targets, worlds). The real set gets the bucket table only.
+    if (!sizeM(data)) {
+      bucketTable();
+      continue;
+    }
 
     const maxShare = config.params.maxUserActionShare?.value;
     const cap = data.manifest.source.activityCap;
@@ -146,12 +160,7 @@ export function checkAll(dataDir: string): CheckAllResult {
         (lift.note ? ` ${lift.note}` : ""),
     );
 
-    if (id === "syn-W2M-M") {
-      const b = bucketReport(data, Q, windowSec, frozen.poolCap);
-      const v = bucketVerdict(b, data.manifest.epoch.seconds);
-      lines.push(...v.lines);
-      if (!v.pass) pass = false;
-    }
+    bucketTable();
   }
 
   const w = (world: string): number | null | undefined => lifts.get(`syn-${world}-M`);

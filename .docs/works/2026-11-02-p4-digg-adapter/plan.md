@@ -65,9 +65,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapte
 
 #### Step 6: Bucket table for Digg in `check` (effort XS)
 
-- [ ] Tests first (TC6): in `run.test.ts`, a Digg-shaped fixture folder (`source.kind` `digg`, Unix epoch) gets the format check and a bucket table, and no calibration or lift. `syn-W2M-M` still gets its table.
-- [ ] Change `checkAll` in `eval/src/checks/run.ts` (design: Approach "`check`").
-- [ ] Commit: `feat: eval check runs the bucket table for digg2009`
+- [x] Tests first (TC6): in `run.test.ts`, a Digg-shaped fixture folder (`source.kind` `digg`, Unix epoch) gets the format check and a bucket table, and no calibration or lift. `syn-W2M-M` still gets its table.
+- [x] Change `checkAll` in `eval/src/checks/run.ts` (design: Approach "`check`").
+- [x] Commit: `feat: eval check runs the bucket table for digg2009`
 
 #### Step 7: Run on the real zips (effort M)
 
