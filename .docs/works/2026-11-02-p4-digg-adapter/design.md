@@ -1,7 +1,7 @@
 # Digg 2009 adapter to the canonical format
 
 Spec status: approved · 2026-11-02
-Design status: draft · 2026-11-02
+Design status: approved · 2026-11-02
 Type: feature · Folder: `.docs/works/2026-11-02-p4-digg-adapter/`
 
 ## 1. Spec
@@ -96,12 +96,12 @@ The author approved the Spec on 2026-11-02 without choosing another option, so t
 - The pinned Node has `zlib.inflateRawSync` and `zlib.crc32`.
 
 So the reader is small:
-1. Find the end-of-central-directory record and the one central entry.
-2. Read the local header.
-3. Decrypt with traditional ZipCrypto: three 32-bit keys updated with a CRC-32 table, then a 12-byte header whose last byte must equal the high byte of the CRC-32.
-4. Inflate, and compare the CRC-32 and the size of the output with the header.
+1. Find the end-of-central-directory record and the one central entry. Take the CRC-32 and both sizes from the central entry.
+2. Read the local header to find where the data starts.
+3. Decrypt with traditional ZipCrypto: three 32-bit keys updated with a CRC-32 table, then a 12-byte header. Its last byte must equal the high byte of the CRC-32, or, when bit 3 (data descriptor) is set, the high byte of the file's modification time.
+4. Inflate, and compare the CRC-32 and the size of the output with the central entry.
 
-It supports only this case. A second member, another method, bit 3 (data descriptor) or zip64 stops it with a clear message. The SHA-256 check runs first, so only the two known files ever reach the reader. Nothing is written to disk until the canonical output.
+The Digg zips do not set bit 3, but the system `zip -P` always does (checked on 2026-11-02: a fixture made with it has flag 9). Step 3 handles both, so the test fixture comes from an independent tool. A second member, another method or zip64 stops the reader with a clear message. The SHA-256 check runs first, so only the two known files ever reach the reader. Nothing is written to disk until the canonical output.
 
 **One config file for the source.** `eval/config/digg2009.json` holds, for each zip, the file name, the Internet Archive URL, the capture time, the SHA-256, the member name and the member size. It also holds the published password, the page URL, the citation, and the choices. A test reads the zip table of `.docs/datasets.md` §4 and fails if a URL, SHA-256, member name or member size differs. This works like the `frozen-v1.json` test of P3: the doc stays the source, and the code cannot drift from it.
 
@@ -186,7 +186,7 @@ sequenceDiagram
 |---|---|---|---|
 | F1 | A zip is missing or has another SHA-256 | The check runs before any read | Stop, and name the file, both hashes and the URL from the config. Write nothing and delete nothing (DW1) |
 | F2 | Wrong password or a damaged member | The ZipCrypto check byte, or the CRC-32 and size after inflate | Stop with the member name. Never write partial output |
-| F3 | A zip shape the reader does not support (bit 3, zip64, more than one member, method other than 8) | Header checks in `zip.ts` | Stop. With the pinned SHA-256 this cannot happen; the check is for a wrong file passed by hand |
+| F3 | A zip shape the reader does not support (zip64, more than one member, method other than 8) | Header checks in `zip.ts` | Stop. With the pinned SHA-256 this cannot happen; the check is for a wrong file passed by hand |
 | F4 | A bad line (wrong field count, missing quote, non-digit) | The strict parser | Stop with the member and the line number. Do not skip lines quietly |
 | F5 | Memory or time with 3 million rows (not checked) | The adapter and `check` crash with an out-of-memory error, or run long | Typed arrays in the parser. The `adapt:digg` and `check` scripts set `--max-old-space-size=4096`. The acceptance notes the run time (not Class D) |
 | F6 | The TS bucket table differs from blueprint §3.7 | DW5 | Compare the steps with the P2 script's output in order: positives `n`, T, test users, then each row. Find the rule that differs and fix the code. Never change a choice to force the match |
@@ -203,7 +203,7 @@ The canonical data has no blocked users, soft deletes, pending posts, bans or ca
 | File | New or changed | Purpose |
 |---|---|---|
 | `eval/config/digg2009.json` | new | Zip names, URLs, capture times, SHA-256, members and their sizes, the password from the page, page URL, citation, choices |
-| `eval/src/adapters/zip.ts` | new | `readEncryptedMember(zip: Buffer, password: string): { name: string; data: Buffer }` (ZipCrypto, `inflateRawSync`, `crc32`) |
+| `eval/src/adapters/zip.ts` | new | `readEncryptedMember(zip: Buffer, password: string): { name: string; data: Buffer }` (ZipCrypto with or without bit 3, `inflateRawSync`, `crc32`) |
 | `eval/src/adapters/zip.test.ts` and `eval/src/adapters/fixtures/tiny.zip` | new | The reader against a few-hundred-byte zip made once with the system `zip -P` and committed. The test covers the right and wrong password, a changed byte (CRC), and an unsupported shape |
 | `eval/src/adapters/digg-parse.ts` | new | `parseVotes(buf): VoteRows`, `parseFriends(buf): LinkRows` (typed arrays), the strict line rules |
 | `eval/src/adapters/digg.ts` | new | `loadDiggConfig()`, `toCanonical(votes, links, choices): { tables, counts }`, `adaptDigg(rawDir, outDir): { manifest, counts }` |
