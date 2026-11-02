@@ -111,15 +111,15 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 ## Claude's part
 
-- [ ] Read the commits and the diff against the design. Check the lockfile diff (links only).
-- [ ] Acceptance items below, including the Docker stack check (DW9).
-- [ ] **Docs:**
+- [x] Read the commits and the diff against the design. Check the lockfile diff (links only).
+- [x] Acceptance items below, including the Docker stack check (DW9).
+- [x] **Docs:**
   - `CLAUDE.md`: an Overview line for `packages/ranking` (`@breadit/ranking`), and its build before the backend.
   - `.docs/implementation-plan.md` §2.6: the two feature-builder signatures, plus a change-log line.
   - `.docs/super-plan.md`: P5 part 1 status, the §4 row (`p5-ranking-package` ✅, P5 still open for the harness), and a change-log line.
   - `.docs/Bugs Report.md`: T4 marked "score part done in task 5; `Date.now()` in Explore goes in task 8".
   - Commit: `docs: close p5-ranking-package`.
-- [ ] Fill in the Result, then close the task.
+- [x] Fill in the Result, then close the task.
 
 ## Tests
 
@@ -136,12 +136,41 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 ## Acceptance
 
-- [ ] `npm ci` at the root, `npx prisma generate`, then build `@breadit/ranking` → all exit 0; the lockfile diff of the task holds only the new links (DW1)
-- [ ] `grep` for `function computeExploreScoreFixed` in `apps/backend/src` → no match; the package's golden test passes (DW2)
-- [ ] The package's tests → every method case, pool case, AsOf case and grep test passes (DW3, DW4, DW6, DW7)
-- [ ] `npm run verify -w @breadit/eval` → the cross-check passes with the package imported by name (DW5)
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up → every check passes, with "ranking build" and "ranking tests" in the summary (DW8)
-- [ ] `docker compose up --build` → both images build; `/api/health` answers 200; `GET /api/posts?feed=explore` answers 200 with posts; then stop the stack (DW9)
-- [ ] `git diff --stat` of the task commits → only the DW10 files plus `eval/package.json` and `.docs/implementation-plan.md` (design note for DW10) (DW10)
+- [x] `npm ci` at the root, `npx prisma generate`, then build `@breadit/ranking` → all exit 0; the lockfile diff of the task holds only the new links (DW1)
+- [x] `grep` for `function computeExploreScoreFixed` in `apps/backend/src` → no match; the package's golden test passes (DW2)
+- [x] The package's tests → every method case, pool case, AsOf case and grep test passes (DW3, DW4, DW6, DW7)
+- [x] `npm run verify -w @breadit/eval` → the cross-check passes with the package imported by name (DW5)
+- [x] `bash .claude/hooks/verify.sh` with db and redis up → every check passes, with "ranking build" and "ranking tests" in the summary (DW8)
+- [x] `docker compose up --build` → both images build; `/api/health` answers 200; `GET /api/posts?feed=explore` answers 200 with posts; then stop the stack (DW9)
+- [x] `git diff --stat` of the task commits → only the DW10 files plus `eval/package.json` and `.docs/implementation-plan.md` (design note for DW10) (DW10)
 
 ## Result
+
+**Delivered, 2026-11-02.** `@breadit/ranking` (`packages/ranking`) is a pure CommonJS package. It holds:
+- the `AsOf` rule and the feature builders;
+- `buildPool`;
+- the scorers for all 13 method ids of blueprint §2.6;
+- `rankPool`;
+- the moved `computeExploreScoreFixed`.
+
+The backend's Explore imports the score from the package; the private copy is gone, and nothing else in `posts.service.ts` changed. The Dockerfile and `verify.sh` build the package before the backend.
+
+**Tests.**
+- Package: 82 unit tests. Each method is checked against hand-computed scores, plus the edge cases (`m` = 0 with no history, zero likes in BL5, a large `createdAt` in BL0, unknown methods and missing params).
+- Eval: 175 tests, with the new cross-check. `buildPool` equals the P3 `inPool` on 200+ random fixtures. Sonnet broke `buildPool` on purpose twice, and the cross-check caught both.
+- `verify.sh` after a clean `npm ci` and `prisma generate`: all 9 checks pass. Ranking build and tests 82/82, backend unit 99/99, integration 108/108 (including the Explore test), eval verify.
+
+**Acceptance.**
+- DW1: `npm ci` exit 0. The lockfile diff adds only the workspace link and the two `@breadit/ranking` dependencies, with no third-party package.
+- DW2: no definition of `computeExploreScoreFixed` is left in `apps/backend/src`.
+- DW9: `docker compose up --build` built both images. `/api/health` answered 200, and `GET /api/posts?feed=explore` answered 200. The page was empty, because the newest dev post (2026-10-21) is older than Explore's 7-day window. Explore with posts is covered by the integration test. The backend and app containers were stopped afterwards.
+
+**Commits.** Steps 1–9: `ff0e04e`, `e286b6a`, `cd7884b`, `1aef187`, `fd513e1`, `0ca3970`, `be31eb6`, `334a51b`, `a92cf68`. Closing docs: the commit that holds this Result.
+
+**Differences from the plan.**
+- **13 method ids, not 12.** The design and plan miscounted. Blueprint §2.6 has 13, and all 13 are implemented and tested.
+- **`postFeaturesAsOf` takes the post, not just its id.** `postFeaturesAsOf(post: Pick<Post, 'id' | 'createdAt'>, asOf, positives)`, because `PostFeatures` needs `createdAt`. The design's sequence diagram already showed a post. Blueprint §2.6 now has this form.
+- **Params per method.** `scorer` reads only the params a method uses: H-follow needs `alpha` and `m`, H-comm needs `beta` and `m`. Extra params are ignored, so the harness may pass all three. Recorded in blueprint §2.6.
+- **The engager sum includes a followee author again if the author also engaged with the post.** That is how super-plan §6 reads literally. Canonical data has no positive on one's own post, so it can only happen in live data.
+- **Extra safeguards.** A non-finite score throws, `rankPool` throws on NaN, and a negative `maxPosts` counts as 0. `index.ts` also exports the feature-data types, `visibleAt` and `ageHours`.
+- **`.gitignore` gets `packages/ranking/dist/`.** It was outside DW10's list but is needed, the same as `packages/shared/dist/`. `CLAUDE.md` says to build the package before the backend or `eval`.

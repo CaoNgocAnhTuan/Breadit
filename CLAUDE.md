@@ -9,6 +9,7 @@ Breadit is an X/Twitter clone built as an npm-workspaces monorepo:
 - `apps/frontend` (`@breadit/frontend`): Next.js 15 App Router, React 19, TanStack Query, Tailwind, Socket.IO client
 - `apps/backend` (`@breadit/backend`): NestJS 10 on **Fastify** (not Express), Prisma 6, PostgreSQL 16, Redis 7, Socket.IO
 - `packages/shared` (`@breadit/shared`): shared TS types imported by the frontend. Its `types` point at `dist/`, so run `npm run build -w @breadit/shared` before typechecking or building the frontend.
+- `packages/ranking` (`@breadit/ranking`): the pure ranking code of the thesis (pool, as-of features, every scorer, `computeExploreScoreFixed`), used by the backend's Explore and by `eval/`. It is CommonJS built to `dist/`, so run `npm run build -w @breadit/ranking` before the backend build, the backend tests or `eval` (`verify.sh` and the backend Dockerfile do this). Its tests: `npm run test -w @breadit/ranking`.
 
 `docs/` and `Latex/` hold the pre-thesis report and design material (ADRs, use cases, ERDs, k6 perf scripts). Do not move or edit them unless asked. Thesis-phase docs go in `.docs/` at the repo root. No application code lives in any of these folders.
 

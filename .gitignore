@@ -25,6 +25,7 @@ apps/frontend/out/
 apps/frontend/build/
 apps/backend/dist/
 packages/shared/dist/
+packages/ranking/dist/
 
 # misc
 .DS_Store

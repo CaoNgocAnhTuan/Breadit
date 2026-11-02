@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.2 · 2026-11-02 · Status: approved 2026-10-28
+Version 1.3 · 2026-11-02 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -9,7 +9,7 @@ How the pieces of P3 to P10 fit together in the code. A thing is here only if tw
 
 | Module | Owner task | May import | What it holds |
 |---|---|---|---|
-| `packages/ranking` (`@breadit/ranking`) | `p5-ranking-package` | the Node standard library only | Types, `buildPool`, as-of feature functions, every scorer, `rankPool`, and `computeExploreScoreFixed` moved from `posts.service.ts`. Pure: no Nest, Prisma, Redis, clock or randomness. Builds to `dist/` with `tsc`, like `@breadit/shared` |
+| `packages/ranking` (`@breadit/ranking`) | `p5-ranking-package` ✅ (2026-11-02) | the Node standard library only | Types, `buildPool`, as-of feature functions, every scorer, `rankPool`, and `computeExploreScoreFixed` moved from `posts.service.ts`. Pure: no Nest, Prisma, Redis, clock or randomness. Builds to `dist/` with `tsc`, like `@breadit/shared` |
 | `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it ✅ (2026-11-02; `rng.ts`, `canonical/`, `generator/`, `checks/`, `config/`; `adapters/digg.ts` added by `p4-digg-adapter` ✅; loader, harness, metrics, stats and report still to come) | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `config/` |
 | Backend feed module `apps/backend/src/feed/` | `p6-social-feed` | `@breadit/ranking`, `PrismaService`, `BlockService` | A thin service that loads data and calls `buildPool` and a scorer. `PostsService.findAll` calls it when `algo` is set. Explore imports `computeExploreScoreFixed` from `@breadit/ranking` (done in `p5-ranking-package`) |
 | Frontend toggle | `p6-social-feed` | the API only | `algo` in `app/(board)/page.tsx`, `Feed.tsx`, `InfiniteFeed.tsx` |
@@ -101,6 +101,22 @@ function rankPool(pool: readonly Post[], score: (p: Post) => number): PostId[]; 
 - The harness builds `UserFeatures` and `PostFeatures` from the canonical files with the `AsOf` rule. The live app builds them from Prisma. Both call the same `buildPool`, `scorer` and `rankPool`, so only the loading differs.
 - The live query loads every candidate in the window, with no row limit below `maxPosts` plus the user's earlier positives. So `buildPool` sees the same set as the harness.
 - The E4 `m` sweep is a parameter (`params.m`), not a method id.
+- **Feature builders** (added by task 5, `p5-ranking-package`; both sides call them, so only the loading differs):
+
+```ts
+interface Follow { followerId: UserId; followeeId: UserId; t: Sec }
+interface Membership { userId: UserId; communityId: number; t: Sec }
+interface PostInfo { authorId: UserId; communityId: number | null }
+interface UserFeatureData { follows: readonly Follow[]; memberships: readonly Membership[];
+  positives: readonly Positive[]; postInfo: ReadonlyMap<PostId, PostInfo> }
+function userFeaturesAsOf(user: UserId, asOf: AsOf, data: UserFeatureData): UserFeatures;
+function postFeaturesAsOf(post: Pick<Post, 'id' | 'createdAt'>, asOf: AsOf, positives: readonly Positive[]): PostFeatures;
+function visibleAt(e: { id: number; t: Sec }, asOf: AsOf): boolean;
+function ageHours(createdAt: Sec, asOf: AsOf): number;
+```
+
+  Follows and memberships count when `t < asOf.t` (they have no event id). Positives use the `AsOf` rule above.
+- **Params per method** (task 5). `scorer` throws on a missing param: BL2t `ageWeight`; BL4 `divisor`; BL5 `gravity`; BL6 `alpha`; H, H-noauthor and H-noengager `alpha`, `beta`, `m`; H-follow `alpha`, `m`; H-comm `beta`, `m`. Extra params are ignored. BL5 is the natural log of the HN score (task 5 Open question 1); a post with no like gets `−2^31`.
 
 ### 2.7 Results files (H-d)
 
@@ -246,8 +262,8 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-02. ✅ mea
 | ✅ 10-28 | 2 | `p0-baseline-freeze` | P0 | — | `.nvmrc`, `engines`, image digests, clean clone check | 0.5 | 10-30 | — |
 | ✅ 11-02 | 3 | `p3-synthetic-generator` | P3 | 1, 2, D1 | `eval/` workspace, `rng.ts`, canonical writer, config, worlds, bucket table (section 3) | 2.5 | 11-01 | — |
 | ✅ 11-02 | 4 | `p4-digg-adapter` † | P4 | 3 (canonical writer) | adapter, the real Digg choices, the same bucket table | 2 | 11-03 | — |
-| ▶ next | 5 | `p5-ranking-package` | P5 | 1 | `packages/ranking`, move `computeExploreScoreFixed`, backend imports it, Dockerfile build order | 3 | 11-06 | T4 (score takes `asOf`) |
-| ⬜ | 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
+| ✅ 11-02 | 5 | `p5-ranking-package` | P5 | 1 | `packages/ranking`, move `computeExploreScoreFixed`, backend imports it, Dockerfile build order | 3 | 11-06 | T4 (score takes `asOf`) |
+| ▶ next | 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
 | ⬜ | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
 | ⬜ | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
 | ⬜ | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
@@ -282,3 +298,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.0 · 2026-10-28 · Task `p2-implementation-blueprint`. First version.
 - 1.1 · 2026-11-02 · Status line: approved 2026-10-28 (it still said draft). Task 8 scope: the default `algo` from an env variable. Task 11 scope: set the default `algo` by the P7 rule (super-plan 0.15). No day budget or date changed.
 - 1.2 · 2026-11-02 · Status marks after tasks 3 and 4: a Status column in the §5 task list (tasks 1–4 ✅, task 5 next), the module map row of `eval/`, the done notes in §3.6 and §3.7, the stale P0 sentence in §5, and §6 (D1 followed by the generator; the P4 choices decided). No contract, rule, day budget or date changed.
+- 1.3 · 2026-11-02 · Task `p5-ranking-package`: §2.6 gets the feature-builder signatures (`userFeaturesAsOf`, `postFeaturesAsOf`, `visibleAt`, `ageHours`), the params per method, and the BL5 form. §1 and §5: task 5 ✅, task 6 next. The other signatures of §2.6 are unchanged.
