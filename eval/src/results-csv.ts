@@ -22,3 +22,10 @@ export function writeCsv(dir: string, name: string, header: readonly string[], r
   writeFileSync(join(dir, name), text, "utf8");
   return { rows: rows.length, sha256: sha256Hex(text) };
 }
+
+/** Writes a CSV text made by `csvText` to <dir>/<name>. */
+export function writeCsvText(dir: string, name: string, text: string): FileEntry {
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, name), text, "utf8");
+  return { rows: text.split("\n").length - 2, sha256: sha256Hex(text) };
+}

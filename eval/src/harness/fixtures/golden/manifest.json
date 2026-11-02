@@ -1,0 +1,39 @@
+{
+  "datasetId": "golden",
+  "epoch": {
+    "iso": "1970-01-01T00:00:00Z",
+    "seconds": 0
+  },
+  "files": {
+    "communities.csv": {
+      "rows": 1,
+      "sha256": "8f27c6d905ad394fc0bd3ac73ae4710d1204ff6d25040d75923e42888a697eb3"
+    },
+    "follows.csv": {
+      "rows": 8,
+      "sha256": "1d57886b5f417de615fc01baa7c5ab257a474ab0a1c39bc27324cc57f29a3e55"
+    },
+    "interactions.csv": {
+      "rows": 33,
+      "sha256": "e4748634fce07a01a985456e87258d8c28377d941cf3856f5ba696933c325968"
+    },
+    "memberships.csv": {
+      "rows": 5,
+      "sha256": "8136fead357f01af99206ee4aba0cfaf1e2b09070fd2e0ad2260d1c149b30741"
+    },
+    "posts.csv": {
+      "rows": 12,
+      "sha256": "e2c688b1debab78ee5a4cada1780e46539339b0b9de800b4a93fd59ebf5e13cc"
+    },
+    "users.csv": {
+      "rows": 9,
+      "sha256": "c8d39f3c76ce52409179e30e82a53332902e8a608c666b5cd62da9c7b56251b9"
+    }
+  },
+  "node": "v22.23.4",
+  "schemaVersion": 1,
+  "source": {
+    "kind": "hand-written",
+    "note": "eval/src/harness/fixtures/golden: 9 users, 12 posts, 33 positives, written by hand for the golden test"
+  }
+}

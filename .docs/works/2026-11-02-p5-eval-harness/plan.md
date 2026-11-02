@@ -89,20 +89,20 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 6: The run, the golden dataset and the leakage test (effort M)
 
-- [ ] **Golden (TC2, DW1).** Write the golden dataset by hand in `eval/src/harness/fixtures/golden/`: about 6 users, 12 posts, a few follows, one community, interactions on both sides of its T.
+- [x] **Golden (TC2, DW1).** Write the golden dataset by hand in `eval/src/harness/fixtures/golden/`: about 6 users, 12 posts, a few follows, one community, interactions on both sides of its T.
   - For two users, work out in the test's comments the item, the pool, each method's rank and the metrics.
   - The harness, for all 13 methods and both splits in memory, must give the files in `golden-expected/` byte for byte.
-- [ ] **Leakage (TC3, DW2).** For each golden user, and for 30 users of `syn-W2M-S` chosen with the `bootstrap` stream:
+- [x] **Leakage (TC3, DW2).** For each golden user, and for 30 users of `syn-W2M-S` chosen with the `bootstrap` stream:
   - change or delete every follow, membership, post and interaction after that user's item time;
   - hold T fixed and rank again;
   - the user's `per_user` rows must not change.
-- [ ] **Reference mode (TC9).** On `syn-W2M-S`, the `fast` and `reference` modes give byte-identical `per_user.csv`.
-- [ ] **Guards (TC10).**
+- [x] **Reference mode (TC9).** On `syn-W2M-S`, the `fast` and `reference` modes give byte-identical `per_user.csv`.
+- [x] **Guards (TC10).**
   - A config with `split: "test"` and no `testApprovedBy` stops before loading data.
   - A T that differs from `cutTimes` stops with both values.
   - A missing method param stops before loading data.
-- [ ] **The code.** Write `eval/src/harness/run.ts` and `eval/src/harness/write.ts`, with the 5 MB rule for `per_user.csv` and the run manifest (design: Approach "Runs are configs", "Output").
-- [ ] Commit: `feat: eval harness run, results files, golden and leakage tests`
+- [x] **The code.** Write `eval/src/harness/run.ts` and `eval/src/harness/write.ts`, with the 5 MB rule for `per_user.csv` and the run manifest (design: Approach "Runs are configs", "Output").
+- [x] Commit: `feat: eval harness run, results files, golden and leakage tests`
 
 #### Step 7: Tuning (effort S)
 

@@ -1,0 +1,7 @@
+dataset,split,bucket,n_test_users,n_left_out
+golden,validation,0,3,1
+golden,validation,1-4,6,0
+golden,validation,0-4,9,1
+golden,validation,5-19,0,0
+golden,validation,20+,0,0
+golden,validation,all,9,1

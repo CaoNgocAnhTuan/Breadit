@@ -1,0 +1,7 @@
+dataset,split,bucket,n_test_users,n_left_out
+golden,test,0,0,0
+golden,test,1-4,3,0
+golden,test,0-4,3,0
+golden,test,5-19,2,0
+golden,test,20+,0,0
+golden,test,all,5,0

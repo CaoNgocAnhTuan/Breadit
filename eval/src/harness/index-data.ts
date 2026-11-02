@@ -197,7 +197,7 @@ export function positiveEvents(data: Pick<Dataset, "interactions">): Event[] {
 }
 
 /** The AsOf rule of blueprint section 2.6, on plain numbers. `visibleAt` of the package gives the same answer. */
-function visible(t: number, id: number, asOf: AsOf): boolean {
+export function visible(t: number, id: number, asOf: AsOf): boolean {
   return t < asOf.t || (t === asOf.t && asOf.beforeEventId !== undefined && id < asOf.beforeEventId);
 }
 

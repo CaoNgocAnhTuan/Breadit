@@ -27,8 +27,13 @@ function sortKeys(value: unknown): unknown {
   return value;
 }
 
+/** Two-space JSON with sorted keys and a final LF: the one text form of every manifest (datasets and runs). */
+export function canonicalJson(value: unknown): string {
+  return JSON.stringify(sortKeys(value), null, 2) + "\n";
+}
+
 export function manifestText(m: Manifest): string {
-  return JSON.stringify(sortKeys(m), null, 2) + "\n";
+  return canonicalJson(m);
 }
 
 export function writeManifest(dir: string, m: Manifest): void {

@@ -81,6 +81,11 @@ function membersOf(group: string, bucket: string): boolean {
   return group === bucket;
 }
 
+/** The summary groups a history bucket belongs to: itself, "0-4" when it is one of the two lowest, and "all". */
+export function groupsOf(bucket: string): string[] {
+  return GROUPS.filter((g) => membersOf(g, bucket));
+}
+
 /**
  * Summary rows of one method: for each K and group, the number of users and the mean Recall@K and NDCG@K.
  * Means sum in user_id order, whatever the input order (super-plan section 2).
