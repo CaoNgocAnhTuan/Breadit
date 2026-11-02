@@ -15,4 +15,5 @@ export type {
 export { ageHours, visibleAt } from './asof';
 export type { Follow, Membership, PostInfo, UserFeatureData } from './features';
 export { postFeaturesAsOf, userFeaturesAsOf } from './features';
+export { buildPool } from './pool';
 export { computeExploreScoreFixed } from './explore';

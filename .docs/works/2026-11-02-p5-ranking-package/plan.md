@@ -54,13 +54,13 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 #### Step 5: `buildPool` (effort S)
 
-- [ ] Tests first (TC4):
+- [x] Tests first (TC4):
   - **Window edges:** `createdAt` = `t − W` is in, `t` is out.
   - **Exclusions:** own posts, earlier positives, blocked authors, `deleted`, and `!isApproved` are all out.
   - **Cap:** only the newest `maxPosts` are kept, with `createdAt` ties going to the larger id.
   - **Order:** the output order is `(createdAt desc, id desc)`.
-- [ ] Write `src/pool.ts` (design: Approach "`buildPool`").
-- [ ] Commit: `feat: ranking buildPool`
+- [x] Write `src/pool.ts` (design: Approach "`buildPool`").
+- [x] Commit: `feat: ranking buildPool`
 
 #### Step 6: Scorers and `rankPool` (effort M)
 
