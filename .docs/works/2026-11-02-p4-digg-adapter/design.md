@@ -1,7 +1,7 @@
 # Digg 2009 adapter to the canonical format
 
-Spec status: draft · 2026-11-02
-Design status: pending
+Spec status: approved · 2026-11-02
+Design status: draft · 2026-11-02
 Type: feature · Folder: `.docs/works/2026-11-02-p4-digg-adapter/`
 
 ## 1. Spec
@@ -89,30 +89,134 @@ What exists today (checked on 2026-11-02):
 
 ### Approach
 
+The author approved the Spec on 2026-11-02 without choosing another option, so this design follows the recommendation of all five open questions. These are the P2 choices: drop links with date 0, no reverse for `mutual`, follows counted by the `AsOf` rule (before `t_u`), Digg's own ids, and `joined_at` from the first appearance. So DW4 and DW5 expect exactly the P2 numbers.
+
+**Read the zips in memory, in TypeScript, with no new dependency.** Checked on 2026-11-02:
+- Both local headers have flag 1 (encrypted, no data descriptor) and method 8 (deflate). The CRC-32 and both sizes are in the local header, and there is no zip64.
+- The pinned Node has `zlib.inflateRawSync` and `zlib.crc32`.
+
+So the reader is small:
+1. Find the end-of-central-directory record and the one central entry.
+2. Read the local header.
+3. Decrypt with traditional ZipCrypto: three 32-bit keys updated with a CRC-32 table, then a 12-byte header whose last byte must equal the high byte of the CRC-32.
+4. Inflate, and compare the CRC-32 and the size of the output with the header.
+
+It supports only this case. A second member, another method, bit 3 (data descriptor) or zip64 stops it with a clear message. The SHA-256 check runs first, so only the two known files ever reach the reader. Nothing is written to disk until the canonical output.
+
+**One config file for the source.** `eval/config/digg2009.json` holds, for each zip, the file name, the Internet Archive URL, the capture time, the SHA-256, the member name and the member size. It also holds the published password, the page URL, the citation, and the choices. A test reads the zip table of `.docs/datasets.md` §4 and fails if a URL, SHA-256, member name or member size differs. This works like the `frozen-v1.json` test of P3: the doc stays the source, and the code cannot drift from it.
+
+**Parse strictly, then transform with pure functions.** The two members are about 85.6 MB and 61.2 MB. The parser scans the bytes once:
+- each line has exactly 3 (votes) or 4 (friends) fields, each a double-quoted non-negative integer;
+- a line ends with CR, LF or CR LF;
+- one empty last line is allowed;
+- anything else stops with the member name and line number.
+
+Rows go into typed arrays (`Int32Array`, `Float64Array`), not one object per row, to keep memory low. Then `toCanonical(votes, links, choices)` builds the six tables with the P2 rules:
+1. **Repeats.** A repeated (voter, story) pair keeps its earliest vote.
+2. **Stories.** Each story's author and `created_at` come from its first vote (ties to the smaller voter id). The author's vote is the post, not a positive.
+3. **Likes.** Every other vote is a `like`. `event_id` is the 1-based rank in `(t, voter_id, story_id)` order.
+4. **Follows.** A link with date 0 or a self-link is dropped. A pair keeps its earliest date (the file has none repeated). There is no reverse link.
+5. **Users.** `users.csv` is every voter, plus every id in a kept link. `joined_at` is the earliest of the id's first vote and the dates of its kept links, on either side.
+6. **Communities.** `communities.csv` and `memberships.csv` hold the header only.
+
+The tables go through the P3 `writeTable` and `writeManifest`, so sort order, LF and hashes follow blueprint §2.2 and §2.3 without new code.
+
+**Manifest `source`:**
+- `kind: "digg"`;
+- for each zip: name, URL, capture time, SHA-256, member;
+- the choices, by name;
+- the counts table of DW4.
+
+`epoch` is `{ iso: "1970-01-01T00:00:00Z", seconds: 0 }`. There is no `masterSeed`, because the adapter draws no random number.
+
+**`check`.** `checkAll` in `run.ts` runs the bucket table for every dataset id in a fixed list: `syn-W2M-M` and `digg2009`. `bucketVerdict` already takes the epoch from the manifest. Calibration and lift stay synthetic-only, because the existing `sizeM` test is false for Digg.
+
 **Rejected options:**
 
 | Option | Why not |
 |---|---|
-| | |
+| An npm zip library (for example `adm-zip`, `unzipper`) | A new dependency for one fixed case. Most of them do not decrypt ZipCrypto. The reader above is short and is tested against a zip made by the system `zip -P` |
+| Extract with `unzip -P` into a temp folder | It writes the raw CSVs to disk. P1 and P2 never extracted the members, and DW7 asks for no extracted file |
+| Run the Python of P2 and convert its output | A second language on the data path. The harness is TS, and DW5 needs the TS bucket code to meet the Python numbers independently |
+| Add reverse links for `mutual` rows, or keep links with date 0 | Open questions 1 and 2: the dates are unknown, so they could leak the future |
 
 ### Workflow and sequence diagrams
 
+Adapt:
+
 ```mermaid
 sequenceDiagram
-    participant C as Client
-    participant B as Backend
+    participant A as Author
+    participant C as cli/adapt-digg.ts
+    participant G as digg2009.json
+    participant Z as adapters/zip.ts
+    participant P as adapters/digg.ts
+    participant W as canonical writer
+    A->>C: npm run adapt:digg -w @breadit/eval
+    C->>C: checkNode, then read digg2009.json
+    loop votes zip, friends zip
+        C->>C: SHA-256 of the file must equal the config, else stop
+        C->>Z: readEncryptedMember(bytes, password)
+        Z-->>C: member bytes (CRC-32 and size checked)
+        C->>P: parse rows into typed arrays
+    end
+    C->>P: toCanonical(votes, links, choices)
+    P-->>C: six tables and the counts
+    C->>W: delete eval/data/digg2009, write six CSV files and the manifest
+    C-->>A: the counts table and the manifest SHA-256
+```
+
+Check (only the new part):
+
+```mermaid
+sequenceDiagram
+    participant C as cli/check.ts
+    participant R as checks/run.ts
+    participant K as checks/buckets.ts
+    C->>R: checkAll(eval/data)
+    R->>R: format check on every folder, digg2009 too
+    R->>K: bucketReport for syn-W2M-M and digg2009, q 0.8
+    K-->>R: the table, with T and the epoch from the manifest
+    R-->>C: report, and exit 1 if any check fails
 ```
 
 ### Failure modes
 
 | # | What can go wrong | How we notice | How we resolve it |
 |---|---|---|---|
-| F1 | | | |
+| F1 | A zip is missing or has another SHA-256 | The check runs before any read | Stop, and name the file, both hashes and the URL from the config. Write nothing and delete nothing (DW1) |
+| F2 | Wrong password or a damaged member | The ZipCrypto check byte, or the CRC-32 and size after inflate | Stop with the member name. Never write partial output |
+| F3 | A zip shape the reader does not support (bit 3, zip64, more than one member, method other than 8) | Header checks in `zip.ts` | Stop. With the pinned SHA-256 this cannot happen; the check is for a wrong file passed by hand |
+| F4 | A bad line (wrong field count, missing quote, non-digit) | The strict parser | Stop with the member and the line number. Do not skip lines quietly |
+| F5 | Memory or time with 3 million rows (not checked) | The adapter and `check` crash with an out-of-memory error, or run long | Typed arrays in the parser. The `adapt:digg` and `check` scripts set `--max-old-space-size=4096`. The acceptance notes the run time (not Class D) |
+| F6 | The TS bucket table differs from blueprint §3.7 | DW5 | Compare the steps with the P2 script's output in order: positives `n`, T, test users, then each row. Find the rule that differs and fix the code. Never change a choice to force the match |
+| F7 | A like at the same second as its story's first vote | The format check (`interaction-not-after-post`) | P2 found no tie at the first vote, so none is expected. If one appears, stop and report: it needs an author decision |
+| F8 | An author votes again on their own story | Repeats keep the earliest vote, which is the authored one | Expected. The later rows are counted under "repeats dropped" |
+| F9 | Old files stay in `eval/data/digg2009/` | `check` fails on a file not in the manifest | The adapter deletes the folder after the SHA-256 check, then writes it fresh. It refuses an out dir outside the given path |
+| F10 | `datasets.md` and `digg2009.json` disagree | The config test | Fix the JSON. The doc is the source |
+| F11 | A forbidden pattern (`Date.now`, `.sort()` with no compare) | The post-edit hook and the grep test | Remove it. The capture time is a string in the config, never a clock |
+
+The canonical data has no blocked users, soft deletes, pending posts, bans or caches (blueprint §2.2).
 
 ### Code files
 
 | File | New or changed | Purpose |
 |---|---|---|
-| | | |
+| `eval/config/digg2009.json` | new | Zip names, URLs, capture times, SHA-256, members and their sizes, the password from the page, page URL, citation, choices |
+| `eval/src/adapters/zip.ts` | new | `readEncryptedMember(zip: Buffer, password: string): { name: string; data: Buffer }` (ZipCrypto, `inflateRawSync`, `crc32`) |
+| `eval/src/adapters/zip.test.ts` and `eval/src/adapters/fixtures/tiny.zip` | new | The reader against a few-hundred-byte zip made once with the system `zip -P` and committed. The test covers the right and wrong password, a changed byte (CRC), and an unsupported shape |
+| `eval/src/adapters/digg-parse.ts` | new | `parseVotes(buf): VoteRows`, `parseFriends(buf): LinkRows` (typed arrays), the strict line rules |
+| `eval/src/adapters/digg.ts` | new | `loadDiggConfig()`, `toCanonical(votes, links, choices): { tables, counts }`, `adaptDigg(rawDir, outDir): { manifest, counts }` |
+| `eval/src/adapters/digg.test.ts` | new | Parser cases (CR, CRLF, quotes, bad lines). The `toCanonical` cases of `test_check_cut_time.py` that apply: repeats keep the earliest, author and `created_at` from the first vote with ties to the smaller voter, the author vote is not a positive, event order `(t, voter, story)`, date 0 and self-links dropped, a pair keeps its earliest date. Also: no reverse for `mutual`, users and `joined_at`. And the config against `.docs/datasets.md` §4 |
+| `eval/src/cli/adapt-digg.ts` | new | Command line: raw dir (default `datasets/raw/digg2009`) and out dir (default `eval/data`). Prints the counts and the manifest SHA-256 |
+| `eval/src/checks/run.ts` | changed | Bucket table for `syn-W2M-M` and `digg2009` |
+| `eval/src/checks/run.test.ts` | changed | A Digg-shaped fixture (`kind: "digg"`, Unix epoch) gets a bucket table and no calibration |
+| `eval/package.json` | changed | Script `adapt:digg`. `--max-old-space-size=4096` on `adapt:digg` and `check` |
+| `CLAUDE.md` | changed | The eval line names `adapt:digg` and the raw zip folder |
+| `.docs/super-plan.md` | changed | The P4 sentence of Open question 3, a P4 status paragraph, the §4 status table, a change-log line |
+| `.docs/datasets.md` | changed | §4: one line saying the zips are now kept in `datasets/raw/digg2009/` (git-ignored) |
+| `check_output.txt` (this folder) | new | The `check` output for `digg2009` (counts, bucket table, manifest SHA-256) and the double-run result |
 
 ### Data, schema and cache changes
+
+None in Postgres or Redis. The app is not touched. The new output is `eval/data/digg2009/`: six CSV files and one manifest, git-ignored and rebuilt from the zips. `datasets/raw/digg2009/` is only read.
