@@ -81,14 +81,14 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapte
 
 ## Claude's part
 
-- [ ] Read the commits and the diff against the design.
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up (DW8).
-- [ ] Docs:
+- [x] Read the commits and the diff against the design.
+- [x] `bash .claude/hooks/verify.sh` with db and redis up (DW8).
+- [x] Docs:
   - **`.docs/super-plan.md`:** the P4 sentence of Spec Open question 3 ("uses a link only when it is dated before the test time of the item (`AsOf`)"), a P4 status paragraph, the §4 status row (P4 ✅ if DW1–DW9 pass, with `p4-digg-adapter` ✅), and a change-log line.
   - **`.docs/datasets.md` §4:** one line saying the zips are now kept in `datasets/raw/digg2009/` (git-ignored).
   - **`CLAUDE.md`:** the eval line names `adapt:digg`.
   - Commit: `docs: close p4-digg-adapter`.
-- [ ] Fill in the Result, then close the task.
+- [x] Fill in the Result, then close the task.
 
 ## Tests
 
@@ -105,14 +105,36 @@ All tests are unit tests in `eval/src/**/*.test.ts` under `node --test` and the 
 
 ## Acceptance
 
-- [ ] A one-byte-changed copy of a zip → the adapter stops before reading, names both hashes, and writes nothing (DW1)
-- [ ] Two `adapt:digg` runs into two empty folders → identical manifests and CSV files (DW2)
-- [ ] `check` on `eval/data` → format passes for `digg2009` and the eight synthetic datasets (DW3)
-- [ ] The counts table → 3,018,197 vote rows, 7,299 repeats dropped, 3,553 stories, 3,007,345 positives; 1,731,658 link rows, 1,670 date-0 and 5 self-links dropped, 1,729,983 follows (DW4)
-- [ ] The `digg2009` bucket table at `q` = 0.8 → equals blueprint §3.7: T = 1246068297, 68,120 test users, every row (bucket 0–4: 22,028 / 20,644 / 1,384 / 9,400) (DW5)
-- [ ] `eval/data/digg2009/manifest.json` → `datasetId`, both zips with URL and SHA-256, the choices, Unix epoch, the pinned `node` (DW6)
-- [ ] Files written and `git status` → only `eval/data/digg2009/`; nothing extracted; `datasets/` unchanged (DW7)
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up → every check passes (DW8)
-- [ ] `git diff --stat` of the task commits → only the files listed in DW9 (DW9)
+- [x] A one-byte-changed copy of a zip → the adapter stops before reading, names both hashes, and writes nothing (DW1)
+- [x] Two `adapt:digg` runs into two empty folders → identical manifests and CSV files (DW2)
+- [x] `check` on `eval/data` → format passes for `digg2009` and the eight synthetic datasets (DW3)
+- [x] The counts table → 3,018,197 vote rows, 7,299 repeats dropped, 3,553 stories, 3,007,345 positives; 1,731,658 link rows, 1,670 date-0 and 5 self-links dropped, 1,729,983 follows (DW4)
+- [x] The `digg2009` bucket table at `q` = 0.8 → equals blueprint §3.7: T = 1246068297, 68,120 test users, every row (bucket 0–4: 22,028 / 20,644 / 1,384 / 9,400) (DW5)
+- [x] `eval/data/digg2009/manifest.json` → `datasetId`, both zips with URL and SHA-256, the choices, Unix epoch, the pinned `node` (DW6)
+- [x] Files written and `git status` → only `eval/data/digg2009/`; nothing extracted; `datasets/` unchanged (DW7)
+- [x] `bash .claude/hooks/verify.sh` with db and redis up → every check passes (DW8)
+- [x] `git diff --stat` of the task commits → only the files listed in DW9 (DW9)
 
 ## Result
+
+**Delivered, 2026-11-02.** `npm run adapt:digg -w @breadit/eval` reads the two Digg zips in memory (SHA-256 first, ZipCrypto and deflate in TypeScript, nothing extracted) and writes `eval/data/digg2009/` in the canonical format. `check` now runs the bucket table for `digg2009` too.
+
+**Numbers** (`check_output.txt`, and a second run by Claude):
+- Counts equal DW4: 3,018,197 vote rows, 7,299 repeats dropped, 3,553 stories, 3,007,345 positives; 1,731,658 link rows, 1,670 date-0 and 5 self-links dropped, 0 repeated pairs, 1,729,983 follows. Users: 336,047.
+- The bucket table at `q` = 0.8 equals blueprint §3.7 in every number: T = 1246068297, 68,120 test users, bucket 0–4 22,028 / 20,644 / 1,384 / 9,400, pool at T 823, median pool 783. So the TS bucket code and the P2 Python script agree.
+- Manifest SHA-256 `923e45e17c40b7fa3ae7356153d7f8813c93fbf24c2ee75e63ed36f89bcc4a85`, the same in Sonnet's two runs and in Claude's run into a third folder (`diff -rq` clean).
+- `adapt:digg`: 6.6 s, 1.40 GB peak. `check` on nine folders: 8.1 s, 1.52 GB peak (Class R, not compared).
+- DW1: a one-byte-changed copy of `digg_votes.zip` stops with both hashes and the URL, exit 1; an existing output folder was left untouched.
+
+**Tests.** Eval: 174 pass (was 111). `verify.sh`: all 7 checks pass (backend unit 99/99, integration 108/108, eval verify) after regenerating the Prisma client (below).
+
+**Commits.** Steps 1–7: `b375520`, `4898cf6`, `a4511c5`, `2cd5d8e`, `f498239`, `11dbfff`, `494f342`. Closing docs: the commit that holds this Result.
+
+**Differences from the plan.**
+- **Design change before approval (bit 3).** The system `zip -P` always sets bit 3, so the reader takes the CRC and sizes from the central directory and picks the check byte by the flag. It was written into design.md and plan.md before the plan was approved.
+- **An extra test helper.** `eval/src/adapters/zip-fixture.ts` builds small ZipCrypto zips in memory for the unsupported-shape and `adaptDigg` tests. `tiny.zip`, made by `zip -X -P`, stays the independent check.
+- **Extra fields.** The manifest `source` has a `rules` list and the counts `mutualReversesAdded` and `repeatedLinksDropped` (both 0). `toCanonical` also supports the two rejected options (`addMutualReverse: true`, `dropZeroDateLinks: false`), each with one unit test. The config keeps the P2 values.
+- **Parser limits.** The parser stops on an id above 2,147,483,647, more than 15 digits, or a `mutual` value other than 0 or 1.
+- **Step 1 commit on Node v22.14.0.** The pre-commit hook only typechecks the frontend. All tests and Steps 2–7 ran on v22.23.4.
+- **`verify.sh` first failed on the backend** (build, unit and integration tests). The cause was not this task: Claude's `npm ci` during the P3 acceptance had deleted the generated Prisma client. `npx prisma generate` fixed it, and every check then passed. `CLAUDE.md` now says to run `prisma generate` after `npm ci`.
+- **The super-plan P4 sentence** now follows the blueprint `AsOf` rule (Spec Open question 3), and says the undated links are dropped.

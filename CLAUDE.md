@@ -45,6 +45,7 @@ Root `npm run dev|build|start|lint|typecheck` only targets the **frontend**. Use
 nvm use                                # Node version from .nvmrc (Node 22, pinned in P0)
 docker compose up db redis -d          # Postgres on :5433, Redis on :6378
 npm install                            # install first so npx uses the pinned Prisma 6, not the latest
+                                       # after `npm ci`, run `npx prisma generate` (below) again: npm ci deletes the generated client
 npm run dev                            # frontend on :3000
 npm run dev -w @breadit/backend        # backend on :4000 (nest start --watch)
 npm run build -w @breadit/backend
@@ -58,7 +59,7 @@ make rebuild | backend-rebuild | frontend-rebuild | logs   # see Makefile
 
 Backend tests (Jest): `npm run test -w @breadit/backend` runs the unit tests, `npm run test:it -w @breadit/backend` runs the integration tests, and `npm run test:backend` runs both. The integration tests boot the real app, so they need `docker compose up db redis -d`. They use the Postgres schema `it_test` and Redis database 1, so the dev data in schema `public` is not touched. The frontend has no tests.
 
-Eval (`eval/`, `@breadit/eval`, thesis evaluation code): run `nvm use` first, because the `.ts` files run directly on the pinned Node and do not load on an older one. `npm run verify -w @breadit/eval` runs the typecheck and the tests. `npm run gen -w @breadit/eval` writes the eight synthetic datasets to `eval/data/` (git-ignored, rebuilt from the seed), and `npm run check -w @breadit/eval` checks them. No Docker is needed.
+Eval (`eval/`, `@breadit/eval`, thesis evaluation code): run `nvm use` first, because the `.ts` files run directly on the pinned Node and do not load on an older one. `npm run verify -w @breadit/eval` runs the typecheck and the tests. `npm run gen -w @breadit/eval` writes the eight synthetic datasets to `eval/data/` (git-ignored, rebuilt from the seed), `npm run adapt:digg -w @breadit/eval` converts the Digg 2009 zips in `datasets/raw/digg2009/` (git-ignored, downloaded by hand, see `.docs/datasets.md` §4) to `eval/data/digg2009/`, and `npm run check -w @breadit/eval` checks every dataset. No Docker is needed.
 
 `scripts/verify-bug-sweep.sh` and `scripts/verify-socket.cjs` replay curl and Socket.IO checks against a running backend (see the header of the first one for how to start the backend without sending real email).
 

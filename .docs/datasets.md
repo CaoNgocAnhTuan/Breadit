@@ -102,7 +102,7 @@ Photo upload time and favorite time look like one sequence. In the samples, the 
 
 **Not checked.** The full date range of links; the share of users with favorites; the number of users in the group file (the groups sample has 50,000 groups, the file was not read to its end); license text beyond the copyright line.
 
-**Digg: the two zips from the Internet Archive (task `p1-digg-archive-check`).** We asked the Internet Archive index (CDX) for each zip and fetched the raw capture (the `id_` form), one request at a time. The first requests answered HTTP 429 (too many requests); the files came after we waited 60 and 120 seconds. The fetch ran on 2026-10-26 from 18:33 to 18:39 UTC (the machine's local time is 7 hours ahead, so it was 2026-10-27 locally). The zips stay in the scratchpad, not in git. Nothing was extracted: `digg_stats.py` (task folder) reads the member as text through `zipfile` and writes no file.
+**Digg: the two zips from the Internet Archive (task `p1-digg-archive-check`).** We asked the Internet Archive index (CDX) for each zip and fetched the raw capture (the `id_` form), one request at a time. The first requests answered HTTP 429 (too many requests); the files came after we waited 60 and 120 seconds. The fetch ran on 2026-10-26 from 18:33 to 18:39 UTC (the machine's local time is 7 hours ahead, so it was 2026-10-27 locally). The zips stay out of git. Since 2026-11-02 they are kept in `datasets/raw/digg2009/` (git-ignored), where the adapter of task `p4-digg-adapter` reads them. Nothing was extracted: `digg_stats.py` (task folder) reads the member as text through `zipfile` and writes no file.
 
 | | `digg_votes.zip` | `digg_friends.zip` |
 |---|---|---|
