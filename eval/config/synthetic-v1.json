@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "params": {
+    "activityParetoAlpha": {
+      "value": 1.125,
+      "kind": "calibrated",
+      "note": "For a Pareto law the top 20% share is 0.2^(1 - 1/alpha). 1.125 gives 0.836. Median over mean is then about 0.21.",
+      "targets": [
+        { "key": "activitySkewTop20", "value": 0.8364, "row": "Activity skew (share of votes by the top 20% of voters)", "file": "digg_votes1.csv" },
+        { "key": "votesPerUserMedian", "value": 4, "row": "Votes per voter (median)", "file": "digg_votes1.csv" }
+      ]
+    },
+    "interactionsPerUserMean": {
+      "value": 21.65,
+      "kind": "calibrated",
+      "note": "Total actions = mean x users, so the mean is met by construction.",
+      "targets": [
+        { "key": "votesPerUserMean", "value": 21.65, "row": "Votes per voter (mean)", "file": "digg_votes1.csv" }
+      ]
+    },
+    "followeesMean": {
+      "value": 24.26,
+      "kind": "calibrated",
+      "note": "Mean list length of users with a list. Capped at users - 1.",
+      "targets": [
+        { "key": "followeesMean", "value": 24.26, "row": "Followees per user (users with at least 1 followee)", "file": "digg_friends.csv" }
+      ]
+    },
+    "followListShare": { "value": 0.5, "kind": "chosen", "note": "Near the 51.19% of Digg voters with a list (.docs/datasets.md section 4)." },
+    "twoWayShare": { "value": 0.5, "kind": "chosen", "note": "Near the 51.18% mutual rows (.docs/datasets.md section 6a)." },
+    "followInSpanShare": { "value": 0.2, "kind": "chosen", "note": "Share of links dated inside the activity span. The rest are dated before it." },
+    "secondaryParetoAlpha": { "value": 2, "kind": "chosen", "note": "Tail of list length, popularity and posting weights." },
+    "topics": { "value": 20, "kind": "chosen", "note": "Topics = communities." },
+    "interestSpread": { "value": 0.3, "kind": "chosen", "note": "Share of a user's interest that is spread over all topics. The rest sits on the main topic." },
+    "noMembershipShare": { "value": 0.3, "kind": "chosen", "note": "Users with no community." },
+    "maxMembershipsPerUser": { "value": 4, "kind": "chosen", "note": "Other users have 1 to this many memberships." },
+    "communityPostShare": { "value": 0.3, "kind": "chosen", "note": "Share of posts that go to a community of the author." },
+    "spanDays": { "value": 70, "kind": "chosen", "note": "Activity span. About 2,000 posts per 7 days at size M." },
+    "beforeDays": { "value": 180, "kind": "chosen", "note": "Time before the span, for joins and early links." },
+    "lateJoinerShare": { "value": 0.2, "kind": "chosen", "note": "Users who join inside the span (real cold-start users)." },
+    "candidateWindowDays": { "value": 7, "kind": "chosen", "note": "W_gen: a user picks a post created in this window." },
+    "freshnessTauHours": { "value": 24, "kind": "chosen", "note": "fresh(p, t) = 1 / (1 + age hours / tau)." },
+    "popularityPi": { "value": 1, "kind": "chosen", "note": "Weight (1 + pi x actions on the post so far). In every world." },
+    "typeShareLike": { "value": 0.75, "kind": "chosen", "note": "Type mix of actions." },
+    "typeShareComment": { "value": 0.15, "kind": "chosen", "note": "Type mix of actions." },
+    "typeShareRepost": { "value": 0.1, "kind": "chosen", "note": "Type mix of actions." }
+  },
+  "worlds": {
+    "W0": {
+      "homophily": { "value": 0, "kind": "chosen" },
+      "influenceSocial": { "value": 0, "kind": "chosen" },
+      "influenceCommunity": { "value": 0, "kind": "chosen" }
+    },
+    "W1": {
+      "homophily": { "value": 0.7, "kind": "chosen" },
+      "influenceSocial": { "value": 0, "kind": "chosen" },
+      "influenceCommunity": { "value": 0, "kind": "chosen" }
+    },
+    "W2L": {
+      "homophily": { "value": 0.7, "kind": "chosen" },
+      "influenceSocial": { "value": 0.5, "kind": "chosen" },
+      "influenceCommunity": { "value": 0.5, "kind": "chosen" }
+    },
+    "W2M": {
+      "homophily": { "value": 0.7, "kind": "chosen" },
+      "influenceSocial": { "value": 2, "kind": "chosen" },
+      "influenceCommunity": { "value": 2, "kind": "chosen" }
+    },
+    "W2H": {
+      "homophily": { "value": 0.7, "kind": "chosen" },
+      "influenceSocial": { "value": 8, "kind": "chosen" },
+      "influenceCommunity": { "value": 8, "kind": "chosen" }
+    }
+  }
+}

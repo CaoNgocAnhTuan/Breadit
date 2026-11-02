@@ -60,9 +60,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 6: The config and the stages (effort M)
 
-- [ ] Tests first (TC9), one per stage on a tiny config (for example 30 users, 120 posts): `users` (ids `1..N`, joined times inside the time range, the late-joiner share), `follows` (no self-link, no repeat, the list share, dated after both users joined, homophily 0 gives no link between similar users above chance in a large draw), `communities` (one per topic, memberships after `joined_at`), `posts` (ids follow `(created_at, author_id, draw order)`, D1 holds), `interactions` (strictly after the post, never one's own post, never a repeated pair, influence 0 makes `S(u, p, t)` have no effect: two configs that differ only in a γ with no follows give the same rows).
-- [ ] Write `eval/config/synthetic-v1.json` with the start values of the design table "Parameters", each with `kind` and, when calibrated, `target` (the §6a value and row name). Write `eval/src/generator/config.ts` and the five stage files (design: Approach "The generator", the weight formula, "Parameters").
-- [ ] Commit: `feat: eval generator stages and synthetic-v1 config`
+- [x] Tests first (TC9), one per stage on a tiny config (for example 30 users, 120 posts): `users` (ids `1..N`, joined times inside the time range, the late-joiner share), `follows` (no self-link, no repeat, the list share, dated after both users joined, homophily 0 gives no link between similar users above chance in a large draw), `communities` (one per topic, memberships after `joined_at`), `posts` (ids follow `(created_at, author_id, draw order)`, D1 holds), `interactions` (strictly after the post, never one's own post, never a repeated pair, influence 0 makes `S(u, p, t)` have no effect: two configs that differ only in a γ with no follows give the same rows).
+- [x] Write `eval/config/synthetic-v1.json` with the start values of the design table "Parameters", each with `kind` and, when calibrated, `target` (the §6a value and row name). Write `eval/src/generator/config.ts` and the five stage files (design: Approach "The generator", the weight formula, "Parameters").
+- [x] Commit: `feat: eval generator stages and synthetic-v1 config`
 
 #### Step 7: Generate a dataset (effort S)
 
