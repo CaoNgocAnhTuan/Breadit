@@ -12,6 +12,40 @@ Sources: the code (`apps/backend/src/posts/`, `packages/ranking/src/`, `apps/fro
 
 ## 1. The components on the feed path
 
+The big picture, feed path only. Dashed boxes are planned (task 8). The full diagram is in [System_Architecture.md §3](../../System_Architecture.md).
+
+```mermaid
+flowchart LR
+    classDef fe fill:#F0EEFF,stroke:#4338CA,color:#1E1B4B
+    classDef be fill:#E6F4ED,stroke:#0F766E,color:#164E48
+    classDef pkg fill:#FDF2F8,stroke:#DB2777,color:#831843
+    classDef db fill:#FEF3E8,stroke:#C2410C,color:#431407
+    classDef off fill:#FEFCE8,stroke:#A16207,color:#422006
+    classDef planned stroke-dasharray:6 4
+
+    UI["Frontend<br/>Feed · InfiniteFeed"]:::fe
+    API["PostsController<br/>GET /api/posts"]:::be
+    SVC["PostsService.findAll<br/>mode · cache · page"]:::be
+    FS["FeedService<br/>loads data"]:::be
+    RANK["@breadit/ranking<br/>pool · features · score · sort"]:::pkg
+    PG[("Postgres")]:::db
+    RD[("Redis<br/>page cache")]:::db
+    EVAL["eval/ harness<br/>offline"]:::off
+    class FS planned
+
+    UI -->|"cursor, feed, algo"| API --> SVC
+    SVC <-->|"10 s pages"| RD
+    SVC -->|"algo set"| FS
+    SVC -->|"Explore score"| RANK
+    FS -->|"plain arrays"| RANK
+    RANK -->|"ordered post ids"| FS
+    FS --> PG
+    SVC -->|"load page posts"| PG
+    EVAL -.->|"same functions, CSV data"| RANK
+```
+
+How to read it: the frontend calls `PostsController`, and `PostsService` checks the Redis cache and picks the feed mode. When `algo` is set, `FeedService` loads data from Postgres into plain arrays, hands them to `@breadit/ranking`, and gets back an ordered list of post ids. The offline evaluation calls the same functions with data from CSV files.
+
 | Component | Where | Its job in the feed |
 |---|---|---|
 | Home page | `apps/frontend/src/app/(board)/page.tsx` | Shows the tabs (For You, Explore, Following, Communities) and reads `?feed=` from the URL |

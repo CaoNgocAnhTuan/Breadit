@@ -12,6 +12,40 @@ Nguồn: code (`apps/backend/src/posts/`, `packages/ranking/src/`, `apps/fronten
 
 ## 1. Các component trên đường đi của feed
 
+Bức tranh tổng thể, chỉ phần đường đi của feed. Ô nét đứt là phần dự kiến (task 8). Sơ đồ đầy đủ nằm ở [System_Architecture.md §3](../../System_Architecture.md).
+
+```mermaid
+flowchart LR
+    classDef fe fill:#F0EEFF,stroke:#4338CA,color:#1E1B4B
+    classDef be fill:#E6F4ED,stroke:#0F766E,color:#164E48
+    classDef pkg fill:#FDF2F8,stroke:#DB2777,color:#831843
+    classDef db fill:#FEF3E8,stroke:#C2410C,color:#431407
+    classDef off fill:#FEFCE8,stroke:#A16207,color:#422006
+    classDef planned stroke-dasharray:6 4
+
+    UI["Frontend<br/>Feed · InfiniteFeed"]:::fe
+    API["PostsController<br/>GET /api/posts"]:::be
+    SVC["PostsService.findAll<br/>mode · cache · page"]:::be
+    FS["FeedService<br/>loads data"]:::be
+    RANK["@breadit/ranking<br/>pool · features · score · sort"]:::pkg
+    PG[("Postgres")]:::db
+    RD[("Redis<br/>page cache")]:::db
+    EVAL["eval/ harness<br/>offline"]:::off
+    class FS planned
+
+    UI -->|"cursor, feed, algo"| API --> SVC
+    SVC <-->|"10 s pages"| RD
+    SVC -->|"algo set"| FS
+    SVC -->|"Explore score"| RANK
+    FS -->|"plain arrays"| RANK
+    RANK -->|"ordered post ids"| FS
+    FS --> PG
+    SVC -->|"load page posts"| PG
+    EVAL -.->|"same functions, CSV data"| RANK
+```
+
+Cách đọc: frontend gửi request tới `PostsController`, `PostsService` kiểm cache Redis rồi chọn chế độ feed. Khi có `algo`, `FeedService` nạp dữ liệu từ Postgres thành các mảng thuần, đưa cho `@breadit/ranking`, và nhận lại danh sách post id đã sắp. Phần evaluation offline gọi đúng các hàm đó, với dữ liệu từ CSV.
+
 | Component | Ở đâu | Việc của nó trong feed |
 |---|---|---|
 | Trang chủ | `apps/frontend/src/app/(board)/page.tsx` | Hiện các tab (For You, Explore, Following, Communities) và đọc `?feed=` trên URL |
