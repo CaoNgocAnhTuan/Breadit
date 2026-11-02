@@ -63,3 +63,7 @@ datasets/raw/
 .claude/settings.local.json
 # Local copies of reference papers (copyrighted, not for the repo)
 refs-manual/
+
+# eval workspace: generated datasets and local modules
+eval/data/
+eval/node_modules/

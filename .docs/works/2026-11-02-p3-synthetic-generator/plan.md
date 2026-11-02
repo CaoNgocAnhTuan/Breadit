@@ -1,6 +1,6 @@
 # Plan: Seeded synthetic generator and eval workspace
 
-Status: draft · 2026-11-02
+Status: approved · 2026-11-02
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-generator/`
 
 ---
@@ -24,10 +24,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 1: The workspace (effort XS)
 
-- [ ] Create `eval/package.json` and `eval/tsconfig.json` (design: Code files). Scripts: `test` (all `src/**/*.test.ts` with `node --test`), `typecheck` (`tsc --noEmit`), `verify` (typecheck, then test; `.claude/hooks/verify.sh` already runs `npm run verify -w @breadit/eval` when this script exists), `gen` and `check` (the two CLIs of Step 8).
-- [ ] Add `"eval"` to the root `workspaces`. Add `eval/data/` and `eval/node_modules/` to `.gitignore`. Run the install so `package-lock.json` gets the workspace link, and check that no other package changed.
-- [ ] Add one placeholder test so `test` and `verify` run and pass. Step 2 replaces it.
-- [ ] Commit: `build: eval workspace (@breadit/eval)`
+- [x] Create `eval/package.json` and `eval/tsconfig.json` (design: Code files). Scripts: `test` (all `src/**/*.test.ts` with `node --test`), `typecheck` (`tsc --noEmit`), `verify` (typecheck, then test; `.claude/hooks/verify.sh` already runs `npm run verify -w @breadit/eval` when this script exists), `gen` and `check` (the two CLIs of Step 8).
+- [x] Add `"eval"` to the root `workspaces`. Add `eval/data/` and `eval/node_modules/` to `.gitignore`. Run the install so `package-lock.json` gets the workspace link, and check that no other package changed.
+- [x] Add one placeholder test so `test` and `verify` run and pass. Step 2 replaces it.
+- [x] Commit: `build: eval workspace (@breadit/eval)`
 
 #### Step 2: Frozen values and the Node check (effort S)
 
