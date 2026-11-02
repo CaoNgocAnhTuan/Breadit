@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.14 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.15 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -196,7 +196,7 @@ A loader writes the same data into Postgres with explicit IDs, so the live app c
 
 **Do.** Add a thin Nest service and module that load data (reusing `getFolloweesIds`, `getCommunityIds` and `BlockService.getAllBlockedPeerIds`) and call `packages/ranking`. The live pool uses the shared `buildPool`: it lets approved community posts in (`isApproved = true`, Bugs Report R2) and counts distinct followees (T6 is still open). A community ban must clear the cached community list (B6), because the scorer reuses `getCommunityIds`.
 
-Add a feed option `algo` with values `chrono`, `engagement` and `social`. It goes through `posts.controller.ts` into `findAll` and into the cache key. The default behavior of "For You" stays unchanged until the experiments are done. The frontend changes are in `app/(board)/page.tsx` (whitelist), `Feed.tsx` and `InfiniteFeed.tsx` (query key). A test-only `asOf` query parameter is enabled by an env flag and never in production (T4).
+Add a feed option `algo` with values `chrono`, `engagement` and `social`. It goes through `posts.controller.ts` into `findAll` and into the cache key. The default behavior of "For You" stays unchanged until the experiments are done. The default `algo` comes from an env variable; when it is not set, "For You" behaves as today. So the default feed rule (P7) changes only configuration, not code. The frontend changes are in `app/(board)/page.tsx` (whitelist), `Feed.tsx` and `InfiniteFeed.tsx` (query key). A test-only `asOf` query parameter is enabled by an env flag and never in production (T4).
 
 The `reasons` list per post is cut in v0.2. The score's three terms are still interpretable, but the thesis does not claim explanations shown to users.
 
@@ -219,9 +219,11 @@ Run each experiment once on the frozen config. Do not look at test results while
 
 E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, drop the first run as warm-up, and report the median with a bootstrap confidence interval. The throttle limit in `app.module.ts:28` must become an env variable so the benchmark can raise it (N6). A run counts only if `http_req_failed` is 0. This gate would have caught the 71% failures in the pre-thesis data. Also count the Prisma queries per request. That number is deterministic.
 
+**Default feed rule.** The thesis starts from the Orientation's Gap 1: "For You" is not personalized. After P7, the default "For You" becomes `social` if H1 passes on both co-primary tests and the H0 gate passes. Otherwise the default stays as today, and Chapter 6 says why. P8 applies the result. The supervisor confirms this rule with the P7 results (§11, item 7).
+
 ### P8: Repro package and freeze
 
-**Do.** Add `npm run thesis:repro`. It needs `npm ci` and Docker db and redis. It generates the datasets, runs the Digg adapter (P4, unless the cut order of §8 dropped it), runs all experiments, writes the tables and macros, and compares every hash with `.docs/results/manifest.json`. It fails on any difference. Tag the result `v2-thesis-experiments` (the author approves the tag).
+**Do.** Set the default `algo` by the default feed rule (P7). Add `npm run thesis:repro`. It needs `npm ci` and Docker db and redis. It generates the datasets, runs the Digg adapter (P4, unless the cut order of §8 dropped it), runs all experiments, writes the tables and macros, and compares every hash with `.docs/results/manifest.json`. It fails on any difference. Tag the result `v2-thesis-experiments` (the author approves the tag).
 
 **Done when.** The command passes on a clean clone.
 
@@ -428,6 +430,7 @@ The thesis results do not need the schema migration: generated data has no dupli
 4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval.
 5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `Latex/` and `docs/` needs the author's request.
 6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. Set in P2: `.docs/implementation-plan.md` §3.1 and §3.2, checked on Digg in its §3.7; the P3 check is in its §3.6. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family. Set in P2: `.docs/implementation-plan.md` §3.3 (families F1 and F2 per dataset).
+7. **Default feed rule** (P7). Does the supervisor agree that "For You" switches to `social` only when H1 passes on both co-primary tests and the H0 gate passes? Ask with the P7 results.
 
 ---
 
@@ -447,3 +450,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.12 · 2026-10-28 · Task `p2-implementation-blueprint`: `.docs/implementation-plan.md` 1.0 is written. §4: the Tasks column comes from its task list (P4 task renamed `p4-digg-adapter`, P9 written by the author outside tasks), "E1–E7" corrected to "E1–E8", a P2 status paragraph, and the P5 sentence no longer names the removed agents. §11 item 6: (a) and (c) point to the blueprint. §5, §6 and §7 are byte-identical; no frozen value changed.
 - 0.13 · 2026-10-28 · Task `p0-baseline-freeze`: P0 now pins Node 22, not Node 20 (Node 20 end of life 2026-04-30), in "Do" and "Done when", and a P0 status paragraph with the versions and the digest date. §5, §6 and §7 are byte-identical; no frozen value changed.
 - 0.14 · 2026-11-02 · §4: a Status column in the phase table, with a legend (✅ done, 🟡 waits for someone else, ⬜ not started, "late"), and a ✅ after each closed task. P0 and P2 are ✅. P1 is 🟡 because the supervisor has not answered the note. P3 is late (planned end 11-01). No other text changed; §5, §6 and §7 are byte-identical; no frozen value changed.
+- 0.15 · 2026-11-02 · The default feed rule, so the thesis answers the Orientation's Gap 1. P6: the default `algo` comes from an env variable. P7: a "Default feed rule" paragraph (`social` becomes the default only if H1 passes on both co-primary tests and the H0 gate passes). P8: applies the rule. §11: item 7, the rule waits for the supervisor. `.docs/implementation-plan.md` 1.1: rows 8 and 11 name these parts, and its status line says approved. §5, §6 and §7 are byte-identical; no frozen value changed.

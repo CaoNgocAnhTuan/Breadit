@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.0 · 2026-10-28 · Status: draft for the author's approval
+Version 1.1 · 2026-11-02 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -247,10 +247,10 @@ Today is 2026-10-28. The day budget counts the three approvals of each task. One
 | 5 | `p5-ranking-package` | P5 | 1 | `packages/ranking`, move `computeExploreScoreFixed`, backend imports it, Dockerfile build order | 3 | 11-06 | T4 (score takes `asOf`) |
 | 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
 | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
-| 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
+| 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
 | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
 | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
-| 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, tag proposal | 1 | 11-15 | — |
+| 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
 | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
 | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
 
@@ -278,3 +278,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 ## Change log
 
 - 1.0 · 2026-10-28 · Task `p2-implementation-blueprint`. First version.
+- 1.1 · 2026-11-02 · Status line: approved 2026-10-28 (it still said draft). Task 8 scope: the default `algo` from an env variable. Task 11 scope: set the default `algo` by the P7 rule (super-plan 0.15). No day budget or date changed.
