@@ -54,14 +54,14 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 3: Statistics and the scipy cross-check (effort M)
 
-- [ ] **The fixture.** Write `eval/src/stats-fixture.csv` with 14 paired values. Some of them must be tied, and at least one difference must be zero.
-- [ ] **The scipy reference.** Make a Python virtual environment **outside the repo**, for example in the scratchpad, and install pinned `numpy` and `scipy`. Write `stats_crosscheck.py` in this task folder; it reads the fixture and writes `stats_reference.json` with:
+- [x] **The fixture.** Write `eval/src/stats-fixture.csv` with 14 paired values. Some of them must be tied, and at least one difference must be zero.
+- [x] **The scipy reference.** Make a Python virtual environment **outside the repo**, for example in the scratchpad, and install pinned `numpy` and `scipy`. Write `stats_crosscheck.py` in this task folder; it reads the fixture and writes `stats_reference.json` with:
   - the exact p of `scipy.stats.permutation_test(..., permutation_type="samples")`;
   - the CI of `scipy.stats.bootstrap(..., paired=True, method="percentile")`;
   - the Python, numpy and scipy versions.
 
   If the install fails, stop and report (design F11).
-- [ ] **Tests first (TC5).**
+- [x] **Tests first (TC5).**
   - `exactRandomizationTest` equals the scipy exact p to `1e-12`.
   - `randomizationTest` is within 3 standard errors of it.
   - The `pairedBootstrap` CI bounds are within 0.02 of scipy's.
@@ -69,8 +69,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
   - Two runs give identical numbers.
   - Each comparison restarts its stream: computing comparison B before or after comparison A gives the same B.
   - `h1Verdict` and `h0Gate` match blueprint §3.4 and §3.5 on hand-made rows.
-- [ ] **The code.** Write `eval/src/stats.ts`, including `writeCompare` with the columns of blueprint §2.7 (design: Approach "Statistics", "The scipy cross-check").
-- [ ] Commit: `feat: eval statistics (paired bootstrap, randomization, Holm) and scipy cross-check`
+- [x] **The code.** Write `eval/src/stats.ts`, including `writeCompare` with the columns of blueprint §2.7 (design: Approach "Statistics", "The scipy cross-check").
+- [x] Commit: `feat: eval statistics (paired bootstrap, randomization, Holm) and scipy cross-check`
 
 #### Step 4: Split (effort XS)
 

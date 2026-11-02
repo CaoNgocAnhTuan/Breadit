@@ -25,6 +25,29 @@ export function ndcgAt(rank: number, k: number): number {
   return rank <= k ? 1 / Math.log2(rank + 1) : 0;
 }
 
+/** The 13 method ids in the order of `MethodId` in @breadit/ranking. Rows of every results file sort by this order. */
+export const METHOD_ORDER: readonly string[] = [
+  "BL0",
+  "BL1",
+  "BL2",
+  "BL2t",
+  "BL3",
+  "BL4",
+  "BL5",
+  "BL6",
+  "H",
+  "H-follow",
+  "H-comm",
+  "H-noauthor",
+  "H-noengager",
+];
+
+export function methodIndex(method: string): number {
+  const i = METHOD_ORDER.indexOf(method);
+  if (i < 0) throw new Error(`unknown method "${method}"`);
+  return i;
+}
+
 /** The summary groups: each bucket, "0-4" right after the buckets it holds, and "all" last. */
 export const GROUPS: readonly string[] = [
   ...BUCKET_LABELS.slice(0, BUCKETS_0_4.length),

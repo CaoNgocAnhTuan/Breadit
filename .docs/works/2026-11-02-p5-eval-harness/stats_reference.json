@@ -1,0 +1,21 @@
+{
+  "bootstrap": {
+    "level": 0.95,
+    "method": "percentile",
+    "paired": true,
+    "resamples": 10000,
+    "seed": 20261014
+  },
+  "ci_high": 0.125,
+  "ci_low": 0.03125,
+  "exact_p": 0.014404296875,
+  "fixture": "stats-fixture.csv",
+  "mean_diff": 0.08035714285714286,
+  "n": 14,
+  "n_permutations": 16384,
+  "versions": {
+    "numpy": "2.3.5",
+    "python": "3.14.3",
+    "scipy": "1.16.3"
+  }
+}
