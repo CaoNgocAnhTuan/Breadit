@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.20 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.21 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -86,9 +86,9 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 10-28 | P0 Baseline freeze | Node pinned, image digests | A clean clone passes install, migrate, seed, typecheck | `p0-baseline-freeze` ✅ |
 | 🟡 waits for the supervisor | P1 Literature, RQ and data lock ★ | `literature.md`, `datasets.md`, one-page note, Chapter 2 survey | The supervisor confirms the RQs, the data and the design decisions | `p1-literature` ✅, `p1-dataset-selection` ✅, `p1-supervisor-note` ✅, `p1-related-work` ✅ |
 | ✅ 10-28 | P2 Implementation blueprint | `implementation-plan.md` | The author approves it, and it names every later task | `p2-implementation-blueprint` ✅ |
-| ⬜ late, 1 of 2 tasks done | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator` ✅, `p3-postgres-loader` |
+| ▶ next, 1 of 2 tasks done | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator` ✅, `p3-postgres-loader` |
 | ✅ 11-02 | P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` ✅ |
-| ▶ in progress, 1 of 2 tasks done | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package` ✅, `p5-eval-harness` |
+| ✅ 11-02 (★ note ready to send) | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package` ✅, `p5-eval-harness` ✅ |
 | ⬜ | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
 | ⬜ | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark` |
 | ⬜ | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
@@ -195,6 +195,8 @@ A loader writes the same data into Postgres with explicit IDs, so the live app c
 **Status (2026-11-02, part 1 done).** Task `p5-ranking-package` (`.docs/works/2026-11-02-p5-ranking-package/`). `@breadit/ranking` holds the `AsOf` rule, the feature builders, `buildPool`, the 13 method ids (BL0–BL6, BL2t, H and four ablations) and `rankPool`, with 82 unit tests. Each method is checked against scores computed by hand, and `buildPool` agrees with the P3 pool rule on random fixtures. BL5 is the log of the HN score, so the frozen score unit stays. The backend's Explore imports `computeExploreScoreFixed` from the package, so BL2 is the production code; Explore's results are unchanged. The grids, W_L/N_L and T are frozen in `p5-eval-harness`.
 
 **First output ★.** A baseline table (BL0–BL5, validation split, W0, W1 and W2 at size S) goes to the supervisor before tuning starts.
+
+**Status (2026-11-02, part 2 done, P5 done).** Task `p5-eval-harness` (`.docs/works/2026-11-02-p5-eval-harness/`). The harness (`npm run harness -w @breadit/eval -- <runId>`) runs a committed run config through the split, `@breadit/ranking`, the metrics and the statistics. The three P5 tests pass: golden (a hand-checked dataset gives the committed CSV files), leakage (changing or deleting every later event leaves a user's rows unchanged) and double run (byte-identical files). The statistics match scipy 1.16.3 (exact permutation p equal; bootstrap CI within tolerance). T for all nine datasets equals §7, and the test-split item counts equal the P3 and P4 bucket tables. The baseline table ★ is `.docs/results/p5-baseline/`, with the note for the supervisor in the task folder (`baseline-note.md`). A validation run of BL2 and H on `digg2009` takes 78 s and 1.2 GB. The test split was not run.
 
 **Done when.** Three tests pass. (1) Golden: a tiny committed dataset gives a committed CSV. (2) Leakage: change or delete every event after `t_u` for a user, and that user's ranking must not change. (3) Double run: two full runs give equal hashes.
 
@@ -462,3 +464,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.18 · 2026-11-02 · Status marks only: §3 "Tooling" notes the two facts fixed since (the `eval` workspace in P3, the Node pin in P0); §11 item 3 (D1) ✅ decided; §11 item 6 gets a status line ((a) and (c) done, (b) open for P5); §4: ▶ marks P5 as next. `.docs/implementation-plan.md` 1.2 marks tasks 1–4 done. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.19 · 2026-11-02 · Task `p5-ranking-package`: P5 status paragraph (part 1 done), §4 row (1 of 2 tasks). No frozen value changed: BL5 keeps the frozen score unit through its log form (task 5 Open question 1); §5, §6 and §7 are byte-identical.
 - 0.20 · 2026-11-02 · Task `p5-eval-harness`, Step 0: §7 rows "Cut time T" (the nine values from the rule with `q` = 0.8), "Larger pool (W_L, N_L) for E8" (14 days / 4,000) and "Baseline grids" (five values each, with the published value) are set and frozen, as the author decided in the task's Spec (Open questions 1–3). No other frozen value changed; §5 and §6 are byte-identical.
+- 0.21 · 2026-11-02 · Task `p5-eval-harness`: P5 status paragraph (P5 done), §4 row P5 ✅ with the ★ note ready to send, P3 marked ▶ next (the loader). No frozen value changed beyond 0.20; §5 and §6 are byte-identical.

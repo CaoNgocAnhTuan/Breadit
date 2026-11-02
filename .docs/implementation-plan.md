@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.3 · 2026-11-02 · Status: approved 2026-10-28
+Version 1.4 · 2026-11-02 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -10,7 +10,7 @@ How the pieces of P3 to P10 fit together in the code. A thing is here only if tw
 | Module | Owner task | May import | What it holds |
 |---|---|---|---|
 | `packages/ranking` (`@breadit/ranking`) | `p5-ranking-package` ✅ (2026-11-02) | the Node standard library only | Types, `buildPool`, as-of feature functions, every scorer, `rankPool`, and `computeExploreScoreFixed` moved from `posts.service.ts`. Pure: no Nest, Prisma, Redis, clock or randomness. Builds to `dist/` with `tsc`, like `@breadit/shared` |
-| `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it ✅ (2026-11-02; `rng.ts`, `canonical/`, `generator/`, `checks/`, `config/`; `adapters/digg.ts` added by `p4-digg-adapter` ✅; loader, harness, metrics, stats and report still to come) | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `config/` |
+| `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it ✅ (2026-11-02; `rng.ts`, `canonical/`, `generator/`, `checks/`, `config/`; `adapters/digg.ts` by `p4-digg-adapter` ✅; `harness/`, `metrics.ts`, `stats.ts` by `p5-eval-harness` ✅; loader and report still to come) | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `config/` |
 | Backend feed module `apps/backend/src/feed/` | `p6-social-feed` | `@breadit/ranking`, `PrismaService`, `BlockService` | A thin service that loads data and calls `buildPool` and a scorer. `PostsService.findAll` calls it when `algo` is set. Explore imports `computeExploreScoreFixed` from `@breadit/ranking` (done in `p5-ranking-package`) |
 | Frontend toggle | `p6-social-feed` | the API only | `algo` in `app/(board)/page.tsx`, `Feed.tsx`, `InfiniteFeed.tsx` |
 
@@ -120,7 +120,7 @@ function ageHours(createdAt: Sec, asOf: AsOf): number;
 
 ### 2.7 Results files (H-d)
 
-Written by the harness into `.docs/results/<runId>/`. Class D (super-plan §2). Metrics have 6 decimals.
+Written by the harness into `.docs/results/<runId>/`. Class D (super-plan §2). Metrics have 6 decimals. A `per_user.csv` over 5 MB goes to `eval/results/<runId>/` (git-ignored) instead, and its SHA-256 stays in the committed run manifest (task 6, 2026-11-02). In `compare.csv` every comparison is on NDCG@K per user.
 
 | File | Columns | One row per |
 |---|---|---|
@@ -182,7 +182,7 @@ Two families per dataset, each corrected with Holm on its own. The two co-primar
 - Holm stays valid when tests overlap, and bucket 0–4 contains 0 and 1–4. So the overlap does not break it.
 - Holm level and confidence level: §7, row "Confidence level / Holm level".
 
-### 3.4 Reading of H1 (for the author to confirm)
+### 3.4 Reading of H1 (confirmed by the author on 2026-11-02, task 6)
 
 H1 passes on a dataset when, for the F1 row (NDCG@10, group 0–4), both hold:
 - the Holm-adjusted p of the randomization test is below the Holm level (§7, row "Confidence level / Holm level"), and
@@ -263,8 +263,8 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-02. ✅ mea
 | ✅ 11-02 | 3 | `p3-synthetic-generator` | P3 | 1, 2, D1 | `eval/` workspace, `rng.ts`, canonical writer, config, worlds, bucket table (section 3) | 2.5 | 11-01 | — |
 | ✅ 11-02 | 4 | `p4-digg-adapter` † | P4 | 3 (canonical writer) | adapter, the real Digg choices, the same bucket table | 2 | 11-03 | — |
 | ✅ 11-02 | 5 | `p5-ranking-package` | P5 | 1 | `packages/ranking`, move `computeExploreScoreFixed`, backend imports it, Dockerfile build order | 3 | 11-06 | T4 (score takes `asOf`) |
-| ▶ next | 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
-| ⬜ | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
+| ✅ 11-02 | 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
+| ▶ next | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
 | ⬜ | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
 | ⬜ | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
 | ⬜ | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
@@ -299,3 +299,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.1 · 2026-11-02 · Status line: approved 2026-10-28 (it still said draft). Task 8 scope: the default `algo` from an env variable. Task 11 scope: set the default `algo` by the P7 rule (super-plan 0.15). No day budget or date changed.
 - 1.2 · 2026-11-02 · Status marks after tasks 3 and 4: a Status column in the §5 task list (tasks 1–4 ✅, task 5 next), the module map row of `eval/`, the done notes in §3.6 and §3.7, the stale P0 sentence in §5, and §6 (D1 followed by the generator; the P4 choices decided). No contract, rule, day budget or date changed.
 - 1.3 · 2026-11-02 · Task `p5-ranking-package`: §2.6 gets the feature-builder signatures (`userFeaturesAsOf`, `postFeaturesAsOf`, `visibleAt`, `ageHours`), the params per method, and the BL5 form. §1 and §5: task 5 ✅, task 6 next. The other signatures of §2.6 are unchanged.
+- 1.4 · 2026-11-02 · Task `p5-eval-harness`: §2.7 the 5 MB rule for `per_user.csv` and the NDCG basis of `compare.csv`; §3.4 confirmed by the author; §1 and §5: task 6 ✅, task 7 next.

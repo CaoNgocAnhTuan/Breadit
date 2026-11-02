@@ -130,15 +130,15 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 ## Claude's part
 
-- [ ] Read the commits and the diff against the design. Check that no results folder has `split = test` (DW8).
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up (DW11).
-- [ ] **The supervisor note.** Write `baseline-note.md` in this task folder (the ★ checkpoint): the table from `summary.csv`, what was run, and what comes next (tuning, then the experiments).
-- [ ] **Docs:**
+- [x] Read the commits and the diff against the design. Check that no results folder has `split = test` (DW8).
+- [x] `bash .claude/hooks/verify.sh` with db and redis up (DW11).
+- [x] **The supervisor note.** Write `baseline-note.md` in this task folder (the ★ checkpoint): the table from `summary.csv`, what was run, and what comes next (tuning, then the experiments).
+- [x] **Docs:**
   - `CLAUDE.md`: the `harness` and `rank` commands in the eval line.
   - `.docs/implementation-plan.md`: §2.7 (the 5 MB rule and `eval/results/`), §3.4 confirmed by the author on 2026-11-02, task 6 ✅, a change-log line.
   - `.docs/super-plan.md`: the P5 status and the §4 row (P5 ✅ when DW1–DW12 pass), a change-log line.
   - Commit: `docs: close p5-eval-harness`.
-- [ ] Fill in the Result, then close the task.
+- [x] Fill in the Result, then close the task.
 
 ## Tests
 
@@ -159,13 +159,48 @@ All tests are unit tests in `eval/src/**/*.test.ts` (`node --test`, pinned Node)
 
 ## Acceptance
 
-- [ ] `.docs/results/p5-baseline/` → `summary.csv`, `coverage.csv`, `leftout.csv`, `per_user.csv` and `manifest.json` for BL0–BL5 on the three S datasets, validation split (DW7)
-- [ ] Rerun `p5-baseline` into an empty folder outside the repo → every file is byte-identical (DW3)
-- [ ] `run_output.txt` → the T of all nine datasets equals §7; the validation counts per bucket are printed (DW6)
-- [ ] `run_output.txt` → BL2 and H finish on `syn-W2M-M` and `digg2009`, with the time and memory noted (DW9)
-- [ ] `grep` for `"split": "test"` under `.docs/results/` and `eval/config/runs/` → no match (DW8)
-- [ ] The eval tests → TC1–TC10 pass (DW1, DW2, DW4, DW5, DW10)
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up → every check passes (DW11)
-- [ ] `git diff --stat` of the task commits → only the files of DW12 (DW12)
+- [x] `.docs/results/p5-baseline/` → `summary.csv`, `coverage.csv`, `leftout.csv`, `per_user.csv` and `manifest.json` for BL0–BL5 on the three S datasets, validation split (DW7)
+- [x] Rerun `p5-baseline` into an empty folder outside the repo → every file is byte-identical (DW3)
+- [x] `run_output.txt` → the T of all nine datasets equals §7; the validation counts per bucket are printed (DW6)
+- [x] `run_output.txt` → BL2 and H finish on `syn-W2M-M` and `digg2009`, with the time and memory noted (DW9)
+- [x] `grep` for `"split": "test"` under `.docs/results/` and `eval/config/runs/` → no match (DW8)
+- [x] The eval tests → TC1–TC10 pass (DW1, DW2, DW4, DW5, DW10)
+- [x] `bash .claude/hooks/verify.sh` with db and redis up → every check passes (DW11)
+- [x] `git diff --stat` of the task commits → only the files of DW12 (DW12)
 
 ## Result
+
+**Delivered, 2026-11-02.** The `eval/` harness is finished: split, fast post features (with a reference mode), run, results files, tuning, and the `harness` and `rank` commands. `eval/src/metrics.ts` and `eval/src/stats.ts` hold the metrics and statistics: paired bootstrap, randomization test, Holm, the H1 verdict and the H0 gate. The three P5 tests pass, and the baseline table ★ is in `.docs/results/p5-baseline/`. The note for the supervisor is `baseline-note.md` in this folder. The test split was never run on real data.
+
+**Tests.** Eval: 257 tests (175 before). `verify.sh`: all 9 checks pass (ranking 82, backend 99, integration 108, eval verify).
+
+**Acceptance.**
+- **DW1–DW5, DW10:** the golden, leakage, metrics, statistics and `rank` tests pass.
+- **The scipy cross-check** (Python 3.14.3, numpy 2.3.5, scipy 1.16.3, in a venv outside the repo):
+  - exact p 0.014404296875, equal to scipy's;
+  - Monte Carlo p 0.013799, 0.5 standard errors away;
+  - CI 0.03125 / 0.125, equal to scipy's.
+- **DW3:** Sonnet's two runs and Claude's third run of `p5-baseline` are byte-identical (manifest `f76463b298299f6d37a28478a71045ea64fbcfd7eac0f18542ceef297fb61481`).
+- **DW6:** T equals §7 on all nine datasets. The test-split item counts equal the P3 table on `syn-W2M-S` and `syn-W2M-M` (unit test), and the P4 table on `digg2009` (Claude counted it, no ranking: 68,120 test users; bucket 0–4 22,028 / 20,644 kept). Validation items: 180 per S world and 903 per M world, with none left out; on Digg 127,654 with 3,103 left out.
+- **DW7:** BL0–BL5 on the three S worlds, 180 users each.
+- **DW8:** no config or result has `split: test`, and the hook never asked.
+- **DW9:** BL2 and H on the validation split. `syn-W2M-M` took 1.0 s and 153 MB; `digg2009` took 77.5 s and 1.22 GB.
+- **DW11:** `verify.sh` passes.
+- **DW12:** the diff holds only `eval/`, `.gitignore`, `.docs/results/p5-baseline/`, the task folder, and Claude's doc files.
+
+**Commits.**
+- Step 0 (Claude): `43e1694`, `5bff084`.
+- Steps 1–9: `3e272a3`, `0a7cf8c`, `fad7159`, `1d709f6`, `2c261e3`, `a63954b`, `d6eb563`, `803b9df`, `e8bd5d2`.
+- Closing docs: the commit that holds this Result.
+
+**Differences from the plan.**
+- **More frozen values in code.** `frozen-v1.json` also holds K, `m`, the α/β grid, the resample counts, the levels and `q`, each checked against §7.
+- **`fastPostFeatures(post, asOf, engaged, idx)`.** `engaged` comes from `followeeEngagement(idx, followees, asOf)`, built once per item. That is cheaper than one lookup per pool post. The fast and reference modes are byte-identical on the golden data and `syn-W2M-S`.
+- **Extra files.** `results-csv.ts`, `harness/config.ts`, `harness/commands.ts`, the test helper `harness/random-data.ts`, and a few exported helpers.
+- **Run-config details.**
+  - `"m": "frozen"` reads `m` from `frozen-v1.json`.
+  - `harness` takes `--out`, `--record-t` and `--data-dir`; `rank` takes `--param` and `--config`.
+  - A config with `"grid"` params tunes first, then runs the chosen values.
+- **`compare.csv`** compares NDCG@K per user (it has no metric column), and the blueprint §2.7 now says so. Tuning compares the 6-decimal NDCG@10, so `tuning.csv` alone shows the choice.
+- **Counting test-split items.** Two unit tests and Claude's Digg check count test-split items to prove DW6. They do no ranking and compute no metric, so no test result was seen. Claude accepted this as within the rule.
+- **The golden dataset** has 9 users, 12 posts and 33 positives, larger than "about 6 users". Its expected CSV files were also checked against a separate Python re-implementation (not committed).
