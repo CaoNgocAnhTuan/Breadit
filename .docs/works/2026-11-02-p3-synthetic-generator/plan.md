@@ -112,10 +112,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 ## Claude's part
 
-- [ ] Read the commits and the diff against the design. Check that `package-lock.json` changed only by the workspace link.
-- [ ] With Docker db and redis up: `bash .claude/hooks/verify.sh` (it now also runs `eval verify`) and `docker compose build` (DW9). If `npm ci` fails in a Dockerfile (design F4), add `COPY eval/package.json ./eval/` next to the `packages/shared` line in both Dockerfiles, build again, and commit `build: Dockerfiles copy the eval workspace manifest`.
-- [ ] Docs: one line in `CLAUDE.md` "Commands" for `gen`, `check` and `test` of `@breadit/eval`, after `nvm use`. `.docs/Bugs Report.md`: D1 decided on 2026-10-28 (membership required, product rule in task 8), out of "Open decision", and the count line. `.docs/super-plan.md`: the P3 status paragraph (`p3-synthetic-generator` done, `p3-postgres-loader` still open), the §7 row "Synthetic world parameters" gets the SHA-256 of `synthetic-v1.json` (design Open question 5: approving this plan freezes it), the status table in §4 (P3 stays ⬜ until the loader is done, the task gets ✅), and a change-log line. Commit: `docs: close p3-synthetic-generator, freeze synthetic-v1`.
-- [ ] Fill in the Result, then close the task.
+- [x] Read the commits and the diff against the design. Check that `package-lock.json` changed only by the workspace link.
+- [x] With Docker db and redis up: `bash .claude/hooks/verify.sh` (it now also runs `eval verify`) and `docker compose build` (DW9). If `npm ci` fails in a Dockerfile (design F4), add `COPY eval/package.json ./eval/` next to the `packages/shared` line in both Dockerfiles, build again, and commit `build: Dockerfiles copy the eval workspace manifest`.
+- [x] Docs: one line in `CLAUDE.md` "Commands" for `gen`, `check` and `test` of `@breadit/eval`, after `nvm use`. `.docs/Bugs Report.md`: D1 decided on 2026-10-28 (membership required, product rule in task 8), out of "Open decision", and the count line. `.docs/super-plan.md`: the P3 status paragraph (`p3-synthetic-generator` done, `p3-postgres-loader` still open), the §7 row "Synthetic world parameters" gets the SHA-256 of `synthetic-v1.json` (design Open question 5: approving this plan freezes it), the status table in §4 (P3 stays ⬜ until the loader is done, the task gets ✅), and a change-log line. Commit: `docs: close p3-synthetic-generator, freeze synthetic-v1`.
+- [x] Fill in the Result, then close the task.
 
 ## Tests
 
@@ -142,15 +142,36 @@ All tests are unit tests in `eval/src/**/*.test.ts`, run by `node --test` under 
 
 ## Acceptance
 
-- [ ] `npm ci` at the root, then `npm run verify -w @breadit/eval` under the pinned Node → both exit 0 (DW1)
-- [ ] `check` on `eval/data` → format passes for all eight datasets (DW4)
-- [ ] Two `gen` runs into two empty folders → every `manifest.json` pair has the same SHA-256 (DW3)
-- [ ] Calibration table for the five M datasets → every calibrated value of design §4 within its tolerance, and no user above `maxUserActionShare` (DW5, amended)
-- [ ] Bucket table for `syn-W2M-M` at `q` = 0.8 → at least 100 kept test users in bucket 0–4, and at least one in bucket 0 (DW6, amended)
-- [ ] Lift per M world → W0 lowest, and W2L < W2M < W2H (DW7)
-- [ ] grep `eval/src` for the forbidden patterns → no match without `// harness-allow:` (DW8)
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up, and `docker compose build` → all pass (DW9)
-- [ ] `git diff --stat` from the commit before Step 1 → only the files listed in DW10 (DW10)
-- [ ] `check` with the default shell Node (v22.14.0) → it stops and writes no file (it cannot load `.ts` there). `checkNode` covers another 22.x that can load `.ts` (TC3) (F1)
+- [x] `npm ci` at the root, then `npm run verify -w @breadit/eval` under the pinned Node → both exit 0 (DW1)
+- [x] `check` on `eval/data` → format passes for all eight datasets (DW4)
+- [x] Two `gen` runs into two empty folders → every `manifest.json` pair has the same SHA-256 (DW3)
+- [x] Calibration table for the five M datasets → every calibrated value of design §4 within its tolerance, and no user above `maxUserActionShare` (DW5, amended)
+- [x] Bucket table for `syn-W2M-M` at `q` = 0.8 → at least 100 kept test users in bucket 0–4, and at least one in bucket 0 (DW6, amended)
+- [x] Lift per M world → W0 lowest, and W2L < W2M < W2H (DW7)
+- [x] grep `eval/src` for the forbidden patterns → no match without `// harness-allow:` (DW8)
+- [x] `bash .claude/hooks/verify.sh` with db and redis up, and `docker compose build` → all pass (DW9)
+- [x] `git diff --stat` from the commit before Step 1 → only the files listed in DW10 (DW10)
+- [x] `check` with the default shell Node (v22.14.0) → it stops and writes no file (it cannot load `.ts` there). `checkNode` covers another 22.x that can load `.ts` (TC3) (F1)
 
 ## Result
+
+**Delivered, 2026-11-02.** The `eval/` workspace (`@breadit/eval`) with the seeded RNG, the canonical CSV and manifest writers, the five-stage generator, the four checks and the `gen` and `check` commands. It builds the eight synthetic datasets of `.docs/implementation-plan.md` §4. `synthetic-v1.json` is frozen (SHA-256 `70341fd94eb40d549e8217fb8c39bcb105277afd25cd39d6b178273e5ff48007`, super-plan §7).
+
+**Tests.** 111 eval unit tests pass (`node --test`, Node v22.23.4), typecheck clean. `verify.sh`: all 7 checks pass (backend unit 99/99, integration 108/108, eval verify). `docker compose build`: both images build; the Dockerfiles needed no change (F4 did not happen).
+
+**Acceptance numbers** (`check_output.txt`):
+- Two `gen` runs into two empty folders: all eight manifests equal, and `diff -rq` finds no difference. Both equal the committed hashes.
+- Calibration (five M datasets): every value within tolerance. Votes per user mean 22.26 (target 21.65), median 4 (4), p90 40 (45), p99 332 (287); shares 1 / 2–4 / 5–19 / 20+: 0.280 / 0.265 / 0.234 / 0.221; skew 0.828 (0.8364); followees of users with one 24.36–24.45 (24.26); users with a followee 0.496 (0.5119). Top user 4.86% of actions (limit 5%), two users at the cap.
+- Lift: W0 1.091, W1 1.570, W2L 2.244, W2M 3.783, W2H 7.637.
+- Buckets, `syn-W2M-M`, q = 0.8: 590 test users; kept in 0–4: 174 (threshold 100), in bucket 0: 59.
+- Old Node (v22.14.0): `check` stops with `ERR_UNKNOWN_FILE_EXTENSION` and writes nothing.
+
+**Commits.** Steps 1–9: `2673a5b`, `52c0124`, `3fa331f`, `58c0639`, `3739176`, `effa603`, `308a8a5`, `1b4a677`, `79ea7dd`. Amendment 1: `e487223` (docs), Steps 10–13: `5ebf070`, `357a73e`, `2a08b08`, `497d2c0`. Closing docs: the commit that holds this Result.
+
+**Differences from the plan.**
+- **Amendment 1 (design §4).** The first data passed every DW but had one user with 35.8% of actions, an empty bucket 0, and 99.8% of users with a followee. The author agreed in chat to the fix: activity drawn by the Digg bins with a capped tail, returned links only between list holders, span 80 days, and more calibration targets. Steps 10–13 were added.
+- **Calibration rounds.** Step 9 moved `activityParetoAlpha` and `followeesMean` (both later replaced or reset by the amendment). Step 13 moved `activityTailAlpha` from 1.06 to 1.12: at 1.06 the mean (24.25) and p99 (389) failed. Only 1.12 and 1.14 pass the mean, p99 and the 5% limit together.
+- **Config shape.** Four parameters `activityBinShare1`, `…2to4`, `…5to19`, `…20plus` instead of one `activityBinShares`. Four more chosen parameters not in the design table: `interestSpread` 0.3, `followInSpanShare` 0.2, `secondaryParetoAlpha` 2, `maxMembershipsPerUser` 4. The manifest `source` also has `world`, `size`, `skippedActions` and `activityCap`.
+- **The pool cap N_max still binds for later test users.** At T the window holds 1,972 posts, but the median pool over kept test users is 2,000, because late-joining authors post more near the end of the span. Only 16 of 190 bucket 0–4 test users are left out, and DW6 passes, so no parameter moved. All methods rank the same pool, so this does not favor one method.
+- **Coupling to know for later tuning.** The user cap is `floor(0.05 × mean × N)`, but the realized total is not fixed. A lighter tail (`activityTailAlpha` ≥ 1.16) lowers the total and puts the top user above 5%.
+- **Extra files.** `sfc32_check.py` (the Python cross-check of the RNG vector) in this folder. `eval/package.json` has a `verify` script, which `verify.sh` runs.

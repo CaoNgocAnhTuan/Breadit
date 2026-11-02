@@ -15,7 +15,7 @@ How the report was made: first I read the code and listed 26 suspected problems.
 | Findings in the review | 36 (T1–T10, S1–S6, B1–B10, N1–N10) |
 | **Resolved** | **14** |
 | **Still open** | **22 of the 36, plus 6 found later (R1–R6) = 28** |
-| Open decision | 1 (D1) |
+| Open decision | 0 (D1 decided on 2026-10-28, section 4) |
 
 Open items by priority: **P1 = 6, P2 = 6, P3 = 8, P4 = 8.** What the levels mean is in section 2.
 
@@ -38,7 +38,7 @@ The fixes were checked like this:
 Effort guess: **XS** under 30 min, **S** under 2 hours, **M** half a day, **L** over a day.
 
 **Suggested order**
-1. **By thesis phase:** T4, T3, B6, R2 in **P6** (with the decision D1). Then N6 in **E7**. T6 waits for the schema migration, which the super plan cut (v0.2, §9); the social feed counts distinct followees instead.
+1. **By thesis phase:** T4, T3, B6, R2 in **P6** (with the D1 product rule). Then N6 in **E7**. T6 waits for the schema migration, which the super plan cut (v0.2, §9); the social feed counts distinct followees instead.
 2. **Before sharing the app:** S5 (HTTP part), B1, S4, S6, B5, R3.
 3. **Quick wins** (each XS or S, about half a day together): B9, B10, B2, R1, N8, B1, S5, N7.
 4. The rest of P3 and P4.
@@ -99,9 +99,9 @@ Code locations use function and file names, because line numbers moved during th
 
 ---
 
-## 4. Open decision
+## 4. Decisions
 
-**D1. Can a non-member post into a community?** Today anyone can submit a post to any community and it goes to the approval queue (`PostsService.create`). The community term in the hybrid score assumes that "member" means something. **I recommend requiring membership.** It changes product behavior, so it is your call. Decide before the generator (P3) and the hybrid scorer (P6).
+**D1. Can a non-member post into a community? Decided on 2026-10-28: no, a community post needs membership.** Today anyone can submit a post to any community and it goes to the approval queue (`PostsService.create`). The community term in the hybrid score assumes that "member" means something. The synthetic generator follows the rule (task `p3-synthetic-generator`, 2026-11-02). The product rule in the backend is still to do, in task `p6-social-feed` (`.docs/implementation-plan.md` §5, task 8).
 
 ---
 
@@ -151,7 +151,7 @@ The 14 findings below are fixed on `test-app`. "Where" is the code at the tag `v
 | Phase | Bugs |
 |---|---|
 | **Schema migration** (cut from the super plan in v0.2, §9) | T6, and with the same migration: N3, N10, R4 (schema part) |
-| **P6** (hybrid scorer) | T4, T3, B6, R2, and the decision D1 |
+| **P6** (hybrid scorer) | T4, T3, B6, R2, and the D1 product rule |
 | **E7** (cost run) | N6, and T3 (say if the cache is on) |
 | **Before sharing the app** | S5, B1, S4, S6, B5, R3, R6 |
 | **No phase, when time allows** | the rest of P3 and P4 |

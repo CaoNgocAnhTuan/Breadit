@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.15 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.16 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -86,7 +86,7 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 10-28 | P0 Baseline freeze | Node pinned, image digests | A clean clone passes install, migrate, seed, typecheck | `p0-baseline-freeze` ✅ |
 | 🟡 waits for the supervisor | P1 Literature, RQ and data lock ★ | `literature.md`, `datasets.md`, one-page note, Chapter 2 survey | The supervisor confirms the RQs, the data and the design decisions | `p1-literature` ✅, `p1-dataset-selection` ✅, `p1-supervisor-note` ✅, `p1-related-work` ✅ |
 | ✅ 10-28 | P2 Implementation blueprint | `implementation-plan.md` | The author approves it, and it names every later task | `p2-implementation-blueprint` ✅ |
-| ⬜ late (plan 11-01) | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator`, `p3-postgres-loader` |
+| ⬜ late, 1 of 2 tasks done | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator` ✅, `p3-postgres-loader` |
 | ⬜ | P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` |
 | ⬜ | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package`, `p5-eval-harness` |
 | ⬜ | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
@@ -173,6 +173,8 @@ Two sizes: S and M (section 7).
 A loader writes the same data into Postgres with explicit IDs, so the live app can run on it (P6 parity test, P10 demo). The loader has a demo-only `--rebase-to` option that shifts timestamps to today. Experiments never use it.
 
 **Done when.** Generating twice gives identical manifests. Loading twice gives identical canonical table hashes.
+
+**Status (2026-11-02).** Task `p3-synthetic-generator` is done (`.docs/works/2026-11-02-p3-synthetic-generator/`). The `eval/` workspace builds the eight datasets that `.docs/implementation-plan.md` §4 uses, and two runs give identical manifests. `synthetic-v1.json` is frozen (§7). For `syn-W2M-M`, every calibrated value is within its tolerance of the Digg targets, the social lift rises from W0 to W2H, and at `q` = 0.8 the history bucket 0–4 keeps 174 test users (59 of them in bucket 0). The numbers are in the task's `check_output.txt`. Task `p3-postgres-loader` is still open, so P3 is not done.
 
 ### P4: Public dataset adapter (Digg 2009)
 
@@ -329,7 +331,7 @@ One source of truth. A change needs a new config version and a line in the chang
 | Larger pool (W_L, N_L) for E8 | larger than W and N_max; values set in P5 | P5 |
 | Baseline grids | one parameter each: age weight of BL2t (production 0.25 per hour), time divisor of BL4 (published 45,000 s), gravity of BL5 (published 1.8); 3 to 5 values each, including the published value; set in P5 | P5 |
 | Dataset sizes | S 200 users, 4k posts · M 1,000 users, 20k posts (E7 uses M) | P3 |
-| Synthetic world parameters | in `synthetic-v1.json`, calibrated to `.docs/datasets.md` where possible; W2 has three cells: low, middle and high influence at the middle homophily | P3 |
+| Synthetic world parameters | in `eval/config/synthetic-v1.json` (SHA-256 `70341fd94eb40d549e8217fb8c39bcb105277afd25cd39d6b178273e5ff48007`, frozen 2026-11-02), calibrated to `.docs/datasets.md` where possible; W2 has three cells: low, middle and high influence at the middle homophily | P3 |
 | Primary W2 cell for H1 | the middle cell | P3 |
 | k6 runs / load profile | 5 runs, first dropped / set in P7 | P7 |
 
@@ -451,3 +453,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.13 · 2026-10-28 · Task `p0-baseline-freeze`: P0 now pins Node 22, not Node 20 (Node 20 end of life 2026-04-30), in "Do" and "Done when", and a P0 status paragraph with the versions and the digest date. §5, §6 and §7 are byte-identical; no frozen value changed.
 - 0.14 · 2026-11-02 · §4: a Status column in the phase table, with a legend (✅ done, 🟡 waits for someone else, ⬜ not started, "late"), and a ✅ after each closed task. P0 and P2 are ✅. P1 is 🟡 because the supervisor has not answered the note. P3 is late (planned end 11-01). No other text changed; §5, §6 and §7 are byte-identical; no frozen value changed.
 - 0.15 · 2026-11-02 · The default feed rule, so the thesis answers the Orientation's Gap 1. P6: the default `algo` comes from an env variable. P7: a "Default feed rule" paragraph (`social` becomes the default only if H1 passes on both co-primary tests and the H0 gate passes). P8: applies the rule. §11: item 7, the rule waits for the supervisor. `.docs/implementation-plan.md` 1.1: rows 8 and 11 name these parts, and its status line says approved. §5, §6 and §7 are byte-identical; no frozen value changed.
+- 0.16 · 2026-11-02 · Task `p3-synthetic-generator`: §7 row "Synthetic world parameters" names the frozen `eval/config/synthetic-v1.json` and its SHA-256 (the plan approval froze it; there is no `/freeze` command). P3 status paragraph. §4: the task gets ✅, P3 shows 1 of 2 tasks done. The other §7 values are unchanged; §5 and §6 are byte-identical.

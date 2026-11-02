@@ -58,6 +58,8 @@ make rebuild | backend-rebuild | frontend-rebuild | logs   # see Makefile
 
 Backend tests (Jest): `npm run test -w @breadit/backend` runs the unit tests, `npm run test:it -w @breadit/backend` runs the integration tests, and `npm run test:backend` runs both. The integration tests boot the real app, so they need `docker compose up db redis -d`. They use the Postgres schema `it_test` and Redis database 1, so the dev data in schema `public` is not touched. The frontend has no tests.
 
+Eval (`eval/`, `@breadit/eval`, thesis evaluation code): run `nvm use` first, because the `.ts` files run directly on the pinned Node and do not load on an older one. `npm run verify -w @breadit/eval` runs the typecheck and the tests. `npm run gen -w @breadit/eval` writes the eight synthetic datasets to `eval/data/` (git-ignored, rebuilt from the seed), and `npm run check -w @breadit/eval` checks them. No Docker is needed.
+
 `scripts/verify-bug-sweep.sh` and `scripts/verify-socket.cjs` replay curl and Socket.IO checks against a running backend (see the header of the first one for how to start the backend without sending real email).
 
 When you add a backend dependency, use `npm install --legacy-peer-deps`: `@nestjs/core` is 10 while `@nestjs/websockets` is 11, and plain `npm install` stops on that peer conflict.
