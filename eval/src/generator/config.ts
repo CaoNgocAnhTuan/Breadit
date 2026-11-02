@@ -58,7 +58,11 @@ export function loadTargets(c: SyntheticConfig): CalibrationTargets {
   for (const p of Object.values(c.params)) {
     for (const t of p.targets ?? []) out[t.key] = t.value;
   }
-  const keys: CalibrationKey[] = ["votesPerUserMean", "votesPerUserMedian", "activitySkewTop20", "followeesMean"];
+  const keys: CalibrationKey[] = [
+    "votesPerUserMean", "votesPerUserMedian", "votesPerUserP90", "votesPerUserP99",
+    "shareUsers1", "shareUsers2to4", "shareUsers5to19", "shareUsers20plus",
+    "activitySkewTop20", "followeesMean", "followListShare",
+  ];
   for (const k of keys) if (out[k] === undefined) throw new Error(`no calibration target for ${k}`);
   return out as CalibrationTargets;
 }

@@ -19,7 +19,7 @@ test("every parameter is marked calibrated or chosen, and calibrated ones have a
 test("targets come from the config: the calibration keys", () => {
   const t = loadTargets(loadConfig());
   assert.deepEqual(Object.keys(t).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)), [
-    "activitySkewTop20", "followeesMean", "shareUsers1", "shareUsers20plus", "shareUsers2to4", "shareUsers5to19",
+    "activitySkewTop20", "followListShare", "followeesMean", "shareUsers1", "shareUsers20plus", "shareUsers2to4", "shareUsers5to19",
     "votesPerUserMean", "votesPerUserMedian", "votesPerUserP90", "votesPerUserP99",
   ]);
   assert.equal(t.votesPerUserP90, 45);
@@ -33,7 +33,7 @@ test("makeParams reads sizes and the epoch span from the frozen values", () => {
   assert.equal(p.nUsers, f.sizes.M.users);
   assert.equal(p.nPosts, f.sizes.M.posts);
   assert.equal(p.spanStart, 180 * 86400);
-  assert.equal(p.spanEnd, 250 * 86400);
+  assert.equal(p.spanEnd, 260 * 86400);
   assert.equal(p.influenceSocial, 2);
   assert.equal(makeParams(loadConfig(), f, "W0", "S").homophily, 0);
   assert.deepEqual([...SIZES], ["S", "M"]);

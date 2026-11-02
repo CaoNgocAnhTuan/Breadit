@@ -99,9 +99,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 12: Follow rule and span (effort XS)
 
-- [ ] Tests first (TC16): a user without a list has no followee; a returned link always goes to a user with a list; the share of users with a followee equals the share of list holders.
-- [ ] Change `eval/src/generator/follows.ts`. In `synthetic-v1.json`: `followListShare` becomes calibrated (target 51.19%, `.docs/datasets.md` §4), `followeesMean` start 19.4, `spanDays` 80 (design §4 "Follows", "Span").
-- [ ] Commit: `feat: eval returned links only between list holders, span 80 days`
+- [x] Tests first (TC16): a user without a list has no followee; a returned link always goes to a user with a list; the share of users with a followee equals the share of list holders.
+- [x] Change `eval/src/generator/follows.ts`. In `synthetic-v1.json`: `followListShare` becomes calibrated (target 51.19%, `.docs/datasets.md` §4), `followeesMean` start 19.4, `spanDays` 80 (design §4 "Follows", "Span").
+- [x] Commit: `feat: eval returned links only between list holders, span 80 days`
 
 #### Step 13: Generate, check and calibrate again (effort M)
 

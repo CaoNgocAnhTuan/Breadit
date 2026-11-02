@@ -98,7 +98,7 @@ test("follows: a share of links is returned", () => {
   const follows = genFollows(rng(frozen.masterSeed, "follows"), p, users);
   const keys = new Set(follows.map((f) => `${f.followerId}:${f.followeeId}`));
   const mutual = follows.filter((f) => keys.has(`${f.followeeId}:${f.followerId}`)).length / follows.length;
-  assert.ok(mutual > 0.4 && mutual < 0.8, `mutual ${mutual}`);
+  assert.ok(mutual > 0.25 && mutual < 0.8, `mutual ${mutual}`);
   const none = genFollows(rng(frozen.masterSeed, "follows"), { ...p, twoWayShare: 0 }, users);
   const k2 = new Set(none.map((f) => `${f.followerId}:${f.followeeId}`));
   const m2 = none.filter((f) => k2.has(`${f.followeeId}:${f.followerId}`)).length / none.length;
@@ -288,4 +288,31 @@ test("a world changes only what its knobs change: W1 and W2M share users, follow
   assert.deepEqual(w1.memberships, w2.memberships);
   assert.deepEqual(w1.posts, w2.posts);
   assert.notDeepEqual(w1.interactions, w2.interactions);
+});
+
+// TC16
+test("follows: a user without a list has no followee, and returns only go to list holders", () => {
+  const base = params({ nUsers: 600 });
+  const users = genUsers(rng(frozen.masterSeed, "users"), base);
+  const without = genFollows(rng(frozen.masterSeed, "follows"), { ...base, twoWayShare: 0 }, users);
+  const withReturns = genFollows(rng(frozen.masterSeed, "follows"), { ...base, twoWayShare: 1 }, users);
+  const holders = new Set(without.map((f) => f.followerId));
+  const followers = new Set(withReturns.map((f) => f.followerId));
+  assert.ok(withReturns.length > without.length, "some links are returned");
+  assert.deepEqual([...followers].sort((a, b) => a - b), [...holders].sort((a, b) => a - b));
+  // the forward links are unchanged, so every added link is a return from a holder to a holder
+  const forward = new Set(without.map((f) => `${f.followerId}:${f.followeeId}`));
+  for (const f of withReturns) {
+    if (forward.has(`${f.followerId}:${f.followeeId}`)) continue;
+    assert.ok(holders.has(f.followerId) && forward.has(`${f.followeeId}:${f.followerId}`));
+    assert.ok(holders.has(f.followeeId), "a returned link goes to a user with a list");
+  }
+});
+
+test("follows: the share of users with a followee equals the share of list holders", () => {
+  const p = params({ nUsers: 1000, followListShare: 0.5119 });
+  const users = genUsers(rng(frozen.masterSeed, "users"), p);
+  const follows = genFollows(rng(frozen.masterSeed, "follows"), p, users);
+  const share = new Set(follows.map((f) => f.followerId)).size / 1000;
+  assert.ok(Math.abs(share - 0.5119) < 0.04, `share ${share}`);
 });
