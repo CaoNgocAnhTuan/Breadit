@@ -1,1 +1,1 @@
-export {};
+export { computeExploreScoreFixed } from './explore';

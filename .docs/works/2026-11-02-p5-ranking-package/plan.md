@@ -33,9 +33,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 #### Step 2: Move the Explore score (package side) (effort XS)
 
-- [ ] Tests first (TC2): `explore.spec.ts` holds a verbatim copy of the old backend function as the reference, and a fixed table of inputs: all zero; large counts; fractional ages; an age that makes the score negative; a score exactly at a ×100 boundary. Every package value must equal the reference.
-- [ ] Write `src/explore.ts` with `computeExploreScoreFixed`, copied unchanged from `posts.service.ts`, and export it from `src/index.ts` by name (design F3, F4).
-- [ ] Commit: `feat: ranking computeExploreScoreFixed (moved, golden-tested)`
+- [x] Tests first (TC2): `explore.spec.ts` holds a verbatim copy of the old backend function as the reference, and a fixed table of inputs: all zero; large counts; fractional ages; an age that makes the score negative; a score exactly at a ×100 boundary. Every package value must equal the reference.
+- [x] Write `src/explore.ts` with `computeExploreScoreFixed`, copied unchanged from `posts.service.ts`, and export it from `src/index.ts` by name (design F3, F4).
+- [x] Commit: `feat: ranking computeExploreScoreFixed (moved, golden-tested)`
 
 #### Step 3: Types and the AsOf rule (effort XS)
 
