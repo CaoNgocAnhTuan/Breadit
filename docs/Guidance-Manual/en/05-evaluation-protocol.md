@@ -121,7 +121,7 @@ For every user i: `d_i = NDCG@10(H) − NDCG@10(BL2)`. Pairing by user removes t
 
 **H0 gate first.** On the null world `syn-W0-M`, the CI of H − BL2 (NDCG@10, all users) must **not** lie above 0. In W0 follows carry no influence, so if H "wins" there, something is wrong (a bug or a leak). Then we stop and fix before trusting any other result.
 
-The details of the statistics will be in file 06.
+The details, with worked examples, are in [06 Statistics](06-statistics.md).
 
 ## 12. Why you can trust the numbers
 

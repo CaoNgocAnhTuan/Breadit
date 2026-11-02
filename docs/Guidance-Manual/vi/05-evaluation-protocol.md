@@ -121,7 +121,7 @@ Với mỗi user i: `d_i = NDCG@10(H) − NDCG@10(BL2)`. Ghép cặp theo user l
 
 **Cổng H0 trước tiên.** Trên thế giới null `syn-W0-M`, CI của H − BL2 (NDCG@10, mọi user) **không được** nằm hẳn trên 0. Trong W0 follow không có ảnh hưởng, nên nếu H "thắng" ở đó thì có gì đó sai (bug hoặc leak). Khi đó ta dừng lại và sửa trước khi tin bất kỳ kết quả nào khác.
 
-Chi tiết phần thống kê sẽ nằm trong file 06.
+Chi tiết, kèm ví dụ tính tay, nằm trong [06 Thống kê](06-statistics.md).
 
 ## 12. Vì sao có thể tin các con số
 
