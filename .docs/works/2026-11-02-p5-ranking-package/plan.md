@@ -64,7 +64,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 #### Step 6: Scorers and `rankPool` (effort M)
 
-- [ ] Tests first (TC3, TC7):
+- [x] Tests first (TC3, TC7):
   - **One case per method id.** There are 12 method ids. Use one small pool, with each expected `scoreFixed` computed by hand in the test's comments from the design's scorer table.
   - **Required cases:**
     - BL2t at `ageWeight` 0.25 equals BL2;
@@ -80,8 +80,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
   - **`rankPool`.** It gives `(scoreFixed desc, postId desc)` for any input order.
   - **Integers.** On random fixtures, every scorer returns `Number.isInteger` values.
   - **Grep test.** It scans `packages/ranking/src` (spec files excluded) for `Date.now`, `new Date()`, `performance.now`, `Math.random`, `.sort()`, `localeCompare`, and for any import not starting with `node:` or `./`.
-- [ ] Write `src/scorers.ts` and `src/rank.ts`, and export everything from `src/index.ts` by name (design: the scorer table and its notes).
-- [ ] Commit: `feat: ranking scorers BL0-BL6, H and ablations, rankPool`
+- [x] Write `src/scorers.ts` and `src/rank.ts`, and export everything from `src/index.ts` by name (design: the scorer table and its notes).
+- [x] Commit: `feat: ranking scorers BL0-BL6, H and ablations, rankPool`
 
 #### Step 7: Backend uses the package (effort S)
 

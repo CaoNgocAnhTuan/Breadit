@@ -1,5 +1,5 @@
 // The types of blueprint 2.6 (H-c). Signatures are fixed: the harness and the feed module both call them.
-// A user id is a string, `u` plus the integer padded to 10 digits (blueprint 2.5). Compare ids with `<`, never localeCompare.
+// A user id is a string, `u` plus the integer padded to 10 digits (blueprint 2.5). Compare ids with `<` and `>`, never with a locale function.
 
 export type UserId = string;
 export type PostId = number;

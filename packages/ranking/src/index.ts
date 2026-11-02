@@ -17,3 +17,5 @@ export type { Follow, Membership, PostInfo, UserFeatureData } from './features';
 export { postFeaturesAsOf, userFeaturesAsOf } from './features';
 export { buildPool } from './pool';
 export { computeExploreScoreFixed } from './explore';
+export { rankPool } from './rank';
+export { scorer } from './scorers';
