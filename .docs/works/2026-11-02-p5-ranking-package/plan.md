@@ -39,9 +39,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 #### Step 3: Types and the AsOf rule (effort XS)
 
-- [ ] Tests first (TC6, part 1): `visibleAt` is true for `t < asOf.t`; for `t === asOf.t` only with an event id smaller than `beforeEventId`; false with no `beforeEventId`; false after. `ageHours` is `(asOf.t − createdAt) / 3600`.
-- [ ] Write `src/types.ts` (blueprint §2.6) and `src/asof.ts`.
-- [ ] Commit: `feat: ranking types and AsOf rule`
+- [x] Tests first (TC6, part 1): `visibleAt` is true for `t < asOf.t`; for `t === asOf.t` only with an event id smaller than `beforeEventId`; false with no `beforeEventId`; false after. `ageHours` is `(asOf.t − createdAt) / 3600`.
+- [x] Write `src/types.ts` (blueprint §2.6) and `src/asof.ts`.
+- [x] Commit: `feat: ranking types and AsOf rule`
 
 #### Step 4: Feature builders (effort S)
 
