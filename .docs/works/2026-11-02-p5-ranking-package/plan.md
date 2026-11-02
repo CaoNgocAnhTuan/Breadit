@@ -101,13 +101,13 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 #### Step 9: Build order (effort S)
 
-- [ ] **Dockerfile.** Change `apps/backend/Dockerfile` as in design "Build order":
+- [x] **Dockerfile.** Change `apps/backend/Dockerfile` as in design "Build order":
   - `deps` copies the package's `package.json`;
   - `builder` copies the package and builds it before the backend;
   - `runner` copies the package's `package.json` and `dist/` to the same paths.
-- [ ] **`verify.sh`.** Add the steps "ranking build" and "ranking tests" after "shared build".
-- [ ] **Run.** Run `bash .claude/hooks/verify.sh` with db and redis up; every check must pass. Run `docker compose build`; both images must build.
-- [ ] Commit: `build: Docker and verify.sh build @breadit/ranking before the backend`
+- [x] **`verify.sh`.** Add the steps "ranking build" and "ranking tests" after "shared build".
+- [x] **Run.** Run `bash .claude/hooks/verify.sh` with db and redis up; every check must pass. Run `docker compose build`; both images must build.
+- [x] Commit: `build: Docker and verify.sh build @breadit/ranking before the backend`
 
 ## Claude's part
 

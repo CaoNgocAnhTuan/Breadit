@@ -45,6 +45,8 @@ step() {
 skip() { SUMMARY+=("SKIP  $1"); }
 
 step "shared build" npm run build -w @breadit/shared
+step "ranking build" npm run build -w @breadit/ranking
+step "ranking tests" npm run test -w @breadit/ranking
 step "frontend typecheck" npm run typecheck
 if [ "$QUICK" = 0 ]; then
   step "frontend lint" npm run lint
