@@ -50,13 +50,13 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 5: The four checks (effort M)
 
-- [ ] Tests first, each on a small hand-made fixture folder written by the Step 4 writer (TC5 to TC8):
+- [x] Tests first, each on a small hand-made fixture folder written by the Step 4 writer (TC5 to TC8):
   - **format** (TC5): passes on a good fixture. Fails, one case each: self-follow, repeated follow pair, interaction on an unknown post, interaction at the same second as or before its post, interaction on one's own post, community post by a non-member or by a member who joined after `created_at`, unsorted rows, a CRLF line, a file not listed in the manifest, a SHA-256 that differs from the manifest.
   - **calibration** (TC6): mean and median per user and the top-20% share on a fixture with known answers. Users with no action are not counted. Pass and fail at the tolerance edges (10% of the target, 5 points for the skew).
   - **lift** (TC7): on a fixture where every action falls on an exposed post the lift is above 1. On a fixture with no follows it is not computed and the report says so. A follow dated at or after the action does not count.
   - **buckets** (TC8): port the cases of `.docs/works/2026-10-28-p2-implementation-blueprint/test_check_cut_time.py` that apply to canonical data (cut time at rank `ceil(q·n)` with exact integer math, the event at T is validation, last event after T is the test item, time ties broken by event id, history counts strictly earlier events, bucket edges and the union 0–4, window edges, own and earlier posts out of the pool, only the newest N_max, `created_at` ties to the larger post id, the brute-force comparison on random fixtures drawn from `rng`).
-- [ ] Write `eval/src/checks/format.ts`, `calibration.ts`, `lift.ts`, `buckets.ts` (design: Approach "Checks read only the canonical files"). Calibration targets come from `synthetic-v1.json` (`target` fields), so the checks hold no Digg number of their own.
-- [ ] Commit: `feat: eval checks (format, calibration, lift, buckets)`
+- [x] Write `eval/src/checks/format.ts`, `calibration.ts`, `lift.ts`, `buckets.ts` (design: Approach "Checks read only the canonical files"). Calibration targets come from `synthetic-v1.json` (`target` fields), so the checks hold no Digg number of their own.
+- [x] Commit: `feat: eval checks (format, calibration, lift, buckets)`
 
 #### Step 6: The config and the stages (effort M)
 
