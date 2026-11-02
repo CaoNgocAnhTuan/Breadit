@@ -74,9 +74,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 4: Split (effort XS)
 
-- [ ] Tests first (TC6, part 1): `validationItems` picks each user's last positive with `t ≤ T` by `(t, event_id)`. An event at exactly T is validation. A user with nothing at or before T has no validation item. On `syn-W2M-S`, the test items of the harness equal `testItems` of `buckets.ts`.
-- [ ] Write `eval/src/harness/split.ts` (design: Approach "The split").
-- [ ] Commit: `feat: eval harness split (validation and test items)`
+- [x] Tests first (TC6, part 1): `validationItems` picks each user's last positive with `t ≤ T` by `(t, event_id)`. An event at exactly T is validation. A user with nothing at or before T has no validation item. On `syn-W2M-S`, the test items of the harness equal `testItems` of `buckets.ts`.
+- [x] Write `eval/src/harness/split.ts` (design: Approach "The split").
+- [x] Commit: `feat: eval harness split (validation and test items)`
 
 #### Step 5: Indexes and post features (effort S)
 
