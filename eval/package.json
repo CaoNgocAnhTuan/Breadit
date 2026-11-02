@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit",
     "verify": "npm run typecheck && npm run test",
     "gen": "node src/cli/generate.ts",
-    "check": "node src/cli/check.ts"
+    "adapt:digg": "node --max-old-space-size=4096 src/cli/adapt-digg.ts",
+    "check": "node --max-old-space-size=4096 src/cli/check.ts"
   },
   "devDependencies": {
     "@types/node": "^20",

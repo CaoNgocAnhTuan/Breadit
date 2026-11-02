@@ -54,14 +54,14 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapte
 
 #### Step 5: Adapter and command (effort S)
 
-- [ ] Tests first (TC5): `adaptDigg` with a test config and two tiny fixture zips (made in the test folder with `zip -P` from text written by the test, or committed beside `tiny.zip`):
+- [x] Tests first (TC5): `adaptDigg` with a test config and two tiny fixture zips (made in the test folder with `zip -P` from text written by the test, or committed beside `tiny.zip`):
   - it writes the six files and a manifest with `datasetId` `digg2009`, `source.kind` `digg`, both zips (URL, capture time, SHA-256, member), the choices, the counts, and the Unix epoch;
   - two runs into two folders give byte-identical files;
   - a SHA-256 mismatch stops before any read, and leaves an existing output folder untouched (DW1);
   - a stale file in the output folder is gone after a run;
   - an out dir outside the given path is refused.
-- [ ] Write `adaptDigg` and `eval/src/cli/adapt-digg.ts` (calls `checkNode()` first; prints the counts and the manifest SHA-256). Add the `adapt:digg` script and `--max-old-space-size=4096` on `adapt:digg` and `check` in `eval/package.json` (design F5, Code files).
-- [ ] Commit: `feat: eval adapt:digg command`
+- [x] Write `adaptDigg` and `eval/src/cli/adapt-digg.ts` (calls `checkNode()` first; prints the counts and the manifest SHA-256). Add the `adapt:digg` script and `--max-old-space-size=4096` on `adapt:digg` and `check` in `eval/package.json` (design F5, Code files).
+- [x] Commit: `feat: eval adapt:digg command`
 
 #### Step 6: Bucket table for Digg in `check` (effort XS)
 

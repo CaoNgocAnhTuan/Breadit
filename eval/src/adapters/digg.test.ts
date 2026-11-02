@@ -1,8 +1,15 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { loadDiggConfig, toCanonical } from "./digg.ts";
-import type { DiggChoices } from "./digg.ts";
+import { spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { sha256Hex } from "../canonical/csv.ts";
+import type { Manifest } from "../canonical/manifest.ts";
+import { checkFormat } from "../checks/format.ts";
+import { tempDir } from "../checks/fixture.ts";
+import { adaptDigg, loadDiggConfig, toCanonical } from "./digg.ts";
+import type { DiggChoices, DiggConfig } from "./digg.ts";
+import { buildZip } from "./zip-fixture.ts";
 import type { LinkRows, VoteRows } from "./digg-parse.ts";
 
 // TC1: the config equals the zip table of .docs/datasets.md section 4. The doc is the source (design F10).
@@ -228,4 +235,186 @@ test("TC4: the counts table holds the rows read and the rows dropped by every ru
     follows: 1,
     users: 4,
   });
+});
+
+// ---------------------------------------------------------------- TC5: adaptDigg and the command
+
+const ZIP_PASSWORD = "adapter-test-password";
+const VOTES_CSV =
+  '"100","1","1"\r"110","2","1"\r"120","3","1"\r"105","2","2"\r"130","4","2"\r"140","2","1"\r';
+const FRIENDS_CSV = '"1","50","2","1"\r\n"0","60","3","1"\r\n"0","0","4","1"\r\n"0","70","5","5"\r\n';
+
+/** A raw folder with two tiny zips in the layout of the real ones, and a config that matches them. */
+function tinyRaw(): { raw: string; config: DiggConfig } {
+  const raw = tempDir("eval-raw-");
+  const make = (file: string, member: string, text: string, url: string) => {
+    const bytes = buildZip([{ name: member, data: text, password: ZIP_PASSWORD }]);
+    writeFileSync(join(raw, file), bytes);
+    return {
+      file,
+      url,
+      capturedAt: "2013-08-26T05:35:17Z",
+      sha256: sha256Hex(bytes),
+      member,
+      memberBytes: Buffer.byteLength(text),
+    };
+  };
+  const config: DiggConfig = {
+    ...loadDiggConfig(),
+    password: ZIP_PASSWORD,
+    zips: {
+      votes: make("digg_votes.zip", "digg_votes1.csv", VOTES_CSV, "http://example.test/digg_votes.zip"),
+      friends: make("digg_friends.zip", "digg_friends.csv", FRIENDS_CSV, "http://example.test/digg_friends.zip"),
+    },
+  };
+  return { raw, config };
+}
+
+const FILES = ["users.csv", "follows.csv", "communities.csv", "memberships.csv", "posts.csv", "interactions.csv", "manifest.json"];
+
+test("TC5: adaptDigg writes six files and a manifest that passes the format check", () => {
+  const { raw, config } = tinyRaw();
+  const out = tempDir();
+  const r = adaptDigg(raw, out, config);
+  const dir = join(out, "digg2009");
+  assert.deepEqual(readdirSync(dir).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)), [...FILES].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)));
+  assert.deepEqual(r.counts, {
+    voteRows: 6, repeatedVotesDropped: 1, stories: 2, positives: 3,
+    linkRows: 4, zeroDateLinksDropped: 1, selfLinksDropped: 1, mutualReversesAdded: 0, repeatedLinksDropped: 0,
+    follows: 2, users: 4,
+  });
+  assert.equal(readFileSync(join(dir, "interactions.csv"), "utf8"), "event_id,user_id,post_id,type,created_at\n1,2,1,like,110\n2,3,1,like,120\n3,4,2,like,130\n");
+  assert.equal(readFileSync(join(dir, "communities.csv"), "utf8"), "community_id,created_at\n");
+  assert.equal(readFileSync(join(dir, "memberships.csv"), "utf8"), "user_id,community_id,joined_at\n");
+  const f = checkFormat(dir);
+  assert.deepEqual(f.problems, []);
+  assert.equal(f.pass, true);
+});
+
+test("TC5: the manifest names both zips, the choices, the counts, the Unix epoch and the pinned node", () => {
+  const { raw, config } = tinyRaw();
+  const out = tempDir();
+  adaptDigg(raw, out, config);
+  const m = JSON.parse(readFileSync(join(out, "digg2009", "manifest.json"), "utf8")) as Manifest;
+  assert.equal(m.schemaVersion, 1);
+  assert.equal(m.datasetId, "digg2009");
+  assert.equal(m.masterSeed, undefined);
+  assert.deepEqual(m.epoch, { iso: "1970-01-01T00:00:00Z", seconds: 0 });
+  assert.equal(m.node, process.version);
+  const s = m.source as Record<string, unknown>;
+  assert.equal(s.kind, "digg");
+  assert.deepEqual(s.choices, config.choices);
+  assert.equal((s.counts as { positives: number }).positives, 3);
+  const zips = s.zips as Record<string, Record<string, unknown>>;
+  for (const k of ["votes", "friends"] as const) {
+    const z = config.zips[k];
+    assert.deepEqual(zips[k], { file: z.file, url: z.url, capturedAt: z.capturedAt, sha256: z.sha256, member: z.member });
+  }
+  assert.deepEqual(Object.keys(m.files), ["communities.csv", "follows.csv", "interactions.csv", "memberships.csv", "posts.csv", "users.csv"]);
+  assert.equal(m.files["interactions.csv"]?.rows, 3);
+  assert.equal(m.files["interactions.csv"]?.sha256, sha256Hex(readFileSync(join(out, "digg2009", "interactions.csv"))));
+});
+
+test("TC5: two runs into two folders give byte-identical files", () => {
+  const { raw, config } = tinyRaw();
+  const a = tempDir();
+  const b = tempDir();
+  adaptDigg(raw, a, config);
+  adaptDigg(raw, b, config);
+  for (const name of FILES) {
+    assert.ok(readFileSync(join(a, "digg2009", name)).equals(readFileSync(join(b, "digg2009", name))), name);
+  }
+});
+
+test("TC5: a SHA-256 mismatch stops before any read, names the file and both hashes, and leaves the output alone", () => {
+  const { raw, config } = tinyRaw();
+  const path = join(raw, "digg_friends.zip");
+  const bytes = readFileSync(path);
+  bytes[bytes.length - 40] = (bytes[bytes.length - 40] as number) ^ 0x01;
+  writeFileSync(path, bytes);
+  const out = tempDir();
+  mkdirSync(join(out, "digg2009"));
+  writeFileSync(join(out, "digg2009", "keep.txt"), "old\n");
+  assert.throws(
+    () => adaptDigg(raw, out, config),
+    (e: Error) =>
+      e.message.includes("digg_friends.zip") &&
+      e.message.includes(config.zips.friends.sha256) &&
+      e.message.includes(sha256Hex(bytes)) &&
+      e.message.includes(config.zips.friends.url),
+  );
+  assert.deepEqual(readdirSync(join(out, "digg2009")), ["keep.txt"]);
+  // an empty out dir stays empty
+  const empty = tempDir();
+  assert.throws(() => adaptDigg(raw, empty, config), /SHA-256/);
+  assert.deepEqual(readdirSync(empty), []);
+});
+
+test("TC5: a missing zip stops and names the file", () => {
+  const { raw, config } = tinyRaw();
+  rmSync(join(raw, "digg_votes.zip"));
+  const out = tempDir();
+  assert.throws(() => adaptDigg(raw, out, config), /digg_votes\.zip/);
+  assert.deepEqual(readdirSync(out), []);
+});
+
+test("TC5: a member that is not the one in the config stops", () => {
+  const { raw, config } = tinyRaw();
+  const wrongName = { ...config, zips: { ...config.zips, votes: { ...config.zips.votes, member: "other.csv" } } };
+  assert.throws(() => adaptDigg(raw, tempDir(), wrongName), /member.*other\.csv/);
+  const wrongSize = { ...config, zips: { ...config.zips, votes: { ...config.zips.votes, memberBytes: 1 } } };
+  assert.throws(() => adaptDigg(raw, tempDir(), wrongSize), /bytes/);
+});
+
+test("TC5: a bad line stops the run and writes nothing", () => {
+  const raw = tempDir("eval-raw-");
+  const bytes = buildZip([{ name: "digg_votes1.csv", data: '"100","1"\r', password: ZIP_PASSWORD }]);
+  writeFileSync(join(raw, "digg_votes.zip"), bytes);
+  const friends = buildZip([{ name: "digg_friends.csv", data: FRIENDS_CSV, password: ZIP_PASSWORD }]);
+  writeFileSync(join(raw, "digg_friends.zip"), friends);
+  const base = loadDiggConfig();
+  const config: DiggConfig = {
+    ...base,
+    password: ZIP_PASSWORD,
+    zips: {
+      votes: { ...base.zips.votes, sha256: sha256Hex(bytes), memberBytes: 10 },
+      friends: { ...base.zips.friends, sha256: sha256Hex(friends), memberBytes: Buffer.byteLength(FRIENDS_CSV) },
+    },
+  };
+  const out = tempDir();
+  assert.throws(() => adaptDigg(raw, out, config), /digg_votes1\.csv: line 1/);
+  assert.deepEqual(readdirSync(out), []);
+});
+
+test("TC5: a stale file in the output folder is gone after a run", () => {
+  const { raw, config } = tinyRaw();
+  const out = tempDir();
+  mkdirSync(join(out, "digg2009"));
+  writeFileSync(join(out, "digg2009", "stale.csv"), "x\n");
+  adaptDigg(raw, out, config);
+  assert.equal(existsSync(join(out, "digg2009", "stale.csv")), false);
+  assert.equal(checkFormat(join(out, "digg2009")).pass, true);
+});
+
+test("TC5: a dataset folder outside the out dir is refused, and nothing is written or deleted", () => {
+  const { raw, config } = tinyRaw();
+  const out = tempDir();
+  const outside = join(out, "..", "eval-escape-target");
+  for (const id of ["../eval-escape-target", "a/b", "", ".."]) {
+    assert.throws(() => adaptDigg(raw, out, { ...config, datasetId: id }), /outside the out dir/, JSON.stringify(id));
+  }
+  assert.equal(existsSync(outside), false);
+  assert.deepEqual(readdirSync(out), []);
+});
+
+test("TC5: the adapt:digg command stops on a zip with another SHA-256 and writes nothing", () => {
+  const { raw } = tinyRaw(); // the tiny zips are not the real ones, so their SHA-256 differs from the real config
+  const out = tempDir();
+  const script = new URL("../cli/adapt-digg.ts", import.meta.url).pathname;
+  const r = spawnSync(process.execPath, [script, raw, out], { encoding: "utf8" });
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /digg_votes\.zip/);
+  assert.match(r.stderr, /55bba035e08d31f14022aeef1f57b24322d2c0bea1fb241e3c99b0af59aafda1/);
+  assert.match(r.stderr, new RegExp(sha256Hex(readFileSync(join(raw, "digg_votes.zip")))));
+  assert.deepEqual(readdirSync(out), []);
 });

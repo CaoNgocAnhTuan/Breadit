@@ -1,7 +1,15 @@
-import { readFileSync } from "node:fs";
-import type { Row } from "../canonical/csv.ts";
+import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { sha256Hex, writeTable } from "../canonical/csv.ts";
+import type { FileEntry, Row } from "../canonical/csv.ts";
+import { writeManifest } from "../canonical/manifest.ts";
+import type { Manifest } from "../canonical/manifest.ts";
+import { SCHEMAS, TABLES } from "../canonical/schema.ts";
 import type { TableName } from "../canonical/schema.ts";
+import { datasetDir } from "../generator/generate.ts";
+import { parseFriends, parseVotes } from "./digg-parse.ts";
 import type { LinkRows, VoteRows } from "./digg-parse.ts";
+import { readEncryptedMember } from "./zip.ts";
 
 // The Digg 2009 source: two zips, their SHA-256, the password from the Digg page, and the choices of the
 // adapter (task p4-digg-adapter, Spec open questions 1, 2, 4 and 5). digg.test.ts keeps the zip table equal to
@@ -193,4 +201,102 @@ export function toCanonical(
     users: users.length,
   };
   return { tables, counts };
+}
+
+// ---------------------------------------------------------------- the adapter (design "Adapt" sequence)
+
+/** The rules that are fixed in the code (the P2 rules of blueprint section 3.7), named in the manifest. */
+export const RULES: readonly string[] = [
+  "repeatedVote: a repeated (voter, story) pair keeps its earliest vote",
+  "story: author and created_at come from the first vote, a time tie goes to the smaller voter id",
+  "authorVote: the first vote is the post, not a like",
+  "otherVotes: every other vote is a like, event_id is the 1-based rank in (t, voter_id, story_id) order",
+  "selfLinks: dropped",
+  "repeatedLink: a (user, friend) pair keeps its earliest date",
+  "followsCountedAt: the adapter keeps every dated link with its date, the harness counts a link when it is dated before the test time of the item (AsOf)",
+];
+
+/** Lines of the counts table (DW4), one per count. */
+export function countsTable(c: DiggCounts): string[] {
+  const rows: Array<[string, number]> = [
+    ["vote rows read", c.voteRows],
+    ["repeated votes dropped", c.repeatedVotesDropped],
+    ["stories", c.stories],
+    ["positives (likes)", c.positives],
+    ["link rows read", c.linkRows],
+    ["links with date 0 dropped", c.zeroDateLinksDropped],
+    ["self-links dropped", c.selfLinksDropped],
+    ["mutual reverses added", c.mutualReversesAdded],
+    ["repeated link pairs dropped", c.repeatedLinksDropped],
+    ["follows written", c.follows],
+    ["users written", c.users],
+  ];
+  const width = Math.max(...rows.map((r) => r[0].length));
+  return rows.map(([name, n]) => `  ${name.padEnd(width)}  ${String(n).padStart(10)}`);
+}
+
+function zipBytes(rawDir: string, z: DiggZip): Buffer {
+  const path = join(rawDir, z.file);
+  if (!existsSync(path)) {
+    throw new Error(`zip not found: ${path} (expected ${z.file}, SHA-256 ${z.sha256}, from ${z.url})`);
+  }
+  const bytes = readFileSync(path);
+  const got = sha256Hex(bytes);
+  if (got !== z.sha256) {
+    throw new Error(`SHA-256 of ${path} is ${got}, expected ${z.sha256} (${z.file} from ${z.url}). No row was read and nothing was written.`);
+  }
+  return bytes;
+}
+
+function memberText(bytes: Buffer, z: DiggZip, password: string): Buffer {
+  const m = readEncryptedMember(bytes, password);
+  if (m.name !== z.member) throw new Error(`${z.file}: member is "${m.name}", expected "${z.member}"`);
+  if (m.data.length !== z.memberBytes) {
+    throw new Error(`${z.file}: member "${m.name}" has ${m.data.length} bytes, expected ${z.memberBytes} bytes`);
+  }
+  return m.data;
+}
+
+function zipEntry(z: DiggZip): Record<string, string> {
+  return { file: z.file, url: z.url, capturedAt: z.capturedAt, sha256: z.sha256, member: z.member };
+}
+
+/**
+ * Reads the two zips in memory and writes <outDir>/<datasetId>/ in the canonical format with a manifest.
+ * Order (design F1, F2, F9): check the folder path, check both SHA-256 values, read and parse, transform, and only
+ * then delete the old folder and write. A failure before the write leaves the old folder as it was.
+ */
+export function adaptDigg(
+  rawDir: string,
+  outDir: string,
+  config: DiggConfig = loadDiggConfig(),
+): { manifest: Manifest; counts: DiggCounts } {
+  const dir = datasetDir(outDir, config.datasetId);
+  const votesZip = zipBytes(rawDir, config.zips.votes);
+  const friendsZip = zipBytes(rawDir, config.zips.friends);
+  const votes = parseVotes(memberText(votesZip, config.zips.votes, config.password), config.zips.votes.member);
+  const links = parseFriends(memberText(friendsZip, config.zips.friends, config.password), config.zips.friends.member);
+  const { tables, counts } = toCanonical(votes, links, config.choices);
+
+  rmSync(dir, { recursive: true, force: true });
+  mkdirSync(dir, { recursive: true });
+  const files: Record<string, FileEntry> = {};
+  for (const t of TABLES) files[SCHEMAS[t].file] = writeTable(dir, t, tables[t]);
+  const manifest: Manifest = {
+    schemaVersion: 1,
+    datasetId: config.datasetId,
+    source: {
+      kind: "digg",
+      page: config.page,
+      zips: { votes: zipEntry(config.zips.votes), friends: zipEntry(config.zips.friends) },
+      choices: config.choices,
+      rules: RULES,
+      counts,
+    },
+    epoch: { iso: "1970-01-01T00:00:00Z", seconds: 0 },
+    node: process.version,
+    files,
+  };
+  writeManifest(dir, manifest);
+  return { manifest, counts };
 }
