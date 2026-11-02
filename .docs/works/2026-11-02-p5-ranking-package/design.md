@@ -57,6 +57,8 @@ What exists today (checked on 2026-11-02):
 
 ### Open questions
 
+**Decided by the author on 2026-11-02:** the recommendation of each of the four questions below.
+
 1. **Score resolution of BL5 (Hacker News).** The frozen score unit is `floor(score × 100)` (§7). The HN score `(P−1)^0.8 / (T+2)^1.8` is small: for 5 likes at 24 hours it is about 0.01, so ×100 gives 1. Most posts would tie, and the comparison with BL5 would mostly measure the tie-break. BL4 (Reddit "hot") has the same problem in a milder form: with Digg dates, ×100 groups posts in steps of about 7.5 minutes. Recommendation: keep the frozen unit for every method. Define the BL5 score as the natural log of the HN score, `0.8·ln(likes) − gravity·ln(ageHours + 2)` with `P − 1` = likes. The log gives exactly the same order and keeps a 1% step. A post with no like gets the lowest band. BL4 stays as published. Other option: a finer unit (for example ×10⁶) for BL4 and BL5 only, which changes a frozen value and is the author's call.
 2. **Where the P5 grids and values are frozen.** §7 freezes at P5 the baseline grids (BL2t, BL4, BL5), the larger pool (W_L, N_L) and the value of T. Recommendation: this task defines the parameters (each scorer takes them through `params`), and task 6 proposes and freezes the values, because tuning and the first test-split run happen there. Other option: propose the grids here.
 3. **Package format.** Recommendation: build to CommonJS in `dist/` with `tsc`, like `@breadit/shared`. The backend loads it as it loads any package, and the ES module `eval/` loads it through Node's CommonJS interop (DW5 proves it). Other option: an ES module package, which the CommonJS backend could reach only through `import()`.
