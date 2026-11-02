@@ -105,10 +105,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 13: Generate, check and calibrate again (effort M)
 
-- [ ] Same as Step 9, with the DW5 and DW6 of design §4. Calibration may move only `activityTailAlpha`, `followeesMean` and `followListShare`. Buckets may move only `lateJoinerShare`, `freshnessTauHours` or `spanDays`. At most 5 rounds, then stop and report. Never change homophily or influence.
-- [ ] Report the top user's share, the number of users at the cap, the bucket 0 count and the median pool size, with every parameter change.
-- [ ] Two runs into two folders: all eight manifests equal. Replace `check_output.txt`.
-- [ ] Commit: `chore: P3 synthetic data regenerated after amendment 1`
+- [x] Same as Step 9, with the DW5 and DW6 of design §4. Calibration may move only `activityTailAlpha`, `followeesMean` and `followListShare`. Buckets may move only `lateJoinerShare`, `freshnessTauHours` or `spanDays`. At most 5 rounds, then stop and report. Never change homophily or influence.
+- [x] Report the top user's share, the number of users at the cap, the bucket 0 count and the median pool size, with every parameter change.
+- [x] Two runs into two folders: all eight manifests equal. Replace `check_output.txt`.
+- [x] Commit: `chore: P3 synthetic data regenerated after amendment 1`
 
 ## Claude's part
 

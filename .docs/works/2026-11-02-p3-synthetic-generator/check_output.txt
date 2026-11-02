@@ -1,105 +1,151 @@
-synthetic-v1.json sha256 3d54d5850e88ae326b65854fc032bab221e1dbb2a54fd3d8826f85f3a8adba0d
+synthetic-v1.json sha256 70341fd94eb40d549e8217fb8c39bcb105277afd25cd39d6b178273e5ff48007
 window W 7 days, pool cap N_max 2000, q 0.8
 
 == syn-W0-S ==
-manifest sha256 3bff0c720826b671c26ef1ec578bb14343c9c2be8b04cc2dd6aba65f792d47dd
-rows communities=20 follows=4589 interactions=4328 memberships=370 posts=4000 users=200
-skipped actions (no candidate): 2
+manifest sha256 949e5a4a8ffa210984dbafebde237f41fea709bdbcdea0df4e94b520dd155dce
+rows communities=20 follows=2055 interactions=3427 memberships=370 posts=4000 users=200
+skipped actions (no candidate): 0
 format: pass
 
 == syn-W1-S ==
-manifest sha256 31247972adb9ad10135349d9db964e62db5fcfa27914e2718680fe3aea11c99b
-rows communities=20 follows=4613 interactions=4328 memberships=370 posts=4000 users=200
-skipped actions (no candidate): 2
+manifest sha256 eed4873bd666673bc9be4e119ab2ec3e9dddbf1f46ffba04d667c4b3fd027b12
+rows communities=20 follows=2050 interactions=3427 memberships=370 posts=4000 users=200
+skipped actions (no candidate): 0
 format: pass
 
 == syn-W2M-S ==
-manifest sha256 5551b119668ed55b0bccf78dd1043964d08eb6a327677ddb6df4122ced0fc8ca
-rows communities=20 follows=4613 interactions=4328 memberships=370 posts=4000 users=200
-skipped actions (no candidate): 2
+manifest sha256 cc06e0804d652b827149ef04b7c6a9feb266298a616a5fa1b161ed1f899e823c
+rows communities=20 follows=2050 interactions=3427 memberships=370 posts=4000 users=200
+skipped actions (no candidate): 0
 format: pass
 
 == syn-W0-M ==
-manifest sha256 addbf03c9b30290bd733cb220488724588ce4a0ff348a708b94c96f960910d37
-rows communities=20 follows=24330 interactions=21648 memberships=1773 posts=20000 users=1000
-skipped actions (no candidate): 2
+manifest sha256 2472c1e48ba8904456b5aef2673c7472b1fdb0f67c1f80d35195151ce8215d4b
+rows communities=20 follows=12085 interactions=22258 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 0
 format: pass
 calibration: pass
-               value  generated     target  tolerance  result
-    votesPerUserMean  21.648000  21.650000        10%    pass
-  votesPerUserMedian   4.000000   4.000000        10%    pass
-   activitySkewTop20   0.847469   0.836400   5 points    pass
-       followeesMean  24.378758  24.260000        10%    pass
-lift: 1.054062 (actions 21648, on exposed posts 500, expected exposed 474.355386)
+               value   generated      target  tolerance  result
+    votesPerUserMean   22.258000   21.650000        10%    pass
+  votesPerUserMedian    4.000000    4.000000        10%    pass
+     votesPerUserP90   40.000000   45.000000        25%    pass
+     votesPerUserP99  332.000000  287.000000        25%    pass
+         shareUsers1    0.280000    0.278000   5 points    pass
+      shareUsers2to4    0.265000    0.256200   5 points    pass
+     shareUsers5to19    0.234000    0.268600   5 points    pass
+    shareUsers20plus    0.221000    0.197200   5 points    pass
+   activitySkewTop20    0.828466    0.836400   5 points    pass
+       followeesMean   24.364919   24.260000        10%    pass
+     followListShare    0.496000    0.511900   5 points    pass
+  maxUserActionShare    0.048612    0.050000      limit    pass
+top user: 1082 actions (0.048612 of all), users at the cap: 2
+lift: 1.090659 (actions 22258, on exposed posts 262, expected exposed 240.221740)
 
 == syn-W1-M ==
-manifest sha256 f30703d04dcd5e1cb937ca530ded5ec39c6967713581ed9c326ed43f123a8acc
-rows communities=20 follows=24275 interactions=21648 memberships=1773 posts=20000 users=1000
-skipped actions (no candidate): 2
+manifest sha256 a0fba507997e94d2432d08b4a6c27e6c7abec74e6fad34dcc7450140a8c0d073
+rows communities=20 follows=12126 interactions=22258 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 0
 format: pass
 calibration: pass
-               value  generated     target  tolerance  result
-    votesPerUserMean  21.648000  21.650000        10%    pass
-  votesPerUserMedian   4.000000   4.000000        10%    pass
-   activitySkewTop20   0.847469   0.836400   5 points    pass
-       followeesMean  24.323647  24.260000        10%    pass
-lift: 1.637104 (actions 21648, on exposed posts 781, expected exposed 477.061897)
+               value   generated      target  tolerance  result
+    votesPerUserMean   22.258000   21.650000        10%    pass
+  votesPerUserMedian    4.000000    4.000000        10%    pass
+     votesPerUserP90   40.000000   45.000000        25%    pass
+     votesPerUserP99  332.000000  287.000000        25%    pass
+         shareUsers1    0.280000    0.278000   5 points    pass
+      shareUsers2to4    0.265000    0.256200   5 points    pass
+     shareUsers5to19    0.234000    0.268600   5 points    pass
+    shareUsers20plus    0.221000    0.197200   5 points    pass
+   activitySkewTop20    0.828466    0.836400   5 points    pass
+       followeesMean   24.447581   24.260000        10%    pass
+     followListShare    0.496000    0.511900   5 points    pass
+  maxUserActionShare    0.048612    0.050000      limit    pass
+top user: 1082 actions (0.048612 of all), users at the cap: 2
+lift: 1.570196 (actions 22258, on exposed posts 406, expected exposed 258.566437)
 
 == syn-W2L-M ==
-manifest sha256 bf476fc6922df57551734e5adf926d408b8c57271aa325edba9560a9155714c2
-rows communities=20 follows=24275 interactions=21648 memberships=1773 posts=20000 users=1000
-skipped actions (no candidate): 2
+manifest sha256 159ec321fed32c5a423c5d1899c24447b9eb2428bb24130ad8987753c47d568e
+rows communities=20 follows=12126 interactions=22258 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 0
 format: pass
 calibration: pass
-               value  generated     target  tolerance  result
-    votesPerUserMean  21.648000  21.650000        10%    pass
-  votesPerUserMedian   4.000000   4.000000        10%    pass
-   activitySkewTop20   0.847469   0.836400   5 points    pass
-       followeesMean  24.323647  24.260000        10%    pass
-lift: 2.088188 (actions 21648, on exposed posts 992, expected exposed 475.053074)
+               value   generated      target  tolerance  result
+    votesPerUserMean   22.258000   21.650000        10%    pass
+  votesPerUserMedian    4.000000    4.000000        10%    pass
+     votesPerUserP90   40.000000   45.000000        25%    pass
+     votesPerUserP99  332.000000  287.000000        25%    pass
+         shareUsers1    0.280000    0.278000   5 points    pass
+      shareUsers2to4    0.265000    0.256200   5 points    pass
+     shareUsers5to19    0.234000    0.268600   5 points    pass
+    shareUsers20plus    0.221000    0.197200   5 points    pass
+   activitySkewTop20    0.828466    0.836400   5 points    pass
+       followeesMean   24.447581   24.260000        10%    pass
+     followListShare    0.496000    0.511900   5 points    pass
+  maxUserActionShare    0.048612    0.050000      limit    pass
+top user: 1082 actions (0.048612 of all), users at the cap: 2
+lift: 2.244189 (actions 22258, on exposed posts 578, expected exposed 257.554122)
 
 == syn-W2M-M ==
-manifest sha256 0dd52422608f9b66e43b9339fce85e13349fe67932ec464117ac78cfd76fb95f
-rows communities=20 follows=24275 interactions=21648 memberships=1773 posts=20000 users=1000
-skipped actions (no candidate): 2
+manifest sha256 a144074779cbd1187c825a8c872c9d9e196a90da5061067d8488ae63224962ed
+rows communities=20 follows=12126 interactions=22258 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 0
 format: pass
 calibration: pass
-               value  generated     target  tolerance  result
-    votesPerUserMean  21.648000  21.650000        10%    pass
-  votesPerUserMedian   4.000000   4.000000        10%    pass
-   activitySkewTop20   0.847469   0.836400   5 points    pass
-       followeesMean  24.323647  24.260000        10%    pass
-lift: 3.477411 (actions 21648, on exposed posts 1603, expected exposed 460.975093)
-buckets (q 0.8): positives 21648, T 20835066 (2026-08-30T03:31:06.000Z), test users 571
-  pool at T: 2000 (window only: 2274), median pool over kept test users 2000.000000
+               value   generated      target  tolerance  result
+    votesPerUserMean   22.258000   21.650000        10%    pass
+  votesPerUserMedian    4.000000    4.000000        10%    pass
+     votesPerUserP90   40.000000   45.000000        25%    pass
+     votesPerUserP99  332.000000  287.000000        25%    pass
+         shareUsers1    0.280000    0.278000   5 points    pass
+      shareUsers2to4    0.265000    0.256200   5 points    pass
+     shareUsers5to19    0.234000    0.268600   5 points    pass
+    shareUsers20plus    0.221000    0.197200   5 points    pass
+   activitySkewTop20    0.828466    0.836400   5 points    pass
+       followeesMean   24.447581   24.260000        10%    pass
+     followListShare    0.496000    0.511900   5 points    pass
+  maxUserActionShare    0.048612    0.050000      limit    pass
+top user: 1082 actions (0.048612 of all), users at the cap: 2
+lift: 3.782916 (actions 22258, on exposed posts 963, expected exposed 254.565538)
+buckets (q 0.8): positives 22258, T 21412417 (2026-09-05T19:53:37.000Z), test users 590
+  pool at T: 1972 (window only: 1972), median pool over kept test users 2000.000000
   bucket  test_users  kept  left_out  kept_with_followee
-       0           0     0         0                   0
-     1-4         264   226        38                 224
-     0-4         264   226        38                 224
-    5-19         194   171        23                 170
-     20+         113    98        15                  98
-  kept test users in bucket 0-4: 226 (threshold 100): pass
+       0          64    59         5                  26
+     1-4         126   115        11                  58
+     0-4         190   174        16                  84
+    5-19         192   177        15                  91
+     20+         208   190        18                  86
+  kept test users in bucket 0-4: 174 (threshold 100): pass
+  kept test users in bucket 0: 59 (at least 1): pass
 
 == syn-W2H-M ==
-manifest sha256 e05d1c8442f276145cb975aca74643f6a8e638d9a6b607027d45382f3e16fde2
-rows communities=20 follows=24275 interactions=21648 memberships=1773 posts=20000 users=1000
-skipped actions (no candidate): 2
+manifest sha256 ef3e596056267d4e7de8cadb5cbd4537c1f7013c9c9c804e16a62db11e7b3e98
+rows communities=20 follows=12126 interactions=22258 memberships=1773 posts=20000 users=1000
+skipped actions (no candidate): 0
 format: pass
 calibration: pass
-               value  generated     target  tolerance  result
-    votesPerUserMean  21.648000  21.650000        10%    pass
-  votesPerUserMedian   4.000000   4.000000        10%    pass
-   activitySkewTop20   0.847469   0.836400   5 points    pass
-       followeesMean  24.323647  24.260000        10%    pass
-lift: 6.780122 (actions 21648, on exposed posts 2954, expected exposed 435.685372)
+               value   generated      target  tolerance  result
+    votesPerUserMean   22.258000   21.650000        10%    pass
+  votesPerUserMedian    4.000000    4.000000        10%    pass
+     votesPerUserP90   40.000000   45.000000        25%    pass
+     votesPerUserP99  332.000000  287.000000        25%    pass
+         shareUsers1    0.280000    0.278000   5 points    pass
+      shareUsers2to4    0.265000    0.256200   5 points    pass
+     shareUsers5to19    0.234000    0.268600   5 points    pass
+    shareUsers20plus    0.221000    0.197200   5 points    pass
+   activitySkewTop20    0.828466    0.836400   5 points    pass
+       followeesMean   24.447581   24.260000        10%    pass
+     followListShare    0.496000    0.511900   5 points    pass
+  maxUserActionShare    0.048612    0.050000      limit    pass
+top user: 1082 actions (0.048612 of all), users at the cap: 2
+lift: 7.637369 (actions 22258, on exposed posts 1882, expected exposed 246.419936)
 
 == lift per size M world ==
   world      lift
-     W0  1.054062
-     W1  1.637104
-    W2L  2.088188
-    W2M  3.477411
-    W2H  6.780122
+     W0  1.090659
+     W1  1.570196
+    W2L  2.244189
+    W2M  3.782916
+    W2H  7.637369
 lift order (W0 lowest, W2L < W2M < W2H): pass
 
 result: pass

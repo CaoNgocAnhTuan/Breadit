@@ -2,9 +2,9 @@
   "version": 1,
   "params": {
     "activityTailAlpha": {
-      "value": 1.06,
+      "value": 1.12,
       "kind": "calibrated",
-      "note": "Tail of the action count in the bin 20 or more: floor(20 x Pareto(alpha)), capped. Amendment 1 start value.",
+      "note": "Tail of the action count in the bin 20 or more: floor(20 x Pareto(alpha)), capped. Amendment 1 start value 1.06 gave a mean of 24.25 and a 99th percentile of 389. Calibration round 1 moved it to 1.12 (mean 22.26, 99th percentile 332, top user under 5%).",
       "targets": [
         {
           "key": "votesPerUserP90",
