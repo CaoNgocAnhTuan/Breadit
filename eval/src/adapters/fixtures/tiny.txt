@@ -1,0 +1,8 @@
+"1246573330","318","1"
+"1246603391","399","1"
+"1246573479","1749","1"
+"1246573330","318","1"
+"1246603391","399","1"
+"1246573479","1749","1"
+tiny fixture for the zip reader test: the same lines again and again
+tiny fixture for the zip reader test: the same lines again and again

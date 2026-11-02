@@ -30,10 +30,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapte
 
 #### Step 2: Zip reader (effort S)
 
-- [ ] Make the fixture once: a short text file (a few lines, written by you and committed as `eval/src/adapters/fixtures/tiny.txt`) zipped with the system `zip -P <a test password>` into `eval/src/adapters/fixtures/tiny.zip`. Record the exact command in a comment at the top of `zip.test.ts`. The system `zip` sets flag bits 0 and 3 (flag 9) and method 8; the test also builds a copy of the fixture with bit 3 cleared and the CRC check byte, so both check-byte rules of design Approach step 3 are covered.
-- [ ] Tests first (TC2): the right password gives exactly `tiny.txt`; a wrong password stops with "wrong password"; a copy with one byte of the compressed data changed stops on the CRC-32 or size check; a zip with two members, method 0 or zip64 sizes stops as unsupported (build these small buffers in the test).
-- [ ] Write `eval/src/adapters/zip.ts` with `readEncryptedMember` (design: Approach "Read the zips in memory", F2, F3).
-- [ ] Commit: `feat: eval in-memory ZipCrypto zip reader`
+- [x] Make the fixture once: a short text file (a few lines, written by you and committed as `eval/src/adapters/fixtures/tiny.txt`) zipped with the system `zip -P <a test password>` into `eval/src/adapters/fixtures/tiny.zip`. Record the exact command in a comment at the top of `zip.test.ts`. The system `zip` sets flag bits 0 and 3 (flag 9) and method 8; the test also builds a copy of the fixture with bit 3 cleared and the CRC check byte, so both check-byte rules of design Approach step 3 are covered.
+- [x] Tests first (TC2): the right password gives exactly `tiny.txt`; a wrong password stops with "wrong password"; a copy with one byte of the compressed data changed stops on the CRC-32 or size check; a zip with two members, method 0 or zip64 sizes stops as unsupported (build these small buffers in the test).
+- [x] Write `eval/src/adapters/zip.ts` with `readEncryptedMember` (design: Approach "Read the zips in memory", F2, F3).
+- [x] Commit: `feat: eval in-memory ZipCrypto zip reader`
 
 #### Step 3: Strict parser (effort S)
 
