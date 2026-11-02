@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.19 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.20 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -331,9 +331,9 @@ One source of truth. A change needs a new config version and a line in the chang
 | Prior strength `m` | 5 (E4 tests 0, 2, 5, 10) | P5 |
 | α, β grid | 0, 1, 2, 4, 8, 16 (engagement points per unit) | P5 |
 | Window W / pool cap N_max | 7 days / 2,000 | P5 |
-| Cut time T | the rule is set in P2; the value is set before the first test-split run | P5 |
-| Larger pool (W_L, N_L) for E8 | larger than W and N_max; values set in P5 | P5 |
-| Baseline grids | one parameter each: age weight of BL2t (production 0.25 per hour), time divisor of BL4 (published 45,000 s), gravity of BL5 (published 1.8); 3 to 5 values each, including the published value; set in P5 | P5 |
+| Cut time T | `q` = 0.8 (rule: `.docs/implementation-plan.md` §3.1). The three S datasets 21393508 and the five M datasets 21412417 (seconds from the base epoch); `digg2009` 1246068297 (Unix seconds). Computed with `cutTime` of `eval/src/checks/buckets.ts`; frozen 2026-11-02 | P5 |
+| Larger pool (W_L, N_L) for E8 | 14 days / 4,000; frozen 2026-11-02 | P5 |
+| Baseline grids | BL2t age weight 0.0625, 0.125, 0.25, 0.5, 1 per hour (production 0.25); BL4 time divisor 11,250, 22,500, 45,000, 90,000, 180,000 s (published 45,000); BL5 gravity 1.2, 1.5, 1.8, 2.1, 2.4 (published 1.8); frozen 2026-11-02 | P5 |
 | Dataset sizes | S 200 users, 4k posts · M 1,000 users, 20k posts (E7 uses M) | P3 |
 | Synthetic world parameters | in `eval/config/synthetic-v1.json` (SHA-256 `70341fd94eb40d549e8217fb8c39bcb105277afd25cd39d6b178273e5ff48007`, frozen 2026-11-02), calibrated to `.docs/datasets.md` where possible; W2 has three cells: low, middle and high influence at the middle homophily | P3 |
 | Primary W2 cell for H1 | the middle cell | P3 |
@@ -461,3 +461,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.17 · 2026-11-02 · Task `p4-digg-adapter`: P4 text, the follow rule now matches the blueprint `AsOf` contract (a link counts when dated before the item's test time, not "at or before T"), and the undated links are dropped (decided). P4 status paragraph. §4: P4 ✅. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.18 · 2026-11-02 · Status marks only: §3 "Tooling" notes the two facts fixed since (the `eval` workspace in P3, the Node pin in P0); §11 item 3 (D1) ✅ decided; §11 item 6 gets a status line ((a) and (c) done, (b) open for P5); §4: ▶ marks P5 as next. `.docs/implementation-plan.md` 1.2 marks tasks 1–4 done. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.19 · 2026-11-02 · Task `p5-ranking-package`: P5 status paragraph (part 1 done), §4 row (1 of 2 tasks). No frozen value changed: BL5 keeps the frozen score unit through its log form (task 5 Open question 1); §5, §6 and §7 are byte-identical.
+- 0.20 · 2026-11-02 · Task `p5-eval-harness`, Step 0: §7 rows "Cut time T" (the nine values from the rule with `q` = 0.8), "Larger pool (W_L, N_L) for E8" (14 days / 4,000) and "Baseline grids" (five values each, with the published value) are set and frozen, as the author decided in the task's Spec (Open questions 1–3). No other frozen value changed; §5 and §6 are byte-identical.

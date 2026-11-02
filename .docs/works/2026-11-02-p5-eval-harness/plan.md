@@ -1,6 +1,6 @@
 # Plan: Evaluation harness, metrics, statistics and the baseline table
 
-Status: draft · 2026-11-02
+Status: approved · 2026-11-02
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harness/`
 
 ---
