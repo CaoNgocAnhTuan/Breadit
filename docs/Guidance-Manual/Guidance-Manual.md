@@ -25,11 +25,11 @@ Mỗi file có hai bản cùng nội dung: tiếng Anh (`en/`) và tiếng Việ
 | 05 | The evaluation protocol · Giao thức đánh giá | How is a result number made? · Một con số kết quả được tạo ra thế nào? | [en](en/05-evaluation-protocol.md) | [vi](vi/05-evaluation-protocol.md) | ✅ |
 | 06 | Statistics · Thống kê | When is a gain real? · Khi nào một mức cải thiện là thật? | — | — | 🔜 |
 | 07 | Determinism · Tính tất định | Why is every run identical? · Vì sao mọi lần chạy giống hệt nhau? | — | — | 🔜 |
-| 08 | Code walkthrough · Đi theo code | Where is each idea in the code? · Mỗi ý tưởng nằm ở đâu trong code? | — | — | 🔜 |
+| 08 | The system and the news feed · Hệ thống và news feed | How does the backend get the ranked feed, and how can the feed be optimized? · Backend lấy feed đã xếp hạng thế nào, và tối ưu feed ra sao? | [en](en/08-system-and-feed.md) | [vi](vi/08-system-and-feed.md) | ✅ |
 | 09 | Glossary · Bảng thuật ngữ | What does this word mean? · Từ này nghĩa là gì? | [en](en/09-glossary.md) | [vi](vi/09-glossary.md) | ✅ |
 | 10 | Defense question bank · Ngân hàng câu hỏi bảo vệ | What will the committee ask? · Hội đồng sẽ hỏi gì? | [en](en/10-defense-qa.md) | [vi](vi/10-defense-qa.md) | ✅ |
 
-**Short path (1 hour) · Lộ trình ngắn (1 giờ):** 09 → 03 → 05 → 10.
+**Short path (1 hour) · Lộ trình ngắn (1 giờ):** 09 → 03 → 05 → 10. Add 08 for the system and the feed · Thêm 08 để hiểu hệ thống và feed.
 
 Also read · Đọc thêm: [System_Architecture.md](../System_Architecture.md) (the system, the diagrams and the annotated directory tree · hệ thống, sơ đồ và cây thư mục có chú thích).
 
