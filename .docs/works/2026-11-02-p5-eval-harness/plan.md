@@ -106,13 +106,13 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 7: Tuning (effort S)
 
-- [ ] Tests first (TC7): on the golden dataset:
+- [x] Tests first (TC7): on the golden dataset:
   - a grid for BL2t and one for H gives the `tuning.csv` rows;
   - the choice is by NDCG@10, ties to the smaller value, and for H to the smaller `(α, β)`;
   - the grids come from `frozen-v1.json`;
   - a test-split config is refused for tuning.
-- [ ] Write `eval/src/harness/tuning.ts` (design: Approach "Tuning").
-- [ ] Commit: `feat: eval harness tuning on the validation split`
+- [x] Write `eval/src/harness/tuning.ts` (design: Approach "Tuning").
+- [x] Commit: `feat: eval harness tuning on the validation split`
 
 #### Step 8: Commands (effort S)
 
