@@ -48,9 +48,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 2: Metrics (effort XS)
 
-- [ ] Tests first (TC4): `recallAt` and `ndcgAt` on hand ranks: rank 1, rank K, rank K + 1, and a large rank. `summarize` covers the groups (each bucket, `0-4`, `all`), the means in `user_id` order and 6 decimals. `coverage` covers two methods with overlapping top-K lists.
-- [ ] Write `eval/src/metrics.ts` (design: Approach "Metrics").
-- [ ] Commit: `feat: eval metrics (Recall/HitRate, NDCG, Coverage)`
+- [x] Tests first (TC4): `recallAt` and `ndcgAt` on hand ranks: rank 1, rank K, rank K + 1, and a large rank. `summarize` covers the groups (each bucket, `0-4`, `all`), the means in `user_id` order and 6 decimals. `coverage` covers two methods with overlapping top-K lists.
+- [x] Write `eval/src/metrics.ts` (design: Approach "Metrics").
+- [x] Commit: `feat: eval metrics (Recall/HitRate, NDCG, Coverage)`
 
 #### Step 3: Statistics and the scipy cross-check (effort M)
 
