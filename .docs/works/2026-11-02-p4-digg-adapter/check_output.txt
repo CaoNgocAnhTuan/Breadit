@@ -1,0 +1,66 @@
+P4 digg2009: output of the real run (task p4-digg-adapter, plan Step 7), 2026-11-02.
+Node v22.23.4 (the .nvmrc version). Raw zips: datasets/raw/digg2009/, SHA-256 equal to .docs/datasets.md section 4.
+
+== 1. npm run adapt:digg -w @breadit/eval ==
+
+digg2009 written to /Users/hung/Desktop/Breadit/eval/data/digg2009
+  vote rows read                  3018197
+  repeated votes dropped             7299
+  stories                            3553
+  positives (likes)               3007345
+  link rows read                  1731658
+  links with date 0 dropped          1670
+  self-links dropped                    5
+  mutual reverses added                 0
+  repeated link pairs dropped           0
+  follows written                 1729983
+  users written                    336047
+manifest sha256 923e45e17c40b7fa3ae7356153d7f8813c93fbf24c2ee75e63ed36f89bcc4a85
+        6.60 real         6.68 user         0.44 sys
+          1434877952  maximum resident set size
+run time 6.6 s, peak memory 1.43 GB (max resident set size 1434877952 bytes; not Class D)
+
+== 2. npm run check -w @breadit/eval (digg2009 part; the other eight folders also pass) ==
+
+synthetic-v1.json sha256 70341fd94eb40d549e8217fb8c39bcb105277afd25cd39d6b178273e5ff48007
+window W 7 days, pool cap N_max 2000, q 0.8
+
+== digg2009 ==
+manifest sha256 923e45e17c40b7fa3ae7356153d7f8813c93fbf24c2ee75e63ed36f89bcc4a85
+rows communities=0 follows=1729983 interactions=3007345 memberships=0 posts=3553 users=336047
+format: pass
+buckets (q 0.8): positives 3007345, T 1246068297 (2009-06-27T02:04:57.000Z), test users 68120
+  pool at T: 823 (window only: 823), median pool over kept test users 783.000000
+  bucket  test_users   kept  left_out  kept_with_followee
+       0        7141   6638       503                2557
+     1-4       14887  14006       881                6843
+     0-4       22028  20644      1384                9400
+    5-19       21818  20787      1031               11839
+     20+       24274  23142      1132               15510
+  kept test users in bucket 0-4: 20644 (threshold 100): pass
+  kept test users in bucket 0: 6638 (at least 1): pass
+
+result of the whole run (nine folders): pass
+run time 8.1 s, peak memory 1.52 GB (not Class D)
+
+== 3. Blueprint section 3.7 (q = 0.8) against this table: equal in every number ==
+positives 3,007,345 | T 1246068297 (2009-06-27T02:04:57Z) | test users 68,120 | pool at T 823 | median pool 783
+bucket 0: 7,141 / 6,638 / 503 / 2,557 | 1-4: 14,887 / 14,006 / 881 / 6,843 | 0-4: 22,028 / 20,644 / 1,384 / 9,400
+bucket 5-19: 21,818 / 20,787 / 1,031 / 11,839 | 20+: 24,274 / 23,142 / 1,132 / 15,510
+
+== 4. Double run (DW2) ==
+A second adapt:digg run into an empty folder outside the repo gave byte-identical users.csv, follows.csv,
+communities.csv, memberships.csv, posts.csv, interactions.csv and manifest.json (cmp on each file).
+manifest sha256 of both runs: 923e45e17c40b7fa3ae7356153d7f8813c93fbf24c2ee75e63ed36f89bcc4a85
+
+== 5. SHA-256 mismatch on the real case (DW1) ==
+A copy of digg_votes.zip with one byte changed (SHA-256 beaf99ce140af6e1dc8bbebfeb68788378bf6269dd80dc29db0b7c9b5b00d930),
+next to the unchanged digg_friends.zip, in a folder outside the repo. The out folder held digg2009/keep.txt.
+Exit code 1, message below. After the run the out folder held only digg2009/keep.txt. The copy was deleted.
+
+error: SHA-256 of <scratch>/raw-changed/digg_votes.zip is beaf99ce140af6e1dc8bbebfeb68788378bf6269dd80dc29db0b7c9b5b00d930, expected 55bba035e08d31f14022aeef1f57b24322d2c0bea1fb241e3c99b0af59aafda1 (digg_votes.zip from http://web.archive.org/web/20130826053517id_/http://www.isi.edu/~lerman/downloads/digg_votes.zip). No row was read and nothing was written.
+
+== 6. Files written (DW7) ==
+eval/data/digg2009/: communities.csv memberships.csv posts.csv users.csv follows.csv interactions.csv manifest.json (git-ignored).
+git status after the run: only the untracked docs/supervisor-note.md (not ours). No member was extracted; no digg_votes1.csv or digg_friends.csv exists on disk.
+datasets/raw/digg2009/ unchanged (same SHA-256, same file dates).

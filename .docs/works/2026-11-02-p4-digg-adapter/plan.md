@@ -71,13 +71,13 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapte
 
 #### Step 7: Run on the real zips (effort M)
 
-- [ ] Run `adapt:digg` on `datasets/raw/digg2009/`. Compare its counts with DW4. Note the run time and peak memory if easy (not Class D).
-- [ ] Run `check` on `eval/data`. Format must pass for all nine folders (DW3). Compare the `digg2009` bucket table with blueprint §3.7 at `q` = 0.8, row by row (DW5). If a number differs, follow design F6 and stop and report; do not commit a mismatch.
-- [ ] Run `adapt:digg` a second time into a folder outside the repo and compare every file (DW2).
-- [ ] DW1 on the real case: copy one zip outside the repo, change one byte, point the adapter at that copy, and check that it stops and writes nothing. Delete the copy.
-- [ ] List what the adapter wrote and check `git status` (DW7).
-- [ ] Save the `digg2009` part of the `check` output, the counts table, the manifest SHA-256, the double-run result and the DW1 message as `check_output.txt` in this task folder.
-- [ ] Commit: `chore: P4 digg2009 adapted and checked`
+- [x] Run `adapt:digg` on `datasets/raw/digg2009/`. Compare its counts with DW4. Note the run time and peak memory if easy (not Class D).
+- [x] Run `check` on `eval/data`. Format must pass for all nine folders (DW3). Compare the `digg2009` bucket table with blueprint §3.7 at `q` = 0.8, row by row (DW5). If a number differs, follow design F6 and stop and report; do not commit a mismatch.
+- [x] Run `adapt:digg` a second time into a folder outside the repo and compare every file (DW2).
+- [x] DW1 on the real case: copy one zip outside the repo, change one byte, point the adapter at that copy, and check that it stops and writes nothing. Delete the copy.
+- [x] List what the adapter wrote and check `git status` (DW7).
+- [x] Save the `digg2009` part of the `check` output, the counts table, the manifest SHA-256, the double-run result and the DW1 message as `check_output.txt` in this task folder.
+- [x] Commit: `chore: P4 digg2009 adapted and checked`
 
 ## Claude's part
 
