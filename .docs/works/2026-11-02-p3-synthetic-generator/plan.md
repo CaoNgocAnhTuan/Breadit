@@ -31,9 +31,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 2: Frozen values and the Node check (effort S)
 
-- [ ] Tests first (TC3): `src/frozen.test.ts` reads the §7 table of `.docs/super-plan.md` by row name and compares "Master seed", "Base epoch" (as integer seconds since the Unix epoch and as the ISO string), "Dataset sizes" (S and M users and posts), "History buckets", and "Window W / pool cap N_max" with `frozen-v1.json`. Also test that `checkNode()` throws when the version differs from `.nvmrc` (pass the version in, so the test does not depend on the real Node).
-- [ ] Write `eval/config/frozen-v1.json` and `eval/src/frozen.ts` with `loadFrozen()` and `checkNode()` (design: Approach "One source for the frozen values", F1, F3).
-- [ ] Commit: `feat: eval frozen values checked against super-plan §7`
+- [x] Tests first (TC3): `src/frozen.test.ts` reads the §7 table of `.docs/super-plan.md` by row name and compares "Master seed", "Base epoch" (as integer seconds since the Unix epoch and as the ISO string), "Dataset sizes" (S and M users and posts), "History buckets", and "Window W / pool cap N_max" with `frozen-v1.json`. Also test that `checkNode()` throws when the version differs from `.nvmrc` (pass the version in, so the test does not depend on the real Node).
+- [x] Write `eval/config/frozen-v1.json` and `eval/src/frozen.ts` with `loadFrozen()` and `checkNode()` (design: Approach "One source for the frozen values", F1, F3).
+- [x] Commit: `feat: eval frozen values checked against super-plan §7`
 
 #### Step 3: The RNG (effort S)
 
