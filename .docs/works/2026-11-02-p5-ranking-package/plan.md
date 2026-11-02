@@ -91,13 +91,13 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-ranking-pac
 
 #### Step 8: Cross-check with the P3 pool rule (effort S)
 
-- [ ] Add `"@breadit/ranking": "0.1.0"` to `eval/package.json` dependencies.
-- [ ] Tests first (TC5): `eval/src/checks/pool-crosscheck.test.ts`.
+- [x] Add `"@breadit/ranking": "0.1.0"` to `eval/package.json` dependencies.
+- [x] Tests first (TC5): `eval/src/checks/pool-crosscheck.test.ts`.
   - Draw at least 200 random fixtures the way `buckets.test.ts` does (`rng(masterSeed, "bootstrap")`, inside the test only). Add no new stage name; `rng` accepts only the fixed names of blueprint §2.4.
   - Each fixture has posts with `createdAt` ties, own posts, earlier positives, a window and a small `maxPosts`.
   - For each fixture compare "the test post is in `buildPool`" with `inPool` from `eval/src/checks/buckets.ts`. They must be equal every time.
-- [ ] The test imports `@breadit/ranking` by name from the ES module side (design F4).
-- [ ] Commit: `test: eval cross-checks buildPool against the P3 pool rule`
+- [x] The test imports `@breadit/ranking` by name from the ES module side (design F4).
+- [x] Commit: `test: eval cross-checks buildPool against the P3 pool rule`
 
 #### Step 9: Build order (effort S)
 

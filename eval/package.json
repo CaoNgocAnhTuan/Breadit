@@ -11,6 +11,9 @@
     "adapt:digg": "node --max-old-space-size=4096 src/cli/adapt-digg.ts",
     "check": "node --max-old-space-size=4096 src/cli/check.ts"
   },
+  "dependencies": {
+    "@breadit/ranking": "0.1.0"
+  },
   "devDependencies": {
     "@types/node": "^20",
     "typescript": "^5"
