@@ -96,7 +96,8 @@ sh('git', 'init', '-q', '-b', 'test-app');
 sh('git', 'config', 'user.email', 'harness@test.local');
 sh('git', 'config', 'user.name', 'harness test');
 sh('git', 'config', 'commit.gpgsign', 'false');
-put('docs/README.md', 'pre-thesis doc\n');
+put('docs/Pre-thesis/README.md', 'pre-thesis doc\n');
+put('docs/System_Architecture.md', 'thesis doc\n');
 put('Latex/main.tex', '\\documentclass{report}\n');
 put('apps/backend/src/posts/x.ts', 'export const x = 1;\n');
 put('apps/backend/prisma/migrations/20260101000000_init/migration.sql', '-- init\n');
@@ -126,7 +127,8 @@ check('cli status lists the new task and ignores the old folder', /demo-bug/.tes
 // ---------------------------------------------------------------- pre-edit: file guard
 
 expect('Write Latex/main.tex is denied', run('pre-edit.cjs', write('Latex/main.tex', 'x')), 'deny');
-expect('Edit docs/README.md is denied', run('pre-edit.cjs', edit('docs/README.md', 'pre', 'post')), 'deny');
+expect('Edit docs/Pre-thesis/README.md is denied', run('pre-edit.cjs', edit('docs/Pre-thesis/README.md', 'pre', 'post')), 'deny');
+expect('Edit docs/System_Architecture.md passes', run('pre-edit.cjs', edit('docs/System_Architecture.md', 'thesis', 'Thesis')), 'pass');
 expect('Write .env is denied', run('pre-edit.cjs', write('.env', 'A=1')), 'deny');
 expect('Write apps/backend/.env.local is denied', run('pre-edit.cjs', write('apps/backend/.env.local', 'A=1')), 'deny');
 expect('Edit a committed migration is denied', run('pre-edit.cjs', edit('apps/backend/prisma/migrations/20260101000000_init/migration.sql', 'init', 'x')), 'deny');
@@ -209,7 +211,8 @@ expect('git switch main asks', run('pre-bash.cjs', bash('git switch main')), 'as
 expect('git reset --hard asks', run('pre-bash.cjs', bash('git reset --hard HEAD~1')), 'ask');
 expect('git commit --no-verify asks', run('pre-bash.cjs', bash('git commit --no-verify -m x')), 'ask');
 expect('an eval run on the test split asks', run('pre-bash.cjs', bash('node eval/dist/cli.js run --split test')), 'ask');
-expect('echo into docs/ is denied', run('pre-bash.cjs', bash('echo hi > docs/new.md')), 'deny');
+expect('echo into docs/Pre-thesis/ is denied', run('pre-bash.cjs', bash('echo hi > docs/Pre-thesis/new.md')), 'deny');
+expect('rm -rf docs is denied', run('pre-bash.cjs', bash('rm -rf docs')), 'deny');
 expect('sed -i on Latex/ is denied', run('pre-bash.cjs', bash("sed -i '' 's/a/b/' Latex/main.tex")), 'deny');
 expect('rm -rf Latex is denied', run('pre-bash.cjs', bash('rm -rf Latex')), 'deny');
 expect('writing an approved status with sed is denied', run('pre-bash.cjs', bash(`sed -i '' 's/Design status: draft/Design status: approved/' ${T}/design.md`)), 'deny');

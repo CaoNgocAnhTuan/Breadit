@@ -33,7 +33,7 @@ Task state lives in status lines: `Spec status:` and `Design status:` in `design
 
 | Hook | When | What |
 |---|---|---|
-| `pre-edit.cjs` | before Edit or Write | Refuses `docs/`, `Latex/`, `.env`, committed migrations, `humans_v1.sql`, the results manifest. Refuses "approved" status lines written by Claude. Asks before code edits unless the active task's plan is approved |
+| `pre-edit.cjs` | before Edit or Write | Refuses `docs/Pre-thesis/`, `Latex/`, `.env`, committed migrations, `humans_v1.sql`, the results manifest. Refuses "approved" status lines written by Claude. Asks before code edits unless the active task's plan is approved |
 | `pre-bash.cjs` | before Bash | Refuses `db push`, `migrate reset`, `down -v`, reading `.env`, force push, commits off `test-app`. Asks for push, tags, branches, `main`, discarding work, `--no-verify`, the eval test split |
 | `on-prompt.cjs` | when the author sends a prompt | Writes the approval when the author types `/approve` |
 | `post-edit.cjs` | after Edit or Write | Determinism check in `eval/` and ranking code (super-plan §2). Line limits of `design.md` and `plan.md` |

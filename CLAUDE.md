@@ -11,7 +11,7 @@ Breadit is an X/Twitter clone built as an npm-workspaces monorepo:
 - `packages/shared` (`@breadit/shared`): shared TS types imported by the frontend. Its `types` point at `dist/`, so run `npm run build -w @breadit/shared` before typechecking or building the frontend.
 - `packages/ranking` (`@breadit/ranking`): the pure ranking code of the thesis (pool, as-of features, every scorer, `computeExploreScoreFixed`), used by the backend's Explore and by `eval/`. It is CommonJS built to `dist/`, so run `npm run build -w @breadit/ranking` before the backend build, the backend tests or `eval` (`verify.sh` and the backend Dockerfile do this). Its tests: `npm run test -w @breadit/ranking`.
 
-`docs/` and `Latex/` hold the pre-thesis report and design material (ADRs, use cases, ERDs, k6 perf scripts). Do not move or edit them unless asked. Thesis-phase docs go in `.docs/` at the repo root. No application code lives in any of these folders.
+`docs/Pre-thesis/` and `Latex/` hold the pre-thesis report and design material (ADRs, use cases, ERDs, k6 perf scripts). Do not move or edit them. Thesis-phase docs go in `.docs/` at the repo root. The root of `docs/` holds thesis docs for the supervisor and the defense, such as `docs/System_Architecture.md` (the proposed system and the annotated directory tree). No application code lives in any of these folders.
 
 ## How to write
 
@@ -36,7 +36,7 @@ Every feature, super-plan item or bug fix goes through three approvals before an
 
 **Git.** Commit every change on the current branch, `test-app`. Never create a new branch for a change: no feature, task, fix or thesis branches. Tags, pushes and any change to `main` need the author's OK.
 
-Only the author runs `/approve`. The hooks in `.claude/hooks/` enforce the rest: code edits ask the author unless the active task's plan is approved, `docs/`, `Latex/`, `.env` and committed migrations cannot be edited, and commits go on `test-app` only. Thesis reports are written separately, not inside a task. A frozen value (super-plan §7) changes only when the author asks, with a line in the super-plan change log. See `.claude/README.md` for the full map.
+Only the author runs `/approve`. The hooks in `.claude/hooks/` enforce the rest: code edits ask the author unless the active task's plan is approved, `docs/Pre-thesis/`, `Latex/`, `.env` and committed migrations cannot be edited, and commits go on `test-app` only. Thesis reports are written separately, not inside a task. A frozen value (super-plan §7) changes only when the author asks, with a line in the super-plan change log. See `.claude/README.md` for the full map.
 
 ## Commands
 

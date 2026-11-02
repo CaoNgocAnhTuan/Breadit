@@ -3,7 +3,7 @@
 /**
  * PreToolUse hook for Edit, Write, MultiEdit and NotebookEdit.
  *
- * 1. File guard: refuses edits to frozen or secret files (docs/, Latex/, .env, committed
+ * 1. File guard: refuses edits to frozen or secret files (docs/Pre-thesis/, Latex/, .env, committed
  *    migrations, datasets/humans_v1.sql, the results manifest).
  * 2. Task files (.docs/works/<task>/{design,plan}.md):
  *    - Claude never writes an "approved" status line (only the author's /approve does);
