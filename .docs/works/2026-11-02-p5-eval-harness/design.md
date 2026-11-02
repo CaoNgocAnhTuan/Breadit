@@ -1,7 +1,7 @@
 # Evaluation harness, metrics, statistics and the baseline table
 
-Spec status: draft · 2026-11-02
-Design status: pending
+Spec status: approved · 2026-11-02
+Design status: draft · 2026-11-02
 Type: feature · Folder: `.docs/works/2026-11-02-p5-eval-harness/`
 
 ## 1. Spec
@@ -105,30 +105,181 @@ What exists today (checked on 2026-11-02):
 
 ### Approach
 
+The author approved the Spec on 2026-11-02 without choosing another option, so this design follows the recommendation of all six open questions:
+1. **Baseline grids:** BL2t 0.0625–1, BL4 11,250–180,000, BL5 1.2–2.4.
+2. **Larger pool:** W_L = 14 days, N_L = 4,000.
+3. **T:** computed, recorded in §7, then enforced.
+4. **Big files:** `per_user.csv` over 5 MB lives in a git-ignored folder, with its hash in the committed manifest.
+5. **scipy:** a one-time virtual environment outside the repo.
+6. **H1:** the reading of blueprint §3.4 is confirmed.
+
+**Call the shared package wherever possible.** The live feed (task 8) will call `@breadit/ranking`, so the harness calls the same functions. That way parity is true by construction, not by a second copy:
+- `userFeaturesAsOf`, with only this user's follows, memberships and positives passed in (the function filters by user anyway, so a subset gives the same result);
+- `buildPool`, with only the posts in the window passed in (the function filters by window anyway);
+- `scorer(method)` and `rankPool`, unchanged.
+
+**One fast path, checked against the package.** `postFeaturesAsOf` walks every positive of a post. On Digg that is about 850 votes per story, times about 800 posts in a pool, times about 68,000 users, which is far too slow. The harness builds `PostFeatures` itself from per-post indexes:
+- **Counts.** Positives sorted by `(t, id)` with running counts per type. A binary search with the `AsOf` rule gives likes, comments and reposts.
+- **`engagedBy`.** It holds only this user's followees who acted on the post before the item time. They are found by walking the user's sorted followees, so the list is sorted.
+
+No scorer reads `engagedBy` except through `engagedBy ∩ followees` (BL6, H and its ablations; see `packages/ranking/src/scorers.ts`), so every score is the same. A `reference` mode uses the package's `postFeaturesAsOf` unchanged. A test runs both modes on `syn-W2M-S` and on the golden dataset, and requires byte-identical `per_user.csv` (F3).
+
+**The split.** `eval/src/harness/split.ts` imports `cutTime`, `testItems` and `historyCount` from `eval/src/checks/buckets.ts`, so the T rule exists once. It adds `validationItems`: for each user, the last positive with `t ≤ T`, by `(t, event_id)`.
+
+The canonical files have no repeated (user, post) pair and no positive on one's own post (P3 and P4 format checks), so "a post the user had not touched before" holds for every item. The harness still checks it and stops if it fails.
+
+For each item:
+- `asOf = { t: item.t, beforeEventId: item.eventId }`;
+- `history = historyCount`, with the bucket from `bucketOf`;
+- earlier positives = the posts of the user's visible positives;
+- the user id becomes `u` plus 10 digits (blueprint §2.5).
+
+**T is checked against §7.** `frozen-v1.json` gets `cutTimes` (dataset id to T), `poolLarge` (`{ windowDays, poolCap }`) and `baselineGrids`. The existing `frozen.test.ts` reads the matching §7 rows and must agree. The harness computes T, and stops when it differs from `cutTimes[datasetId]`. A dataset with no recorded T can run only with `--record-t`. That flag prints T and writes no results; it is used once, in Step 9 of the plan, to fill the row.
+
+**Runs are configs.** Each run is a committed JSON file, `eval/config/runs/<runId>.json`, with these fields:
+- `datasets`;
+- `split`;
+- `methods`;
+- the `params` of each method (a fixed value, or `"grid"` for tuning);
+- `pool` (`normal` or `large`);
+- `mode`, which is always `fast` except in tests.
+
+`npm run harness -w @breadit/eval -- <runId>` runs it. This task adds one config, `p5-baseline` (Spec DW7). The command reads `split` only from the config file, never from a `--split` flag, so the hook in `pre-bash.cjs` is not needed for it. To keep the "author decides" rule, the harness itself refuses `split: "test"` unless the run config also has `"testApprovedBy": "author"`. Task 9 adds that field when the author agrees.
+
+**Output.** `.docs/results/<runId>/` holds:
+- `summary.csv`, `coverage.csv`, `leftout.csv`, and `tuning.csv` when a grid ran (blueprint §2.7 columns);
+- `manifest.json` with the run config SHA-256, each input dataset's manifest SHA-256, `node`, and every output file with rows and SHA-256.
+
+`per_user.csv` goes there when it is under 5 MB. Otherwise it goes to `eval/results/<runId>/` (git-ignored), with its hash still in the committed manifest (Spec Open question 4). Every number is printed with 6 decimals. All means sum in `user_id` order.
+
+**Metrics** (`eval/src/metrics.ts`). With the item at 1-based rank `r` in the full pool:
+- **Recall@K** (= HitRate@K) is `[r ≤ K]`.
+- **NDCG@K** is `1 / log2(r + 1)` when `r ≤ K`, else 0.
+- **Coverage@K** is the number of distinct posts in any top-K list of the run, divided by the number of distinct posts in any pool of the run, per method and K (super-plan §5).
+
+Summary groups are each bucket, `0-4` and `all`.
+
+**Statistics** (`eval/src/stats.ts`). For a comparison (method, ref, K, group), `d_i` is method minus ref, per kept user, in `user_id` order.
+- **Bootstrap.** B resamples (§7) of n indices each. Each resample's mean is kept, and the CI uses the 2.5th and 97.5th percentiles with linear interpolation (numpy's default).
+- **Randomization test.** P sign-flip permutations (§7). The two-sided `p = (1 + #{|mean*| ≥ |mean_obs|}) / (P + 1)`.
+- **Common random numbers.** Every comparison restarts its stream: `rng(masterSeed, "bootstrap")` and `rng(masterSeed, "permutation")`. Adding or removing a comparison then changes no other result, and the cost stays linear.
+- **Holm.** Within one family (blueprint §3.3): sort by `p_raw` (ties by the comparison key). Then `p_holm_i = max_{j ≤ i} min(1, (m − j + 1) · p_j)`.
+- **`h1Verdict(rows)`** follows blueprint §3.4: F1 row, NDCG@10, group 0–4, `p_holm < 0.05` and `ci_low > 0`.
+- **`h0Gate(rows)`** follows blueprint §3.5: `ci_low ≤ 0` for H − BL2, NDCG@10, all users, on `syn-W0-M`.
+
+`compare.csv` is written by `writeCompare`. In this task it runs only on the fixture; task 9 runs it on real data.
+
+**Tuning.** For a method with `"grid"` params, the harness runs every grid point on the validation split and writes `tuning.csv`. It picks by NDCG@10 over all kept users, with ties to the smaller value; for H, ties go to the smaller `(α, β)` in that order (super-plan §5). The grids come from `frozen-v1.json`: α/β from §7, the three baseline grids from Spec Open question 1. In this task it is tested on the golden dataset only.
+
+**The `rank` command** (blueprint §2.9): `npm run rank -w @breadit/eval -- --dataset <id> --method <m> --user <u> --asof <t> [--before-event <id>] --top <n>`. The params come from a run config or from flags. It prints post ids in order, using the same code path as the harness.
+
+**The scipy cross-check.** `stats_crosscheck.py` in this task folder runs once, in a virtual environment outside the repo with pinned `numpy` and `scipy`, on `eval/src/stats-fixture.csv`. The fixture has 14 paired values, few enough for an exact permutation test (`2^14` sign patterns). The script writes `stats_reference.json`, with the exact p-value of `scipy.stats.permutation_test` (`permutation_type="samples"`) and the CI of `scipy.stats.bootstrap` (`paired=True`, `method="percentile"`). The TS test passes when:
+- our exact enumeration equals scipy's p to `1e-12`;
+- our Monte Carlo p is within 3 standard errors of it;
+- our CI bounds are within 0.02 of scipy's (both are Monte Carlo, with different generators).
+
+Holm is checked against a worked example by hand from Holm (1979).
+
 **Rejected options:**
 
 | Option | Why not |
 |---|---|
-| | |
+| Call `postFeaturesAsOf` everywhere | About 850 × 800 × 68,000 positive checks per method on Digg. The fast path gives the same scores, and the reference mode proves it |
+| Change `@breadit/ranking` to export the hybrid's terms for tuning | Out of the Spec's scope (no change to the package). Calling `scorer` per grid point is fast enough at this size |
+| Reuse the P3 `check` code for the pool | `check` only counts. The harness must call `buildPool` itself, so the pool that is ranked is the pool the live feed uses |
+| A `--split test` flag on the command line | The test split is set by the run config and needs `testApprovedBy` there; the hook still guards any shell command that types it |
+| One running RNG stream across comparisons | The result of one comparison would depend on which comparisons came before it |
 
 ### Workflow and sequence diagrams
 
+One run:
+
 ```mermaid
 sequenceDiagram
-    participant C as Client
-    participant B as Backend
+    participant A as Author
+    participant C as cli/harness.ts
+    participant L as loadDataset and indexes
+    participant S as harness/split.ts
+    participant R as @breadit/ranking
+    participant W as results writer
+    A->>C: npm run harness -w @breadit/eval -- p5-baseline
+    C->>C: checkNode, read run config, refuse split test without approval
+    loop each dataset of the config
+        C->>L: load canonical files, build per-user and per-post indexes
+        C->>S: cutTime(q 0.8), must equal cutTimes in frozen-v1.json
+        S-->>C: items (validation or test), history, bucket
+        loop each item, in user_id order
+            C->>R: userFeaturesAsOf(user subset), buildPool(window slice)
+            loop each method
+                C->>R: scorer(method) on each pool post, fast post features
+                C->>R: rankPool, find the item's rank
+            end
+        end
+    end
+    C->>W: per_user, summary, coverage, leftout, tuning when a grid ran
+    W->>W: 6 decimals, sorted rows, LF, manifest with SHA-256
+    C-->>A: one line per dataset, results folder, manifest SHA-256
+```
+
+Statistics (task 9 calls it; this task tests it):
+
+```mermaid
+sequenceDiagram
+    participant H as harness results
+    participant S as stats.ts
+    participant G as rng streams
+    H->>S: per-user metric of method and ref, one group
+    S->>G: restart bootstrap stream, draw B resamples
+    S->>G: restart permutation stream, draw P sign flips
+    S-->>H: mean_diff, ci_low, ci_high, p_raw
+    H->>S: holm(family rows)
+    S-->>H: p_holm, then h1Verdict and h0Gate
 ```
 
 ### Failure modes
 
 | # | What can go wrong | How we notice | How we resolve it |
 |---|---|---|---|
-| F1 | | | |
+| F1 | A future event leaks into a feature | DW2 leakage test | Every feature goes through `visibleAt` or a strict `t < asOf.t`. The test mutates or deletes every later event and holds T fixed |
+| F2 | T changes because a dataset changed | The harness compares with `cutTimes` | Stop with both values. Only `--record-t` writes a new value, and §7 must agree (`frozen.test.ts`) |
+| F3 | The fast post features differ from the package | The reference-mode test (byte-identical `per_user.csv`) | The fast path keeps only what the scorers read. Any difference fails the test, and the fast path is fixed |
+| F4 | Digg is too slow or too big | DW9 reports time and memory | Per-user and per-post indexes in typed arrays; `--max-old-space-size=4096` on the harness script. If DW9 needs more than 30 minutes per method set, stop and report before task 9 |
+| F5 | A run is not reproducible (float order, Map order) | DW3 double run | Users in `user_id` order, sums in that order, every `.sort` with a compare, 6 decimals |
+| F6 | The test split runs by mistake | DW8, the config guard, the hook | `split: "test"` without `testApprovedBy` stops before any work. The golden test runs the test split in memory only |
+| F7 | A wrong statistic | DW5 against scipy and the Holm example | Exact enumeration and tolerances as stated. A miss stops the task, not the tolerance |
+| F8 | An item on a touched post | The harness check | Stop with the user and post. The format checks of P3 and P4 make it impossible today |
+| F9 | `per_user.csv` too big for git | Its size | Over 5 MB, it goes to the git-ignored `eval/results/`; the committed manifest keeps its hash |
+| F10 | A missing param for a method | `scorer` throws (task 5) | The run config must list every param a method needs; the harness validates the config before loading data |
+| F11 | scipy cannot be installed (no network, broken Python) | Step 3 of the plan | Report it. Then the fallback of Spec Open question 5 needs the author: hand-computed small cases only |
+
+The canonical data has no blocked users, deleted or pending posts, bans or caches. `blocked` is passed as an empty set.
 
 ### Code files
 
 | File | New or changed | Purpose |
 |---|---|---|
-| | | |
+| `eval/src/harness/split.ts` | new | `validationItems(pos, T)`, and re-export of `cutTime`, `testItems`, `historyCount` and `bucketOf` from `checks/buckets.ts` |
+| `eval/src/harness/index-data.ts` | new | Per-user arrays (follows, memberships, positives), per-post sorted positives with running type counts, the first positive per (post, user), posts sorted by `(createdAt, id)` |
+| `eval/src/harness/post-features.ts` | new | `fastPostFeatures(post, asOf, followees, idx): PostFeatures`, and `referencePostFeatures` (calls `postFeaturesAsOf`) |
+| `eval/src/harness/run.ts` | new | `runConfig(config, opts): RunResult` and `rankUser(...)`: items, features, pool, scores, ranks, top-K lists |
+| `eval/src/harness/tuning.ts` | new | Grid runs on the validation split, the choice rule, `tuning.csv` rows |
+| `eval/src/harness/write.ts` | new | The CSV files of blueprint §2.7 and the run manifest; the 5 MB rule for `per_user.csv` |
+| `eval/src/metrics.ts` | new | `recallAt`, `ndcgAt`, `summarize`, `coverage` |
+| `eval/src/stats.ts` | new | `pairedBootstrap`, `randomizationTest`, `exactRandomizationTest`, `holm`, `writeCompare`, `h1Verdict`, `h0Gate` |
+| `eval/src/cli/harness.ts`, `eval/src/cli/rank.ts` | new | The two commands. Both call `checkNode()` |
+| `eval/config/runs/p5-baseline.json` | new | BL0–BL5, the three S datasets, validation split, production and published params |
+| `eval/config/frozen-v1.json`, `eval/src/frozen.ts`, `eval/src/frozen.test.ts` | changed | `cutTimes`, `poolLarge`, `baselineGrids`, and their §7 checks |
+| `eval/src/harness/fixtures/golden/` and `golden-expected/` | new | The tiny hand-made dataset and its expected CSV files |
+| `eval/src/stats-fixture.csv` | new | 14 paired values for the cross-check |
+| `eval/src/harness/*.test.ts`, `eval/src/metrics.test.ts`, `eval/src/stats.test.ts` | new | DW1–DW6 and DW10, the reference-mode test, the config guard |
+| `eval/package.json` | changed | Scripts `harness` and `rank` (with `--max-old-space-size=4096`) |
+| `.gitignore` | changed | `eval/results/` |
+| `.docs/results/p5-baseline/` | new | The baseline-table run (DW7) |
+| `stats_crosscheck.py`, `stats_reference.json`, `baseline-note.md`, `run_output.txt` (this folder) | new | The scipy reference with its versions, the note for the supervisor ★, the DW6 and DW9 output |
+| `CLAUDE.md` | changed | The `harness` and `rank` commands in the eval line |
+| `.docs/super-plan.md` | changed | §7 rows "Cut time T", "Larger pool", "Baseline grids"; P5 status; change log |
+| `.docs/implementation-plan.md` | changed | §2.7 (the 5 MB rule and `eval/results/`), §3.4 confirmed, task 6 ✅ |
 
 ### Data, schema and cache changes
+
+None in Postgres or Redis. New files go to `.docs/results/<runId>/` (committed) and `eval/results/<runId>/` (git-ignored, big `per_user.csv` only).
