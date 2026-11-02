@@ -1,0 +1,11 @@
+{
+  "datasets": ["syn-W0-S", "syn-W1-S", "syn-W2M-S"],
+  "split": "validation",
+  "methods": ["BL0", "BL1", "BL2", "BL3", "BL4", "BL5"],
+  "params": {
+    "BL4": { "divisor": 45000 },
+    "BL5": { "gravity": 1.8 }
+  },
+  "pool": "normal",
+  "mode": "fast"
+}

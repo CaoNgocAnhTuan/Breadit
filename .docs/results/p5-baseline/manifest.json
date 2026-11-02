@@ -1,0 +1,32 @@
+{
+  "files": {
+    "coverage.csv": {
+      "rows": 54,
+      "sha256": "7d43120a6c43375d6955c57fa60257fb767822eaa793ee496608c784a609afb2"
+    },
+    "leftout.csv": {
+      "rows": 18,
+      "sha256": "3359b94923f7b749c1acfc8a6b2e4b47cc663bdde884bcbc9b861b446b16d493"
+    },
+    "per_user.csv": {
+      "rows": 3240,
+      "sha256": "99eb9c901c0ed2457952f7c11db9457addf17f5577072058021605eb070f0a93"
+    },
+    "summary.csv": {
+      "rows": 324,
+      "sha256": "d7f71b4942539e0c4aba65cafdbf227c379aa070401a0de85af4e86f09d58248"
+    }
+  },
+  "masterSeed": 20261014,
+  "node": "v22.23.4",
+  "runId": "p5-baseline",
+  "schemaVersion": 1,
+  "source": {
+    "configSha256": "52fd042ed4fece23a280a7fc3872563735d3b02febba46466ba8effa41427cf5",
+    "datasets": {
+      "syn-W0-S": "949e5a4a8ffa210984dbafebde237f41fea709bdbcdea0df4e94b520dd155dce",
+      "syn-W1-S": "eed4873bd666673bc9be4e119ab2ec3e9dddbf1f46ffba04d667c4b3fd027b12",
+      "syn-W2M-S": "cc06e0804d652b827149ef04b7c6a9feb266298a616a5fa1b161ed1f899e823c"
+    }
+  }
+}

@@ -122,11 +122,11 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 9: Real runs (effort M)
 
-- [ ] **The baseline table (DW7).** Write `eval/config/runs/p5-baseline.json`: BL0–BL5 on `syn-W0-S`, `syn-W1-S` and `syn-W2M-S`, validation split, BL4 `divisor` 45000, BL5 `gravity` 1.8, normal pool. Run it into `.docs/results/p5-baseline/`.
-- [ ] **Double run (DW3).** Run it again into a folder outside the repo and compare every file.
-- [ ] **T on all nine datasets (DW6).** Compute T and count the validation items, with no ranking. Every T must equal `cutTimes`. Write the counts per bucket to `run_output.txt`.
-- [ ] **Size (DW9).** Run BL2 and H (`m` from §7, `alpha` 1, `beta` 1) on the validation split of `syn-W2M-M` and `digg2009`, into a folder outside the repo, with a config that is not committed. Write the run time and peak memory to `run_output.txt`. If `digg2009` takes more than 30 minutes, stop and report (design F4).
-- [ ] Commit: `chore: P5 baseline table and harness runs` (the config, `.docs/results/p5-baseline/`, `run_output.txt`)
+- [x] **The baseline table (DW7).** Write `eval/config/runs/p5-baseline.json`: BL0–BL5 on `syn-W0-S`, `syn-W1-S` and `syn-W2M-S`, validation split, BL4 `divisor` 45000, BL5 `gravity` 1.8, normal pool. Run it into `.docs/results/p5-baseline/`.
+- [x] **Double run (DW3).** Run it again into a folder outside the repo and compare every file.
+- [x] **T on all nine datasets (DW6).** Compute T and count the validation items, with no ranking. Every T must equal `cutTimes`. Write the counts per bucket to `run_output.txt`.
+- [x] **Size (DW9).** Run BL2 and H (`m` from §7, `alpha` 1, `beta` 1) on the validation split of `syn-W2M-M` and `digg2009`, into a folder outside the repo, with a config that is not committed. Write the run time and peak memory to `run_output.txt`. If `digg2009` takes more than 30 minutes, stop and report (design F4).
+- [x] Commit: `chore: P5 baseline table and harness runs` (the config, `.docs/results/p5-baseline/`, `run_output.txt`)
 
 ## Claude's part
 

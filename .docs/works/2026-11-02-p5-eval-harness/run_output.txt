@@ -1,0 +1,138 @@
+Task p5-eval-harness, Step 9: real runs
+Date: 2026-11-02. Node v22.23.4 (the version in .nvmrc). The test split was not run.
+
+1. Baseline table run (DW7)
+---------------------------
+Config: eval/config/runs/p5-baseline.json (BL0 to BL5, syn-W0-S, syn-W1-S, syn-W2M-S, validation split,
+BL4 divisor 45000, BL5 gravity 1.8, normal pool, mode fast).
+Command: npm run harness -w @breadit/eval -- p5-baseline
+Output:
+  syn-W0-S  T 21393508  validation  users 180  left out 0  per_user rows 1080
+  syn-W1-S  T 21393508  validation  users 180  left out 0  per_user rows 1080
+  syn-W2M-S  T 21393508  validation  users 180  left out 0  per_user rows 1080
+  manifest sha256 f76463b298299f6d37a28478a71045ea64fbcfd7eac0f18542ceef297fb61481
+
+Files in .docs/results/p5-baseline/ (SHA-256, the same in the manifest):
+7d43120a6c43375d6955c57fa60257fb767822eaa793ee496608c784a609afb2  coverage.csv
+3359b94923f7b749c1acfc8a6b2e4b47cc663bdde884bcbc9b861b446b16d493  leftout.csv
+f76463b298299f6d37a28478a71045ea64fbcfd7eac0f18542ceef297fb61481  manifest.json
+99eb9c901c0ed2457952f7c11db9457addf17f5577072058021605eb070f0a93  per_user.csv
+d7f71b4942539e0c4aba65cafdbf227c379aa070401a0de85af4e86f09d58248  summary.csv
+
+2. Double run (DW3)
+-------------------
+The same config was run again with --out into an empty folder outside the repo (the scratchpad).
+Command: npm run harness -w @breadit/eval -- p5-baseline --out <empty folder outside the repo>
+Check:   diff -r .docs/results/p5-baseline <that folder>
+Result:  no difference. All five files are byte-identical, manifest.json included. The SHA-256 of
+         manifest.json is the same in both runs (f76463b2...fb61481).
+
+3. T and validation items on all nine datasets (DW6)
+----------------------------------------------------
+Command: npm run harness -w @breadit/eval -- <config with the nine datasets, validation split> --record-t
+(The config is not committed. It lists the nine dataset ids, split "validation", method BL1.)
+--record-t computes T by the rule of blueprint 3.1 and counts the items. It ranks nothing and writes no result file.
+Every computed T equals "recorded", which is cutTimes of eval/config/frozen-v1.json (super-plan section 7).
+The columns of each table: bucket, users with a validation item, users left out of the pool.
+
+syn-W0-S  T 21393508  recorded 21393508  equal
+  validation items per bucket (users with an item, left out of the pool)
+  0           49        0
+  1-4         43        0
+  0-4         92        0
+  5-19        52        0
+  20+         36        0
+  all        180        0
+syn-W1-S  T 21393508  recorded 21393508  equal
+  validation items per bucket (users with an item, left out of the pool)
+  0           49        0
+  1-4         43        0
+  0-4         92        0
+  5-19        52        0
+  20+         36        0
+  all        180        0
+syn-W2M-S  T 21393508  recorded 21393508  equal
+  validation items per bucket (users with an item, left out of the pool)
+  0           49        0
+  1-4         43        0
+  0-4         92        0
+  5-19        52        0
+  20+         36        0
+  all        180        0
+syn-W0-M  T 21412417  recorded 21412417  equal
+  validation items per bucket (users with an item, left out of the pool)
+  0          265        0
+  1-4        252        0
+  0-4        517        0
+  5-19       220        0
+  20+        166        0
+  all        903        0
+syn-W1-M  T 21412417  recorded 21412417  equal
+  validation items per bucket (users with an item, left out of the pool)
+  0          265        0
+  1-4        252        0
+  0-4        517        0
+  5-19       220        0
+  20+        166        0
+  all        903        0
+syn-W2L-M  T 21412417  recorded 21412417  equal
+  validation items per bucket (users with an item, left out of the pool)
+  0          265        0
+  1-4        252        0
+  0-4        517        0
+  5-19       220        0
+  20+        166        0
+  all        903        0
+syn-W2M-M  T 21412417  recorded 21412417  equal
+  validation items per bucket (users with an item, left out of the pool)
+  0          265        0
+  1-4        252        0
+  0-4        517        0
+  5-19       220        0
+  20+        166        0
+  all        903        0
+syn-W2H-M  T 21412417  recorded 21412417  equal
+  validation items per bucket (users with an item, left out of the pool)
+  0          265        0
+  1-4        252        0
+  0-4        517        0
+  5-19       220        0
+  20+        166        0
+  all        903        0
+digg2009  T 1246068297  recorded 1246068297  equal
+  validation items per bucket (users with an item, left out of the pool)
+  0        36322      838
+  1-4      39336     1080
+  0-4      75658     1918
+  5-19     29627      759
+  20+      22369      426
+  all     127654     3103
+
+Time and memory of this counting run, all nine datasets in one process (Class R, not compared):
+9.51 real        10.27 user         0.66 sys
+1386463232  maximum resident set size
+
+The test-split counts are not made here. The unit test "item counts of the harness equal the bucket table of the P3 check"
+(eval/src/harness/run.test.ts) counts the test items of syn-W2M-S and syn-W2M-M, with no ranking, and compares the
+kept and left-out numbers per bucket with checks/buckets.ts. They are equal.
+
+4. Size runs (DW9)
+------------------
+Methods BL2 and H (m = the frozen value, alpha 1, beta 1, plain settings, not tuned). Validation split, normal pool.
+Config: not committed (one file per dataset in the scratchpad), run with --out into a folder outside the repo.
+Time and memory come from /usr/bin/time -l around "npm run harness". These are Class R numbers (repeatable, not identical).
+"maximum resident set size" is the peak memory of the node process, in bytes.
+
+syn-W2M-M
+  syn-W2M-M  T 21412417  validation  users 903  left out 0  per_user rows 1806
+  time: 1.00 real         1.08 user         0.05 sys
+  peak memory (max resident set size): 152879104 bytes
+
+digg2009
+  digg2009  T 1246068297  validation  users 127654  left out 3103  per_user rows 249102
+  time: 77.50 real        76.27 user         1.28 sys
+  peak memory (max resident set size): 1217560576 bytes
+
+Both finish. digg2009 takes about 78 seconds, far below the 30 minutes of design F4.
+The per_user.csv of the digg2009 size run is 11.4 MB for two methods (249,102 rows). With the default output folder it would
+go to eval/results/<runId>/ (git-ignored), and only its SHA-256 would stay in the committed manifest.
