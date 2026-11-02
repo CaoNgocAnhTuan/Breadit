@@ -43,14 +43,14 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapte
 
 #### Step 4: Transform (effort S)
 
-- [ ] Tests first (TC4), on hand-made rows:
+- [x] Tests first (TC4), on hand-made rows:
   - **Votes:** a repeated pair keeps its earliest vote; author and `created_at` come from the first vote, with a time tie going to the smaller voter id; the author's vote is not an interaction; `event_id` is 1-based in `(t, voter_id, story_id)` order; every interaction is a `like`.
   - **Links:** date 0 and self-links are dropped; a repeated pair keeps its earliest date; a `mutual` = 1 row adds no reverse link.
   - **Users:** voters plus ids in kept links; `joined_at` is the earliest first appearance (a vote, or a kept link on either side).
   - **Communities:** header-only tables.
   - **Counts:** the counts table holds every rule's dropped rows.
-- [ ] Write `toCanonical` in `eval/src/adapters/digg.ts` (design: Approach, the five rules).
-- [ ] Commit: `feat: eval Digg to canonical transform (P2 choices)`
+- [x] Write `toCanonical` in `eval/src/adapters/digg.ts` (design: Approach, the five rules).
+- [x] Commit: `feat: eval Digg to canonical transform (P2 choices)`
 
 #### Step 5: Adapter and command (effort S)
 

@@ -1,4 +1,7 @@
 import { readFileSync } from "node:fs";
+import type { Row } from "../canonical/csv.ts";
+import type { TableName } from "../canonical/schema.ts";
+import type { LinkRows, VoteRows } from "./digg-parse.ts";
 
 // The Digg 2009 source: two zips, their SHA-256, the password from the Digg page, and the choices of the
 // adapter (task p4-digg-adapter, Spec open questions 1, 2, 4 and 5). digg.test.ts keeps the zip table equal to
@@ -44,4 +47,150 @@ export function diggConfigUrl(): URL {
 
 export function loadDiggConfig(): DiggConfig {
   return JSON.parse(readFileSync(diggConfigUrl(), "utf8")) as DiggConfig;
+}
+
+// ---------------------------------------------------------------- the transform (design "Parse strictly, then transform")
+
+/** Rows read and rows dropped by each rule, in the order of the counts table (DW4). */
+export interface DiggCounts {
+  voteRows: number;
+  repeatedVotesDropped: number;
+  stories: number;
+  positives: number;
+  linkRows: number;
+  zeroDateLinksDropped: number;
+  selfLinksDropped: number;
+  mutualReversesAdded: number;
+  repeatedLinksDropped: number;
+  follows: number;
+  users: number;
+}
+
+export type CanonicalTables = Record<TableName, Row[]>;
+
+/**
+ * Digg rows to the six canonical tables with the P2 rules (blueprint section 3.7):
+ * a repeated (voter, story) pair keeps its earliest vote; a story's author and created_at come from its first vote
+ * (time ties to the smaller voter id); the author's vote is the post, not a like; every other vote is a like,
+ * numbered from 1 in (t, voter, story) order; links with date 0 and self-links are dropped; a link pair keeps its
+ * earliest date; users are the voters plus the ids in kept links, joined at their first appearance.
+ */
+export function toCanonical(
+  votes: VoteRows,
+  links: LinkRows,
+  choices: DiggChoices,
+): { tables: CanonicalTables; counts: DiggCounts } {
+  // ---- votes: sort by (t, voter, story), drop repeats, split the post from the likes
+  const order = new Uint32Array(votes.count);
+  for (let i = 0; i < order.length; i++) order[i] = i;
+  order.sort((a, b) => votes.t[a]! - votes.t[b]! || votes.voter[a]! - votes.voter[b]! || votes.story[a]! - votes.story[b]!);
+
+  const votersByStory = new Map<number, Set<number>>();
+  const authorOf = new Map<number, number>();
+  const posts: Row[] = [];
+  const interactions: Row[] = [];
+  const firstSeen = new Map<number, number>(); // user id -> joined_at
+  let repeated = 0;
+  let eventId = 0;
+  for (const i of order) {
+    const t = votes.t[i] as number;
+    const voter = votes.voter[i] as number;
+    const story = votes.story[i] as number;
+    let seen = votersByStory.get(story);
+    if (seen === undefined) {
+      seen = new Set();
+      votersByStory.set(story, seen);
+    }
+    if (seen.has(voter)) {
+      repeated++;
+      continue;
+    }
+    seen.add(voter);
+    if (!firstSeen.has(voter)) firstSeen.set(voter, t);
+    if (!authorOf.has(story)) {
+      authorOf.set(story, voter);
+      posts.push({ post_id: story, author_id: voter, community_id: null, created_at: t });
+    } else {
+      eventId++;
+      interactions.push({ event_id: eventId, user_id: voter, post_id: story, type: "like", created_at: t });
+    }
+  }
+
+  // ---- links: drop self-links and date 0, add reverses if asked, keep the earliest date of a pair
+  let zero = 0;
+  let self = 0;
+  const lu: number[] = [];
+  const lf: number[] = [];
+  const lt: number[] = [];
+  let reverses = 0;
+  for (let i = 0; i < links.count; i++) {
+    const user = links.user[i] as number;
+    const friend = links.friend[i] as number;
+    const t = links.t[i] as number;
+    if (user === friend) {
+      self++;
+      continue;
+    }
+    if (t === 0 && choices.dropZeroDateLinks) {
+      zero++;
+      continue;
+    }
+    lu.push(user);
+    lf.push(friend);
+    lt.push(t);
+    if (links.mutual[i] === 1 && choices.addMutualReverse) {
+      lu.push(friend);
+      lf.push(user);
+      lt.push(t);
+      reverses++;
+    }
+  }
+  const lorder = new Uint32Array(lu.length);
+  for (let i = 0; i < lorder.length; i++) lorder[i] = i;
+  lorder.sort((a, b) => lu[a]! - lu[b]! || lf[a]! - lf[b]! || lt[a]! - lt[b]!);
+
+  const follows: Row[] = [];
+  let repeatedLinks = 0;
+  let prevUser = -1;
+  let prevFriend = -1;
+  for (const i of lorder) {
+    const user = lu[i] as number;
+    const friend = lf[i] as number;
+    if (user === prevUser && friend === prevFriend) {
+      repeatedLinks++;
+      continue;
+    }
+    prevUser = user;
+    prevFriend = friend;
+    const t = lt[i] as number;
+    follows.push({ follower_id: user, followee_id: friend, created_at: t });
+    for (const id of [user, friend]) {
+      const cur = firstSeen.get(id);
+      if (cur === undefined || t < cur) firstSeen.set(id, t);
+    }
+  }
+
+  const users: Row[] = [...firstSeen.entries()].sort((a, b) => a[0] - b[0]).map(([id, joined]) => ({ user_id: id, joined_at: joined }));
+  const tables: CanonicalTables = {
+    users,
+    follows,
+    communities: [],
+    memberships: [],
+    posts,
+    interactions,
+  };
+  const counts: DiggCounts = {
+    voteRows: votes.count,
+    repeatedVotesDropped: repeated,
+    stories: posts.length,
+    positives: interactions.length,
+    linkRows: links.count,
+    zeroDateLinksDropped: zero,
+    selfLinksDropped: self,
+    mutualReversesAdded: reverses,
+    repeatedLinksDropped: repeatedLinks,
+    follows: follows.length,
+    users: users.length,
+  };
+  return { tables, counts };
 }
