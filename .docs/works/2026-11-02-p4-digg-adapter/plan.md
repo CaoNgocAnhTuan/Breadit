@@ -1,6 +1,6 @@
 # Plan: Digg 2009 adapter to the canonical format
 
-Status: approved · 2026-11-02
+Status: done · 2026-11-02
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p4-digg-adapter/`
 
 ---
