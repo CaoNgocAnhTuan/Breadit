@@ -18,7 +18,7 @@ test("every parameter is marked calibrated or chosen, and calibrated ones have a
 
 test("targets come from the config: four calibration keys", () => {
   const t = loadTargets(loadConfig());
-  assert.deepEqual(Object.keys(t).sort(), ["activitySkewTop20", "followeesMean", "votesPerUserMean", "votesPerUserMedian"]);
+  assert.deepEqual(Object.keys(t).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)), ["activitySkewTop20", "followeesMean", "votesPerUserMean", "votesPerUserMedian"]);
   assert.equal(t.votesPerUserMean, 21.65);
 });
 

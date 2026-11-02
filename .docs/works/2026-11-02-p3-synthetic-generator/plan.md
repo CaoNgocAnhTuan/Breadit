@@ -66,9 +66,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p3-synthetic-g
 
 #### Step 7: Generate a dataset (effort S)
 
-- [ ] Tests first (TC10, TC11): `datasetIds()` returns the eight ids of the design, in a fixed order. `generateDataset` run twice on `syn-W2M-S` into two fresh temporary folders gives byte-identical `manifest.json` files and CSV files (DW3). `syn-W1-S` and `syn-W2M-S` have identical `users.csv`, `follows.csv`, `communities.csv`, `memberships.csv` and `posts.csv` (shared streams). The generator deletes and rewrites the dataset folder and refuses a path outside the out dir (F10).
-- [ ] Write `eval/src/generator/generate.ts`.
-- [ ] Commit: `feat: eval generateDataset (eight synthetic datasets)`
+- [x] Tests first (TC10, TC11): `datasetIds()` returns the eight ids of the design, in a fixed order. `generateDataset` run twice on `syn-W2M-S` into two fresh temporary folders gives byte-identical `manifest.json` files and CSV files (DW3). `syn-W1-S` and `syn-W2M-S` have identical `users.csv`, `follows.csv`, `communities.csv`, `memberships.csv` and `posts.csv` (shared streams). The generator deletes and rewrites the dataset folder and refuses a path outside the out dir (F10).
+- [x] Write `eval/src/generator/generate.ts`.
+- [x] Commit: `feat: eval generateDataset (eight synthetic datasets)`
 
 #### Step 8: The two commands and the grep test (effort S)
 
