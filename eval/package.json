@@ -9,7 +9,9 @@
     "verify": "npm run typecheck && npm run test",
     "gen": "node src/cli/generate.ts",
     "adapt:digg": "node --max-old-space-size=4096 src/cli/adapt-digg.ts",
-    "check": "node --max-old-space-size=4096 src/cli/check.ts"
+    "check": "node --max-old-space-size=4096 src/cli/check.ts",
+    "harness": "node --max-old-space-size=4096 src/cli/harness.ts",
+    "rank": "node --max-old-space-size=4096 src/cli/rank.ts"
   },
   "dependencies": {
     "@breadit/ranking": "0.1.0"

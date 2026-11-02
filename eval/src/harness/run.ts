@@ -136,35 +136,43 @@ function resolveT(prep: Prepared, opts: DatasetRunOptions): number {
   return T;
 }
 
-export interface PreparedItem {
+/** The state of one user at one asOf: history, bucket and the pool. No item is needed (the `rank` command uses this). */
+export interface PreparedAt {
   user: number;
   userId: UserId;
-  ev: Event;
   asOf: AsOf;
   nHistory: number;
   bucket: string;
-  /** Posts of the user's positives before the item. */
+  /** Posts of the user's positives before asOf. */
   earlier: Set<PostId>;
   pool: Post[];
+}
+
+export interface PreparedItem extends PreparedAt {
+  ev: Event;
   inPool: boolean;
 }
 
-/** History, bucket and pool of one item (design "Approach": everything goes through the AsOf rule and buildPool). */
-export function prepareItem(prep: Prepared, ev: Event, setting: PoolSetting): PreparedItem {
+/** History, bucket and pool of a user at asOf (design "Approach": everything goes through the AsOf rule and buildPool). */
+export function prepareAt(prep: Prepared, user: number, asOf: AsOf, setting: PoolSetting): PreparedAt {
   const idx = prep.idx;
-  const user = ev.user;
   const userId = uid(user);
-  const asOf: AsOf = { t: ev.t, beforeEventId: ev.id };
   const earlier = new Set<PostId>();
   const nHistory = userEventCount(idx, user, asOf);
   for (let i = 0; i < nHistory; i++) earlier.add(idx.uPost[(idx.uStart[user] as number) + i] as number);
-  const info = idx.postInfo.get(ev.post);
-  if (info === undefined) throw new Error(`item of user ${user} is on post ${ev.post}, which is not in posts.csv`);
-  if (info.authorId === userId) throw new Error(`item of user ${user} is on their own post ${ev.post}`);
-  if (earlier.has(ev.post)) throw new Error(`item of user ${user} is on post ${ev.post}, which the user touched before`);
-  const candidates = prep.mode === "fast" ? windowCandidates(idx, ev.t, setting.windowSec) : idx.posts;
+  const candidates = prep.mode === "fast" ? windowCandidates(idx, asOf.t, setting.windowSec) : idx.posts;
   const pool = buildPool({ user: userId, asOf, candidates, blocked: NO_BLOCKED, earlierPositives: earlier }, setting);
-  return { user, userId, ev, asOf, nHistory, bucket: bucketOf(nHistory), earlier, pool, inPool: pool.some((p) => p.id === ev.post) };
+  return { user, userId, asOf, nHistory, bucket: bucketOf(nHistory), earlier, pool };
+}
+
+/** `prepareAt` at the item's time, plus the checks on the item (design F8). */
+export function prepareItem(prep: Prepared, ev: Event, setting: PoolSetting): PreparedItem {
+  const at = prepareAt(prep, ev.user, { t: ev.t, beforeEventId: ev.id }, setting);
+  const info = prep.idx.postInfo.get(ev.post);
+  if (info === undefined) throw new Error(`item of user ${ev.user} is on post ${ev.post}, which is not in posts.csv`);
+  if (info.authorId === at.userId) throw new Error(`item of user ${ev.user} is on their own post ${ev.post}`);
+  if (at.earlier.has(ev.post)) throw new Error(`item of user ${ev.user} is on post ${ev.post}, which the user touched before`);
+  return { ...at, ev, inPool: at.pool.some((p) => p.id === ev.post) };
 }
 
 export interface ScoredItem {
@@ -174,7 +182,7 @@ export interface ScoredItem {
 }
 
 /** Scores the pool of one item with each variant and ranks it with `rankPool` of the package. */
-export function scoreItem(prep: Prepared, pi: PreparedItem, variants: readonly Variant[]): ScoredItem {
+export function scoreItem(prep: Prepared, pi: PreparedAt, variants: readonly Variant[]): ScoredItem {
   const idx = prep.idx;
   let uf: UserFeatures;
   const feats = new Map<PostId, PostFeatures>();
@@ -261,6 +269,8 @@ export interface RunConfigOptions {
   dataDir?: string;
   /** Dataset id to its recorded T (default: cutTimes of frozen-v1.json). */
   cutTimes?: Record<string, number>;
+  /** The variants to run for each dataset, from the tuning. A config with a "grid" param needs them. */
+  variants?: Record<string, Variant[]>;
 }
 
 export function defaultDataDir(): string {
@@ -269,11 +279,11 @@ export function defaultDataDir(): string {
 
 /**
  * Runs a config: the guards first (split, methods, params, a recorded T for every dataset), then each dataset in turn.
- * A config with a "grid" param goes through the tuning instead.
+ * A config with a "grid" param needs `o.variants`, the variants chosen by the tuning (`tuneConfig`).
  */
 export function runConfig(cfg: RunConfig, o: RunConfigOptions = {}): RunResult {
   validateConfig(cfg);
-  const variants = fixedVariants(cfg);
+  const common = o.variants === undefined ? fixedVariants(cfg) : undefined;
   const cutTimes = o.cutTimes ?? loadFrozen().cutTimes;
   for (const id of cfg.datasets) {
     if (cutTimes[id] === undefined) {
@@ -287,7 +297,15 @@ export function runConfig(cfg: RunConfig, o: RunConfigOptions = {}): RunResult {
     const dir = join(dataDir, id);
     inputs[id] = sha256Hex(readFileSync(join(dir, "manifest.json")));
     const data = loadDataset(dir);
+    const variants = o.variants === undefined ? (common as Variant[]) : o.variants[id];
+    if (variants === undefined) throw new Error(`no variants were given for dataset ${id}`);
     datasets.push(runDataset(id, data, { split: cfg.split, variants, pool: cfg.pool, mode: cfg.mode }, { expectedT: cutTimes[id] as number }));
   }
   return { datasets, inputs };
+}
+
+/** The whole pool of a user at asOf in rank order, for one variant. Same code path as the harness (the `rank` command). */
+export function rankAt(prep: Prepared, user: number, asOf: AsOf, variant: Variant, pool: PoolName): PostId[] {
+  const at = prepareAt(prep, user, asOf, poolSetting(pool));
+  return scoreItem(prep, at, [variant]).ranked.get(variant.label) as PostId[];
 }

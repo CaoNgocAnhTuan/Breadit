@@ -67,4 +67,6 @@ refs-manual/
 
 # eval workspace: generated datasets and local modules
 eval/data/
+# eval results too big for git (a per_user.csv over 5 MB); the committed manifest keeps its SHA-256
+eval/results/
 eval/node_modules/

@@ -116,9 +116,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 8: Commands (effort S)
 
-- [ ] Tests first (TC8, DW10): for 5 (dataset, method, user, `asOf`) cases on `syn-W2M-S`, `rank` prints the order behind the user's `per_user` rank. The item's position in the printed list equals its rank.
-- [ ] Write `eval/src/cli/harness.ts` and `eval/src/cli/rank.ts`. Add the `harness` and `rank` scripts to `eval/package.json` with `--max-old-space-size=4096`. Add `eval/results/` to `.gitignore`.
-- [ ] Commit: `feat: eval harness and rank commands`
+- [x] Tests first (TC8, DW10): for 5 (dataset, method, user, `asOf`) cases on `syn-W2M-S`, `rank` prints the order behind the user's `per_user` rank. The item's position in the printed list equals its rank.
+- [x] Write `eval/src/cli/harness.ts` and `eval/src/cli/rank.ts`. Add the `harness` and `rank` scripts to `eval/package.json` with `--max-old-space-size=4096`. Add `eval/results/` to `.gitignore`.
+- [x] Commit: `feat: eval harness and rank commands`
 
 #### Step 9: Real runs (effort M)
 
