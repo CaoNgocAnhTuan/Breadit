@@ -80,12 +80,12 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-02-p5-eval-harnes
 
 #### Step 5: Indexes and post features (effort S)
 
-- [ ] Tests first (TC9): on random fixtures and on `syn-W2M-S`, for random (user, post, `asOf`):
+- [x] Tests first (TC9): on random fixtures and on `syn-W2M-S`, for random (user, post, `asOf`):
   - the counts of `fastPostFeatures` equal those of `postFeaturesAsOf`;
   - its `engagedBy` equals `postFeaturesAsOf(...).engagedBy` ∩ the user's followees;
   - every scorer gives the same `scoreFixed` with either one.
-- [ ] Write `eval/src/harness/index-data.ts` and `eval/src/harness/post-features.ts` (design: Approach "One fast path").
-- [ ] Commit: `feat: eval harness indexes and fast post features`
+- [x] Write `eval/src/harness/index-data.ts` and `eval/src/harness/post-features.ts` (design: Approach "One fast path").
+- [x] Commit: `feat: eval harness indexes and fast post features`
 
 #### Step 6: The run, the golden dataset and the leakage test (effort M)
 
