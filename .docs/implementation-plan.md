@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.1 · 2026-11-02 · Status: approved 2026-10-28
+Version 1.2 · 2026-11-02 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -10,7 +10,7 @@ How the pieces of P3 to P10 fit together in the code. A thing is here only if tw
 | Module | Owner task | May import | What it holds |
 |---|---|---|---|
 | `packages/ranking` (`@breadit/ranking`) | `p5-ranking-package` | the Node standard library only | Types, `buildPool`, as-of feature functions, every scorer, `rankPool`, and `computeExploreScoreFixed` moved from `posts.service.ts`. Pure: no Nest, Prisma, Redis, clock or randomness. Builds to `dist/` with `tsc`, like `@breadit/shared` |
-| `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `config/` |
+| `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it ✅ (2026-11-02; `rng.ts`, `canonical/`, `generator/`, `checks/`, `config/`; `adapters/digg.ts` added by `p4-digg-adapter` ✅; loader, harness, metrics, stats and report still to come) | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `config/` |
 | Backend feed module `apps/backend/src/feed/` | `p6-social-feed` | `@breadit/ranking`, `PrismaService`, `BlockService` | A thin service that loads data and calls `buildPool` and a scorer. `PostsService.findAll` calls it when `algo` is set. Explore imports `computeExploreScoreFixed` from `@breadit/ranking` (done in `p5-ranking-package`) |
 | Frontend toggle | `p6-social-feed` | the API only | `algo` in `app/(board)/page.tsx`, `Feed.tsx`, `InfiniteFeed.tsx` |
 
@@ -182,11 +182,13 @@ In `syn-W0-M`, the bootstrap confidence interval of H − BL2 (NDCG@10, all user
 
 The same rule. P3 must print the same bucket table for `syn-W2M-M`. Proposal for the P3 spec, not a frozen value: at least 100 kept test users in bucket 0–4 at size M. Below that, P3 changes a parameter that is "chosen" (not calibrated) before any ranking run.
 
+**Done (task 3, 2026-11-02).** `syn-W2M-M` at `q` = 0.8: 590 test users, 174 kept in bucket 0–4, 59 of them in bucket 0 (`.docs/works/2026-11-02-p3-synthetic-generator/check_output.txt`).
+
 ### 3.7 Digg numbers
 
 Counted on 2026-10-28 by `check_cut_time.py` on the two Digg zips (SHA-256 as in `.docs/datasets.md` §4). Full output: `.docs/works/2026-10-28-p2-implementation-blueprint/cut_time_output.txt`. Two runs gave the same output hash. Window and pool cap were passed from §7, row "Window W / pool cap N_max".
 
-What the check did with the Digg data: 3,018,197 vote rows, of which 7,299 repeat a (voter, story) pair and are dropped; 3,553 stories; 3,007,345 positives (the first vote of each story is the author's post). Of 1,731,658 links, 1,670 have date 0 and 5 are self-links; both kinds are dropped. A repeated row keeps its earliest vote. A story's `created_at` is the time of its first vote. A follow counts at `t_u` when its date is before `t_u`. Votes are `like`. Events are numbered by `(t, voter_id, story_id)`. P4 decides these choices for real.
+What the check did with the Digg data: 3,018,197 vote rows, of which 7,299 repeat a (voter, story) pair and are dropped; 3,553 stories; 3,007,345 positives (the first vote of each story is the author's post). Of 1,731,658 links, 1,670 have date 0 and 5 are self-links; both kinds are dropped. A repeated row keeps its earliest vote. A story's `created_at` is the time of its first vote. A follow counts at `t_u` when its date is before `t_u`. Votes are `like`. Events are numbered by `(t, voter_id, story_id)`. **Task 4 kept these choices (2026-11-02).** Its TypeScript bucket table on `digg2009` gives every number below exactly (`.docs/works/2026-11-02-p4-digg-adapter/check_output.txt`).
 
 **q = 0.8.** `n` = 3,007,345 positives. T = 2009-06-27T02:04:57Z (unix 1246068297). Users with a test item: 68,120. Pool at T: 823 stories; median pool over kept test users: 783.
 
@@ -236,25 +238,25 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 
 ## 5. Task list
 
-Today is 2026-10-28. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
+Written on 2026-10-28; the Status column was last updated on 2026-11-02. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
 
-| # | Task | Phase | Depends on | Scope (short) | Days | Ends | Bugs placed here |
-|---|---|---|---|---|---|---|---|
-| 1 | `p2-implementation-blueprint` | P2 | P1 | this task | 2 | 10-29 | — |
-| 2 | `p0-baseline-freeze` | P0 | — | `.nvmrc`, `engines`, image digests, clean clone check | 0.5 | 10-30 | — |
-| 3 | `p3-synthetic-generator` | P3 | 1, 2, D1 | `eval/` workspace, `rng.ts`, canonical writer, config, worlds, bucket table (section 3) | 2.5 | 11-01 | — |
-| 4 | `p4-digg-adapter` † | P4 | 3 (canonical writer) | adapter, the real Digg choices, the same bucket table | 2 | 11-03 | — |
-| 5 | `p5-ranking-package` | P5 | 1 | `packages/ranking`, move `computeExploreScoreFixed`, backend imports it, Dockerfile build order | 3 | 11-06 | T4 (score takes `asOf`) |
-| 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
-| 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
-| 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
-| 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
-| 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
-| 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
-| 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
-| 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
+| Status | # | Task | Phase | Depends on | Scope (short) | Days | Ends | Bugs placed here |
+|---|---|---|---|---|---|---|---|---|
+| ✅ 10-28 | 1 | `p2-implementation-blueprint` | P2 | P1 | this task | 2 | 10-29 | — |
+| ✅ 10-28 | 2 | `p0-baseline-freeze` | P0 | — | `.nvmrc`, `engines`, image digests, clean clone check | 0.5 | 10-30 | — |
+| ✅ 11-02 | 3 | `p3-synthetic-generator` | P3 | 1, 2, D1 | `eval/` workspace, `rng.ts`, canonical writer, config, worlds, bucket table (section 3) | 2.5 | 11-01 | — |
+| ✅ 11-02 | 4 | `p4-digg-adapter` † | P4 | 3 (canonical writer) | adapter, the real Digg choices, the same bucket table | 2 | 11-03 | — |
+| ▶ next | 5 | `p5-ranking-package` | P5 | 1 | `packages/ranking`, move `computeExploreScoreFixed`, backend imports it, Dockerfile build order | 3 | 11-06 | T4 (score takes `asOf`) |
+| ⬜ | 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
+| ⬜ | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
+| ⬜ | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
+| ⬜ | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
+| ⬜ | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
+| ⬜ | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
+| ⬜ | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
+| ⬜ | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
 
-Spare days: 11-19 and 11-20. P0 is not done yet (no `.nvmrc`, Docker images pinned by tag), so it is task 2 and runs right after this task, before P3 writes the first manifest. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
+Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
 
 **Cut triggers.** Order of super-plan §8, each tied to a date.
 
@@ -271,11 +273,12 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 
 ## 6. Assumptions and open points
 
-- **D1.** A community post needs membership (author's decision, 2026-10-28). The generator follows it. The product rule in the backend is in task 8.
+- **D1.** A community post needs membership (author's decision, 2026-10-28). The generator follows it (task 3, done). The product rule in the backend is in task 8.
 - **Supervisor.** No answer yet to the P1 note. Rows that depend on the answer are marked †: task 4, H1 test 2, the Digg rows of E1 to E6. If the answer changes the data choice, only these rows change, and a line is added to the change log.
-- **P4 choices.** The Digg check in section 3 uses the simple choices listed there. Task 4 decides them for real, reruns the bucket table, and states any change. The reading of H1 in section 3 is for the author to confirm.
+- **P4 choices.** Decided in task 4 (2026-11-02): the simple choices of section 3.7 were kept, and the rerun bucket table equals section 3.7 in every number. The reading of H1 in section 3.4 is still for the author to confirm.
 
 ## Change log
 
 - 1.0 · 2026-10-28 · Task `p2-implementation-blueprint`. First version.
 - 1.1 · 2026-11-02 · Status line: approved 2026-10-28 (it still said draft). Task 8 scope: the default `algo` from an env variable. Task 11 scope: set the default `algo` by the P7 rule (super-plan 0.15). No day budget or date changed.
+- 1.2 · 2026-11-02 · Status marks after tasks 3 and 4: a Status column in the §5 task list (tasks 1–4 ✅, task 5 next), the module map row of `eval/`, the done notes in §3.6 and §3.7, the stale P0 sentence in §5, and §6 (D1 followed by the generator; the P4 choices decided). No contract, rule, day budget or date changed.

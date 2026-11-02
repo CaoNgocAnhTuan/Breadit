@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.17 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.18 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -69,8 +69,8 @@ These facts were checked in the code on 2026-10-22, after the bug sweep (Bugs Re
 - `Thesis_Orientation.md` (step 1 of Hướng A) says: with no real users, simulate the interactions with a Pareto distribution (20% of users make 80% of the actions). The generator in P3 does exactly that, so the data choice follows the Orientation.
 
 **Tooling**
-- The root `workspaces` list is `apps/*` and `packages/*`. A new top-level `eval/` folder is not a workspace until it is added there. The backend does not depend on any workspace package yet.
-- Node is v22.14.0 on the author's Mac and `node:20-alpine` in Docker. There is no `.nvmrc`.
+- The root `workspaces` list is `apps/*` and `packages/*`. A new top-level `eval/` folder is not a workspace until it is added there. The backend does not depend on any workspace package yet. *(Done 2026-11-02: `eval` was added to the workspaces in P3.)*
+- Node is v22.14.0 on the author's Mac and `node:20-alpine` in Docker. There is no `.nvmrc`. *(Fixed 2026-10-28 in P0: Node v22.23.4 is pinned in `.nvmrc` and in both Dockerfiles.)*
 - `docs/planning/k6_results.json` did not come from the current k6 script. Its 71% failed requests match the old limit of 120 requests per minute, which was raised to 1000 in commit `6f7b884` (`app.module.ts:28`). The limit is counted per route per IP (N6). The file does not store status codes, so this is the likely cause, not a proven one. Pre-thesis chapter 5 reports under 1% errors, which contradicts that file.
 
 ---
@@ -79,7 +79,7 @@ These facts were checked in the code on 2026-10-22, after the bug sweep (Bugs Re
 
 The phases are in dependency order. Each phase becomes one or more tasks (column "Tasks", started with `/task` or `/bugfix`). A phase is done when its "Done when" passes. ★ marks a supervisor checkpoint: send the result and wait for the answer before the next phase depends on it.
 
-**Status marks.** ✅ done (its "Done when" passes). 🟡 every output is written, but the "Done when" waits for someone else. ⬜ not started. "Late" means the planned end date in `.docs/implementation-plan.md` §5 has passed. A ✅ next to a task name means that task folder is closed. Last updated: 2026-11-02.
+**Status marks.** ✅ done (its "Done when" passes). 🟡 every output is written, but the "Done when" waits for someone else. ⬜ not started. ▶ next to start. "Late" means the planned end date in `.docs/implementation-plan.md` §5 has passed. A ✅ next to a task name means that task folder is closed. Last updated: 2026-11-02.
 
 | Status | Phase | Output | Done when | Tasks |
 |---|---|---|---|---|
@@ -88,7 +88,7 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 10-28 | P2 Implementation blueprint | `implementation-plan.md` | The author approves it, and it names every later task | `p2-implementation-blueprint` ✅ |
 | ⬜ late, 1 of 2 tasks done | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator` ✅, `p3-postgres-loader` |
 | ✅ 11-02 | P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` ✅ |
-| ⬜ | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package`, `p5-eval-harness` |
+| ▶ next | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package`, `p5-eval-harness` |
 | ⬜ | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
 | ⬜ | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark` |
 | ⬜ | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
@@ -430,10 +430,10 @@ The thesis results do not need the schema migration: generated data has no dupli
 
 1. **What happens on 2026-11-20.** The written submission or the defense? It decides when P10 must be done.
 2. **The university's thesis rules.** Format, length and required chapters. Check the chapter map in P9 against them.
-3. **D1.** Can a non-member post into a community (Bugs Report §4)? Decide before P3. The recommendation is to require membership.
+3. ✅ **D1.** Can a non-member post into a community (Bugs Report §4)? Decided on 2026-10-28: no, a community post needs membership. The generator follows it (P3); the backend rule is in task `p6-social-feed`.
 4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval.
 5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `Latex/` and `docs/` needs the author's request.
-6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. Set in P2: `.docs/implementation-plan.md` §3.1 and §3.2, checked on Digg in its §3.7; the P3 check is in its §3.6. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family. Set in P2: `.docs/implementation-plan.md` §3.3 (families F1 and F2 per dataset).
+6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). Status 2026-11-02: (a) ✅ set in P2 and checked in P3 and P4; (b) still open, for P5; (c) ✅ set in P2. The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. Set in P2: `.docs/implementation-plan.md` §3.1 and §3.2, checked on Digg in its §3.7; the P3 check is in its §3.6. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family. Set in P2: `.docs/implementation-plan.md` §3.3 (families F1 and F2 per dataset).
 7. **Default feed rule** (P7). Does the supervisor agree that "For You" switches to `social` only when H1 passes on both co-primary tests and the H0 gate passes? Ask with the P7 results.
 
 ---
@@ -457,3 +457,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.15 · 2026-11-02 · The default feed rule, so the thesis answers the Orientation's Gap 1. P6: the default `algo` comes from an env variable. P7: a "Default feed rule" paragraph (`social` becomes the default only if H1 passes on both co-primary tests and the H0 gate passes). P8: applies the rule. §11: item 7, the rule waits for the supervisor. `.docs/implementation-plan.md` 1.1: rows 8 and 11 name these parts, and its status line says approved. §5, §6 and §7 are byte-identical; no frozen value changed.
 - 0.16 · 2026-11-02 · Task `p3-synthetic-generator`: §7 row "Synthetic world parameters" names the frozen `eval/config/synthetic-v1.json` and its SHA-256 (the plan approval froze it; there is no `/freeze` command). P3 status paragraph. §4: the task gets ✅, P3 shows 1 of 2 tasks done. The other §7 values are unchanged; §5 and §6 are byte-identical.
 - 0.17 · 2026-11-02 · Task `p4-digg-adapter`: P4 text, the follow rule now matches the blueprint `AsOf` contract (a link counts when dated before the item's test time, not "at or before T"), and the undated links are dropped (decided). P4 status paragraph. §4: P4 ✅. No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.18 · 2026-11-02 · Status marks only: §3 "Tooling" notes the two facts fixed since (the `eval` workspace in P3, the Node pin in P0); §11 item 3 (D1) ✅ decided; §11 item 6 gets a status line ((a) and (c) done, (b) open for P5); §4: ▶ marks P5 as next. `.docs/implementation-plan.md` 1.2 marks tasks 1–4 done. No frozen value changed; §5, §6 and §7 are byte-identical.
