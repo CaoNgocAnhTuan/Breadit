@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.4 · 2026-11-02 · Status: approved 2026-10-28
+Version 1.5 · 2026-11-10 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -178,7 +178,7 @@ Two families per dataset, each corrected with Holm on its own. The two co-primar
 | F2, secondary | H − each of BL0, BL1, BL2t, BL3, BL4, BL5, BL6, for each K and each group 0–4, 5–19, ≥20, all | 84 |
 
 - Only `syn-W2M-M` and `digg2009` get F1 and F2.
-- Everything else gets bootstrap confidence intervals and no p-value. That covers W0, W1, W2L, W2H, the ablations, E6, E8 and the density bins.
+- Everything else gets bootstrap confidence intervals and no p-value. That covers W0, W1, W2L, W2H, the ablations, E6, E8, the density bins and the optional Hive side check (task 9b).
 - Holm stays valid when tests overlap, and bucket 0–4 contains 0 and 1–4. So the overlap does not break it.
 - Holm level and confidence level: §7, row "Confidence level / Holm level".
 
@@ -249,6 +249,7 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 | E6 † | RQ1 | do ties matter? | `syn-W2M-M`, `digg2009` | all | `summary.csv` with reversed tie-break | table | 5 |
 | E7 | — | what does the new feed cost? (Class R) | live app with `syn-W2M-M` loaded | `chrono`, `engagement`, `social` | `latency.csv`, query count | table | 5 |
 | E8 | RQ1 | does pool size matter? | `syn-W2M-M` | H, BL2, the baseline with the best validation NDCG@10; K as in the E8 row of super-plan P7 | `summary.csv` with the larger pool of §7 | table | 5 |
+| Hive side check (optional) | RQ1, side evidence (no H) | does the community term help on real data? | a Hive slice from SoChainDB, only if task 9b passes its gate (id set by that task) | H-comm, BL2 | `summary.csv`, `compare.csv` (no family) | table | 6 |
 
 `leftout.csv` and `tuning.csv` come with every run. They feed Chapter 3 (protocol) and the appendix.
 
@@ -267,12 +268,15 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-02. ✅ mea
 | ▶ next | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
 | ⬜ | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
 | ⬜ | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
+| ⬜ optional | 9b | `p7-hive-check` | P7 | 9, closed on 11-13 | gate: BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (section 3.2); then a Hive adapter and H-comm against BL2 (super-plan P7) | 0.5 for the gate | 11-14 | — |
 | ⬜ | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
 | ⬜ | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
 | ⬜ | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
 | ⬜ | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
 
 Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
+
+**Task 9b is optional** (added 2026-11-10). Its gate runs right after task 9, only if task 9 closes on 11-13, and takes at most half a day. Tasks 10 to 13 then move half a day later, into the spare day 11-19. The whole Hive work was estimated at 2–3 days, more than the spare days left. So if the gate passes, the author decides then whether to run the rest or to put Hive in future work.
 
 **Cut triggers.** Order of super-plan §8, each tied to a date.
 
@@ -284,6 +288,7 @@ Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the 
 | 4, E7 smaller | the `engagement` row in task 10 | task 10 not started on 11-14 |
 | 5, toggle | the frontend part of task 8 | task 8 not started on 11-10 |
 | 6, Digg | task 4 and H1 test 2 | only if task 4 fails its gate |
+| Hive (not in the §8 order) | task 9b | task 9 not closed on 11-13, or the task 9b gate fails |
 
 The supervisor checkpoints (★) are sends, not stops. The next task starts, and an answer that changes the plan comes back as a change to this file.
 
@@ -292,6 +297,7 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - **D1.** A community post needs membership (author's decision, 2026-10-28). The generator follows it (task 3, done). The product rule in the backend is in task 8.
 - **Supervisor.** No answer yet to the P1 note. Rows that depend on the answer are marked †: task 4, H1 test 2, the Digg rows of E1 to E6. If the answer changes the data choice, only these rows change, and a line is added to the change log.
 - **P4 choices.** Decided in task 4 (2026-11-02): the simple choices of section 3.7 were kept, and the rerun bucket table equals section 3.7 in every number. The reading of H1 in section 3.4 is still for the author to confirm.
+- **Hive (task 9b).** BigQuery needs a Google Cloud account with billing (super-plan §11, item 8). If the gate passes, decision Q2 of 2026-10-26 changes and the supervisor is told.
 
 ## Change log
 
@@ -300,3 +306,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.2 · 2026-11-02 · Status marks after tasks 3 and 4: a Status column in the §5 task list (tasks 1–4 ✅, task 5 next), the module map row of `eval/`, the done notes in §3.6 and §3.7, the stale P0 sentence in §5, and §6 (D1 followed by the generator; the P4 choices decided). No contract, rule, day budget or date changed.
 - 1.3 · 2026-11-02 · Task `p5-ranking-package`: §2.6 gets the feature-builder signatures (`userFeaturesAsOf`, `postFeaturesAsOf`, `visibleAt`, `ageHours`), the params per method, and the BL5 form. §1 and §5: task 5 ✅, task 6 next. The other signatures of §2.6 are unchanged.
 - 1.4 · 2026-11-02 · Task `p5-eval-harness`: §2.7 the 5 MB rule for `per_user.csv` and the NDCG basis of `compare.csv`; §3.4 confirmed by the author; §1 and §5: task 6 ✅, task 7 next.
+- 1.5 · 2026-11-10 · Optional task 9b `p7-hive-check` (super-plan 0.22): its row and a note in §5, a cut-trigger row, a row in the §4 measurement plan, the §3.3 list of runs with no family, and a §6 bullet. No contract, rule or other task changed. Dates move only if the gate runs (tasks 10 to 13 by half a day).

@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.21 · 2026-11-02 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.22 · 2026-11-10 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -90,7 +90,7 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 11-02 | P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` ✅ |
 | ✅ 11-02 (★ note ready to send) | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package` ✅, `p5-eval-harness` ✅ |
 | ⬜ | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
-| ⬜ | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark` |
+| ⬜ | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark`, `p7-hive-check` (optional, gated) |
 | ⬜ | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
 | ⬜ | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
 | ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-defense-package` |
@@ -229,6 +229,13 @@ E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, d
 
 **Default feed rule.** The thesis starts from the Orientation's Gap 1: "For You" is not personalized. After P7, the default "For You" becomes `social` if H1 passes on both co-primary tests and the H0 gate passes. Otherwise the default stays as today, and Chapter 6 says why. P8 applies the result. The supervisor confirms this rule with the P7 results (§11, item 7).
 
+**Hive side check (optional, gated, added 2026-11-10).** Digg has no communities, so the community term and its prior for cold users are tested only on synthetic data. Hive is the only real candidate found that has the three things this needs: posts tagged with a community, votes with a time, and memberships with a join date (checked on the public API). SoChainDB publishes Hive data from 2020-03-27 to 2022-07-04 on BigQuery under CC BY-SA 4.0 (https://github.com/SOCHAINDB/hive-db). The other candidates fail: the Flickr photo file has no group column, and we found no membership list for Reddit votes or Farcaster. Meetup was not checked, because Kaggle returned 403.
+
+- **Role.** Side evidence only. It is not in family F1, and it does not change H1, the H0 gate or the default feed rule. A bad result is reported too.
+- **Method.** H-comm against BL2 only. So real data still does not test the follow and community terms together.
+- **Gate.** At most half a day, and only if `p7-offline-experiments` closes on time (11-13). It passes only if BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (the threshold of `.docs/implementation-plan.md` §3.2). If it fails, stop: Hive goes to future work, with what was checked.
+- **If the gate passes.** This changes decision Q2 of 2026-10-26 (`.docs/datasets.md` §7: the community term on synthetic data only). Add a line to the change log here and tell the supervisor (§11, item 8).
+
 ### P8: Repro package and freeze
 
 **Do.** Set the default `algo` by the default feed rule (P7). Add `npm run thesis:repro`. It needs `npm ci` and Docker db and redis. It generates the datasets, runs the Digg adapter (P4, unless the cut order of §8 dropped it), runs all experiments, writes the tables and macros, and compares every hash with `.docs/results/manifest.json`. It fails on any difference. Tag the result `v2-thesis-experiments` (the author approves the tag).
@@ -349,7 +356,8 @@ One source of truth. A change needs a new config version and a line in the chang
 - **No public dataset.** This is now a fallback risk. It applies only if the Digg conversion fails (the gate in P4). Then all results are synthetic. Say so plainly in chapters 3 and 6, and lean on W0 and W1 to show the result is not built in.
 - **Digg is small and special.** It has 3,553 stories in one month, and only stories that reached the front page, so every story is already popular and a popularity baseline may look strong. Only about 59% of the voters are in the friend table. The zips come from the Internet Archive copy of 2013-08-26 and have a password that the page gives. The terms say "research purposes only" and ask to cite Hogg and Lerman (2012) [50]. The license question goes to the supervisor note. State all of these as limits.
 - **Leakage.** Defense: as-of features and the mutation test in P5.
-- **Weak community evidence.** No public dataset I found has a follow graph, item interactions and explicit community membership together. State it as a limitation.
+- **Weak community evidence.** No public dataset I found has a follow graph, item interactions and explicit community membership together. State it as a limitation. Hive has dated votes and memberships, and is only an optional side check (P7).
+- **Hive side check (only if it runs, P7).** What we know comes from about 100 minutes of blocks in October 2026, so it says nothing sure about 2020–2022. Data access: crawling the public API is too slow (1,000 blocks are 14–70 MB, 4 of 6 requests timed out after 90 seconds, and a month is about 12–60 GB), so only BigQuery is left. It needs a Google Cloud account with billing and was not tried. Bot votes: Hive pays tokens for votes, and 27.4% of the sampled votes came in the first 5 minutes after the post (15 posts, 2,267 votes); this is a sign, not a proof. Cold users: the sample showed only 2 subscribes, so there may be too few cold users with a membership; the gate checks this. Exposure bias: users see more posts from communities they joined, so they vote on them more, and the gain can look larger than it is.
 
 **Cut order.** The deadline is 2026-11-20. If time runs short, drop in this order:
 1. The timestamp shuffle in E5.
@@ -360,6 +368,8 @@ One source of truth. A change needs a new config version and a line in the chang
 6. P4, the Digg adapter, only as a last resort. It is co-primary evidence for RQ1, so it is no longer the first cut. Cut it only if the conversion fails at its gate.
 
 Never cut: the W0 null world (H0), the leakage and double-run tests, the repro command, and the supervisor checkpoints.
+
+The Hive side check (P7) is not in this order. It is optional, and its gate already drops it when the plan is late.
 
 ---
 
@@ -439,6 +449,7 @@ The thesis results do not need the schema migration: generated data has no dupli
 5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `Latex/` and `docs/` needs the author's request.
 6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). Status 2026-11-02: (a) ✅ set in P2 and checked in P3 and P4; (b) still open, for P5; (c) ✅ set in P2. The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. Set in P2: `.docs/implementation-plan.md` §3.1 and §3.2, checked on Digg in its §3.7; the P3 check is in its §3.6. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family. Set in P2: `.docs/implementation-plan.md` §3.3 (families F1 and F2 per dataset).
 7. **Default feed rule** (P7). Does the supervisor agree that "For You" switches to `social` only when H1 passes on both co-primary tests and the H0 gate passes? Ask with the P7 results.
+8. **Hive side check** (P7). BigQuery needs a Google Cloud account with billing: the author decides before 11-13 whether to open one. If the gate passes, tell the supervisor that the community term gets real side evidence (decision Q2 changes).
 
 ---
 
@@ -465,3 +476,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.19 · 2026-11-02 · Task `p5-ranking-package`: P5 status paragraph (part 1 done), §4 row (1 of 2 tasks). No frozen value changed: BL5 keeps the frozen score unit through its log form (task 5 Open question 1); §5, §6 and §7 are byte-identical.
 - 0.20 · 2026-11-02 · Task `p5-eval-harness`, Step 0: §7 rows "Cut time T" (the nine values from the rule with `q` = 0.8), "Larger pool (W_L, N_L) for E8" (14 days / 4,000) and "Baseline grids" (five values each, with the published value) are set and frozen, as the author decided in the task's Spec (Open questions 1–3). No other frozen value changed; §5 and §6 are byte-identical.
 - 0.21 · 2026-11-02 · Task `p5-eval-harness`: P5 status paragraph (P5 done), §4 row P5 ✅ with the ★ note ready to send, P3 marked ▶ next (the loader). No frozen value changed beyond 0.20; §5 and §6 are byte-identical.
+- 0.22 · 2026-11-10 · An optional, gated Hive side check for the community term (author's request). P7: a "Hive side check" paragraph (role, method, gate, what happens if it passes) and the task `p7-hive-check` in the §4 Tasks column. §8: the Hive risks, one sentence in "Weak community evidence", and a line that Hive is outside the cut order. §11: item 8. Decision Q2 of 2026-10-26 stays until the gate passes. `.docs/implementation-plan.md` 1.5 adds task 9b. No frozen value changed; §5, §6 and §7 are byte-identical.
