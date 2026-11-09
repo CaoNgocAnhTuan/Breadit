@@ -38,6 +38,8 @@ Every source is converted to the same six CSV tables (implementation-plan §2.2)
 
 Rules: UTF-8, LF line ends, sorted rows, integer ids, integer seconds, no duplicates, only additions (no unlike or unfollow). A `manifest.json` records the source, the seed, the Node version and the SHA-256 of every file. Data lives in `eval/data/<datasetId>/` (git-ignored, rebuilt by a command).
 
+**Into Postgres.** The live app cannot read CSV files. So `npm run load -w @breadit/eval -- <datasetId>` writes a synthetic dataset into its own Postgres schema `eval_load` (never `public`) and keeps the ids: a user id becomes `u0000000042`, a like and a comment keep their `event_id`, and a repost becomes a post row with `rePostId`. `npm run load:check` reads the rows back, writes the six CSV files again and checks that their SHA-256 equal the manifest. The parity test (task 8) and the cost benchmark E7 run the app on this schema. A demo-only `--rebase-to` shifts every time by one constant so the last event lands on a given date; experiments never use it.
+
 ## 3. The synthetic generator
 
 Five stages, each with its own random stream from the master seed 20261014 (file 07):

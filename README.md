@@ -148,11 +148,13 @@ npm run test:backend                         # backend unit + integration tests 
 npm run test -w @breadit/ranking             # ranking package tests
 npm run verify -w @breadit/eval              # eval typecheck + tests
 
-# Thesis evaluation (no Docker needed; build @breadit/ranking first)
+# Thesis evaluation (no Docker needed except for load; build @breadit/ranking first)
 npm run gen -w @breadit/eval                 # the eight synthetic datasets
 npm run adapt:digg -w @breadit/eval          # convert the Digg 2009 zips (see .docs/datasets.md §4)
 npm run check -w @breadit/eval               # check every dataset
 npm run harness -w @breadit/eval -- <runId>  # run eval/config/runs/<runId>.json
+npm run load -w @breadit/eval -- <id>        # write a synthetic dataset into Postgres schema eval_load (needs db)
+npm run load:check -w @breadit/eval -- <id>  # read it back and compare the hashes with the manifest
 
 # Docker helpers (via Makefile)
 make up                  # docker compose up -d

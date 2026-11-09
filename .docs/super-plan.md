@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.22 · 2026-11-10 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.23 · 2026-11-10 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -79,17 +79,17 @@ These facts were checked in the code on 2026-10-22, after the bug sweep (Bugs Re
 
 The phases are in dependency order. Each phase becomes one or more tasks (column "Tasks", started with `/task` or `/bugfix`). A phase is done when its "Done when" passes. ★ marks a supervisor checkpoint: send the result and wait for the answer before the next phase depends on it.
 
-**Status marks.** ✅ done (its "Done when" passes). 🟡 every output is written, but the "Done when" waits for someone else. ⬜ not started. ▶ next to start. "Late" means the planned end date in `.docs/implementation-plan.md` §5 has passed. A ✅ next to a task name means that task folder is closed. Last updated: 2026-11-02.
+**Status marks.** ✅ done (its "Done when" passes). 🟡 every output is written, but the "Done when" waits for someone else. ⬜ not started. ▶ next to start. "Late" means the planned end date in `.docs/implementation-plan.md` §5 has passed. A ✅ next to a task name means that task folder is closed. Last updated: 2026-11-10.
 
 | Status | Phase | Output | Done when | Tasks |
 |---|---|---|---|---|
 | ✅ 10-28 | P0 Baseline freeze | Node pinned, image digests | A clean clone passes install, migrate, seed, typecheck | `p0-baseline-freeze` ✅ |
 | 🟡 waits for the supervisor | P1 Literature, RQ and data lock ★ | `literature.md`, `datasets.md`, one-page note, Chapter 2 survey | The supervisor confirms the RQs, the data and the design decisions | `p1-literature` ✅, `p1-dataset-selection` ✅, `p1-supervisor-note` ✅, `p1-related-work` ✅ |
 | ✅ 10-28 | P2 Implementation blueprint | `implementation-plan.md` | The author approves it, and it names every later task | `p2-implementation-blueprint` ✅ |
-| ▶ next, 1 of 2 tasks done | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator` ✅, `p3-postgres-loader` |
+| ✅ 11-10 | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator` ✅, `p3-postgres-loader` ✅ |
 | ✅ 11-02 | P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` ✅ |
 | ✅ 11-02 (★ note ready to send) | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package` ✅, `p5-eval-harness` ✅ |
-| ⬜ | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
+| ▶ next | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
 | ⬜ | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark`, `p7-hive-check` (optional, gated) |
 | ⬜ | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
 | ⬜ | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
@@ -175,6 +175,8 @@ A loader writes the same data into Postgres with explicit IDs, so the live app c
 **Done when.** Generating twice gives identical manifests. Loading twice gives identical canonical table hashes.
 
 **Status (2026-11-02).** Task `p3-synthetic-generator` is done (`.docs/works/2026-11-02-p3-synthetic-generator/`). The `eval/` workspace builds the eight datasets that `.docs/implementation-plan.md` §4 uses, and two runs give identical manifests. `synthetic-v1.json` is frozen (§7). For `syn-W2M-M`, every calibrated value is within its tolerance of the Digg targets, the social lift rises from W0 to W2H, and at `q` = 0.8 the history bucket 0–4 keeps 174 test users (59 of them in bucket 0). The numbers are in the task's `check_output.txt`. Task `p3-postgres-loader` is still open, so P3 is not done.
+
+**Status (2026-11-10, done).** Task `p3-postgres-loader` (`.docs/works/2026-11-10-p3-postgres-loader/`). `npm run load -w @breadit/eval -- <datasetId>` writes a synthetic dataset into its own Postgres schema `eval_load` (never `public`) with explicit ids, in one transaction, in about 3 s for `syn-W2M-M`. `npm run load:check` reads it back. For `syn-W2M-M` the six files have the same SHA-256 as the dataset manifest, in two loads and after a `--rebase-to` load, so loading twice gives identical canonical table hashes. The `public` row counts did not change. A loaded user can sign in, and the app creates new posts after a load. Repost events become `Post` rows with `rePostId`, so the P6 candidate query must leave them out (`.docs/implementation-plan.md` §2.5). P3 is done.
 
 ### P4: Public dataset adapter (Digg 2009)
 
@@ -477,3 +479,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.20 · 2026-11-02 · Task `p5-eval-harness`, Step 0: §7 rows "Cut time T" (the nine values from the rule with `q` = 0.8), "Larger pool (W_L, N_L) for E8" (14 days / 4,000) and "Baseline grids" (five values each, with the published value) are set and frozen, as the author decided in the task's Spec (Open questions 1–3). No other frozen value changed; §5 and §6 are byte-identical.
 - 0.21 · 2026-11-02 · Task `p5-eval-harness`: P5 status paragraph (P5 done), §4 row P5 ✅ with the ★ note ready to send, P3 marked ▶ next (the loader). No frozen value changed beyond 0.20; §5 and §6 are byte-identical.
 - 0.22 · 2026-11-10 · An optional, gated Hive side check for the community term (author's request). P7: a "Hive side check" paragraph (role, method, gate, what happens if it passes) and the task `p7-hive-check` in the §4 Tasks column. §8: the Hive risks, one sentence in "Weak community evidence", and a line that Hive is outside the cut order. §11: item 8. Decision Q2 of 2026-10-26 stays until the gate passes. `.docs/implementation-plan.md` 1.5 adds task 9b. No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.23 · 2026-11-10 · Task `p3-postgres-loader`: P3 status paragraph (P3 done); §4 rows P3 ✅ with `p3-postgres-loader` ✅ and P6 ▶ next; the status date. No frozen value changed; §5, §6 and §7 are byte-identical.

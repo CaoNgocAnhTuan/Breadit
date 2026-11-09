@@ -38,6 +38,8 @@ Mọi nguồn được chuyển về cùng sáu bảng CSV (implementation-plan 
 
 Quy tắc: UTF-8, xuống dòng LF, các dòng đã sắp xếp, id là số nguyên, thời gian là số giây nguyên, không trùng lặp, chỉ có thêm vào (không có unlike hay unfollow). Một file `manifest.json` ghi nguồn, seed, phiên bản Node và SHA-256 của từng file. Dữ liệu nằm ở `eval/data/<datasetId>/` (git bỏ qua, dựng lại bằng một lệnh).
 
+**Nạp vào Postgres.** App đang chạy không đọc được file CSV. Vì vậy `npm run load -w @breadit/eval -- <datasetId>` ghi một dataset synthetic vào schema Postgres riêng `eval_load` (không bao giờ là `public`) và giữ nguyên id: user id thành `u0000000042`, like và comment giữ `event_id` của chúng, còn repost thành một dòng post có `rePostId`. `npm run load:check` đọc các dòng ra lại, ghi lại sáu file CSV và kiểm tra SHA-256 của chúng bằng với manifest. Parity test (task 8) và cost benchmark E7 chạy app trên schema này. Tùy chọn `--rebase-to`, chỉ dùng cho demo, dời mọi thời điểm đi cùng một khoảng để sự kiện cuối rơi vào một ngày cho trước; các thí nghiệm không bao giờ dùng nó.
+
 ## 3. Generator synthetic
 
 Năm bước, mỗi bước có luồng ngẫu nhiên riêng từ master seed 20261014 (file 07):

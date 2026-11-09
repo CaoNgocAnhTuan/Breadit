@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.5 · 2026-11-10 · Status: approved 2026-10-28
+Version 1.6 · 2026-11-10 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -10,7 +10,7 @@ How the pieces of P3 to P10 fit together in the code. A thing is here only if tw
 | Module | Owner task | May import | What it holds |
 |---|---|---|---|
 | `packages/ranking` (`@breadit/ranking`) | `p5-ranking-package` ✅ (2026-11-02) | the Node standard library only | Types, `buildPool`, as-of feature functions, every scorer, `rankPool`, and `computeExploreScoreFixed` moved from `posts.service.ts`. Pure: no Nest, Prisma, Redis, clock or randomness. Builds to `dist/` with `tsc`, like `@breadit/shared` |
-| `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it ✅ (2026-11-02; `rng.ts`, `canonical/`, `generator/`, `checks/`, `config/`; `adapters/digg.ts` by `p4-digg-adapter` ✅; `harness/`, `metrics.ts`, `stats.ts` by `p5-eval-harness` ✅; loader and report still to come) | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `config/` |
+| `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it ✅ (2026-11-02; `rng.ts`, `canonical/`, `generator/`, `checks/`, `config/`; `adapters/digg.ts` by `p4-digg-adapter` ✅; `harness/`, `metrics.ts`, `stats.ts` by `p5-eval-harness` ✅; `loader/` by `p3-postgres-loader` ✅ (2026-11-10); report still to come) | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `config/` |
 | Backend feed module `apps/backend/src/feed/` | `p6-social-feed` | `@breadit/ranking`, `PrismaService`, `BlockService` | A thin service that loads data and calls `buildPool` and a scorer. `PostsService.findAll` calls it when `algo` is set. Explore imports `computeExploreScoreFixed` from `@breadit/ranking` (done in `p5-ranking-package`) |
 | Frontend toggle | `p6-social-feed` | the API only | `algo` in `app/(board)/page.tsx`, `Feed.tsx`, `InfiniteFeed.tsx` |
 
@@ -67,6 +67,11 @@ P8 merges all of them into `.docs/results/manifest.json` and compares.
 ### 2.5 User ids in the app and in the CSVs
 
 The app has string user ids and the CSVs have integers. One rule for both sides: inside `packages/ranking` a user id is a string, `u` plus the integer padded to 10 digits (`u0000000042`). The loader writes the same string as `User.id`. So the live app and the harness sort users the same way (plain `<` on strings, never `localeCompare`). Post ids stay integers: `Post.id` is an autoincrement integer, and the loader sets it explicitly.
+
+What the loader writes (task 7, 2026-11-10), for task 8 to read:
+- **Positives come from three tables.** A like is a `Like` row and a comment is a `Comment` row, each with `id` = `event_id`. A repost is a `Post` row with `rePostId` = the reposted post and `id` = R + `event_id`, where R is the largest canonical post id.
+- **The live pool must leave out `Post` rows with a `rePostId`.** The harness pool holds only canonical posts. The live features must count reposts from those rows, like the harness does.
+- **Times are whole seconds:** the manifest epoch plus the CSV seconds. The schema is `eval_load`.
 
 ### 2.6 `packages/ranking` signatures (H-c)
 
@@ -255,7 +260,7 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 
 ## 5. Task list
 
-Written on 2026-10-28; the Status column was last updated on 2026-11-02. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
+Written on 2026-10-28; the Status column was last updated on 2026-11-10. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
 
 | Status | # | Task | Phase | Depends on | Scope (short) | Days | Ends | Bugs placed here |
 |---|---|---|---|---|---|---|---|---|
@@ -265,8 +270,8 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-02. ✅ mea
 | ✅ 11-02 | 4 | `p4-digg-adapter` † | P4 | 3 (canonical writer) | adapter, the real Digg choices, the same bucket table | 2 | 11-03 | — |
 | ✅ 11-02 | 5 | `p5-ranking-package` | P5 | 1 | `packages/ranking`, move `computeExploreScoreFixed`, backend imports it, Dockerfile build order | 3 | 11-06 | T4 (score takes `asOf`) |
 | ✅ 11-02 | 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
-| ▶ next | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
-| ⬜ | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
+| ✅ 11-10 | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
+| ▶ next | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
 | ⬜ | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
 | ⬜ optional | 9b | `p7-hive-check` | P7 | 9, closed on 11-13 | gate: BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (section 3.2); then a Hive adapter and H-comm against BL2 (super-plan P7) | 0.5 for the gate | 11-14 | — |
 | ⬜ | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
@@ -274,7 +279,7 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-02. ✅ mea
 | ⬜ | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
 | ⬜ | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
 
-Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
+Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Task 7 closed on 11-10, one day after its planned end. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
 
 **Task 9b is optional** (added 2026-11-10). Its gate runs right after task 9, only if task 9 closes on 11-13, and takes at most half a day. Tasks 10 to 13 then move half a day later, into the spare day 11-19. The whole Hive work was estimated at 2–3 days, more than the spare days left. So if the gate passes, the author decides then whether to run the rest or to put Hive in future work.
 
@@ -307,3 +312,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.3 · 2026-11-02 · Task `p5-ranking-package`: §2.6 gets the feature-builder signatures (`userFeaturesAsOf`, `postFeaturesAsOf`, `visibleAt`, `ageHours`), the params per method, and the BL5 form. §1 and §5: task 5 ✅, task 6 next. The other signatures of §2.6 are unchanged.
 - 1.4 · 2026-11-02 · Task `p5-eval-harness`: §2.7 the 5 MB rule for `per_user.csv` and the NDCG basis of `compare.csv`; §3.4 confirmed by the author; §1 and §5: task 6 ✅, task 7 next.
 - 1.5 · 2026-11-10 · Optional task 9b `p7-hive-check` (super-plan 0.22): its row and a note in §5, a cut-trigger row, a row in the §4 measurement plan, the §3.3 list of runs with no family, and a §6 bullet. No contract, rule or other task changed. Dates move only if the gate runs (tasks 10 to 13 by half a day).
+- 1.6 · 2026-11-10 · Task `p3-postgres-loader`: §2.5 says what the loader writes for task 8 (three tables of positives, repost rows left out of the live pool, the `eval_load` schema); §1 `eval/` row (loader done); §5 task 7 ✅, task 8 next, one line on the day late. No contract of task 7 changed.

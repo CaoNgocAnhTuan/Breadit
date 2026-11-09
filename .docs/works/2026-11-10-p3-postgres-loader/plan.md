@@ -1,6 +1,6 @@
 # Plan: Postgres loader for canonical datasets
 
-Status: approved · 2026-11-10
+Status: done · 2026-11-10
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p3-postgres-loader/`
 
 ---
@@ -93,10 +93,10 @@ Needs Docker db and redis.
 
 ## Claude's part
 
-- [ ] Read the commits and the diff against the design.
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up (DW1).
-- [ ] The Acceptance items below.
-- [ ] Docs (DW7):
+- [x] Read the commits and the diff against the design.
+- [x] `bash .claude/hooks/verify.sh` with db and redis up (DW1).
+- [x] The Acceptance items below.
+- [x] Docs (DW7):
   - **`CLAUDE.md`:** the Overview line ("only the planned loader writes to Postgres") and the Eval commands name `load` and `load:check`, the `eval_load` schema and the Docker need.
   - **`README.md`:** the eval commands.
   - **`docs/Guidance-Manual/en/04-data.md` and `vi/04-data.md`:** the load command, the same content in both.
@@ -104,7 +104,7 @@ Needs Docker db and redis.
   - **`.docs/super-plan.md`:** a P3 status paragraph, the §4 row (P3 ✅, `p3-postgres-loader` ✅) and a change-log line.
   - **`.docs/implementation-plan.md`:** the §1 `eval/` row (loader done), §5 row 7 ✅, and a change-log line.
   - Commit: `docs: close p3-postgres-loader`.
-- [ ] Fill in the Result, then close the task.
+- [x] Fill in the Result, then close the task.
 
 ## Tests
 
@@ -120,14 +120,55 @@ All tests are unit tests in `eval/src/**/*.test.ts` under `node --test` and the 
 
 ## Acceptance
 
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up → every check passes, including eval verify with the new tests (DW1)
-- [ ] `load` then `load:check` on `syn-W2M-M` → 6 of 6 `ok`, equal to the dataset manifest (DW2)
-- [ ] A second `load` and `load:check` → the same output; counts `User` 1,000, `Follow` 12,126, `Community` 20, `CommunityMember` 1,773, `Post` 22,212 (2,212 of them reposts), `Like` 16,616, `Comment` 3,430 (DW3)
-- [ ] Row counts of every table in `public` before and after the loads → equal (DW4)
-- [ ] The backend from `run-safe.sh` with `DATABASE_URL` set to `?schema=eval_load` and `--no-cache`. Sign in as `u0000000001@example.com` with `password` → 200 and a session cookie. Then create one post → created, with an id above every `Post` id that was there before (DW5). Stop the backend after.
-- [ ] `load --rebase-to 2026-11-18T12:00:00Z` then `load:check` → latest time 2026-11-18T12:00:00Z and 6 of 6 `ok`. Then a plain `load` again (DW6)
-- [ ] The docs of "Claude's part" → loader ✅, the storage question answered, the commands listed in both languages, no "planned loader" left (DW7)
-- [ ] `git diff --stat` of the task commits → only the files of design Code files, this folder and `check_output.txt`
+- [x] `bash .claude/hooks/verify.sh` with db and redis up → every check passes, including eval verify with the new tests (DW1)
+- [x] `load` then `load:check` on `syn-W2M-M` → 6 of 6 `ok`, equal to the dataset manifest (DW2)
+- [x] A second `load` and `load:check` → the same output; counts `User` 1,000, `Follow` 12,126, `Community` 20, `CommunityMember` 1,773, `Post` 22,212 (2,212 of them reposts), `Like` 16,616, `Comment` 3,430 (DW3)
+- [x] Row counts of every table in `public` before and after the loads → equal (DW4)
+- [x] The backend from `run-safe.sh` with `DATABASE_URL` set to `?schema=eval_load` and `--no-cache`. Sign in as `u0000000001@example.com` with `password` → 200 and a session cookie. Then create one post → created, with an id above every `Post` id that was there before (DW5). Stop the backend after.
+- [x] `load --rebase-to 2026-11-18T12:00:00Z` then `load:check` → latest time 2026-11-18T12:00:00Z and 6 of 6 `ok`. Then a plain `load` again (DW6)
+- [x] The docs of "Claude's part" → loader ✅, the storage question answered, the commands listed in both languages, no "planned loader" left (DW7)
+- [x] `git diff --stat` of the task commits → only the files of design Code files, this folder and `check_output.txt`
 
 ## Result
+
+**Delivered, 2026-11-10.**
+- **Load.** `npm run load -w @breadit/eval -- <datasetId>` writes a synthetic dataset into the Postgres schema `eval_load` (never `public`) with explicit ids, in one transaction.
+- **Check.** `npm run load:check` reads it back and compares the six canonical files with the dataset manifest.
+- **End state.** The schema ends in the plain `syn-W2M-M` state for task 8.
+
+**Numbers.** Sonnet's runs are in `check_output.txt`, and Claude ran every check again.
+- **Counts (DW3),** in every load: `User` 1,000; `Follow` 12,126; `Community` 20; `CommunityMember` 1,773; `Post` 22,212 (20,000 posts, 2,212 reposts); `Like` 16,616; `Comment` 3,430.
+- **Hashes (DW2, DW3).** All six exported files equal the manifest (for example `interactions.csv` `512c7feb…6861`), in every plain load and in the rebase load. Two exports were byte-identical.
+- **Rebase (DW6).** `--rebase-to 2026-11-18T12:00:00Z` gives a shift of 5,313,617 s and a latest time of 2026-11-18T12:00:00Z, with 6 of 6 `ok`. A plain load gives shift 0 and a latest time of 2026-09-17T23:59:43Z.
+- **`public` (DW4).** Every row count was equal before and after, for example `User` 106, `Post` 890, `Like` 2,001.
+- **App on the loaded schema (DW5).** With the backend from `run-safe.sh` (`?schema=eval_load`, `--no-cache`), signing in as `u0000000001@example.com` returned 200. A new post got id 42,251, above the largest loaded id 42,250. The final plain load removed that post.
+- **Load time:** about 3 s (2.9–3.8 s; Class R, not compared).
+
+**Tests.** Eval: 297 pass (was 257). `verify.sh`: all 9 checks pass (ranking 82, backend unit 99, integration 108, eval verify 297).
+
+**Commits.**
+- Docs: `e9030ff`.
+- Steps 1–5: `95a9937`, `a5c7071`, `ed50b45`, `29cbc36`, `6667c2c`.
+- Closing docs: the commit that holds this Result.
+
+**Differences from the plan.**
+- **`schemaOf(url)` in `target.ts`** (not in the design list). `db.ts` uses it, so every schema name that goes into raw SQL passes the `eval_` check.
+- **Tests.**
+  - The id tests are in their own `ids.test.ts`.
+  - `imports.test.ts` also checks that only `db.ts` imports Prisma inside `src/loader/`.
+- **Guards.**
+  - `toAppRows` refuses an `event_id` below 1, which would clash with the largest post id.
+  - `load` reads the manifest before the data, so `digg2009` is refused at once.
+- **Implementation choices.**
+  - Arguments use `node:util` `parseArgs`.
+  - The run time uses `performance.now()` with a `harness-allow` comment (Class R, printed only).
+  - `readBack` fills unused fields with fallbacks when they are null; `fromAppRows` ignores those fields.
+- **Docs beyond the plan's list.**
+  - Blueprint §2.5 now says what the loader writes for task 8: positives in three tables, repost rows left out of the live pool.
+  - System_Architecture and the super plan mark task 8 as next.
+
+**Open points.**
+- **`randomDataset(SMALL)` repeats user id 11** (`eval/src/harness/random-data.ts`). This is an old bug in a shared test helper. `map.test.ts` works around it and says so. Fix it later in its own small change.
+- **`load:check` against the wrong dataset** fails with an error (a negative canonical time) instead of DIFF lines. It still exits 1.
+- **Redis for the demo.** The loader does not touch Redis. Task 13 must clear the cache or turn it off when the backend runs on `eval_load` (design F11).
 

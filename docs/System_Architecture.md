@@ -98,7 +98,7 @@ flowchart TB
         Report["Report: macros for LaTeX<br/>task 9"]:::offline
     end
 
-    class Toggle,FS,Loader,Report planned
+    class Toggle,FS,Report planned
 
     Browser -->|"page request"| MW
     MW --> SSR
@@ -211,7 +211,7 @@ ESM. The `.ts` files run directly on the pinned Node 22 (type stripping), tests 
 - **Checks** ✅ (`src/checks/`). Format, calibration against Digg, the social lift from W0 to W2H, the cut time T and the history bucket table.
 - **Harness** ✅ (`src/harness/`, `metrics.ts`, `stats.ts`). Runs a committed run config: picks each user's validation or test item, builds the pool and features as of that item's time, ranks with each method, and records the item's rank. Then it computes Recall@K, NDCG@K and coverage (K = 5, 10, 20), tunes parameters on the validation split, and compares methods with a paired bootstrap and a randomization test (10,000 each) with Holm correction.
 - **`rank` command** ✅. Prints one ranking for one user at one time. The parity test uses it.
-- **Postgres loader** 🔜 (task 7, `src/loader/`). Writes a canonical dataset into Postgres with explicit ids, so the live app can run on it (parity test, demo). It is the only part of `eval/` that imports `@prisma/client`. A demo-only `--rebase-to` option shifts all times to today. Experiments never use it.
+- **Postgres loader** ✅ (task 7, `src/loader/`). `npm run load` writes a synthetic canonical dataset into its own Postgres schema `eval_load` (never `public`) with explicit ids, so the live app can run on it (parity test, E7, demo). It empties the schema and writes every row in one transaction. A like and a comment keep their `event_id`, and a repost becomes a `Post` row with `rePostId`. `npm run load:check` reads the rows back and checks that the six CSV files equal the manifest. It is the only part of `eval/` that imports `@prisma/client`. A demo-only `--rebase-to <time>` shifts all times by one constant so the last event lands on that time. Experiments never use it.
 - **Report** 🔜 (task 9, `src/report/`). Turns the results CSVs into `macros.csv` and `results-macros.tex`, so the thesis text never contains a typed number.
 
 ### 4.5 Data stores and files
@@ -220,7 +220,7 @@ ESM. The `.ts` files run directly on the pinned Node 22 (type stripping), tests 
 |---|---|---|
 | PostgreSQL 16, schema `public` | live app data (dev seed, demo users) | backend |
 | PostgreSQL 16, schema `it_test` | integration test data | backend IT tests |
-| PostgreSQL 16, loaded datasets 🔜 | a canonical dataset with explicit ids | parity test, demo. A separate schema or a separate database is still an open question for task 7 |
+| PostgreSQL 16, schema `eval_load` | a loaded synthetic dataset with explicit ids, emptied and refilled by each `npm run load` (task 7 chose a separate schema) | parity test, E7, demo |
 | Redis 7, db 0 | JSON cache, rate limit, Socket.IO adapter, token blacklist | backend |
 | Redis 7, db 1 | integration tests | backend IT tests |
 | `eval/data/<datasetId>/` | canonical CSVs and `manifest.json` (git-ignored, rebuilt from the seed or the zips) | harness, checks, loader |
@@ -457,8 +457,8 @@ Breadit/
 │   │   ├── metrics.ts                # Recall@K, NDCG@K, coverage
 │   │   ├── stats.ts                  # paired bootstrap, randomization test, Holm
 │   │   ├── results-csv.ts            # writes results CSVs and their hashes
-│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank
-│   │   ├── loader/ 🔜                # task 7 · writes a canonical dataset into Postgres (the only Prisma user here)
+│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank, load, load-check
+│   │   ├── loader/                   # writes a synthetic dataset into the Postgres schema eval_load (the only Prisma user here)
 │   │   ├── report/ 🔜                # task 9 · results CSVs → macros.csv and results-macros.tex
 │   │   └── *.test.ts                 # node --test tests (golden, leakage, double run, scipy cross-check, ...)
 │   ├── data/                         # git-ignored · canonical datasets, rebuilt by `gen` and `adapt:digg`
@@ -505,8 +505,8 @@ Breadit/
 | Digg 2009 adapter | P4 · task 4 | ✅ |
 | `@breadit/ranking`, Explore uses it | P5 · task 5 | ✅ |
 | Harness, metrics, statistics, baseline table | P5 · task 6 | ✅ |
-| Postgres loader | P3 · task 7 | 🔜 next |
-| Feed module, `algo`, `asOf` flag, parity test, toggle | P6 · task 8 | 🔜 |
+| Postgres loader | P3 · task 7 | ✅ |
+| Feed module, `algo`, `asOf` flag, parity test, toggle | P6 · task 8 | 🔜 next |
 | Experiments E1–E6, E8, report and macros | P7 · task 9 | 🔜 |
 | Cost benchmark E7 | P7 · task 10 | 🔜 |
 | `npm run thesis:repro`, default `algo` | P8 · task 11 | 🔜 |
