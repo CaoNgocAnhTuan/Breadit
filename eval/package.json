@@ -11,7 +11,9 @@
     "adapt:digg": "node --max-old-space-size=4096 src/cli/adapt-digg.ts",
     "check": "node --max-old-space-size=4096 src/cli/check.ts",
     "harness": "node --max-old-space-size=4096 src/cli/harness.ts",
-    "rank": "node --max-old-space-size=4096 src/cli/rank.ts"
+    "rank": "node --max-old-space-size=4096 src/cli/rank.ts",
+    "load": "node src/cli/load.ts",
+    "load:check": "node src/cli/load-check.ts"
   },
   "dependencies": {
     "@breadit/ranking": "0.1.0",

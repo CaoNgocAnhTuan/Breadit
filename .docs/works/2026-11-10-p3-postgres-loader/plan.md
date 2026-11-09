@@ -71,13 +71,13 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p3-postgres-lo
 
 #### Step 4: The two commands (effort S)
 
-- [ ] Write `eval/src/cli/load.ts` and `eval/src/cli/load-check.ts` (design: Approach "Load" and "Check", both sequence diagrams). Both call `checkNode()` first and take `<datasetId>` (folder `eval/data/<datasetId>/`) and `--schema`. `load` also takes `--rebase-to`, and `load-check` also takes `--out` (default `eval/results/load-check/<datasetId>/`).
+- [x] Write `eval/src/cli/load.ts` and `eval/src/cli/load-check.ts` (design: Approach "Load" and "Check", both sequence diagrams). Both call `checkNode()` first and take `<datasetId>` (folder `eval/data/<datasetId>/`) and `--schema`. `load` also takes `--rebase-to`, and `load-check` also takes `--out` (default `eval/results/load-check/<datasetId>/`).
   - **`load`** refuses a manifest whose `source.kind` is not `synthetic` (F13). It prints the schema name (not the full URL), the counts per table, the shift and the latest time as ISO, plus the run time in seconds (Class R, for F5).
   - **`load-check`** prints one line per file (`ok` or `DIFF` with both hashes), the shift and the latest time. It exits 1 on any `DIFF`, and says the check is meant right after a load (F12).
   - **Errors** go to stderr with exit code 1, in the style of `cli/adapt-digg.ts`.
-- [ ] Add the scripts `load` and `load:check` to `eval/package.json`.
-- [ ] `npm run verify -w @breadit/eval` passes.
-- [ ] Commit: `feat: eval load and load:check commands`
+- [x] Add the scripts `load` and `load:check` to `eval/package.json`.
+- [x] `npm run verify -w @breadit/eval` passes.
+- [x] Commit: `feat: eval load and load:check commands`
 
 #### Step 5: Run on `syn-W2M-M` (effort S)
 
