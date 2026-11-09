@@ -29,7 +29,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p3-postgres-lo
 
 #### Step 1: Target, ids and time helpers (effort S)
 
-- [ ] Tests first:
+- [x] Tests first:
   - **TC1** (`eval/src/loader/target.test.ts`): `targetUrl` refuses `public`, `it_test`, an empty name, upper case and odd characters. It sets `?schema=eval_load` on a URL with no schema, and overwrites an existing `?schema=public`. The rest of the URL is unchanged.
   - **TC2** (`eval/src/loader/time.test.ts`):
     - `parseRebase` takes only `YYYY-MM-DDTHH:MM:SSZ` (refuses no `Z`, milliseconds, an offset, a bad date);
@@ -38,9 +38,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p3-postgres-lo
     - `toDate` and `fromDate` are inverses for a shift of 0 and a nonzero shift;
     - `fromDate` refuses a `Date` that is not a whole second.
   - In TC3 (Step 2) or here: `appUserId(42)` is `u0000000042`, `canonicalUserId` reverses it and refuses anything else, and `repostOffset` is the largest `postId` (0 for no posts).
-- [ ] Write `eval/src/loader/target.ts`, `eval/src/loader/ids.ts` and `eval/src/loader/time.ts` with the signatures of design Code files (design: Approach, the "Ids", "Time" and target paragraphs).
-- [ ] `PASSWORD_HASH` in `ids.ts`: compute it once, with the `bcryptjs` the backend already has, as a bcrypt hash of `password` at cost 10, and check it with `bcrypt.compare`. Paste it as a constant, with a one-line comment saying how it was made. Do not add `bcryptjs` to `eval` (design: rejected "Hash the password at load time").
-- [ ] Commit: `feat: eval loader target guard, ids and time helpers`
+- [x] Write `eval/src/loader/target.ts`, `eval/src/loader/ids.ts` and `eval/src/loader/time.ts` with the signatures of design Code files (design: Approach, the "Ids", "Time" and target paragraphs).
+- [x] `PASSWORD_HASH` in `ids.ts`: compute it once, with the `bcryptjs` the backend already has, as a bcrypt hash of `password` at cost 10, and check it with `bcrypt.compare`. Paste it as a constant, with a one-line comment saying how it was made. Do not add `bcryptjs` to `eval` (design: rejected "Hash the password at load time").
+- [x] Commit: `feat: eval loader target guard, ids and time helpers`
 
 #### Step 2: Mapping both ways (effort S)
 
