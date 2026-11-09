@@ -55,9 +55,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p3-postgres-lo
 
 #### Step 3: Prisma dependency, import guard and database file (effort S)
 
-- [ ] Add `@prisma/client` `^6.2.1` to `eval/package.json` dependencies. Check that `package-lock.json` changed only for this, and that the Prisma client still resolves (generate it again if the install removed it).
-- [ ] Tests first, **TC4** (`eval/src/imports.test.ts`): a detector finds `from "@prisma/client"` and `from '@prisma/client'` in sample text (and not in a comment that only names it). Then no file outside `src/loader/` imports it. Use the same file walk as `forbidden.test.ts`, with a sort compare function.
-- [ ] Write `eval/src/loader/db.ts` (design: Approach "Load" and "Check", insert order under Code files, F2–F7):
+- [x] Add `@prisma/client` `^6.2.1` to `eval/package.json` dependencies. Check that `package-lock.json` changed only for this, and that the Prisma client still resolves (generate it again if the install removed it).
+- [x] Tests first, **TC4** (`eval/src/imports.test.ts`): a detector finds `from "@prisma/client"` and `from '@prisma/client'` in sample text (and not in a comment that only names it). Then no file outside `src/loader/` imports it. Use the same file walk as `forbidden.test.ts`, with a sort compare function.
+- [x] Write `eval/src/loader/db.ts` (design: Approach "Load" and "Check", insert order under Code files, F2–F7):
   - **`migrate(url)`** runs `prisma migrate deploy` with the backend schema from the repo root, as a child process with `DATABASE_URL` set to `url`. On failure it throws with the `global-setup.ts` wording about Docker.
   - **`load(url, rows)`** opens one interactive transaction with an explicit 300 s timeout. Inside it:
     - truncate every table of the target schema except `_prisma_migrations`, with `RESTART IDENTITY CASCADE`;
@@ -67,7 +67,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p3-postgres-lo
   - **`readBack(url)`** reads the same tables with `orderBy: { id: 'asc' }` into `AppRows`.
   - **Identifiers.** The schema name in raw SQL comes only from a name that passed `targetUrl`'s check.
   - **No unit test** needs a database. Typecheck must pass.
-- [ ] Commit: `feat: eval loader database steps (migrate, load, read back)`
+- [x] Commit: `feat: eval loader database steps (migrate, load, read back)`
 
 #### Step 4: The two commands (effort S)
 

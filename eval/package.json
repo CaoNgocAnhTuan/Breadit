@@ -14,7 +14,8 @@
     "rank": "node --max-old-space-size=4096 src/cli/rank.ts"
   },
   "dependencies": {
-    "@breadit/ranking": "0.1.0"
+    "@breadit/ranking": "0.1.0",
+    "@prisma/client": "^6.2.1"
   },
   "devDependencies": {
     "@types/node": "^20",
