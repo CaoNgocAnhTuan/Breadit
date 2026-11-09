@@ -1,0 +1,157 @@
+Step 5 output: syn-W2M-M loaded into schema eval_load (2026-11-10)
+Commands: npm run load -w @breadit/eval -- syn-W2M-M [--rebase-to ...]  and  npm run load:check -w @breadit/eval -- syn-W2M-M
+Node v22.23.4, Docker Postgres 16 on localhost:5433, database breadit, no DATABASE_URL in the shell (default URL, schema eval_load)
+
+== public: row counts BEFORE any load (read-only query)
+Account 0
+Block 0
+Comment 755
+CommentLike 0
+CommentMedia 0
+Community 11
+CommunityBannedUser 0
+CommunityMember 269
+CommunityRule 30
+Conversation 3
+ConversationMember 6
+Follow 488
+Hashtag 221
+Like 2001
+Mention 52
+Message 2
+Notification 10
+Post 890
+PostMedia 584
+PostTag 2168
+Report 0
+SavedPosts 500
+Session 0
+User 106
+VerificationToken 0
+_prisma_migrations 18
+
+== Run 1: load
+syn-W2M-M loaded into schema eval_load
+User 1000
+Follow 12126
+Community 20
+CommunityMember 1773
+Post 22212 (20000 posts, 2212 reposts)
+Like 16616
+Comment 3430
+shift 0 s
+latest time 2026-09-17T23:59:43Z
+run time 3.8 s
+-- Run 1: load:check (exit 0)
+ok    users.csv 1000 rows sha256 26d7101d45e8409e465ffd7631e011ab4aa7f69f6c5022fb8c2531524bf5f242
+ok    follows.csv 12126 rows sha256 ffbf242a369aeab5f83751fc1c8e5593011735e541372246d1ba86923939589c
+ok    communities.csv 20 rows sha256 e4ead5fc74a2e0784ec09c95c3393fd07a6deea413f1c671faa1688a35fd7bd9
+ok    memberships.csv 1773 rows sha256 2c102eb64453fa199c8bdd116634a9114e778511270a447e6dfa49c847d90b29
+ok    posts.csv 20000 rows sha256 be744b912d4f2e9971875d33047ce41d9ca5050cff8d31ef5f655acc91f03847
+ok    interactions.csv 22258 rows sha256 512c7feb44ba58e4ff1602c62c6d706fc41395ab7178c9d3b570a8238b5e6861
+shift 0 s
+latest time 2026-09-17T23:59:43Z
+6 of 6 files equal the manifest
+
+== Run 2: load (second load, same target)
+syn-W2M-M loaded into schema eval_load
+User 1000
+Follow 12126
+Community 20
+CommunityMember 1773
+Post 22212 (20000 posts, 2212 reposts)
+Like 16616
+Comment 3430
+shift 0 s
+latest time 2026-09-17T23:59:43Z
+run time 3.0 s
+-- Run 2: load:check (exit 0)
+ok    users.csv 1000 rows sha256 26d7101d45e8409e465ffd7631e011ab4aa7f69f6c5022fb8c2531524bf5f242
+ok    follows.csv 12126 rows sha256 ffbf242a369aeab5f83751fc1c8e5593011735e541372246d1ba86923939589c
+ok    communities.csv 20 rows sha256 e4ead5fc74a2e0784ec09c95c3393fd07a6deea413f1c671faa1688a35fd7bd9
+ok    memberships.csv 1773 rows sha256 2c102eb64453fa199c8bdd116634a9114e778511270a447e6dfa49c847d90b29
+ok    posts.csv 20000 rows sha256 be744b912d4f2e9971875d33047ce41d9ca5050cff8d31ef5f655acc91f03847
+ok    interactions.csv 22258 rows sha256 512c7feb44ba58e4ff1602c62c6d706fc41395ab7178c9d3b570a8238b5e6861
+shift 0 s
+latest time 2026-09-17T23:59:43Z
+6 of 6 files equal the manifest
+-- Run 1 and run 2: outputs equal apart from the run time line; the two exported folders are byte-identical (diff -r)
+
+== Run 3: load --rebase-to 2026-11-18T12:00:00Z
+syn-W2M-M loaded into schema eval_load
+User 1000
+Follow 12126
+Community 20
+CommunityMember 1773
+Post 22212 (20000 posts, 2212 reposts)
+Like 16616
+Comment 3430
+shift 5313617 s
+latest time 2026-11-18T12:00:00Z
+run time 3.2 s
+-- Run 3: load:check (exit 0; the shift is found from the data and removed before the hashes)
+ok    users.csv 1000 rows sha256 26d7101d45e8409e465ffd7631e011ab4aa7f69f6c5022fb8c2531524bf5f242
+ok    follows.csv 12126 rows sha256 ffbf242a369aeab5f83751fc1c8e5593011735e541372246d1ba86923939589c
+ok    communities.csv 20 rows sha256 e4ead5fc74a2e0784ec09c95c3393fd07a6deea413f1c671faa1688a35fd7bd9
+ok    memberships.csv 1773 rows sha256 2c102eb64453fa199c8bdd116634a9114e778511270a447e6dfa49c847d90b29
+ok    posts.csv 20000 rows sha256 be744b912d4f2e9971875d33047ce41d9ca5050cff8d31ef5f655acc91f03847
+ok    interactions.csv 22258 rows sha256 512c7feb44ba58e4ff1602c62c6d706fc41395ab7178c9d3b570a8238b5e6861
+shift 5313617 s
+latest time 2026-11-18T12:00:00Z
+6 of 6 files equal the manifest
+
+== Run 4: plain load again (the state that task 8 uses)
+syn-W2M-M loaded into schema eval_load
+User 1000
+Follow 12126
+Community 20
+CommunityMember 1773
+Post 22212 (20000 posts, 2212 reposts)
+Like 16616
+Comment 3430
+shift 0 s
+latest time 2026-09-17T23:59:43Z
+run time 3.3 s
+-- Run 4: load:check (exit 0)
+ok    users.csv 1000 rows sha256 26d7101d45e8409e465ffd7631e011ab4aa7f69f6c5022fb8c2531524bf5f242
+ok    follows.csv 12126 rows sha256 ffbf242a369aeab5f83751fc1c8e5593011735e541372246d1ba86923939589c
+ok    communities.csv 20 rows sha256 e4ead5fc74a2e0784ec09c95c3393fd07a6deea413f1c671faa1688a35fd7bd9
+ok    memberships.csv 1773 rows sha256 2c102eb64453fa199c8bdd116634a9114e778511270a447e6dfa49c847d90b29
+ok    posts.csv 20000 rows sha256 be744b912d4f2e9971875d33047ce41d9ca5050cff8d31ef5f655acc91f03847
+ok    interactions.csv 22258 rows sha256 512c7feb44ba58e4ff1602c62c6d706fc41395ab7178c9d3b570a8238b5e6861
+shift 0 s
+latest time 2026-09-17T23:59:43Z
+6 of 6 files equal the manifest
+
+== public: row counts AFTER all loads (read-only query)
+Account 0
+Block 0
+Comment 755
+CommentLike 0
+CommentMedia 0
+Community 11
+CommunityBannedUser 0
+CommunityMember 269
+CommunityRule 30
+Conversation 3
+ConversationMember 6
+Follow 488
+Hashtag 221
+Like 2001
+Mention 52
+Message 2
+Notification 10
+Post 890
+PostMedia 584
+PostTag 2168
+Report 0
+SavedPosts 500
+Session 0
+User 106
+VerificationToken 0
+_prisma_migrations 18
+-- before and after: equal (diff of the two lists is empty)
+
+== Extra: load:check exits 1 on a difference
+One Like row (id 5) was deleted by hand in eval_load, then load:check gave: DIFF interactions.csv (22257 rows in the database, 22258 in the manifest), the other five ok, exit 1.
+Then a plain load and load:check again: 6 of 6 equal the manifest. The schema ends in the plain state.

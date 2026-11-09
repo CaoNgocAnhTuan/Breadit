@@ -82,14 +82,14 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p3-postgres-lo
 #### Step 5: Run on `syn-W2M-M` (effort S)
 
 Needs Docker db and redis.
-- [ ] Count the rows of every table in `public` and save the counts (for DW4).
-- [ ] `load` `syn-W2M-M`, then `load:check`. All six lines must say `ok` (DW2), and the counts must equal DW3. If a hash differs, find the mapping rule that differs and report. Do not change the dataset or the check to make it pass.
-- [ ] `load` again, then `load:check` again. Both runs must give the same output apart from the run time (DW3).
-- [ ] `load --rebase-to 2026-11-18T12:00:00Z`, then `load:check`. The latest time must be 2026-11-18T12:00:00Z, and all six lines `ok` (DW6).
-- [ ] `load` once more without `--rebase-to`, so the schema ends in the plain state that task 8 uses.
-- [ ] Count the rows of every table in `public` again. They must equal the first counts (DW4).
-- [ ] Save the outputs of these runs (counts, check lines, shift, latest time, run times, both `public` counts) as `check_output.txt` in this task folder.
-- [ ] Commit: `chore: P3 syn-W2M-M loaded and checked in eval_load`
+- [x] Count the rows of every table in `public` and save the counts (for DW4).
+- [x] `load` `syn-W2M-M`, then `load:check`. All six lines must say `ok` (DW2), and the counts must equal DW3. If a hash differs, find the mapping rule that differs and report. Do not change the dataset or the check to make it pass.
+- [x] `load` again, then `load:check` again. Both runs must give the same output apart from the run time (DW3).
+- [x] `load --rebase-to 2026-11-18T12:00:00Z`, then `load:check`. The latest time must be 2026-11-18T12:00:00Z, and all six lines `ok` (DW6).
+- [x] `load` once more without `--rebase-to`, so the schema ends in the plain state that task 8 uses.
+- [x] Count the rows of every table in `public` again. They must equal the first counts (DW4).
+- [x] Save the outputs of these runs (counts, check lines, shift, latest time, run times, both `public` counts) as `check_output.txt` in this task folder.
+- [x] Commit: `chore: P3 syn-W2M-M loaded and checked in eval_load`
 
 ## Claude's part
 
