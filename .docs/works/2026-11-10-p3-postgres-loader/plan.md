@@ -44,14 +44,14 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p3-postgres-lo
 
 #### Step 2: Mapping both ways (effort S)
 
-- [ ] Tests first, **TC3** (`eval/src/loader/map.test.ts`):
+- [x] Tests first, **TC3** (`eval/src/loader/map.test.ts`):
   - **Round trip:** `fromAppRows(toAppRows(d, e, s), e, s)` deep-equals `d` (after the §2.2 sort) for the golden fixture (`src/harness/fixtures/golden`: 27 likes, 4 comments, 2 reposts, read with `loadDataset`) and for `randomDataset` (`src/harness/random-data.ts`), each with shift 0 and a nonzero shift.
   - **Ids:** user ids and usernames are `u` plus 10 digits. Post, community, like and comment ids are the CSV ids and event ids. Every repost id is `repostOffset + event_id`, above every post id, and unique. `Follow` and `CommunityMember` ids are 1…n in canonical sort order.
   - **Fixed fields** (design table "Fields that are not in the CSV"): email, display name, `PASSWORD_HASH`, `emailVerified` = `createdAt`, `updatedAt` = `createdAt`, community name and slug, role `MEMBER`, post and comment text, `isApproved` true, a repost's `desc` and `communityId` null, `notify` false.
   - **Two runs:** two calls of `toAppRows` on the same input give deep-equal output.
   - **`detectShift`:** finds 0 for unshifted rows and the right value for shifted rows.
-- [ ] Write `eval/src/loader/map.ts`: `AppRows`, `toAppRows`, `fromAppRows`, `detectShift` (design: Code files, Approach). No Prisma import here.
-- [ ] Commit: `feat: eval loader mapping between canonical and app rows`
+- [x] Write `eval/src/loader/map.ts`: `AppRows`, `toAppRows`, `fromAppRows`, `detectShift` (design: Code files, Approach). No Prisma import here.
+- [x] Commit: `feat: eval loader mapping between canonical and app rows`
 
 #### Step 3: Prisma dependency, import guard and database file (effort S)
 
