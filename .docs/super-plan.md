@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.23 · 2026-11-10 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.24 · 2026-11-10 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -89,8 +89,8 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 11-10 | P3 Synthetic generator | `eval/` workspace, worlds W0–W2, loader | Two runs give the same hashes | `p3-synthetic-generator` ✅, `p3-postgres-loader` ✅ |
 | ✅ 11-02 | P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` ✅ |
 | ✅ 11-02 (★ note ready to send) | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package` ✅, `p5-eval-harness` ✅ |
-| ▶ next | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` |
-| ⬜ | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark`, `p7-hive-check` (optional, gated) |
+| ✅ 11-10 | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` ✅ |
+| ▶ next | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark`, `p7-hive-check` (optional, gated) |
 | ⬜ | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
 | ⬜ | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
 | ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-defense-package` |
@@ -204,13 +204,22 @@ A loader writes the same data into Postgres with explicit IDs, so the live app c
 
 ### P6: Social feed in the app
 
-**Do.** Add a thin Nest service and module that load data (reusing `getFolloweesIds`, `getCommunityIds` and `BlockService.getAllBlockedPeerIds`) and call `packages/ranking`. The live pool uses the shared `buildPool`: it lets approved community posts in (`isApproved = true`, Bugs Report R2) and counts distinct followees (T6 is still open). A community ban must clear the cached community list (B6), because the scorer reuses `getCommunityIds`.
+**Do.** Add a thin Nest service and module that load data (reusing `BlockService.getAllBlockedPeerIds`, and reading follows and memberships with their times, because the cached `getFolloweesIds` and `getCommunityIds` hold no times; decided in task `p6-social-feed`) and call `packages/ranking`. The live pool uses the shared `buildPool`: it lets approved community posts in (`isApproved = true`, Bugs Report R2) and counts distinct followees (T6 is still open). A community ban must clear the cached community list (B6), because the Communities feed reads `getCommunityIds`.
 
 Add a feed option `algo` with values `chrono`, `engagement` and `social`. It goes through `posts.controller.ts` into `findAll` and into the cache key. The default behavior of "For You" stays unchanged until the experiments are done. The default `algo` comes from an env variable; when it is not set, "For You" behaves as today. So the default feed rule (P7) changes only configuration, not code. The frontend changes are in `app/(board)/page.tsx` (whitelist), `Feed.tsx` and `InfiniteFeed.tsx` (query key). A test-only `asOf` query parameter is enabled by an env flag and never in production (T4).
 
 The `reasons` list per post is cut in v0.2. The score's three terms are still interpretable, but the thesis does not claim explanations shown to users.
 
 **Done when.** A parity test passes. For 100 sampled (user, `asOf`) pairs on the P3 dataset loaded into Postgres, the live endpoint returns the same order as the harness. The test runs with `REDIS_HTTP_CACHE_ENABLED=false`.
+
+**Status (2026-11-10, done).** Task `p6-social-feed` (`.docs/works/2026-11-10-p6-social-feed/`).
+- **Feed.** `apps/backend/src/feed/` (`FeedService.rank`) loads plain arrays and calls the package. `GET /api/posts?algo=` takes `chrono` (BL0), `engagement` (BL2) or `social` (H) on the logged-in For You. The cursor `t:score:id` ranks every page at the same time.
+- **Config.** `FEED_DEFAULT_ALGO` sets the default; unset keeps today's For You. The test-only `asOf` needs `FEED_ASOF_ENABLED=true`, and the backend refuses that flag in production. α and β of `social` are placeholders (1 and 1) in `feed/feed.constants.ts` until P7; P8 writes the tuned values there.
+- **Bugs.** Explore uses one time per request (T4). B6, T3 and the D1 rule are fixed, and pending posts stay out of the pool (R2).
+- **Parity.** `npm run parity -w @breadit/eval` drew 100 pairs of `syn-W2M-M` (25 per history bucket) and committed the harness orders in `.docs/results/p6-parity/`. Two runs were byte-identical. `npm run test:parity -w @breadit/backend` on `eval_load` gives 300 of 300 full orders at the feed module and 300 of 300 first two pages over HTTP, in about 34 s.
+- **Toggle.** The frontend toggle was checked in Chrome.
+
+P6 is done.
 
 ### P7: Experiments ★
 
@@ -480,3 +489,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.21 · 2026-11-02 · Task `p5-eval-harness`: P5 status paragraph (P5 done), §4 row P5 ✅ with the ★ note ready to send, P3 marked ▶ next (the loader). No frozen value changed beyond 0.20; §5 and §6 are byte-identical.
 - 0.22 · 2026-11-10 · An optional, gated Hive side check for the community term (author's request). P7: a "Hive side check" paragraph (role, method, gate, what happens if it passes) and the task `p7-hive-check` in the §4 Tasks column. §8: the Hive risks, one sentence in "Weak community evidence", and a line that Hive is outside the cut order. §11: item 8. Decision Q2 of 2026-10-26 stays until the gate passes. `.docs/implementation-plan.md` 1.5 adds task 9b. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.23 · 2026-11-10 · Task `p3-postgres-loader`: P3 status paragraph (P3 done); §4 rows P3 ✅ with `p3-postgres-loader` ✅ and P6 ▶ next; the status date. No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.24 · 2026-11-10 · Task `p6-social-feed`: P6 status paragraph (P6 done); the P6 "Do" sentence no longer says the feed reuses `getFolloweesIds` and `getCommunityIds` (they hold no times, so the feed reads follows and memberships with their times), and the B6 reason now names the Communities feed; §4 rows P6 ✅ and P7 ▶ next. No frozen value changed; §5, §6 and §7 are byte-identical.

@@ -67,7 +67,7 @@ masterSeed, epoch, node, files: { name: { rows, sha256 } }
 | Golden test | a tiny hand-checked dataset gives exactly the committed CSV (P5) |
 | Leakage test | changing every event after t_u leaves u's rows unchanged (P5) |
 | Harness double run | two full runs give byte-identical results (P5) |
-| Parity test 🔜 | the live app and the harness give the same order (task 8) |
+| Parity test ✅ | the live app and the harness give the same order: 300 of 300 at the feed module and 300 of 300 over HTTP (task 8, `npm run test:parity -w @breadit/backend`) |
 | `thesis:repro` 🔜 | one command rebuilds everything and compares every hash with `.docs/results/manifest.json` (task 11) |
 
 ## 6. Frozen values

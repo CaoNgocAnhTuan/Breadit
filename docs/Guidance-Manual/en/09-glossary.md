@@ -60,7 +60,7 @@ Every term and symbol used in the thesis, in one place. Each entry is one or two
 | **H** | The hybrid: engagement + α·social + β·community. |
 | **H-follow / H-comm** | H with only the social term / only the community term. |
 | **H-noauthor / H-noengager** | H without the author part / without the engager part of the social term. |
-| **`algo`** | The planned API option of the live feed: `chrono`, `engagement`, `social` (task 8). |
+| **`algo`** | The API option of the live For You feed: `chrono` (BL0), `engagement` (BL2), `social` (H) (task 8). |
 
 ## D. Evaluation
 

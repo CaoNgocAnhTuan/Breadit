@@ -6,7 +6,7 @@ Những câu hội đồng hoặc reviewer có thể hỏi, mỗi câu có câu 
 
 Khi bảo vệ bằng tiếng Anh, dùng bản [English](../en/10-defense-qa.md): câu trả lời ở đó đã được viết để nói thành lời.
 
-Các câu có nhãn **(after P7)** phụ thuộc vào kết quả chưa có. Nội dung cuối cùng sẽ được viết khi chạy xong thí nghiệm. Trạng thái: 2026-11-02, sau P5.
+Các câu có nhãn **(after P7)** phụ thuộc vào kết quả chưa có. Nội dung cuối cùng sẽ được viết khi chạy xong thí nghiệm. Trạng thái: 2026-11-10, sau P6.
 
 ---
 
@@ -102,8 +102,8 @@ Ghi vào đây: dòng F1 cho `syn-W2M-M` và cho `digg2009` (hiệu trung bình,
 ## E. Hệ thống
 
 **Q23. Làm sao biết app thật xếp hạng giống như evaluation?**
-Cả hai gọi cùng một package, `@breadit/ranking`, nên chỉ khác ở cách nạp dữ liệu. Một parity test so endpoint thật với harness trên 100 cặp (user, thời điểm) lấy mẫu và yêu cầu thứ tự giống hệt.
-*Bằng chứng:* `docs/System_Architecture.md` §6.4; task 8 **(after P6)**.
+Cả hai gọi cùng một package, `@breadit/ranking`, nên chỉ khác ở cách nạp dữ liệu. Một parity test so endpoint thật với harness trên 100 cặp (user, thời điểm) lấy mẫu và yêu cầu thứ tự giống hệt. Trên `syn-W2M-M` test pass với cả ba giá trị `algo`: 300 trên 300 thứ tự đầy đủ ở feed module và 300 trên 300 cặp hai trang đầu qua HTTP.
+*Bằng chứng:* `docs/System_Architecture.md` §6.4; task 8 (`.docs/results/p6-parity/`, `npm run test:parity -w @breadit/backend`).
 
 **Q24. Người khác có tái lập được các con số không?**
 Có. Mọi sự ngẫu nhiên đến từ một seed, điểm là số nguyên, tie-break toàn phần, file ở định dạng chuẩn, và mỗi đầu ra có SHA-256 trong manifest. Double-run test chứng minh đầu ra giống hệt từng byte. `npm run thesis:repro` (task 11) dựng lại mọi thứ và so mọi hash.

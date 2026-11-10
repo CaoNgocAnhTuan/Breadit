@@ -67,7 +67,7 @@ masterSeed, epoch, node, files: { name: { rows, sha256 } }
 | Golden test | một dataset nhỏ đã kiểm tay cho ra đúng file CSV đã commit (P5) |
 | Leakage test | đổi mọi sự kiện sau t_u không làm đổi các dòng kết quả của u (P5) |
 | Harness chạy hai lần | hai lần chạy đầy đủ cho kết quả giống hệt từng byte (P5) |
-| Parity test 🔜 | app thật và harness cho cùng thứ tự (task 8) |
+| Parity test ✅ | app thật và harness cho cùng thứ tự: 300 trên 300 ở feed module và 300 trên 300 qua HTTP (task 8, `npm run test:parity -w @breadit/backend`) |
 | `thesis:repro` 🔜 | một lệnh dựng lại mọi thứ và so mọi hash với `.docs/results/manifest.json` (task 11) |
 
 ## 6. Các giá trị frozen

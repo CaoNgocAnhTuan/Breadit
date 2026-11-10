@@ -110,6 +110,8 @@ Copy `.env.example` to `.env`:
 | `UPLOAD_DIR` | Where uploaded files are stored when Cloudinary is off (set to `./uploads` for host dev) |
 | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Upload to Cloudinary when the cloud name is set; otherwise files go to `UPLOAD_DIR` |
 | `REDIS_HTTP_CACHE_ENABLED` | `false` turns off the Redis JSON cache (default `true`) |
+| `FEED_DEFAULT_ALGO` | The ranking of the logged-in "For You" when the request has no `algo`: `chrono`, `engagement` or `social`. Unset means the pre-thesis For You (your and your followees' posts, newest first). Another value stops the backend at start |
+| `FEED_ASOF_ENABLED` | Test only. `true` lets `GET /api/posts` take `asOf` (Unix seconds) to rank the feed at a past time. The backend refuses to start with it when `NODE_ENV=production` |
 
 `STORAGE_DRIVER` is in `.env.example` but the code does not read it (Bugs Report R4).
 
@@ -147,6 +149,7 @@ npx prisma studio --schema=apps/backend/prisma/schema.prisma
 npm run test:backend                         # backend unit + integration tests (needs db and redis)
 npm run test -w @breadit/ranking             # ranking package tests
 npm run verify -w @breadit/eval              # eval typecheck + tests
+npm run test:parity -w @breadit/backend      # live feed order = harness order (needs db, redis and syn-W2M-M in eval_load)
 
 # Thesis evaluation (no Docker needed except for load; build @breadit/ranking first)
 npm run gen -w @breadit/eval                 # the eight synthetic datasets
@@ -155,6 +158,7 @@ npm run check -w @breadit/eval               # check every dataset
 npm run harness -w @breadit/eval -- <runId>  # run eval/config/runs/<runId>.json
 npm run load -w @breadit/eval -- <id>        # write a synthetic dataset into Postgres schema eval_load (needs db)
 npm run load:check -w @breadit/eval -- <id>  # read it back and compare the hashes with the manifest
+npm run parity -w @breadit/eval -- --param alpha=1 --param beta=1   # the parity sample, .docs/results/p6-parity/
 
 # Docker helpers (via Makefile)
 make up                  # docker compose up -d

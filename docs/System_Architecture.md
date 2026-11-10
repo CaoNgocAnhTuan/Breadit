@@ -6,7 +6,7 @@ This document describes the system the thesis proposes: the Breadit platform fro
 
 Sources: [super-plan.md](../.docs/super-plan.md) (phases, protocol, the hybrid score, frozen values) and [implementation-plan.md](../.docs/implementation-plan.md) (module map, data contracts, task list). When this document and those two disagree, those two are right.
 
-**Status marks.** ✅ built and tested. 🔜 planned, with the task that builds it. Status on 2026-11-02.
+**Status marks.** ✅ built and tested. 🔜 planned, with the task that builds it. Status on 2026-11-10.
 
 ---
 
@@ -15,7 +15,7 @@ Sources: [super-plan.md](../.docs/super-plan.md) (phases, protocol, the hybrid s
 The thesis adds three parts to the existing platform:
 
 1. **`@breadit/ranking`** (`packages/ranking`) ✅. One pure TypeScript package that holds every ranking rule: the candidate pool, the "as of time t" features, 13 scoring methods (baselines, the hybrid and its ablations) and the final sort. It has no database, cache, clock or randomness.
-2. **The social feed in the app** 🔜 (task 8, `p6-social-feed`). A thin backend module that loads data from Postgres and calls `@breadit/ranking`. The "For You" feed gets an `algo` option: `chrono`, `engagement` or `social`.
+2. **The social feed in the app** ✅ (task 8, `p6-social-feed`). A thin backend module that loads data from Postgres and calls `@breadit/ranking`. The "For You" feed has an `algo` option: `chrono` (BL0), `engagement` (BL2) or `social` (the hybrid H).
 3. **The offline evaluation** (`eval/`, `@breadit/eval`), mostly ✅. It builds datasets (synthetic worlds and Digg 2009), replays the past at each user's test time, ranks with the same package, and measures quality with statistics.
 
 The key idea: **the live app and the evaluation call the same ranking code.** Only the way they load data differs (Prisma in the app, CSV files in the evaluation). So a number measured offline describes the code that serves users. A parity test checks this (section 6.4).
@@ -98,7 +98,7 @@ flowchart TB
         Report["Report: macros for LaTeX<br/>task 9"]:::offline
     end
 
-    class Toggle,FS,Report planned
+    class Report planned
 
     Browser -->|"page request"| MW
     MW --> SSR
@@ -151,7 +151,8 @@ Unchanged from the pre-thesis, except the feed toggle.
 - **Server components** call the backend with `serverFetch()` / `getSession()` (`src/lib/session.ts`) on `BACKEND_INTERNAL_URL` and forward the `breadit_session` cookie by hand.
 - **Client components** call `api()` / `apiMultipart()` (`src/lib/api.ts`) on `NEXT_PUBLIC_BACKEND_URL` with `credentials: 'include'`. TanStack Query handles infinite scroll and optimistic updates.
 - **`middleware.ts`** only checks that the session cookie exists. The backend does the real check.
-- **Feed toggle** 🔜 (task 8). `app/(board)/page.tsx` adds `algo` to its whitelist of query values, and `Feed.tsx` / `InfiniteFeed.tsx` add it to the query key, so each option has its own cache entry. Cut 5 (super-plan §8) can drop this toggle; the backend option still works without it.
+- **Feed toggle** ✅ (task 8). On the For You tab, three links ("Chronological", "Engagement", "Social") set `?algo=`. `app/(board)/page.tsx` whitelists `algo` (only when `feed` is not set), and `Feed.tsx` / `InfiniteFeed.tsx` put it in the request and the query key, so each option has its own cache entry. "For you" with no `algo` shows the default feed.
+- **Community compose box** ✅ (task 8, D1). A community page shows the compose box only to members. Joining refreshes the page, so the box appears at once.
 
 ### 4.2 Backend (`apps/backend`)
 
@@ -159,12 +160,25 @@ The pre-thesis modules stay: auth (JWT in an httpOnly cookie, guards), users, po
 
 What the thesis changes:
 
-- **Explore** ✅. `PostsService` now imports `computeExploreScoreFixed` from `@breadit/ranking`. So BL2 in the evaluation is exactly the production code. Explore's results did not change. Its 7-day window still reads `Date.now()`; task 8 makes it take the time as an argument (Bugs Report T4).
-- **Feed module** 🔜 (task 8, `apps/backend/src/feed/`). A thin service. It loads from Prisma the candidate posts in the window W, the user's follows, memberships and earlier positives, and the blocked peers (`BlockService.getAllBlockedPeerIds`). Then it calls `userFeaturesAsOf`, `postFeaturesAsOf`, `buildPool`, `scorer(...)` and `rankPool`. It has no ranking logic of its own.
-- **`algo` option** 🔜. `GET /api/posts` gets `algo` with values `chrono`, `engagement` and `social`. It goes through `posts.controller.ts` into `findAll` and into the cache key. The planned mapping is `chrono` = today's "For You" order, `engagement` = the Explore score on the same pool, `social` = the hybrid H with the frozen α, β and m. Task 8's design fixes the details.
-- **Default `algo`** 🔜 comes from an environment variable. When it is not set, "For You" behaves exactly as today.
-- **Test-only `asOf` parameter** 🔜. Enabled by an env flag, never in production. It lets the parity test ask "what would the feed have been at time t".
-- **Bugs fixed on the way** (task 8): community posts enter the pool only when approved (R2), followees are counted once (T6), a community ban clears the cached community list (B6), and the cache state for the benchmark (T3).
+- **Explore** ✅. `PostsService` imports `computeExploreScoreFixed` from `@breadit/ranking`. So BL2 in the evaluation is exactly the production code. Since task 8, the 7-day window and the age use one time per request: the clock read once, or the test-only `asOf` (Bugs Report T4). Its ranking did not change.
+- **Feed module** ✅ (task 8, `apps/backend/src/feed/`). `FeedService.rank(userId, algo, t)` returns the whole ranked pool as `(id, score)` pairs. It never reads the clock. It loads from Prisma:
+  - the root posts created in `[t − W, t)`, community posts included, repost rows left out, with no row limit;
+  - the user's follows and memberships with their times;
+  - the user's likes, comments and reposts before t, with the author and community of each touched post;
+  - the blocked peers (`BlockService.getAllBlockedPeerIds`);
+  - after `buildPool`, the likes, comments and reposts on the pool posts.
+  
+  Then it calls `userFeaturesAsOf`, `buildPool`, `postFeaturesAsOf`, `scorer(...)` and `rankPool`. It has no ranking logic of its own. Follows and memberships are read with their times, not from the cached `getFolloweesIds` / `getCommunityIds`, because the as-of rule needs the times. Comments and reposts count only when not deleted, as in `engagementSelect`.
+- **`algo` option** ✅. `GET /api/posts?algo=` with `chrono` (BL0: followee posts first, then newest first), `engagement` (BL2, the Explore score on the shared pool) or `social` (the hybrid H). `algo` works only on the logged-in For You. An unknown value or a mix with `feed`, `user` or `communityId` gives 400, and a guest gets 401. α and β of `social` are placeholders (1 and 1) in `feed/feed.constants.ts` until P7 tunes them; task 11 writes the tuned values there. `m`, W and N_max are the §7 values, and a unit test checks them against `eval/config/frozen-v1.json`.
+- **Paging.** Pages of 10. The cursor is `t:score:id`: the next page is ranked again at the same time t and starts after that item, so pages never repeat or skip a post. Without `asOf`, a cursor older than 24 h gives 400.
+- **Default `algo`** ✅ comes from `FEED_DEFAULT_ALGO`. When it is not set, "For You" behaves exactly as today. A wrong value stops the backend at start. Docker Compose passes it to the backend.
+- **Test-only `asOf` parameter** ✅. Unix seconds, accepted only when `FEED_ASOF_ENABLED=true`. The backend refuses to start with the flag on and `NODE_ENV=production`, and Docker Compose never passes it. It lets the parity test ask "what would the feed have been at time t". Only creates can be replayed: a delete or an unlike that happened after t is already gone.
+- **Bugs fixed on the way** (task 8):
+  - Pending community posts stay out of the pool (R2, the pool part).
+  - Followees are counted once (T6).
+  - A community ban or delete clears the cached community list and bumps `v:user` (B6).
+  - Creating or deleting a post bumps the author's `v:user` (T3).
+  - A community post needs membership (D1).
 
 ### 4.3 Ranking package (`packages/ranking`, `@breadit/ranking`) ✅
 
@@ -256,7 +270,7 @@ Why this shape (super-plan §6):
 
 ## 6. Main workflows
 
-### 6.1 Live "For You" request with `algo=social` 🔜 (task 8)
+### 6.1 Live "For You" request with `algo=social` ✅ (task 8)
 
 ```mermaid
 sequenceDiagram
@@ -268,28 +282,30 @@ sequenceDiagram
     participant F as FeedService
     participant DB as Postgres via Prisma
     participant R as ranking package
-    B->>C: GET /api/posts with algo=social
-    C->>S: findAll(cursor, user, feed, algo)
-    S->>K: look up the key with algo and the user version
+    B->>C: GET /api/posts?algo=social&cursor=1
+    C->>S: findAll(cursor, user, feed, communityId, algo, asOf)
+    S->>S: check algo and asOf, t = asOf or the clock (read once)
+    S->>K: look up the key with algo, cursor, user version and asOf
     alt cache hit
-        K-->>S: cached result
+        K-->>S: cached page
     else cache miss
-        S->>F: rank the feed for userId at asOf = now
-        F->>DB: posts in window W, follows, memberships, positives, blocked peers
-        DB-->>F: rows
-        F->>R: userFeaturesAsOf and postFeaturesAsOf
-        F->>R: buildPool
-        F->>R: scorer H with frozen alpha, beta, m, then rankPool
+        S->>F: rank(userId, social, t)
+        F->>DB: root posts in [t − W, t), follows, memberships, user positives before t
+        F->>DB: blocked peers (BlockService)
+        F->>R: userFeaturesAsOf, buildPool
+        F->>DB: likes, comments, reposts on the pool posts before t
+        F->>R: postFeaturesAsOf, scorer H, rankPool
         R-->>F: post ids in order
-        F-->>S: ordered ids
-        S->>DB: load one page of posts with counts
-        S->>K: store with TTL
+        F-->>S: (id, score) in rank order
+        S->>S: the 10 items after the cursor
+        S->>DB: load those posts with counts and media
+        S->>K: store the page, 10 s
     end
-    S-->>C: page of posts
+    S-->>C: posts, hasMore, nextCursor "t:score:id"
     C-->>B: JSON
 ```
 
-Without `algo`, `findAll` runs the pre-thesis code paths unchanged. The exact cache shape (ids or full page) is decided in task 8.
+Page 2 sends the cursor back. The pool is ranked again at the same t, and the page starts after the cursor's `(score, id)`. The cache stores whole pages for 10 s. Without `algo` (and with `FEED_DEFAULT_ALGO` unset), `findAll` runs the pre-thesis code paths unchanged.
 
 ### 6.2 Offline evaluation run ✅
 
@@ -340,14 +356,17 @@ flowchart LR
 
 The nine datasets are the eight synthetic ones (five worlds at size M, three at size S) and `digg2009`. `npm run thesis:repro` 🔜 (task 11) runs the whole pipeline again and compares every hash with `.docs/results/manifest.json`.
 
-### 6.4 Parity test 🔜 (task 8)
+### 6.4 Parity test ✅ (task 8)
 
 The parity test proves that the live feed and the harness give the same order.
 
-1. Load a synthetic dataset into Postgres with the loader.
-2. Pick 100 (user, `asOf`) pairs with the `parity` random stream.
-3. For each pair, get the order from the `rank` command and from `GET /api/posts?algo=social` with the test-only `asOf` parameter, with `REDIS_HTTP_CACHE_ENABLED=false`.
-4. The two lists must be equal.
+1. `npm run parity -w @breadit/eval -- --param alpha=1 --param beta=1` draws 100 (user, `asOf`) pairs from `syn-W2M-M` with the `parity` random stream, 25 in each history bucket. For each pair and each `algo` (`chrono` = BL0, `engagement` = BL2, `social` = H) it ranks the pool with the harness (`rankAt`, the same path as the `rank` command). It writes the pool size, the SHA-256 of the full order and the top 20 to `.docs/results/p6-parity/` (committed, with a manifest). The full orders go to the git-ignored `eval/results/p6-parity/orders.csv`.
+2. `npm run load -w @breadit/eval -- syn-W2M-M` loads the same dataset into the Postgres schema `eval_load`, without `--rebase-to`.
+3. `npm run test:parity -w @breadit/backend` starts the app on `eval_load`, with the cache off and the `asOf` flag on. First it checks that the row counts and the first post time equal the parity manifest, and that the backend's α, β, `m` and algo map equal the sample. Then, for each pair and `algo`:
+   - (a) `FeedService.rank` must give the same full order (size and SHA-256);
+   - (b) the first two pages of `GET /api/posts?algo=…&asOf=…` must equal the harness top 20.
+
+Result on 2026-11-10: 300 of 300 for (a) and 300 of 300 for (b), in about 34 s. Live time is Unix seconds and harness time is seconds from the base epoch. Every score uses a time difference or rises with the post time, so the orders are equal; the test compares orders, not score values. When α, β, the dataset or the package changes, run `parity` again and commit its output.
 
 ---
 
@@ -400,12 +419,12 @@ Breadit/
 │   ├── frontend/                     # @breadit/frontend · Next.js 15 App Router, React 19, Tailwind (port 3000)
 │   │   ├── src/app/
 │   │   │   ├── (board)/              # main three-column app (session and ban check in layout.tsx)
-│   │   │   │   ├── page.tsx          # home: For You, Explore, Following, Communities tabs · gets `algo` in task 8
+│   │   │   │   ├── page.tsx          # home: For You, Explore, Following, Communities tabs · the `algo` toggle on For You
 │   │   │   │   ├── @modal/           # parallel route for the compose dialog
 │   │   │   │   └── [username]/ c/ communities/ messages/ notifications/ search/ settings/ ...
 │   │   │   ├── admin-console/        # admin pages, separate layout
 │   │   │   └── sign-in/ sign-up/ verify/ forgot-password/ reset/
-│   │   ├── src/components/           # UI · Feed.tsx and InfiniteFeed.tsx get the `algo` query key in task 8
+│   │   ├── src/components/           # UI · Feed.tsx and InfiniteFeed.tsx carry `algo` in the request and the query key
 │   │   ├── src/lib/                  # api.ts (client fetch) · session.ts (serverFetch, getSession)
 │   │   ├── src/middleware.ts         # sends to /sign-in when the session cookie is missing
 │   │   └── src/socket.ts             # Socket.IO client singleton
@@ -417,13 +436,14 @@ Breadit/
 │       │   └── seed.ts               # dev seed: admin + user1–user50 · not deterministic, not for evaluation
 │       ├── src/
 │       │   ├── posts/                # PostsController, PostsService.findAll (all feeds), Explore via @breadit/ranking
-│       │   ├── feed/ 🔜              # task 8 · FeedService: loads from Prisma, calls @breadit/ranking
+│       │   ├── feed/                 # FeedService (loads from Prisma, calls @breadit/ranking), config, cursor, options
 │       │   ├── auth/                 # JWT cookie, guards, OTP and reset email
 │       │   ├── cache/                # CacheService: Redis JSON cache, version-based invalidation
 │       │   ├── block/                # BlockService: removes blocked peers from every listing
 │       │   ├── notifications/        # Socket.IO gateway and notification rows
 │       │   └── users/ comments/ interactions/ communities/ messages/ search/ hashtags/ uploads/ admin/ health/ ...
 │       ├── test/it/                  # integration tests · Postgres schema it_test, Redis db 1
+│       ├── test/parity/              # parity test · reads eval_load (never writes), Redis db 2
 │       └── Dockerfile                # builds @breadit/ranking first · runs `prisma migrate deploy` on start
 │
 ├── packages/
@@ -457,8 +477,9 @@ Breadit/
 │   │   ├── metrics.ts                # Recall@K, NDCG@K, coverage
 │   │   ├── stats.ts                  # paired bootstrap, randomization test, Holm
 │   │   ├── results-csv.ts            # writes results CSVs and their hashes
-│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank, load, load-check
+│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank, load, load-check, parity
 │   │   ├── loader/                   # writes a synthetic dataset into the Postgres schema eval_load (the only Prisma user here)
+│   │   ├── parity/                   # the parity sample: 100 (user, asOf) pairs and the harness orders
 │   │   ├── report/ 🔜                # task 9 · results CSVs → macros.csv and results-macros.tex
 │   │   └── *.test.ts                 # node --test tests (golden, leakage, double run, scipy cross-check, ...)
 │   ├── data/                         # git-ignored · canonical datasets, rebuilt by `gen` and `adapt:digg`
@@ -475,7 +496,7 @@ Breadit/
 │   ├── datasets.md                   # why Digg 2009, how to download it, calibration targets
 │   ├── literature.md · related-work.md
 │   ├── Bugs Report.md                # known bugs and the task that fixes each
-│   ├── results/                      # committed results, one folder per run (p5-baseline/)
+│   ├── results/                      # committed results, one folder per run (p5-baseline/, p6-parity/)
 │   ├── works/                        # one folder per task: design.md + plan.md
 │   └── latex/ 🔜                     # P9 · the thesis LaTeX, copied from Latex/
 │
@@ -506,8 +527,8 @@ Breadit/
 | `@breadit/ranking`, Explore uses it | P5 · task 5 | ✅ |
 | Harness, metrics, statistics, baseline table | P5 · task 6 | ✅ |
 | Postgres loader | P3 · task 7 | ✅ |
-| Feed module, `algo`, `asOf` flag, parity test, toggle | P6 · task 8 | 🔜 next |
-| Experiments E1–E6, E8, report and macros | P7 · task 9 | 🔜 |
+| Feed module, `algo`, `asOf` flag, parity test, toggle | P6 · task 8 | ✅ |
+| Experiments E1–E6, E8, report and macros | P7 · task 9 | 🔜 next |
 | Cost benchmark E7 | P7 · task 10 | 🔜 |
 | `npm run thesis:repro`, default `algo` | P8 · task 11 | 🔜 |
 | Slides and demo | P10 · task 13 | 🔜 |

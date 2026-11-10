@@ -4,7 +4,7 @@
 
 Questions a committee or a reviewer is likely to ask, each with a short answer and where the evidence is. Learn the short answer first. Open the evidence when you need detail.
 
-Answers marked **(after P7)** depend on results that do not exist yet. Their final text is written when the experiments are done. Status: 2026-11-02, after P5.
+Answers marked **(after P7)** depend on results that do not exist yet. Their final text is written when the experiments are done. Status: 2026-11-10, after P6.
 
 ---
 
@@ -100,8 +100,8 @@ Write here: the F1 row for `syn-W2M-M` and for `digg2009` (mean difference, CI, 
 ## E. The system
 
 **Q23. How do you know the live app ranks the same way as your evaluation?**
-Both call the same package, `@breadit/ranking`, so only data loading differs. A parity test compares the live endpoint and the harness for 100 sampled (user, time) pairs and requires identical orders.
-*Evidence:* `docs/System_Architecture.md` §6.4; task 8 **(after P6)**.
+Both call the same package, `@breadit/ranking`, so only data loading differs. A parity test compares the live endpoint and the harness for 100 sampled (user, time) pairs and requires identical orders. On `syn-W2M-M` it passes for all three `algo` values: 300 of 300 full orders at the feed module and 300 of 300 first two pages over HTTP.
+*Evidence:* `docs/System_Architecture.md` §6.4; task 8 (`.docs/results/p6-parity/`, `npm run test:parity -w @breadit/backend`).
 
 **Q24. Can someone reproduce your numbers?**
 Yes. All randomness comes from one seed, scores are integers, ties are total, files are canonical, and each output has a SHA-256 in a manifest. A double-run test proves byte-identical output. `npm run thesis:repro` (task 11) rebuilds everything and compares every hash.

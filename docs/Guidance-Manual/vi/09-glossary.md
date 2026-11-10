@@ -62,7 +62,7 @@ Thuật ngữ chuyên ngành được giữ nguyên tiếng Anh, vì thesis và 
 | **H** | Hybrid: engagement + α·social + β·community. |
 | **H-follow / H-comm** | H chỉ có social term / chỉ có community term. |
 | **H-noauthor / H-noengager** | H bỏ phần author / bỏ phần engager của social term. |
-| **`algo`** | Tham số API dự kiến của feed thật: `chrono`, `engagement`, `social` (task 8). |
+| **`algo`** | Tham số API của feed For You thật: `chrono` (BL0), `engagement` (BL2), `social` (H) (task 8). |
 
 ## D. Đánh giá
 

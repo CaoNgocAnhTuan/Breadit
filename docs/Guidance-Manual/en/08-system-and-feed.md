@@ -6,13 +6,13 @@
 
 Sources: the code (`apps/backend/src/posts/`, `packages/ranking/src/`, `apps/frontend/src/components/`), super-plan P6 and P7, implementation-plan §1 and §2.6. Diagrams: [System_Architecture.md](../../System_Architecture.md). Terms: [09 Glossary](09-glossary.md).
 
-**Status.** Sections 2 and 3 describe the code as it is on 2026-11-02. Sections 4 to 6 describe task 8 (`p6-social-feed`), which is **not built yet**. Code there is a sketch; task 8's design fixes the real code.
+**Status.** Every section describes the code as it is on 2026-11-10, after task 8 (`p6-social-feed`) built the social feed. The design of task 8 is in `.docs/works/2026-11-10-p6-social-feed/design.md`.
 
 ---
 
 ## 1. The components on the feed path
 
-The big picture, feed path only. Dashed boxes are planned (task 8). The full diagram is in [System_Architecture.md §3](../../System_Architecture.md).
+The big picture, feed path only. The full diagram is in [System_Architecture.md §3](../../System_Architecture.md).
 
 ```mermaid
 flowchart LR
@@ -21,7 +21,6 @@ flowchart LR
     classDef pkg fill:#FDF2F8,stroke:#DB2777,color:#831843
     classDef db fill:#FEF3E8,stroke:#C2410C,color:#431407
     classDef off fill:#FEFCE8,stroke:#A16207,color:#422006
-    classDef planned stroke-dasharray:6 4
 
     UI["Frontend<br/>Feed · InfiniteFeed"]:::fe
     API["PostsController<br/>GET /api/posts"]:::be
@@ -31,7 +30,6 @@ flowchart LR
     PG[("Postgres")]:::db
     RD[("Redis<br/>page cache")]:::db
     EVAL["eval/ harness<br/>offline"]:::off
-    class FS planned
 
     UI -->|"cursor, feed, algo"| API --> SVC
     SVC <-->|"10 s pages"| RD
@@ -48,42 +46,44 @@ How to read it: the frontend calls `PostsController`, and `PostsService` checks 
 
 | Component | Where | Its job in the feed |
 |---|---|---|
-| Home page | `apps/frontend/src/app/(board)/page.tsx` | Shows the tabs (For You, Explore, Following, Communities) and reads `?feed=` from the URL |
+| Home page | `apps/frontend/src/app/(board)/page.tsx` | Shows the tabs (For You, Explore, Following, Communities), reads `?feed=` and `?algo=` from the URL, and on For You shows the toggle "Chronological · Engagement · Social" |
 | `Feed` | `apps/frontend/src/components/Feed.tsx` | Server component: fetches page 1 with `serverFetch`, forwarding the session cookie |
 | `InfiniteFeed` | `apps/frontend/src/components/InfiniteFeed.tsx` | Client component: TanStack Query fetches the next pages with `nextCursor` while you scroll |
-| `PostsController` | `apps/backend/src/posts/posts.controller.ts` | `GET /api/posts` with `cursor`, `user`, `feed`, `communityId`; `OptionalJwtAuthGuard` fills `req.user` if logged in |
+| `PostsController` | `apps/backend/src/posts/posts.controller.ts` | `GET /api/posts` with `cursor`, `user`, `feed`, `communityId`, `algo` and the test-only `asOf`; `OptionalJwtAuthGuard` fills `req.user` if logged in |
 | `PostsService.findAll` | `apps/backend/src/posts/posts.service.ts` | Picks the feed mode, checks the cache, builds the query, orders, pages |
 | `CacheService` | `apps/backend/src/cache/` | Redis JSON cache with version keys (`v:user`) |
 | `BlockService` | `apps/backend/src/block/` | Gives the blocked peers, removed from every feed |
 | `PrismaService` | `apps/backend/src/prisma/` | The database client |
 | `@breadit/ranking` | `packages/ranking/` | Pure functions: pool, features, scores, sort. No database, no clock |
-| `FeedService` 🔜 | `apps/backend/src/feed/` (task 8) | Loads data for the ranking, calls `@breadit/ranking`, returns ordered post ids |
+| `FeedService` | `apps/backend/src/feed/` (task 8) | Loads data for the ranking, calls `@breadit/ranking`, returns the ranked pool as `(id, score)` |
 
-## 2. How a feed request works today
+## 2. How a feed request works
 
-1. You open `/` (For You) or `/?feed=explore`. The server component `Feed` calls `GET /api/posts?cursor=1&feed=...` with your cookie.
-2. `PostsController.findAll` passes `cursor`, `user`, your id (or none for a guest), `feed` and `communityId` to `PostsService.findAll`.
-3. **Cache check.** The key is `feed:<viewer>:<mode>:<profile user>:<communityId>:<cursor>:<v:user>`. A hit returns at once. Pages live **10 seconds**. Follow, block and community changes bump `v:user`, so your next request misses the cache.
-4. **Blocked peers** are loaded and excluded in every mode.
-5. **Mode → query:**
+1. You open `/` (For You), `/?algo=social` or `/?feed=explore`. The server component `Feed` calls `GET /api/posts?cursor=1&...` with your cookie.
+2. `PostsController.findAll` passes `cursor`, `user`, your id (or none for a guest), `feed`, `communityId`, `algo` and `asOf` to `PostsService.findAll`.
+3. **Options.** `resolveFeedOptions` checks `algo` and `asOf` (section 4) and applies the default `algo` from `FEED_DEFAULT_ALGO`. Then the clock is read **once** for the whole request.
+4. **Cache check.** The key is `feed:<viewer>:<mode>:<profile user>:<communityId>:<cursor>:<v:user>:<asOf>`. A hit returns at once. Pages live **10 seconds**. Follow, block, community and own-post changes bump `v:user`, so your next request misses the cache.
+5. **Blocked peers** are loaded and excluded in every mode.
+6. **Mode → query:**
 
 | Mode | Which posts | Order |
 |---|---|---|
-| For You (logged in, no `feed`) | yours and your followees', no community posts | newest first |
+| For You with `algo` (logged in) | the shared pool: root posts of the last 7 days, community posts included (approved only), not yours, not already touched, not blocked | `chrono` = BL0, `engagement` = BL2, `social` = H (section 4) |
+| For You without `algo` (logged in, `FEED_DEFAULT_ALGO` unset) | yours and your followees', no community posts | newest first |
 | `following` | your followees' only | newest first |
 | `communities` | approved posts of your communities | newest first |
 | `explore` | everyone's, no community posts, last 7 days, at most 400 newest | Explore score, then at most 3 posts per author in a window |
 | guest | everyone's, no community posts | newest first |
 
-6. **Pages** have 10 posts. Page 1 is asked with `cursor=1`. Later pages use a token cursor: `(createdAt, id)` for the newest-first modes, `(scoreFixed, id)` for Explore.
-7. `InfiniteFeed` asks for the next page with `nextCursor`. Its query key is `["posts", user, feed, communityId]`.
+7. **Pages** have 10 posts. Page 1 is asked with `cursor=1`. Later pages use a token cursor: `(createdAt, id)` for the newest-first modes, `(scoreFixed, id)` for Explore, `t:score:id` for the `algo` feeds.
+8. `InfiniteFeed` asks for the next page with `nextCursor`. Its query key is `["posts", user, feed, communityId, algo]`.
 
-**Explore and the ranking package.** Explore already calls `computeExploreScoreFixed` from `@breadit/ranking` for each of the 400 candidates. This is the first place where the backend "gets a result from the ranking": it passes counts and age, gets back one integer, and sorts by `(scoreFixed desc, id desc)`.
+**Explore and the ranking package.** Explore calls `computeExploreScoreFixed` from `@breadit/ranking` for each of the 400 candidates: it passes counts and age, gets back one integer, and sorts by `(scoreFixed desc, id desc)`. Since task 8 it uses one time per request for the window and the age: the clock read once, or `asOf` (Bugs Report T4).
 
-**What is weak today** (and what the thesis changes):
-- For You is newest first among followees: not personal, and a new user with no follows sees only their own posts.
-- Community posts never enter For You or Explore, so community affinity has nothing to rank.
-- Explore reads `Date.now()` for the window and the age, so it cannot be replayed at a past time (Bugs Report T4).
+**What was weak before the thesis** (and what changed):
+- For You was newest first among followees: not personal, and a new user with no follows saw only their own posts. The `algo` feeds rank a shared pool for everyone; the default stays as before until P7 decides.
+- Community posts never entered For You or Explore, so community affinity had nothing to rank. The `algo` feeds now include approved community posts.
+- Explore read `Date.now()` twice, so it could not be replayed at a past time. Fixed in task 8 (T4).
 
 ## 3. The contract between the backend and the ranking package
 
@@ -98,12 +98,12 @@ How to read it: the frontend calls `PostsController`, and `PostsService` checks 
 | `rankPool(pool, score)` | the pool and a score function | post ids, ordered by `(score desc, postId desc)` |
 
 Two conversions happen at the border:
-- **Time:** Prisma gives `Date` objects; the package wants integer seconds. `asOf.t` is "now" in seconds, with no event id, so only events strictly before now count.
+- **Time:** Prisma gives `Date` objects; the package wants integer seconds. The feed module rounds every time down to whole Unix seconds (`toSec`). `asOf.t` is "now" (or the test `asOf`) in seconds, with no event id, so only events strictly before it count. The harness counts seconds from the base epoch instead. Every score uses a time difference or rises with the post time, so both give the same order; only BL0's score values differ.
 - **Ids:** user ids are strings on both sides (the loader writes `u0000000042`-style ids for loaded datasets). Post ids are integers.
 
 The evaluation (`eval/`) calls exactly the same five functions with data read from CSV files. That is why a number measured offline describes the live feed.
 
-## 4. The planned For You flow with `algo=social` 🔜 (task 8)
+## 4. The For You flow with `algo=social` (task 8)
 
 ```mermaid
 sequenceDiagram
@@ -115,56 +115,60 @@ sequenceDiagram
     participant F as FeedService
     participant DB as Postgres
     participant R as ranking package
-    UI->>C: GET /api/posts with algo=social and a cursor
-    C->>S: findAll(..., algo)
-    S->>K: key includes algo and v:user
+    UI->>C: GET /api/posts?algo=social&cursor=1
+    C->>S: findAll(..., { algo, asOf })
+    S->>S: resolveFeedOptions, t = asOf or the clock
+    S->>K: key includes algo, cursor, v:user and asOf
     alt hit
         K-->>S: cached page
     else miss
-        S->>F: ordered ids for user at now
-        F->>DB: 1. candidate posts of the last 7 days
-        F->>DB: 2. positives on those posts
-        F->>DB: 3. user's follows, memberships, earlier positives
-        F->>DB: 4. blocked peers
-        F->>R: userFeaturesAsOf, postFeaturesAsOf per candidate
-        F->>R: buildPool, then scorer H and rankPool
+        S->>F: rank(user, social, t)
+        F->>DB: 1. root posts in [t − W, t), community posts included
+        F->>DB: 2. user's follows, memberships, positives before t
+        F->>DB: 3. blocked peers
+        F->>R: userFeaturesAsOf, buildPool
+        F->>DB: 4. likes, comments, reposts on the pool posts before t
+        F->>R: postFeaturesAsOf per pool post, scorer H, rankPool
         R-->>F: ordered post ids
-        F-->>S: ordered ids
-        S->>DB: load the 10 posts of this page with counts and media
-        S->>K: store the page
+        F-->>S: (id, score) in rank order
+        S->>DB: load the 10 posts after the cursor, with counts and media
+        S->>K: store the page, 10 s
     end
-    S-->>C: posts, hasMore, nextCursor
+    S-->>C: posts, hasMore, nextCursor "t:score:id"
     C-->>UI: JSON
 ```
 
-**What `FeedService` must load** (step 3 to 6 above):
+**What `FeedService` loads** (`apps/backend/src/feed/feed.service.ts`):
 
 | Data | From | Used for |
 |---|---|---|
-| Candidate posts | `Post`: root posts, not deleted, approved, created in the last 7 days, **community posts included** | the pool |
-| Positives on candidates | `Like`, comments, reposts on those posts, with user and time | likes, comments, reposts, who engaged |
+| Candidate posts | `Post`: root posts (`parentPostId` and `rePostId` null) created in `[t − W, t)`, **community posts included**, with `isApproved` and `deletedAt`. No row limit | the pool. `buildPool` drops deleted and pending posts (R2) and keeps the newest N_max |
 | The user's follows | `Follow` where the user is the follower, with `createdAt` | followees (counted once, Bugs Report T6) |
 | The user's memberships | `CommunityMember`, with `createdAt` | communities |
-| The user's earlier positives | the user's likes, comments, reposts, plus author and community of each post | trust, community counts, and removing posts already seen |
+| The user's earlier positives | the user's likes, live comments and live reposts before t, plus author and community of each touched post | trust, community counts, and removing posts already touched |
 | Blocked peers | `BlockService.getAllBlockedPeerIds` | removed from the pool |
+| Positives on the pool posts | `Like`, live `Comment` rows and live repost rows (`Post` with `rePostId`) on the pool posts, before t | likes, comments, reposts, who engaged |
 
-The query must not cut the candidates below N_max + the user's earlier positives, so `buildPool` sees the same set as the evaluation would (implementation-plan §2.6).
+Follows and memberships are read with their times, not from the cached `getFolloweesIds` / `getCommunityIds`, because the as-of rule needs the times. The candidate query has no row limit, so `buildPool` sees the same set as the evaluation (implementation-plan §2.6). Positives are loaded only for the pool posts, after `buildPool`.
 
-**Parameters.** α and β come from tuning in P7 and are frozen; m is 5. The `algo` value: `chrono` (today's order), `engagement` (the Explore score on the same pool), `social` (H). The default `algo` comes from an environment variable; when it is not set, For You behaves exactly as today.
+**Parameters** (`feed/feed.constants.ts`). `chrono` = BL0 (followee posts first, then newest first), `engagement` = BL2 (the Explore score on the shared pool), `social` = H. α and β of H are placeholders (α = β = 1) until P7 tunes them; task 11 writes the tuned values in this file. `m`, W and N_max are the values of super-plan §7, and a unit test checks them against `eval/config/frozen-v1.json`. The default `algo` comes from `FEED_DEFAULT_ALGO`; when it is not set, For You behaves exactly as before.
 
-**Sketch of the call** (illustrative; names may change in task 8):
+**The call** (shortened from `FeedService.rank`):
 
 ```ts
-const asOf = { t: Math.floor(Date.now() / 1000) };
-const uf = userFeaturesAsOf(userId, asOf, { follows, memberships, positives: myPositives, postInfo });
-const pool = buildPool(
-  { user: userId, asOf, candidates, blocked, earlierPositives },
-  { windowSec: 7 * 24 * 3600, maxPosts: 2000 },
-);
-const score = scorer('H');
-const ctx = { user: userId, asOf, uf, params: { alpha, beta, m: 5 } };
-const orderedIds = rankPool(pool, (p) => score(ctx, p, postFeatures.get(p.id)!));
+const asOf = { t: asOfSec };                       // from PostsService: asOf, or the clock read once
+const uf = userFeaturesAsOf(userId, asOf, { follows, memberships, positives, postInfo });
+const pool = buildPool({ user: userId, asOf, candidates, blocked, earlierPositives }, POOL_PARAMS);
+const score = scorer(ALGO_METHOD[algo]);            // BL0, BL2 or H
+const ctx = { user: userId, asOf, uf, params: methodParams(algo) };
+const order = rankPool(pool, (p) => score(ctx, p, feats.get(p.id)!));
 ```
+
+**Paging.** The cursor `t:score:id` holds the time t the pool was ranked at and the last item. Page 2 ranks the pool again **at the same t** and returns the items after `(score, id)`. Events after t are not visible at t, so the pages never repeat or skip a post. Without `asOf`, a cursor older than 24 hours gives 400 and the client starts again from page 1.
+
+**Input rules.** `algo` works only on the logged-in For You. An unknown `algo`, or `algo` with `feed`, `user` or `communityId`, gives 400; a guest with `algo` gets 401. `asOf` (Unix seconds) is accepted only when `FEED_ASOF_ENABLED=true`, and the backend refuses to start with that flag in production. A wrong `FEED_DEFAULT_ALGO` also stops the backend at start.
+
+**A limit of `asOf`.** It replays creates only. A post deleted or a like removed after t is already gone from the database (an unlike is a hard delete). The loaded datasets have no deletes, so the parity test is not affected.
 
 ## 5. Optimizing the feed: two different goals
 
@@ -186,8 +190,8 @@ E7 measures latency and query count for `chrono`, `engagement` and `social` (Cla
 | Lever | Idea | Watch out |
 |---|---|---|
 | Page cache | already there: 10 s, key includes `algo` and `v:user` | a longer TTL shows stale feeds |
-| Graph caches | followees and communities are cached 300 s (`graph:follows`, `graph:communities`), cleared on follow or membership change | a community ban must also clear it (Bugs Report B6) |
-| Rank once, page many | keep the ordered id list for a short time and serve pages 2, 3, … from it, instead of ranking again per page | the age term changes scores every second, so a re-rank between pages can move posts; a cursor on `(scoreFixed, id)` like Explore is the other option |
+| Graph caches | followees and communities are cached 300 s (`graph:follows`, `graph:communities`), cleared on follow, membership change, community ban and community delete (B6, task 8) | the `algo` feeds do not use them: they need the follow and membership times |
+| Rank once, page many | today each page ranks the pool again at the cursor's t; keeping the ranked list for a short time would serve pages 2, 3, … without that work | the list must be the one ranked at the same t, or the pages stop matching |
 | Counts in SQL | get likes, comments, reposts per candidate with a grouped count instead of loading every like row | the counts must follow the same "strictly before now" rule |
 | Only followee engagers | the social term only uses engagers who are followees, so loading just those gives the same scores | must give the same order: check with the parity test |
 | Indexes | e.g. `Like(postId)`, `Post(createdAt, id)`, `Follow(followerId)` | needs a schema migration, which v0.2 cut (super-plan §9); future work |
@@ -196,9 +200,11 @@ E7 measures latency and query count for `chrono`, `engagement` and `social` (Cla
 
 **Every optimization must keep the parity test green.** For 100 sampled (user, time) pairs, the live order must equal the evaluation order. If an optimization changes the pool or a feature, the app no longer runs what the thesis measured, and the results stop describing the app.
 
+How to run it: `npm run load -w @breadit/eval -- syn-W2M-M` (without `--rebase-to`), then `npm run test:parity -w @breadit/backend`. It compares the full order at `FeedService.rank` and the first two HTTP pages for each pair and each `algo`, against the committed sample in `.docs/results/p6-parity/` (made by `npm run parity -w @breadit/eval`). On 2026-11-10: 300 of 300 and 300 of 300. When α, β, the dataset or the package changes, make the sample again and commit it.
+
 ## 6. What does not change
 
-The guards (`OptionalJwtAuthGuard` first), the block filter, soft delete (`deletedAt`), approved-only community posts, the version-based cache, and the response shape `{ posts, hasMore, nextCursor }`. The frontend needs only the `algo` value in the URL whitelist and in the query key.
+The guards (`OptionalJwtAuthGuard` first), the block filter, soft delete (`deletedAt`), approved-only community posts, the version-based cache, and the response shape `{ posts, hasMore, nextCursor }`. The frontend only adds the `algo` value to the URL whitelist, the request and the query key.
 
 ## 7. Check yourself
 

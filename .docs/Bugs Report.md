@@ -13,11 +13,11 @@ How the report was made: first I read the code and listed 26 suspected problems.
 | | Count |
 |---|---|
 | Findings in the review | 36 (T1–T10, S1–S6, B1–B10, N1–N10) |
-| **Resolved** | **14** |
-| **Still open** | **22 of the 36, plus 7 found later (R1–R7) = 29** |
-| Open decision | 0 (D1 decided on 2026-10-28, section 4) |
+| **Resolved** | **17** (14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed`) |
+| **Still open** | **19 of the 36, plus 7 found later (R1–R7) = 26** |
+| Open decision | 0 (D1 decided on 2026-10-28 and built on 2026-11-10, section 4) |
 
-Open items by priority: **P1 = 6, P2 = 6, P3 = 8, P4 = 9.** What the levels mean is in section 2.
+Open items by priority: **P1 = 3, P2 = 6, P3 = 8, P4 = 9.** What the levels mean is in section 2.
 
 The fixes were checked like this:
 - The same curl script ran on the unfixed code (**42 passed, 53 failed**) and on the final code on a freshly seeded database (**95 passed, 0 failed**). Output: [works/2026-10-21-bugs-sweep/sweep-before.txt](works/2026-10-21-bugs-sweep/sweep-before.txt) and [works/2026-10-21-bugs-sweep/sweep-after.txt](works/2026-10-21-bugs-sweep/sweep-after.txt).
@@ -38,7 +38,7 @@ The fixes were checked like this:
 Effort guess: **XS** under 30 min, **S** under 2 hours, **M** half a day, **L** over a day.
 
 **Suggested order**
-1. **By thesis phase:** T4, T3, B6, R2 in **P6** (with the D1 product rule). Then N6 in **E7**. T6 waits for the schema migration, which the super plan cut (v0.2, §9); the social feed counts distinct followees instead.
+1. **By thesis phase:** T4, T3, B6, the pool part of R2 and the D1 product rule are done in **P6** (task `p6-social-feed`, 2026-11-10). N6 is next, in **E7**. T6 waits for the schema migration, which the super plan cut (v0.2, §9); the social feed counts distinct followees instead.
 2. **Before sharing the app:** S5 (HTTP part), B1, S4, S6, B5, R3.
 3. **Quick wins** (each XS or S, about half a day together): B9, B10, B2, R1, N8, B1, S5, N7.
 4. The rest of P3 and P4.
@@ -54,11 +54,8 @@ Code locations use function and file names, because line numbers moved during th
 | ID | Problem and effect | Evidence from the run | How to fix | Effort |
 |---|---|---|---|---|
 | **T6** | `interactions.service.ts` (like, save) and `users.service.ts` (follow) do "check, then write" and the tables have no unique key. Two fast requests make duplicate rows and wrong counts. Until fixed, `\|F_u\|` in the trust formula counts duplicates twice. | 6 parallel likes made 6 rows. 6 parallel follows made 6 rows, and one unfollow left 5. **The clean seed already has duplicates:** 53 like pairs (54 extra rows), 45 follow pairs (48 extra), 3 saved pairs (3 extra). | **The schema migration** (cut from the super plan in v0.2, kept in its §9): delete duplicates (keep the lowest `id`), add unique keys, add a CHECK against self-follow. The toggles must catch the unique-key error. The seed is a ready test for the migration. | M |
-| **T4** | Explore uses `Date.now()` for the 7-day window and for age (`posts.service.ts`, Explore branch). The same request gives a different order later, so it cannot be replayed at a past time. | The same Explore page 1 gave `nextCursor` `699:557`, and about ten minutes later `696:557`. | **Partly fixed (2026-11-02, task `p5-ranking-package`):** the score now lives in `@breadit/ranking` and takes time as an argument. Still open: Explore's own `Date.now()` for the window and the age, which goes with the `asOf` flag in task `p6-social-feed`. | M |
-| **T3** | The feed cache lives 10 s and is keyed by the `v:user` counter. Creating or deleting a post, like, repost and comment never change that counter, so a new post can be missing from the feed for up to 10 s. | bob's feed was empty. After he posted, the same call still returned 0 posts, while the profile feed showed it. 11 s later it was there. In Chrome the compose box cleared but the post did not show. With the cache off it showed at once. | Bump `v:user` of the author on create and delete (and on interactions), or skip the cache for the viewer's own feed. **P6/E7:** run the parity test with `REDIS_HTTP_CACHE_ENABLED=false`, and say in E7 whether the cache is on. | S |
 | **N6** | The rate limit (1,000 per minute, `app.module.ts`) is counted **per route** per IP and is hard-coded. The Next server calls from one IP, so all its users share each counter. It is the likely cause of the 71% failures in the old k6 file (not proven: that file stores no status codes). | After 1,300 calls to `/api/posts`, that route gave 429, while `/api/search`, `/api/hashtags/trending` and `/api/communities` gave 200. | **E7** (in the plan): make the limit an env variable. A k6 run counts only if `http_req_failed` is 0. | S |
-| **B6** | A community ban does not clear the banned member's cached community list (5 min). The thesis feed will reuse `getCommunityIds`. | In `club-two`, dave's Communities feed showed post 905. The mod banned dave. 11 s later the feed still showed it. | In `banUser`: delete `graph:communities` for the target and bump `v:user`. Do the same for all members when a community is deleted. | S |
-| **R2** | Pending community posts (not yet approved) can still be liked, saved, reposted and commented on by ID, and their comments can be read. The post itself is hidden since the fix for T10. | The like was accepted: a pending post showed in the Likes tab before the T10 fix. The comment parts are from code. | `assertPostLive` also hides unapproved posts from non-staff. **P6:** `buildPool` must require `isApproved = true` when community posts enter the candidate pool. | S |
+| **R2** | Pending community posts (not yet approved) can still be liked, saved, reposted and commented on by ID, and their comments can be read. The post itself is hidden since the fix for T10. | The like was accepted: a pending post showed in the Likes tab before the T10 fix. The comment parts are from code. | `assertPostLive` also hides unapproved posts from non-staff. **The pool part is done** (task `p6-social-feed`, 2026-11-10): the feed module passes `isApproved` to `buildPool`, which drops pending posts (IT test in `feed-algo.it-spec.ts`). The interaction part is still open; the task left it out because it is not on the feed path. | S |
 
 ### 3.2 P2: before anyone else uses the app
 
@@ -102,13 +99,13 @@ Code locations use function and file names, because line numbers moved during th
 
 ## 4. Decisions
 
-**D1. Can a non-member post into a community? Decided on 2026-10-28: no, a community post needs membership.** Today anyone can submit a post to any community and it goes to the approval queue (`PostsService.create`). The community term in the hybrid score assumes that "member" means something. The synthetic generator follows the rule (task `p3-synthetic-generator`, 2026-11-02). The product rule in the backend is still to do, in task `p6-social-feed` (`.docs/implementation-plan.md` §5, task 8).
+**D1. Can a non-member post into a community? Decided on 2026-10-28: no, a community post needs membership.** Today anyone can submit a post to any community and it goes to the approval queue (`PostsService.create`). The community term in the hybrid score assumes that "member" means something. The synthetic generator follows the rule (task `p3-synthetic-generator`, 2026-11-02). **The product rule is built** (task `p6-social-feed`, 2026-11-10): `PostsService.create` answers 403 "Join the community to post in it" to a non-member, after the ban check (`cb1db27`), and a community page shows the compose box only to members (`50f7da5`).
 
 ---
 
 ## 5. Resolved bugs
 
-The 14 findings below are fixed on `test-app`. "Where" is the code at the tag `v1-prethesis`. Details of each test are in [Pre-thesis verify.md](Pre-thesis%20verify.md).
+The 17 findings below are fixed on `test-app`: 14 in the bug sweep, and T3, T4 and B6 in task `p6-social-feed` (2026-11-10, the last three rows of §5.1). "Where" is the code at the tag `v1-prethesis`. Details of each sweep test are in [Pre-thesis verify.md](Pre-thesis%20verify.md).
 
 ### 5.1 Thesis path
 
@@ -121,6 +118,9 @@ The 14 findings below are fixed on `test-app`. "Where" is the code at the tag `v
 | **T8** | "Most popular" users were sorted by `_count.followers`, which in this schema means "accounts this user follows" (`users.service.ts`). | Recommendations: user32, user3, user48. The most followed: user16, user40, user31. | Rank by followers received, with `id` as tie-break. Connect keeps the field `_count.followers` that the UI reads, now with the real number. Chrome now shows User 16, 31, 40. | `db5a8f4` |
 | **T9** | Recommendations and Connect showed blocked and banned users. | After carol blocked user32, it was still in recommendations and on the connect list (9 pages, 107 users). A banned user was in connect. | Exclude yourself, people you follow, blocked peers (both directions) and banned accounts. | `db5a8f4` |
 | **T10** | A pending community post could be opened by URL and showed in the Likes tab (`findOne`, `getPostsByTab`). | A user outside the community got post 901. A pending post liked by `t_cat` showed in her public Likes tab. | Visible only to the author and the community owner or mods (404 for everyone else). The Likes tab skips pending posts. | `53fb757` |
+| **T4** | Explore used `Date.now()` for the 7-day window and again for the age (`posts.service.ts`, Explore branch), so it could not be replayed at a past time. | The same Explore page 1 gave `nextCursor` `699:557`, and about ten minutes later `696:557`. | The score moved to `@breadit/ranking` with time as an argument (task `p5-ranking-package`). Then Explore got one time per request: the clock read once, or the test-only `asOf`. IT test: two calls with the same `asOf` give byte-identical pages (`explore-asof.it-spec.ts`). | `e4a62da` |
+| **T3** | The feed cache lives 10 s and is keyed by `v:user`. Creating or deleting a post did not change that counter, so a new post could be missing from the author's feed for up to 10 s. | bob posted and his feed still returned 0 posts for 11 s. With the cache off it showed at once. | `PostsService.create` and `remove` bump the author's `v:user` (unit test `posts.service.spec.ts`). Likes, reposts and comments still do not bump anyone's version: other users' feeds can be up to 10 s old. The parity test runs with `REDIS_HTTP_CACHE_ENABLED=false`, and E7 must say whether the cache is on. | `cb1db27` |
+| **B6** | A community ban did not clear the banned member's cached community list (5 min). | In `club-two`, dave's Communities feed showed post 905 for 11 s after the mod banned him. | `banUser` deletes `graph:communities` for the target and bumps their `v:user`. `deleteCommunity` does the same for every former member, read inside its transaction (unit test `communities.service.spec.ts`). | `cb1db27` |
 
 ### 5.2 Security
 
@@ -152,8 +152,8 @@ The 14 findings below are fixed on `test-app`. "Where" is the code at the tag `v
 | Phase | Bugs |
 |---|---|
 | **Schema migration** (cut from the super plan in v0.2, §9) | T6, and with the same migration: N3, N10, R4 (schema part) |
-| **P6** (hybrid scorer) | T4, T3, B6, R2, and the D1 product rule |
-| **E7** (cost run) | N6, and T3 (say if the cache is on) |
+| **P6** (hybrid scorer) | done in task `p6-social-feed` (2026-11-10): T4, T3, B6, the pool part of R2, and the D1 product rule. The interaction part of R2 is still open (no phase) |
+| **E7** (cost run) | N6, and the T3 note (say if the cache is on) |
 | **Before sharing the app** | S5, B1, S4, S6, B5, R3, R6 |
 | **No phase, when time allows** | the rest of P3 and P4 |
 

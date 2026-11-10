@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.6 · 2026-11-10 · Status: approved 2026-10-28
+Version 1.7 · 2026-11-10 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -11,13 +11,13 @@ How the pieces of P3 to P10 fit together in the code. A thing is here only if tw
 |---|---|---|---|
 | `packages/ranking` (`@breadit/ranking`) | `p5-ranking-package` ✅ (2026-11-02) | the Node standard library only | Types, `buildPool`, as-of feature functions, every scorer, `rankPool`, and `computeExploreScoreFixed` moved from `posts.service.ts`. Pure: no Nest, Prisma, Redis, clock or randomness. Builds to `dist/` with `tsc`, like `@breadit/shared` |
 | `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it ✅ (2026-11-02; `rng.ts`, `canonical/`, `generator/`, `checks/`, `config/`; `adapters/digg.ts` by `p4-digg-adapter` ✅; `harness/`, `metrics.ts`, `stats.ts` by `p5-eval-harness` ✅; `loader/` by `p3-postgres-loader` ✅ (2026-11-10); report still to come) | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `config/` |
-| Backend feed module `apps/backend/src/feed/` | `p6-social-feed` | `@breadit/ranking`, `PrismaService`, `BlockService` | A thin service that loads data and calls `buildPool` and a scorer. `PostsService.findAll` calls it when `algo` is set. Explore imports `computeExploreScoreFixed` from `@breadit/ranking` (done in `p5-ranking-package`) |
-| Frontend toggle | `p6-social-feed` | the API only | `algo` in `app/(board)/page.tsx`, `Feed.tsx`, `InfiniteFeed.tsx` |
+| Backend feed module `apps/backend/src/feed/` | `p6-social-feed` ✅ (2026-11-10) | `@breadit/ranking`, `PrismaService`, `BlockService` | A thin service that loads data and calls `buildPool` and a scorer. `PostsService.findAll` calls it when `algo` is set. Explore imports `computeExploreScoreFixed` from `@breadit/ranking` (done in `p5-ranking-package`) |
+| Frontend toggle | `p6-social-feed` ✅ (2026-11-10) | the API only | `algo` in `app/(board)/page.tsx`, `Feed.tsx`, `InfiniteFeed.tsx` |
 
 Rules:
 - Nothing imports `eval`.
 - The harness never touches Postgres, Redis or HTTP (super-plan §2). Only the loader writes to Postgres.
-- `getFolloweesIds` and `getCommunityIds` stay in `PostsService`. P6 decides how the feed module reaches them.
+- `getFolloweesIds` and `getCommunityIds` stay in `PostsService`. P6 decides how the feed module reaches them. Decided in task 8: it does not use them, because they hold ids without times; it reads follows and memberships with their `createdAt`.
 - The determinism rule and hook already cover `packages/ranking/**` and `eval/**`.
 
 ## 2. Data contracts
@@ -147,6 +147,8 @@ The report reads only the CSVs above. It writes `macros.csv` (`name, value, file
 
 `eval rank --dataset <id> --method <m> --user <u> --asof <t> --top <n>` prints post ids in order. The 100 (user, `asOf`) pairs of the P6 test are drawn with the `parity` stream from users and times of `syn-W2M-M`. They are written to a committed CSV, so P6 and the harness use the same pairs.
 
+**Done (task 8, 2026-11-10).** `npm run parity -w @breadit/eval -- --param alpha=<a> --param beta=<b>` draws 25 pairs per history bucket and writes `.docs/results/p6-parity/`: `pairs.csv`, `expected.csv` (pool size, SHA-256 of the full harness order and top 20, for each pair and `algo`) and `manifest.json` (params, algo-to-method map, dataset hash, row counts and first post time). `npm run test:parity -w @breadit/backend` compares the live feed with it on `eval_load`.
+
 ## 3. Cut time T and Holm family
 
 This part is written and committed before the script reads the real Digg files. So the Digg counts cannot bend the rule.
@@ -271,15 +273,15 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-10. ✅ mea
 | ✅ 11-02 | 5 | `p5-ranking-package` | P5 | 1 | `packages/ranking`, move `computeExploreScoreFixed`, backend imports it, Dockerfile build order | 3 | 11-06 | T4 (score takes `asOf`) |
 | ✅ 11-02 | 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
 | ✅ 11-10 | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
-| ▶ next | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
-| ⬜ | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
+| ✅ 11-10 | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
+| ▶ next | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
 | ⬜ optional | 9b | `p7-hive-check` | P7 | 9, closed on 11-13 | gate: BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (section 3.2); then a Hive adapter and H-comm against BL2 (super-plan P7) | 0.5 for the gate | 11-14 | — |
 | ⬜ | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
 | ⬜ | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
 | ⬜ | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
 | ⬜ | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
 
-Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Task 7 closed on 11-10, one day after its planned end. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
+Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Task 7 closed on 11-10, one day after its planned end. Task 8 closed on 11-10, one day before its planned end, so the plan is on time again. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
 
 **Task 9b is optional** (added 2026-11-10). Its gate runs right after task 9, only if task 9 closes on 11-13, and takes at most half a day. Tasks 10 to 13 then move half a day later, into the spare day 11-19. The whole Hive work was estimated at 2–3 days, more than the spare days left. So if the gate passes, the author decides then whether to run the rest or to put Hive in future work.
 
@@ -313,3 +315,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.4 · 2026-11-02 · Task `p5-eval-harness`: §2.7 the 5 MB rule for `per_user.csv` and the NDCG basis of `compare.csv`; §3.4 confirmed by the author; §1 and §5: task 6 ✅, task 7 next.
 - 1.5 · 2026-11-10 · Optional task 9b `p7-hive-check` (super-plan 0.22): its row and a note in §5, a cut-trigger row, a row in the §4 measurement plan, the §3.3 list of runs with no family, and a §6 bullet. No contract, rule or other task changed. Dates move only if the gate runs (tasks 10 to 13 by half a day).
 - 1.6 · 2026-11-10 · Task `p3-postgres-loader`: §2.5 says what the loader writes for task 8 (three tables of positives, repost rows left out of the live pool, the `eval_load` schema); §1 `eval/` row (loader done); §5 task 7 ✅, task 8 next, one line on the day late. No contract of task 7 changed.
+- 1.7 · 2026-11-10 · Task `p6-social-feed`: §1 feed rows ✅ and the decision on `getFolloweesIds` / `getCommunityIds` (not used by the feed module); §2.9 the parity sample is done (command, files); §5 task 8 ✅, task 9 next, one line on the schedule. No contract changed: the feed module calls the §2.6 signatures as they are.

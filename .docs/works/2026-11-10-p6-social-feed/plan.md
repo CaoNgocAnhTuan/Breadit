@@ -1,6 +1,6 @@
 # Plan: Social feed in the app
 
-Status: approved · 2026-11-10
+Status: done · 2026-11-10
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed/`
 
 ---
@@ -149,10 +149,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
 
 ## Claude's part
 
-- [ ] Read the commits and the diff against the design.
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up (DW1).
-- [ ] The Acceptance items below.
-- [ ] Docs (DW11):
+- [x] Read the commits and the diff against the design.
+- [x] `bash .claude/hooks/verify.sh` with db and redis up (DW1).
+- [x] The Acceptance items below.
+- [x] Docs (DW11):
   - **`docs/System_Architecture.md`:** the feed module, `algo`, the default `algo`, the `asOf` flag, the toggle and the parity test ✅; §6.1 and §6.4 describe the built code; the tree and the status table.
   - **Guidance Manual 08, en and vi:** sections 4 to 6 describe the built code. They include the `chrono` = BL0 mapping, the cursor, and F8 (deletes are not replayed).
   - **Guidance Manual 04, 05, 07, 09 and 10, en and vi:** drop the 🔜 marks for task 8, with the same content in both languages.
@@ -166,7 +166,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
     - the §4 row (P6 ✅, `p6-social-feed` ✅; P7 ▶ next);
     - a change-log line.
   - Commit: `docs: close p6-social-feed`.
-- [ ] Fill in the Result, then close the task.
+- [x] Fill in the Result, then close the task.
 
 ## Tests
 
@@ -194,22 +194,80 @@ DW10 and DW11 are Acceptance items. DW1 is `verify.sh`.
 
 ## Acceptance
 
-- [ ] `bash .claude/hooks/verify.sh` with db and redis up → every check passes, with the new unit and IT tests (DW1, DW4–DW9)
-- [ ] `parity` on `syn-W2M-M` run twice → byte-identical files; 100 pairs, 25 in each bucket (DW2)
-- [ ] `test:parity` → all pass: 300 of 300 at the feed module and 300 of 300 over HTTP (DW3)
-- [ ] The backend from `run-safe.sh` on `public`, signed in as a seed user:
+- [x] `bash .claude/hooks/verify.sh` with db and redis up → every check passes, with the new unit and IT tests (DW1, DW4–DW9)
+- [x] `parity` on `syn-W2M-M` run twice → byte-identical files; 100 pairs, 25 in each bucket (DW2)
+- [x] `test:parity` → all pass: 300 of 300 at the feed module and 300 of 300 over HTTP (DW3)
+- [x] The backend from `run-safe.sh` on `public`, signed in as a seed user:
   - `algo=social` page 1 → 200 with a `t:score:id` cursor, and page 2 works;
   - `algo=foo` → 400;
   - `asOf` → 400, because `run-safe.sh` does not set the flag (DW6).
   
   Stop the backend after.
-- [ ] Chrome, with the backend and the frontend running (DW10):
+- [x] Chrome, with the backend and the frontend running (DW10):
   - on For You, each toggle link changes `algo` in the URL and the order of the feed, with no crash;
   - "For you" with no `algo` shows today's feed;
   - on a community page, a non-member sees no compose box; after joining, the box appears.
   
   If no browser is connected, the author checks this.
-- [ ] The docs of "Claude's part" → task 8 ✅ everywhere, no 🔜 left for task 8, the same content in en and vi, and the env variables listed (DW11)
-- [ ] `git diff --stat` of the task commits → only the files of design "Code files", this folder, and `.docs/results/p6-parity/`
+- [x] The docs of "Claude's part" → task 8 ✅ everywhere, no 🔜 left for task 8, the same content in en and vi, and the env variables listed (DW11)
+- [x] `git diff --stat` of the task commits → only the files of design "Code files", this folder, and `.docs/results/p6-parity/`
 
 ## Result
+
+**Delivered, 2026-11-10.**
+- **Feed module.** `apps/backend/src/feed/` (`FeedService.rank`) loads plain arrays from Prisma and calls `@breadit/ranking`.
+- **API.** `GET /api/posts` takes `algo` (`chrono` = BL0, `engagement` = BL2, `social` = H) on the logged-in For You, and pages with a `t:score:id` cursor.
+- **Config.** `FEED_DEFAULT_ALGO` sets the default (unset = today's For You). The test-only `asOf` needs `FEED_ASOF_ENABLED=true`, which the backend refuses in production.
+- **Bugs.** Explore reads the time once (T4). D1, B6, T3 and the pool part of R2 are fixed.
+- **Parity.** The eval `parity` command and the backend `test:parity` project.
+- **Frontend.** The toggle, and the compose box for members only.
+
+**Numbers.** Sonnet's runs are in `check_output.txt`, and Claude ran every check again.
+- **`verify.sh` (DW1):** 9 of 9 checks pass. Ranking 82; backend unit 189 (was 99); integration 146 (was 108); eval verify 316 (was 297).
+- **Parity sample (DW2):** two runs, the same SHA-256 as the committed files (`pairs.csv` `b09002b9…b49b4a`, `expected.csv` `9873d9e9…27122`, manifest `7191a9eb…082e0`, `orders.csv` `af118a51…0c4b`). 100 pairs, 25 in each of 0, 1-4, 5-19, 20+.
+- **Sample content:** pools of 1,400 to 2,000 posts (median 1,705). 49 pairs with followees, 74 with communities. `social` differs from `engagement` in 95 of 100 pairs, and from `chrono` in 100.
+- **Parity test (DW3):** 102 of 102 tests (the F16 check, the files check, 100 pairs). So 300 of 300 at `FeedService.rank` and 300 of 300 over HTTP, in about 34 s. It passed again after the acceptance runs reloaded `eval_load`.
+- **F1:** with `eval_load` loaded with `--rebase-to`, the parity setup stops with the "run `npm run load`" message.
+- **Input rules (DW6), backend from `run-safe.sh` on `public`:**
+  - `algo=foo` → 400;
+  - `algo` with `asOf` → 400 (flag off);
+  - `algo` with `feed=explore` → 400;
+  - `feed=explore&asOf=…` → 400;
+  - a cursor older than 24 h → 400;
+  - a guest with `algo` → 401;
+  - default For You → 200.
+- **Pages:** checked on `eval_load` loaded with `--rebase-to` now, signed in as `u0000000042`.
+  - The three algos give full pages with `t:score:id` cursors.
+  - `social` and `engagement` orders differ.
+  - Social page 2, asked 2 s later, kept the same t and repeated nothing.
+  - Default For You gave today's order.
+- **Chrome (DW10),** on the same rebased data with the frontend dev server:
+  - the toggle row "Chronological · Engagement · Social" shows on For You;
+  - each link sets `?algo=` and changes the order, and infinite scroll loads page 2;
+  - "For you" with no `algo` shows the user's own and followee posts, newest first;
+  - on `c/c1` the non-member saw "Join" and no compose box; after joining, "Leave" and the compose box appeared at once.
+
+**Commits.**
+- Docs: `2e14fa6`.
+- Steps 1–8: `eee61cb`, `742453e`, `fd9f51b`, `e4a62da`, `cb1db27`, `1de9cfe`, `ae81162`, `1836ada`, `50f7da5`.
+- Closing docs: the commit that holds this Result.
+
+**Differences from the plan.**
+- **Acceptance on `public`.** The `algo` pages were empty there: the newest dev post is from 2026-10-21, outside the 7-day window, so the empty page is right (F15). So page 1 and page 2 and the Chrome check ran on `eval_load` loaded with `--rebase-to` now, as the demo will do. Then `eval_load` was loaded plain again: `load:check` 6 of 6, and `test:parity` 102 of 102.
+- **Step 6 order (Sonnet).** `sample.ts` and `expected.ts` were written before their tests. Sonnet then moved them out, saw the tests fail on the missing modules, and moved them back.
+- **Where the parity command lives.** `parityCommand` is in `eval/src/parity/write.ts`, and `eval/src/cli/parity.ts` is a thin script, like the other CLIs. No file outside the design's list.
+- **Extra tests.**
+  - `feed-options.it-spec.ts` also checks the two start-up refusals (F12, F13).
+  - The parity spec also checks the committed files against the manifest hashes. On a mismatch it reads `orders.csv` to name the first differing position (Sonnet checked this with a mutation and then restored the file).
+  - `test/parity/env.ts` refuses a database URL whose schema does not start with `eval_`.
+- **TC6** uses a small in-memory Prisma fake that applies each query's `where`, so a deleted row stays out only when the query asks for that.
+- **IT isolation.** The IT database is shared between files, so the DW5 fixture and the fixed-`asOf` walk each use their own past year. The no-`asOf` paging test backdates its posts.
+- **`algoPage`** also adds `deletedAt: null` to the page load, so a post deleted after ranking is dropped quietly (F9).
+- **Docs beyond the plan's list.** The status lines of Guidance 10 (en, vi) say "after P6". `CLAUDE.md` also lists the eval `parity` command. `.env.example` lists `FEED_ASOF_ENABLED` commented out, as test only.
+
+**Open points.**
+- **TC10 (Explore with `asOf`)** uses `asOf` = now minus 10 days. It assumes the IT schema holds fewer than 400 posts in that window, because of Explore's 400-candidate cap. It held about 114. If the IT data grows past that, the test needs its own past time, as TC7 has.
+- **`verify.sh` does not run `test:parity`,** because it needs `syn-W2M-M` loaded in `eval_load`. Run it by hand after any feed change, and after `--rebase-to` (demo) load plain first.
+- **α and β are placeholders (1, 1).** When task 11 writes the tuned values in `feed.constants.ts`, run `npm run parity` with the same values and commit the new sample, or `test:parity` stops at the F16 check.
+- **R2 for interactions** is still open (Spec Open question 3). Likes, comments and reposts still bump no one's version, so other users' feeds can be up to 10 s old (T3 note for E7).
+- **Frontend lint:** 20 old warnings, unchanged. The four changed files lint clean.
