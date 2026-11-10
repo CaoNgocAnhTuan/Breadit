@@ -108,7 +108,9 @@ export class CommunitiesService {
       throw new ForbiddenException('Only the community owner can delete it');
     }
 
-    await this.prisma.$transaction(async (tx) => {
+    // B6: the former members are read inside the transaction, so the list is the one that was deleted.
+    const memberIds = await this.prisma.$transaction(async (tx) => {
+      const members = await tx.communityMember.findMany({ where: { communityId }, select: { userId: true } });
       await tx.post.updateMany({
         where: { communityId },
         data: { communityId: null, deletedAt: new Date() },
@@ -117,7 +119,13 @@ export class CommunitiesService {
       await tx.communityRule.deleteMany({ where: { communityId } });
       await tx.communityMember.deleteMany({ where: { communityId } });
       await tx.community.delete({ where: { id: communityId } });
+      return members.map((m) => m.userId);
     });
+    for (const id of memberIds) {
+      // Community membership graph changed.
+      await this.cache.del('graph:communities', [id]);
+      await this.cache.incrNumber('v:user', [id]);
+    }
 
     return { success: true };
   }
@@ -275,6 +283,9 @@ export class CommunitiesService {
         where: { userId: targetUserId, communityId },
       }),
     ]);
+    // B6: the target left the community, so their community graph and feed version change (as in `join`).
+    await this.cache.del('graph:communities', [targetUserId]);
+    await this.cache.incrNumber('v:user', [targetUserId]);
 
     return { success: true };
   }

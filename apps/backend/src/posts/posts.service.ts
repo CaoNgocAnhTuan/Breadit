@@ -507,6 +507,8 @@ export class PostsService {
         where: { userId_communityId: { userId, communityId: body.communityId } },
         select: { role: true },
       });
+      // D1: a community post needs membership (the ban check above stays first).
+      if (!communityMembership) throw new ForbiddenException('Join the community to post in it');
     }
 
     const uploadedMedia: { url: string; type: string }[] = [];
@@ -541,6 +543,8 @@ export class PostsService {
         community: { select: { name: true, slug: true } },
       },
     });
+    // T3: the author's own feeds read `v:user`, so a new post must bump it.
+    await this.cache.incrNumber('v:user', [userId]);
 
     if (body.desc) {
       const tags = [
@@ -799,6 +803,8 @@ export class PostsService {
       where: { id: postId },
       data: { deletedAt: new Date() },
     });
+    // T3: the author's own feeds read `v:user`, so a delete must bump it.
+    await this.cache.incrNumber('v:user', [userId]);
     return { success: true };
   }
 }

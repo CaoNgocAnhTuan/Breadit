@@ -90,14 +90,14 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
 
 #### Step 5: D1, B6 and T3 (effort S)
 
-- [ ] Tests first: **TC11** and **TC12** (unit), **TC13** (IT).
-- [ ] `posts/posts.service.ts`:
+- [x] Tests first: **TC11** and **TC12** (unit), **TC13** (IT).
+- [x] `posts/posts.service.ts`:
   - In `create`, after the ban check, a community post from a non-member throws `ForbiddenException('Join the community to post in it')` (D1, F20).
   - `create` and `remove` call `incrNumber('v:user', [userId])` for the author (T3).
-- [ ] `communities/communities.service.ts` (B6, F21):
+- [x] `communities/communities.service.ts` (B6, F21):
   - `banUser` deletes `graph:communities` and bumps `v:user` for the target, after the transaction.
   - `deleteCommunity` reads the member ids inside its transaction, then does the same for each of them after it.
-- [ ] Commit: `fix: D1 community posts need membership; B6 and T3 cache bumps`
+- [x] Commit: `fix: D1 community posts need membership; B6 and T3 cache bumps`
 
 #### Step 6: Eval parity sample (effort S–M)
 
