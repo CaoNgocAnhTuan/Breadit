@@ -56,12 +56,12 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
 
 #### Step 2: `FeedService` and `FeedModule` (effort S–M)
 
-- [ ] Tests first: **TC6** (`feed/feed.service.spec.ts`, mocked Prisma and `BlockService` as in `users/users.service.spec.ts`).
-- [ ] Write `feed/feed.service.ts`: `rank(userId, algo, asOfSec): Promise<RankedPost[]>`, with the six parts of design "Loading, then the package", in that order.
+- [x] Tests first: **TC6** (`feed/feed.service.spec.ts`, mocked Prisma and `BlockService` as in `users/users.service.spec.ts`).
+- [x] Write `feed/feed.service.ts`: `rank(userId, algo, asOfSec): Promise<RankedPost[]>`, with the six parts of design "Loading, then the package", in that order.
   - Positives on the pool posts are loaded after `buildPool`, for the pool ids only, then grouped by post.
   - The score function passed to `rankPool` records each score in a map. The result is `rankPool`'s order with those scores.
-- [ ] Write `feed/feed.module.ts`: import `BlockModule`; provide `FeedService` and `FEED_CONFIG` (`useFactory: () => readFeedConfig(process.env)`); export both.
-- [ ] Commit: `feat: FeedService ranks the pool with @breadit/ranking`
+- [x] Write `feed/feed.module.ts`: import `BlockModule`; provide `FeedService` and `FEED_CONFIG` (`useFactory: () => readFeedConfig(process.env)`); export both.
+- [x] Commit: `feat: FeedService ranks the pool with @breadit/ranking`
 
 #### Step 3: `algo` and `asOf` on `GET /api/posts` (effort M)
 
