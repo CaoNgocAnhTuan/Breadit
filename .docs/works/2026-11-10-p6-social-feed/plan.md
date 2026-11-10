@@ -34,8 +34,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
 
 #### Step 1: Feed helpers: config, constants, mapping, cursor, options (effort S)
 
-- [ ] Tests first (unit, `apps/backend/src/feed/*.spec.ts`): **TC1** to **TC5** of the Tests table.
-- [ ] Write `feed/feed.config.ts`, `feed/feed.constants.ts`, `feed/feed.mapping.ts`, `feed/feed.cursor.ts` and `feed/feed.options.ts` with the signatures of design "Code files".
+- [x] Tests first (unit, `apps/backend/src/feed/*.spec.ts`): **TC1** to **TC5** of the Tests table.
+- [x] Write `feed/feed.config.ts`, `feed/feed.constants.ts`, `feed/feed.mapping.ts`, `feed/feed.cursor.ts` and `feed/feed.options.ts` with the signatures of design "Code files".
   - **Config** (design: Approach, "Options and config"; F12, F13). `FEED_DEFAULT_ALGO` unset or empty gives `null`; one of the three values gives that value; anything else throws, naming the allowed values. `FEED_ASOF_ENABLED` is `true` only for `'true'`. Unset, empty and `'false'` give `false`, and anything else throws. The flag on with `NODE_ENV=production` throws.
   - **Constants.** `ALGO_METHOD` is `chrono` → BL0, `engagement` → BL2, `social` → H. `SOCIAL_PARAMS` is `{ alpha: 1, beta: 1 }`, with a one-line comment: "placeholder until P7; task 11 writes the tuned values". `methodParams('social')` is `{ alpha, beta, m: PRIOR_M }`, and the other two give `{}`.
   - **Cursor** (design: Approach, "Paging pins the time"; F10).
@@ -52,7 +52,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
     5. `algo` from a guest → 401.
     6. Apply the default `algo` only to the logged-in For You (no `feed`, `user` or `communityId`).
     7. `asOf` when the result has no `algo` and `feed` is not `explore` → 400.
-- [ ] Commit: `feat: feed module helpers (config, constants, mapping, cursor, options)`
+- [x] Commit: `feat: feed module helpers (config, constants, mapping, cursor, options)`
 
 #### Step 2: `FeedService` and `FeedModule` (effort S–M)
 
