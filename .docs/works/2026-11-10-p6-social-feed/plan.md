@@ -101,8 +101,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
 
 #### Step 6: Eval parity sample (effort S–M)
 
-- [ ] Tests first (`eval/src/parity/*.test.ts`, `node --test`): **TC14**.
-- [ ] Write `eval/src/parity/sample.ts`, `expected.ts`, `write.ts` and `eval/src/cli/parity.ts`, and add the `parity` script to `eval/package.json` (design: Approach, "Parity sample (eval)"; Code files, Eval).
+- [x] Tests first (`eval/src/parity/*.test.ts`, `node --test`): **TC14**.
+- [x] Write `eval/src/parity/sample.ts`, `expected.ts`, `write.ts` and `eval/src/cli/parity.ts`, and add the `parity` script to `eval/package.json` (design: Approach, "Parity sample (eval)"; Code files, Eval).
   - **Draw.** Use `rng(masterSeed, "parity")` and the quota of 25 per history bucket of §7 (100 pairs). Stop with an error after 1,000,000 draws.
   - **Orders.** Use `prepare(…, "fast")` and `rankAt`, with the `normal` pool.
   - **`orderSha256`.** The SHA-256 of the ids as decimals, joined by `\n`, with no final newline.
@@ -114,8 +114,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
     - `counts` (users, posts, interactions);
     - `files` with rows and SHA-256, and `external: ["orders.csv"]`.
   - **CLI.** `--param alpha=` and `--param beta=` are required. `m` comes from `frozen-v1.json`. It prints the pairs per bucket and the SHA-256 of each file.
-- [ ] `npm run verify -w @breadit/eval` passes.
-- [ ] Commit: `feat: eval parity sample command`
+- [x] `npm run verify -w @breadit/eval` passes.
+- [x] Commit: `feat: eval parity sample command`
 - [ ] Run `parity` on `syn-W2M-M` with `alpha=1` and `beta=1`, twice. The three committed files and `orders.csv` must be byte-identical between the runs, with 25 pairs in each bucket (DW2). Save the two outputs in `check_output.txt`.
 - [ ] Commit: `chore: P6 parity sample of syn-W2M-M` (the three files of `.docs/results/p6-parity/` and `check_output.txt`)
 

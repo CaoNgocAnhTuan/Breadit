@@ -12,6 +12,7 @@
     "check": "node --max-old-space-size=4096 src/cli/check.ts",
     "harness": "node --max-old-space-size=4096 src/cli/harness.ts",
     "rank": "node --max-old-space-size=4096 src/cli/rank.ts",
+    "parity": "node --max-old-space-size=4096 src/cli/parity.ts",
     "load": "node src/cli/load.ts",
     "load:check": "node src/cli/load-check.ts"
   },
