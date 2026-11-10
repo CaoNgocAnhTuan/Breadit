@@ -5,13 +5,22 @@ import Link from "next/link";
 const Homepage = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ feed?: string }>;
+  searchParams: Promise<{ feed?: string; algo?: string }>;
 }) => {
   const params = await searchParams;
   const validFeeds = ["explore", "following", "communities"] as const;
   const feed = validFeeds.includes((params.feed ?? "") as (typeof validFeeds)[number])
     ? (params.feed as (typeof validFeeds)[number])
     : undefined;
+  // The ranking of For You. It is used only when no other feed is chosen (the backend refuses algo with feed).
+  const algos = [
+    { value: "chrono", label: "Chronological" },
+    { value: "engagement", label: "Engagement" },
+    { value: "social", label: "Social" },
+  ] as const;
+  const algo = feed
+    ? undefined
+    : algos.find((a) => a.value === params.algo)?.value;
 
   return (
     <div className="">
@@ -49,8 +58,23 @@ const Homepage = async ({
           Communities
         </Link>
       </div>
+      {!feed && (
+        <div className="flex gap-2 px-4 py-2 border-b-[1px] border-borderGray text-sm text-textGray">
+          {algos.map((a) => (
+            <Link
+              key={a.value}
+              className={`px-3 py-1 rounded-full transition-colors duration-150 hover:bg-white/10 ${
+                algo === a.value ? "bg-white/10 text-white font-bold" : ""
+              }`}
+              href={`/?algo=${a.value}`}
+            >
+              {a.label}
+            </Link>
+          ))}
+        </div>
+      )}
       <Share />
-      <Feed feed={feed} />
+      <Feed feed={feed} algo={algo} />
     </div>
   );
 };

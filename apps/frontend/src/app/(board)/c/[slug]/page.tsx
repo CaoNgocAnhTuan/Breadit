@@ -70,7 +70,7 @@ export default async function CommunityPage({ params }: { params: Promise<{ slug
     <div className="">
       <CommunityHeader community={community} />
       {isStaff && <PendingPostsBanner communityId={community.id} />}
-      <Share communityId={community.id} />
+      {community.membership && <Share communityId={community.id} />}
       <InfiniteFeed communityId={community.id} initialData={initialPosts} />
     </div>
   );

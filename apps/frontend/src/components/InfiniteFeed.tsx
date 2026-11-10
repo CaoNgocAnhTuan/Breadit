@@ -14,12 +14,14 @@ const fetchPosts = async (
   pageParam: number | string,
   userProfileId?: string,
   feed?: string,
-  communityId?: number
+  communityId?: number,
+  algo?: string
 ): Promise<PostPage> => {
   const params = new URLSearchParams({ cursor: String(pageParam) });
   if (userProfileId) params.set("user", userProfileId);
   if (feed) params.set("feed", feed);
   if (communityId) params.set("communityId", String(communityId));
+  if (algo) params.set("algo", algo);
   const res = await fetch(`${BACKEND_URL}/api/posts?${params}`, {
     credentials: "include",
   });
@@ -30,11 +32,13 @@ const InfiniteFeed = ({
   userProfileId,
   feed,
   communityId,
+  algo,
   initialData,
 }: {
   userProfileId?: string;
   feed?: string;
   communityId?: number;
+  algo?: string;
   initialData?: PostPage;
 }) => {
   const { data, error, hasNextPage, fetchNextPage } = useInfiniteQuery<
@@ -44,9 +48,9 @@ const InfiniteFeed = ({
     (string | number)[],
     number | string
   >({
-    queryKey: ["posts", userProfileId ?? "", feed ?? "", communityId ?? ""],
+    queryKey: ["posts", userProfileId ?? "", feed ?? "", communityId ?? "", algo ?? ""],
     queryFn: ({ pageParam }) =>
-      fetchPosts(pageParam as number | string, userProfileId, feed, communityId),
+      fetchPosts(pageParam as number | string, userProfileId, feed, communityId, algo),
     initialPageParam: 1,
     initialData: initialData
       ? { pages: [initialData], pageParams: [1] }

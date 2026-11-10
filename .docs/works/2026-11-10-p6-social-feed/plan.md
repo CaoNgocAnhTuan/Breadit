@@ -141,11 +141,11 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
 
 #### Step 8: Frontend toggle and the community compose box (effort S)
 
-- [ ] `app/(board)/page.tsx`: an `algo` whitelist (`chrono`, `engagement`, `social`), used only when `feed` is not set. On For You, a row of three links under the tabs (`/?algo=chrono`, `/?algo=engagement`, `/?algo=social`), labelled "Chronological", "Engagement" and "Social", with the active one marked like the tabs. Pass `algo` to `Feed`.
-- [ ] `components/Feed.tsx` and `components/InfiniteFeed.tsx`: an `algo` prop, into the request params, the `key` and the `queryKey` (design: Code files, Frontend).
-- [ ] `app/(board)/c/[slug]/page.tsx`: render `Share` only when `community.membership` exists (D1).
-- [ ] `npm run typecheck` and `npm run lint` pass with no new warnings.
-- [ ] Commit: `feat: feed toggle on For You; compose box for community members only`
+- [x] `app/(board)/page.tsx`: an `algo` whitelist (`chrono`, `engagement`, `social`), used only when `feed` is not set. On For You, a row of three links under the tabs (`/?algo=chrono`, `/?algo=engagement`, `/?algo=social`), labelled "Chronological", "Engagement" and "Social", with the active one marked like the tabs. Pass `algo` to `Feed`.
+- [x] `components/Feed.tsx` and `components/InfiniteFeed.tsx`: an `algo` prop, into the request params, the `key` and the `queryKey` (design: Code files, Frontend).
+- [x] `app/(board)/c/[slug]/page.tsx`: render `Share` only when `community.membership` exists (D1).
+- [x] `npm run typecheck` and `npm run lint` pass with no new warnings.
+- [x] Commit: `feat: feed toggle on For You; compose box for community members only`
 
 ## Claude's part
 
