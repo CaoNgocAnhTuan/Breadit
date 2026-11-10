@@ -65,10 +65,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
 
 #### Step 3: `algo` and `asOf` on `GET /api/posts` (effort M)
 
-- [ ] Change `test/it/env.ts`: set `FEED_ASOF_ENABLED` to `'true'` and delete `FEED_DEFAULT_ALGO` (design: Code files).
-- [ ] Tests first (IT): **TC7**, **TC8**, **TC9**.
-- [ ] `posts/posts.module.ts` imports `FeedModule`. `posts/posts.controller.ts` reads `algo` and `asOf` and passes `{ algo, asOf }` as the last argument of `findAll`.
-- [ ] `posts/posts.service.ts` (design: Code files; Approach, "Paging pins the time"; "Data, schema and cache changes"):
+- [x] Change `test/it/env.ts`: set `FEED_ASOF_ENABLED` to `'true'` and delete `FEED_DEFAULT_ALGO` (design: Code files).
+- [x] Tests first (IT): **TC7**, **TC8**, **TC9**.
+- [x] `posts/posts.module.ts` imports `FeedModule`. `posts/posts.controller.ts` reads `algo` and `asOf` and passes `{ algo, asOf }` as the last argument of `findAll`.
+- [x] `posts/posts.service.ts` (design: Code files; Approach, "Paging pins the time"; "Data, schema and cache changes"):
   - Inject `FeedService` and `FEED_CONFIG`.
   - `findAll` calls `resolveFeedOptions` first, then reads `nowSec` once.
   - The new `algo` branch (`algoPage`) comes before the other modes:
@@ -78,9 +78,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
     - `nextCursor` comes from `makeAlgoCursor`.
   - Cache key: `modeKey` is `algo-<algo>` (after the default is applied), and `asOf` (empty when absent) is a new last part for every mode. The TTL stays 10 s.
   - Every other mode keeps its query and order.
-- [ ] `docker-compose.yml`: add `FEED_DEFAULT_ALGO: ${FEED_DEFAULT_ALGO:-}` to the backend environment. Do not add `FEED_ASOF_ENABLED`.
-- [ ] All unit tests and all IT tests pass, the old ones unchanged (DW4).
-- [ ] Commit: `feat: algo and asOf options on GET /api/posts`
+- [x] `docker-compose.yml`: add `FEED_DEFAULT_ALGO: ${FEED_DEFAULT_ALGO:-}` to the backend environment. Do not add `FEED_ASOF_ENABLED`.
+- [x] All unit tests and all IT tests pass, the old ones unchanged (DW4).
+- [x] Commit: `feat: algo and asOf options on GET /api/posts`
 
 #### Step 4: Explore reads the clock once (T4) (effort XS)
 

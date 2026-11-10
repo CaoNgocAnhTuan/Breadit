@@ -56,6 +56,8 @@ export class PostsController {
     @Query('user') user: string | undefined,
     @Query('feed') feed: string | undefined,
     @Query('communityId') communityId: string | undefined,
+    @Query('algo') algo: string | undefined,
+    @Query('asOf') asOf: string | undefined,
     @Req() req: AuthedRequest,
   ) {
     return this.postsService.findAll(
@@ -64,6 +66,7 @@ export class PostsController {
       req.user?.id,
       feed,
       communityId ? Number(communityId) : undefined,
+      { algo, asOf },
     );
   }
 

@@ -18,6 +18,10 @@ process.env.REDIS_HTTP_CACHE_ENABLED = 'false';
 process.env.JWT_SECRET = 'it-test-secret-it-test-secret-0123456789';
 process.env.FRONTEND_URL = 'http://localhost:3000';
 
+// Feed (task p6-social-feed): the test-only `asOf` parameter is on, and a default algo from the shell cannot leak in.
+process.env.FEED_ASOF_ENABLED = 'true';
+delete process.env.FEED_DEFAULT_ALGO;
+
 // No real email, no Cloudinary: uploads go to a temp folder.
 process.env.SMTP_HOST = '127.0.0.1';
 process.env.SMTP_PORT = '1';

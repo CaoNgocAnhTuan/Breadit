@@ -1,5 +1,6 @@
 import {
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
   BadRequestException,
@@ -13,6 +14,10 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { POST_DESC_MAX, isTooLong } from '../common/limits';
 import { engagementSelect } from './engagement';
 import { computeExploreScoreFixed } from '@breadit/ranking';
+import { FEED_CONFIG, type FeedAlgo, type FeedConfig } from '../feed/feed.config';
+import { makeAlgoCursor, pageAfter, parseAlgoCursor } from '../feed/feed.cursor';
+import { resolveFeedOptions } from '../feed/feed.options';
+import { FeedService } from '../feed/feed.service';
 
 // Feed page size (posts per batch). Increase for better UX.
 const LIMIT = 10;
@@ -78,6 +83,8 @@ export class PostsService {
     private readonly notificationsService: NotificationsService,
     private readonly blockService: BlockService,
     private readonly cache: CacheService,
+    private readonly feedService: FeedService,
+    @Inject(FEED_CONFIG) private readonly feedConfig: FeedConfig,
   ) {}
 
   private mentionInclude() {
@@ -141,23 +148,80 @@ export class PostsService {
     }
   }
 
-  async findAll(cursorRaw: string, userParam?: string, userId?: string, feed?: string, communityId?: number) {
+  /**
+   * One page of an `algo` feed (design: Approach, "Paging pins the time"). The pool is ranked at t, which is `asOf`,
+   * the time inside the cursor, or `nowSec` for the first page. The page is the items after the cursor's (score, id).
+   */
+  private async algoPage(
+    userId: string,
+    algo: FeedAlgo,
+    cursorRaw: string,
+    asOfSec: number | null,
+    nowSec: number,
+  ): Promise<CursorFeedPage> {
+    const { t, after } = parseAlgoCursor(cursorRaw, nowSec, asOfSec);
+    const ranked = await this.feedService.rank(userId, algo, t);
+    const { items, hasMore } = pageAfter(ranked, after, LIMIT);
+    if (items.length === 0) return { posts: [], hasMore: false, nextCursor: null };
+
+    const include = this.postInclude(userId);
+    const rows = await this.prisma.post.findMany({
+      where: { id: { in: items.map((x) => x.id) }, deletedAt: null },
+      include: {
+        rePost: { include },
+        ...include,
+        community: { select: { name: true, slug: true } },
+      },
+    });
+    const byId = new Map<number, (typeof rows)[number]>(rows.map((r) => [r.id, r]));
+    // Keep the rank order. A post removed since the ranking is missing, and nothing repeats (F9).
+    const posts = items.flatMap((x) => {
+      const row = byId.get(x.id);
+      return row ? [row] : [];
+    });
+    const nextCursor = hasMore ? makeAlgoCursor(t, items[items.length - 1]) : null;
+    return { posts, hasMore, nextCursor };
+  }
+
+  async findAll(
+    cursorRaw: string,
+    userParam?: string,
+    userId?: string,
+    feed?: string,
+    communityId?: number,
+    raw: { algo?: string; asOf?: string } = {},
+  ) {
+    const { algo, asOfSec } = resolveFeedOptions(
+      { algo: raw.algo, asOf: raw.asOf, feed, user: userParam, communityId },
+      userId,
+      this.feedConfig,
+    );
+    // The clock is read once per request. The `algo` feeds and Explore take their time from here, or from `asOf`.
+    const nowMs = Date.now();
+    const nowSec = Math.floor(nowMs / 1000);
+
     const viewerKey = userId ?? 'guest';
     const version = userId ? await this.cache.getNumber('v:user', [userId], 0) : 0;
-    const modeKey =
-      communityId != null
+    const modeKey = algo
+      ? `algo-${algo}`
+      : communityId != null
         ? 'community'
         : userParam && userParam !== 'undefined'
           ? 'profile'
           : feed ?? 'home';
     const ttlSeconds = 10;
 
-    // Cache key includes raw cursor to support both legacy page cursor and token cursor.
-    const cached = await this.cache.getJson<LegacyFeedPage | CursorFeedPage>(
-      'feed',
-      [viewerKey, modeKey, userParam ?? '', communityId ?? 0, cursorRaw, version],
-    );
+    // Cache key includes raw cursor to support both legacy page cursor and token cursor, and `asOf` (empty when absent).
+    const cacheParts = [viewerKey, modeKey, userParam ?? '', communityId ?? 0, cursorRaw, version, asOfSec ?? ''];
+    const cached = await this.cache.getJson<LegacyFeedPage | CursorFeedPage>('feed', cacheParts);
     if (cached) return cached;
+
+    // The `algo` feeds: rank the shared pool with @breadit/ranking (the feed module), then page over the result.
+    if (algo && userId) {
+      const result = await this.algoPage(userId, algo, cursorRaw, asOfSec, nowSec);
+      await this.cache.setJson('feed', cacheParts, result, ttlSeconds);
+      return result;
+    }
 
     const blockedIds = userId ? [...(await this.blockService.getAllBlockedPeerIds(userId))] : [];
 
@@ -251,12 +315,7 @@ export class PostsService {
         const nextCursor = hasMore ? cursor + 1 : null;
 
         const result: LegacyFeedPage = { posts, hasMore, nextCursor };
-        await this.cache.setJson(
-          'feed',
-          [viewerKey, modeKey, userParam ?? '', communityId ?? 0, cursorRaw, version],
-          result,
-          ttlSeconds,
-        );
+        await this.cache.setJson('feed', cacheParts, result, ttlSeconds);
         return result;
       }
 
@@ -306,12 +365,7 @@ export class PostsService {
       const nextCursor = hasMore && items.length > 0 ? makeExploreCursor(items[items.length - 1]) : null;
 
       const result: CursorFeedPage = { posts, hasMore, nextCursor };
-      await this.cache.setJson(
-        'feed',
-        [viewerKey, modeKey, userParam ?? '', communityId ?? 0, cursorRaw, version],
-        result,
-        ttlSeconds,
-      );
+      await this.cache.setJson('feed', cacheParts, result, ttlSeconds);
       return result;
     }
 
@@ -335,12 +389,7 @@ export class PostsService {
       const nextCursor = hasMore ? cursor + 1 : null;
 
       const result: LegacyFeedPage = { posts, hasMore, nextCursor };
-      await this.cache.setJson(
-        'feed',
-        [viewerKey, modeKey, userParam ?? '', communityId ?? 0, cursorRaw, version],
-        result,
-        ttlSeconds,
-      );
+      await this.cache.setJson('feed', cacheParts, result, ttlSeconds);
       return result;
     }
 
@@ -377,12 +426,7 @@ export class PostsService {
         : null;
 
     const result: CursorFeedPage = { posts, hasMore, nextCursor };
-    await this.cache.setJson(
-      'feed',
-      [viewerKey, modeKey, userParam ?? '', communityId ?? 0, cursorRaw, version],
-      result,
-      ttlSeconds,
-    );
+    await this.cache.setJson('feed', cacheParts, result, ttlSeconds);
     return result;
   }
 

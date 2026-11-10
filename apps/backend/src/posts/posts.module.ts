@@ -3,11 +3,12 @@ import { BlockModule } from '../block/block.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { UploadsModule } from '../uploads/uploads.module';
 import { CacheModule } from '../cache/cache.module';
+import { FeedModule } from '../feed/feed.module';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
 
 @Module({
-  imports: [BlockModule, UploadsModule, NotificationsModule, CacheModule],
+  imports: [BlockModule, UploadsModule, NotificationsModule, CacheModule, FeedModule],
   controllers: [PostsController],
   providers: [PostsService],
 })
