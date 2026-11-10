@@ -1,0 +1,38 @@
+# Step 6: parity sample of syn-W2M-M (npm run parity -w @breadit/eval -- --param alpha=1 --param beta=1)
+
+## Run 1
+
+syn-W2M-M  100 pairs  alpha 1  beta 1  m 5
+pairs per history bucket
+  0       25
+  1-4     25
+  5-19    25
+  20+     25
+results: /Users/hung/Desktop/Breadit/.docs/results/p6-parity
+not committed: orders.csv in /Users/hung/Desktop/Breadit/eval/results/p6-parity
+expected.csv  rows 300  sha256 9873d9e9fcccf497d2f755ddd0344fb949fa8fcc059ebd01c7f97f330eb27122
+orders.csv  rows 300  sha256 af118a51968e9d3076d0673505f7f573f810c710c187a9ae40d74d58011a0c4b
+pairs.csv  rows 100  sha256 b09002b9c4a6bd8de8d17181f98eac084c8340eb783e615a69f9d2ed9bb49b4a
+manifest sha256 7191a9ebb236796e1421df3a59a7e2ac854b13a4472f821d8ead7b82764082e0
+
+## Run 2
+
+syn-W2M-M  100 pairs  alpha 1  beta 1  m 5
+pairs per history bucket
+  0       25
+  1-4     25
+  5-19    25
+  20+     25
+results: /Users/hung/Desktop/Breadit/.docs/results/p6-parity
+not committed: orders.csv in /Users/hung/Desktop/Breadit/eval/results/p6-parity
+expected.csv  rows 300  sha256 9873d9e9fcccf497d2f755ddd0344fb949fa8fcc059ebd01c7f97f330eb27122
+orders.csv  rows 300  sha256 af118a51968e9d3076d0673505f7f573f810c710c187a9ae40d74d58011a0c4b
+pairs.csv  rows 100  sha256 b09002b9c4a6bd8de8d17181f98eac084c8340eb783e615a69f9d2ed9bb49b4a
+manifest sha256 7191a9ebb236796e1421df3a59a7e2ac854b13a4472f821d8ead7b82764082e0
+
+## Byte comparison of run 1 and run 2 (cmp)
+pairs.csv identical
+expected.csv identical
+manifest.json identical
+orders.csv (eval/results/p6-parity, not committed) identical
+pairs per history bucket: 25 in each of 0, 1-4, 5-19, 20+ (DW2)

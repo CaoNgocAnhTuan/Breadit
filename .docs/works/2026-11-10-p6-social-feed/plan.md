@@ -116,8 +116,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
   - **CLI.** `--param alpha=` and `--param beta=` are required. `m` comes from `frozen-v1.json`. It prints the pairs per bucket and the SHA-256 of each file.
 - [x] `npm run verify -w @breadit/eval` passes.
 - [x] Commit: `feat: eval parity sample command`
-- [ ] Run `parity` on `syn-W2M-M` with `alpha=1` and `beta=1`, twice. The three committed files and `orders.csv` must be byte-identical between the runs, with 25 pairs in each bucket (DW2). Save the two outputs in `check_output.txt`.
-- [ ] Commit: `chore: P6 parity sample of syn-W2M-M` (the three files of `.docs/results/p6-parity/` and `check_output.txt`)
+- [x] Run `parity` on `syn-W2M-M` with `alpha=1` and `beta=1`, twice. The three committed files and `orders.csv` must be byte-identical between the runs, with 25 pairs in each bucket (DW2). Save the two outputs in `check_output.txt`.
+- [x] Commit: `chore: P6 parity sample of syn-W2M-M` (the three files of `.docs/results/p6-parity/` and `check_output.txt`)
 
 #### Step 7: Backend parity test (effort S)
 
