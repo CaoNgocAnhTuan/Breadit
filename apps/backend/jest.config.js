@@ -26,5 +26,16 @@ module.exports = {
       setupFiles: ['<rootDir>/test/it/env.ts'],
       globalSetup: '<rootDir>/test/it/global-setup.ts',
     },
+    {
+      // Parity test (task p6-social-feed): the live feed against the harness orders of .docs/results/p6-parity/.
+      // Reads the schema `eval_load` (loaded by `npm run load -w @breadit/eval -- syn-W2M-M`) and Redis db 2.
+      // Needs `docker compose up db redis -d`. It never writes Postgres.
+      ...common,
+      displayName: 'parity',
+      rootDir: '.',
+      testMatch: ['<rootDir>/test/parity/**/*.parity-spec.ts'],
+      setupFiles: ['<rootDir>/test/parity/env.ts'],
+      globalSetup: '<rootDir>/test/parity/global-setup.ts',
+    },
   ],
 };

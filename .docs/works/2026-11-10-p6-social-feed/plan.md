@@ -121,7 +121,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
 
 #### Step 7: Backend parity test (effort S)
 
-- [ ] Write `test/parity/env.ts`, `test/parity/global-setup.ts` and `test/parity/parity.parity-spec.ts`, add the `parity` project to `jest.config.js` and the script `test:parity` to `apps/backend/package.json` (design: Approach, "Parity test (backend)"; the parity sequence diagram; F1, F16, F18). This is **TC15**.
+- [x] Write `test/parity/env.ts`, `test/parity/global-setup.ts` and `test/parity/parity.parity-spec.ts`, add the `parity` project to `jest.config.js` and the script `test:parity` to `apps/backend/package.json` (design: Approach, "Parity test (backend)"; the parity sequence diagram; F1, F16, F18). This is **TC15**.
   - **Env.** Copy the stubs of `test/it/env.ts`. Use the `eval_load` URL (override `PARITY_DATABASE_URL`) and Redis database 2 (override `PARITY_REDIS_URL`). Cache off, `FEED_ASOF_ENABLED` `'true'`, `FEED_DEFAULT_ALGO` deleted.
   - **Global setup.** Read the parity manifest. With Prisma on `eval_load`, compare:
     - the count of `User`;
@@ -136,8 +136,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
     - (b) over HTTP with `cookieFor(user)` (the user row read with `prisma()`): page 1 and, when `hasMore`, page 2 of `GET /api/posts?algo=…&asOf=…`. The ids equal the first `min(20, pool_size)` of `top20`.
     
     Give the spec a timeout long enough for 100 pairs.
-- [ ] Run `test:parity`. All tests pass: 300 of 300 for (a) and 300 of 300 for (b) (DW3). If one fails, report the pair, the algo and the first differing position (use `eval/results/p6-parity/orders.csv`). Do not change the expected files or the feed to make it pass. Save the summary and the run time in `check_output.txt`.
-- [ ] Commit: `test: parity test of the live feed against the harness`
+- [x] Run `test:parity`. All tests pass: 300 of 300 for (a) and 300 of 300 for (b) (DW3). If one fails, report the pair, the algo and the first differing position (use `eval/results/p6-parity/orders.csv`). Do not change the expected files or the feed to make it pass. Save the summary and the run time in `check_output.txt`.
+- [x] Commit: `test: parity test of the live feed against the harness`
 
 #### Step 8: Frontend toggle and the community compose box (effort S)
 

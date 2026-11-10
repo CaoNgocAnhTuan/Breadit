@@ -36,3 +36,15 @@ expected.csv identical
 manifest.json identical
 orders.csv (eval/results/p6-parity, not committed) identical
 pairs per history bucket: 25 in each of 0, 1-4, 5-19, 20+ (DW2)
+
+# Step 7: backend parity test (npm run test:parity -w @breadit/backend)
+Schema eval_load = syn-W2M-M as loaded (no --rebase-to), Redis db 2, cache off, asOf flag on.
+Test Suites: 1 passed, 1 total
+Tests:       102 passed, 102 total
+Time:        32.709 s, estimated 35 s
+F16 (map and params equal the manifest): ok
+Committed files match the manifest (100 pairs, 300 expected rows): ok
+100 pair tests, each with 3 algos: (a) full order at the feed module and (b) first two pages over HTTP.
+So (a) 300 of 300 and (b) 300 of 300: every pair test passed.
+Mutation check (not committed): dropping the comments from the pool positives in FeedService made the pair tests fail,
+with the first differing position in the message (for example pair 1, engagement, position 1: live 11934, harness 12016).
