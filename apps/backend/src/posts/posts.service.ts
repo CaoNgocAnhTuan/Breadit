@@ -326,7 +326,9 @@ export class PostsService {
 
       const RECENT_DAYS = 7;
       const CANDIDATE_TAKE = 400;
-      const since = new Date(Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000);
+      // One time for the whole request (T4): `asOf` when given, else the clock read once at the top of `findAll`.
+      const exploreNowMs = asOfSec !== null ? asOfSec * 1000 : nowMs;
+      const since = new Date(exploreNowMs - RECENT_DAYS * 24 * 60 * 60 * 1000);
 
       const rows = await this.prisma.post.findMany({
         where: { ...whereCondition, createdAt: { gte: since } },
@@ -339,11 +341,10 @@ export class PostsService {
         take: CANDIDATE_TAKE,
       });
 
-      const now = Date.now();
       const scored = rows
         .map((p: any) => {
           const createdAtMs = new Date(p.createdAt).getTime();
-          const ageHours = Math.max(0, (now - createdAtMs) / (1000 * 60 * 60));
+          const ageHours = Math.max(0, (exploreNowMs - createdAtMs) / (1000 * 60 * 60));
           const likes = p?._count?.likes ?? 0;
           const comments = p?._count?.comments ?? 0;
           const reposts = p?._count?.rePosts ?? 0;

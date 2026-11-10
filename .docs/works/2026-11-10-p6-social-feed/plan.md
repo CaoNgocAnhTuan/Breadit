@@ -84,9 +84,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-10-p6-social-feed
 
 #### Step 4: Explore reads the clock once (T4) (effort XS)
 
-- [ ] Tests first (IT): **TC10**.
-- [ ] In the Explore branch of `findAll`, one `nowMs` is used for both the window and the age: `asOfSec * 1000` when `asOf` is given, otherwise `Date.now()` read once (design: Approach, "Explore (T4)"). Nothing else changes.
-- [ ] Commit: `fix: Explore takes one time per request, or asOf (T4)`
+- [x] Tests first (IT): **TC10**.
+- [x] In the Explore branch of `findAll`, one `nowMs` is used for both the window and the age: `asOfSec * 1000` when `asOf` is given, otherwise `Date.now()` read once (design: Approach, "Explore (T4)"). Nothing else changes.
+- [x] Commit: `fix: Explore takes one time per request, or asOf (T4)`
 
 #### Step 5: D1, B6 and T3 (effort S)
 
