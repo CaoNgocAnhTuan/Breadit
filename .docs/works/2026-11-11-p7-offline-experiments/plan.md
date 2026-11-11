@@ -152,8 +152,8 @@ Added on 2026-11-11 at Stop A, by the author's decisions. Claude has already mad
 
 #### Step 10: The report (effort XS)
 
-- [ ] Run `report` and add its output to the run log.
-- [ ] Commit: `chore: P7 report, macros and tables` (`.docs/results/p7-report/` and the run log).
+- [x] Run `report` and add its output to the run log.
+- [x] Commit: `chore: P7 report, macros and tables` (`.docs/results/p7-report/` and the run log).
 
 #### Step 11: Double run (effort XS, plus the run time)
 

@@ -262,3 +262,19 @@ manifest sha256 abe71b605ce5f6b98cd8e33653328586b2aaa30077c22eac928dc3d707f24f58
         3.87 real         3.92 user         0.05 sys
            148029440  maximum resident set size
 
+## Step 10: the report
+
+$ /usr/bin/time -l npm run report -w @breadit/eval
+
+> @breadit/eval@0.1.0 report
+> node src/cli/report.ts
+
+report: 70 macros, 9 tables, 16 figure rows, from 12 runs
+macros verified: 70 of 70 found their cell again
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-report
+manifest sha256 d27f40234e4c0a0e3c8d0cdddaf4875fa6e212108cba5da953d2a5b9f7e1a87b
+        0.21 real         0.22 user         0.03 sys
+            94896128  maximum resident set size
+# macros.csv has 70 rows, every name matches ^[A-Za-z]+$, results-macros.tex has 70 
+ewcommand lines, tables/ has 9 .tex files.
+
