@@ -128,3 +128,21 @@ rule check: 14 groups, 0 violations
 E8 baseline: BL6 (validation NDCG@10 0.018159, K 10, all users, syn-W2M-M)
 equal
 
+## Step 8: the H0 gate on the test split
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-h0
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-h0
+
+syn-W0-M  T 21412417  test  users 590  left out 48  per_user rows 1626
+H0 gate: pass  ci_low -0.004285
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-h0
+manifest sha256 6413fa7d4d2ebdaf8a92bc55f9dd86978b1ae83c65f0a83a2a7ab369399bb08f
+        6.90 real         6.87 user         0.08 sys
+           152109056  maximum resident set size
+# compare.csv, K 10, all users:
+# dataset,family,method,ref,k,bucket,n,mean_diff,ci_low,ci_high,p_raw,p_holm
+# syn-W0-M,none,H,BL2,10,all,542,0.011150,-0.000822,0.023427,,
+# syn-W0-M,none,H-follow,BL2,10,all,542,0.000770,-0.004285,0.006223,,
+

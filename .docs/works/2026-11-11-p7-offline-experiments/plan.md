@@ -141,7 +141,7 @@ Added on 2026-11-11 at Stop A, by the author's decisions. Claude has already mad
 #### Step 8: Approval and the H0 gate (effort XS, after the author's OK)
 
 - [x] Run `freeze --approve author`, then `freeze --check` (must print `equal`). Commit: `chore: the author approves the P7 test split`.
-- [ ] Run the harness on `p7-h0` and add it to the run log.
+- [x] Run the harness on `p7-h0` and add it to the run log.
   - **If the gate fails, this is Stop B.** Commit nothing more. Report the gate line and the compare row. Do not run anything else (design F1).
   - If it passes, commit: `chore: P7 H0 gate on the test split`.
 

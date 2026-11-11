@@ -1,0 +1,10 @@
+dataset,split,method,k,coverage
+syn-W0-M,test,BL2,5,0.076211
+syn-W0-M,test,BL2,10,0.253169
+syn-W0-M,test,BL2,20,0.501787
+syn-W0-M,test,H,5,0.154859
+syn-W0-M,test,H,10,0.208320
+syn-W0-M,test,H,20,0.289893
+syn-W0-M,test,H-follow,5,0.191420
+syn-W0-M,test,H-follow,10,0.359116
+syn-W0-M,test,H-follow,20,0.564511
