@@ -157,10 +157,10 @@ Added on 2026-11-11 at Stop A, by the author's decisions. Claude has already mad
 
 #### Step 11: Double run (effort XS, plus the run time)
 
-- [ ] Delete `.docs/results/p7-*/` and `eval/results/p7-*/`. Run the two tuning runs, `freeze --approve author`, the ten test runs in the Step 8 and Step 9 order, and `report`, all into their default folders (design: "Double run").
-- [ ] Check that git shows no change under `.docs/results/` and `eval/config/runs/`, and that each `eval/results/p7-*/per_user.csv` has the SHA-256 written in its manifest. Write the result in the run log.
-- [ ] If anything differs, stop and report it. Leave the files as they are and commit nothing.
-- [ ] Commit: `chore: P7 double run` (the run log only).
+- [x] Delete `.docs/results/p7-*/` and `eval/results/p7-*/`. Run the two tuning runs, `freeze --approve author`, the ten test runs in the Step 8 and Step 9 order, and `report`, all into their default folders (design: "Double run").
+- [x] Check that git shows no change under `.docs/results/` and `eval/config/runs/`, and that each `eval/results/p7-*/per_user.csv` has the SHA-256 written in its manifest. Write the result in the run log.
+- [x] If anything differs, stop and report it. Leave the files as they are and commit nothing.
+- [x] Commit: `chore: P7 double run` (the run log only).
 
 ## Claude's part
 

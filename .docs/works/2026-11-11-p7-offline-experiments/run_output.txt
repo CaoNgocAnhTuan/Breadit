@@ -278,3 +278,42 @@ manifest sha256 d27f40234e4c0a0e3c8d0cdddaf4875fa6e212108cba5da953d2a5b9f7e1a87b
 # macros.csv has 70 rows, every name matches ^[A-Za-z]+$, results-macros.tex has 70 
 ewcommand lines, tables/ has 9 .tex files.
 
+
+## Step 11: the double run (2026-11-12, 00:03 to 02:33)
+
+Script (made by Sonnet, finished on its own after the agent stopped on a network error; Claude did the check below):
+delete .docs/results/p7-* and eval/results/p7-*; run p7-tune-worlds and p7-tune-main; freeze --approve author; freeze --check;
+the ten test runs in the Step 8 and Step 9 order; report. All into the default folders.
+
+freeze --check:
+  rule check: 14 groups, 0 violations
+  E8 baseline: BL6 (validation NDCG@10 0.018159, K 10, all users, syn-W2M-M)
+  equal
+Verdict lines of the rerun:
+  H1 syn-W2M-M: fail  p_holm 0.680332  ci_low -0.002358
+  H1 digg2009: fail  p_holm 0.335466  ci_low 0.000015
+  H0 gate: pass  ci_low -0.004285
+Exit codes of the ten test runs: all 0.
+
+Check:
+  git status --short .docs/results/ eval/config/runs/ -> no line (every committed file and manifest is byte-identical)
+  p7-e4-terms/per_user.csv (git-ignored) sha256 equals its manifest
+  p7-e6-ties/per_user.csv (git-ignored) sha256 equals its manifest
+  p7-main/per_user.csv (git-ignored) sha256 equals its manifest
+  p7-tune-main/per_user.csv (git-ignored) sha256 equals its manifest
+Result: the double run gives byte-identical files (DW9).
+
+Run time (real, s) and peak memory (max RSS, bytes), Class R, not compared:
+  p7-tune-worlds       156.24     357400576
+  p7-tune-main        3966.56    3015884800
+  p7-h0                  7.04     145145856
+  p7-main             2143.95    2135736320
+  p7-e5-worlds          21.03     186335232
+  p7-e4-terms         1533.38    1176485888
+  p7-e4-m0             330.54    1384988672
+  p7-e4-m2             333.56    1693188096
+  p7-e4-m10            339.75    1214234624
+  p7-e6-ties            97.11    1379418112
+  p7-e8-pool             8.57     221052928
+  p7-e5-shuffle          3.86     155189248
+  report                 0.24      94912512
