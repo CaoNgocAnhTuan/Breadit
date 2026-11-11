@@ -1,5 +1,5 @@
 import { buildPool, rankPool, scorer, userFeaturesAsOf } from "@breadit/ranking";
-import type { AsOf, Follow, Membership, Positive, Post, PostFeatures, PostId, UserFeatureData, UserFeatures, UserId } from "@breadit/ranking";
+import type { AsOf, Follow, Membership, Positive, Post, PostFeatures, PostId, TieBreak, UserFeatureData, UserFeatures, UserId } from "@breadit/ranking";
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import { loadDataset } from "../canonical/dataset.ts";
@@ -8,12 +8,13 @@ import { bucketOf, cutTime } from "../checks/buckets.ts";
 import { loadFrozen } from "../frozen.ts";
 import { CoverageTracker, GROUPS, groupsOf, summarize } from "../metrics.ts";
 import type { CoverageRow, RankRow, SummaryRow } from "../metrics.ts";
-import { fixedVariants, validateConfig } from "./config.ts";
+import { validateConfig, variantsFor } from "./config.ts";
 import type { ModeName, PoolName, RunConfig, Variant } from "./config.ts";
 import { buildDataIndex, followeeEngagement, positiveEvents, uid, userEventCount, userFollows, userMemberships, windowCandidates } from "./index-data.ts";
 import type { DataIndex } from "./index-data.ts";
 import { fastPostFeatures, referencePositives, referencePostFeatures, userFeatureData } from "./post-features.ts";
 import type { DatasetTables } from "./random-data.ts";
+import { shuffleWithinPosts } from "./shuffle.ts";
 import { splitItems } from "./split.ts";
 import type { Event, SplitName } from "./split.ts";
 
@@ -41,6 +42,8 @@ export interface RunParams {
   variants: Variant[];
   pool: PoolName;
   mode: ModeName;
+  /** Order of posts with equal scores. Default "id-desc", the production order. */
+  tieBreak?: TieBreak;
 }
 
 export interface DatasetRunOptions {
@@ -52,6 +55,13 @@ export interface DatasetRunOptions {
   onlyUsers?: ReadonlySet<number>;
   /** Count items and left-out users, and rank nothing. */
   countOnly?: boolean;
+  /**
+   * Keep the per-user rows (default true). When false, no PerUserRow is kept, but the ranks still go to the summary and the
+   * coverage. Tuning uses it: it needs only the summary (design "Tuning memory").
+   */
+  keepPerUser?: boolean;
+  /** The dataset name written in every row (default: the dataset id). The shuffled run of E5 uses `<id>-shuffled`. */
+  label?: string;
 }
 
 export interface PerUserRow {
@@ -182,7 +192,7 @@ export interface ScoredItem {
 }
 
 /** Scores the pool of one item with each variant and ranks it with `rankPool` of the package. */
-export function scoreItem(prep: Prepared, pi: PreparedAt, variants: readonly Variant[]): ScoredItem {
+export function scoreItem(prep: Prepared, pi: PreparedAt, variants: readonly Variant[], tieBreak: TieBreak = "id-desc"): ScoredItem {
   const idx = prep.idx;
   let uf: UserFeatures;
   const feats = new Map<PostId, PostFeatures>();
@@ -199,7 +209,7 @@ export function scoreItem(prep: Prepared, pi: PreparedAt, variants: readonly Var
   for (const v of variants) {
     const score = scorer(v.method);
     const ctx = { user: pi.userId, asOf: pi.asOf, uf, params: v.params };
-    ranked.set(v.label, rankPool(pi.pool, (post) => score(ctx, post, feats.get(post.id) as PostFeatures)));
+    ranked.set(v.label, rankPool(pi.pool, (post) => score(ctx, post, feats.get(post.id) as PostFeatures), tieBreak));
   }
   return { nFollowees: uf.followees.length, ranked };
 }
@@ -207,6 +217,8 @@ export function scoreItem(prep: Prepared, pi: PreparedAt, variants: readonly Var
 /** One dataset, one split: items, pools, ranks, and the per-user, summary, coverage and left-out rows. */
 export function runDataset(datasetId: string, data: DatasetTables, rp: RunParams, opts: DatasetRunOptions = {}): DatasetRun {
   const frozen = loadFrozen();
+  const label = opts.label ?? datasetId;
+  const keepPerUser = opts.keepPerUser ?? true;
   const prep = prepare(datasetId, data, rp.mode);
   const T = resolveT(prep, opts);
   const items = splitItems(prep.events, T, rp.split);
@@ -228,34 +240,36 @@ export function runDataset(datasetId: string, data: DatasetTables, rp: RunParams
       continue;
     }
     if (opts.countOnly) continue;
-    const scored = scoreItem(prep, pi, rp.variants);
+    const scored = scoreItem(prep, pi, rp.variants, rp.tieBreak);
     cov.addPool(pi.pool.map((p) => p.id));
     for (const v of rp.variants) {
       const order = scored.ranked.get(v.label) as PostId[];
       const rank = order.indexOf(ev.post) + 1;
-      perUser.push({
-        dataset: datasetId,
-        split: rp.split,
-        method: v.label,
-        userId: user,
-        bucket: pi.bucket,
-        nHistory: pi.nHistory,
-        nFollowees: scored.nFollowees,
-        testPostId: ev.post,
-        rank,
-      });
+      if (keepPerUser) {
+        perUser.push({
+          dataset: label,
+          split: rp.split,
+          method: v.label,
+          userId: user,
+          bucket: pi.bucket,
+          nHistory: pi.nHistory,
+          nFollowees: scored.nFollowees,
+          testPostId: ev.post,
+          rank,
+        });
+      }
       (rankRows.get(v.label) as RankRow[]).push({ userId: user, bucket: pi.bucket, rank });
       cov.addTop(v.label, order.slice(0, maxK));
     }
   }
 
   const labels = rp.variants.map((v) => v.label);
-  const summary = labels.flatMap((l) => summarize(datasetId, rp.split, l, rankRows.get(l) as RankRow[], ks));
+  const summary = labels.flatMap((l) => summarize(label, rp.split, l, rankRows.get(l) as RankRow[], ks));
   const leftOut: LeftOutRow[] = GROUPS.map((g) => {
     const c = counts.get(g) as { n: number; left: number };
-    return { dataset: datasetId, split: rp.split, bucket: g, nTestUsers: c.n, nLeftOut: c.left };
+    return { dataset: label, split: rp.split, bucket: g, nTestUsers: c.n, nLeftOut: c.left };
   });
-  return { dataset: datasetId, split: rp.split, T, perUser, summary, coverage: cov.rows(datasetId, rp.split, labels), leftOut };
+  return { dataset: label, split: rp.split, T, perUser, summary, coverage: cov.rows(label, rp.split, labels), leftOut };
 }
 
 /** Items and left-out users per bucket, with no ranking (DW6). */
@@ -280,10 +294,13 @@ export function defaultDataDir(): string {
 /**
  * Runs a config: the guards first (split, methods, params, a recorded T for every dataset), then each dataset in turn.
  * A config with a "grid" param needs `o.variants`, the variants chosen by the tuning (`tuneConfig`).
+ * The variants of a dataset are `o.variants[id]`, else `variantsFor(cfg, id)` (its `datasetParams` replace `params`).
+ * With `cfg.shuffle`, a dataset runs on its interactions shuffled inside each post, its rows carry the label `<id>-shuffled`,
+ * and T is still checked against the T of the source id.
  */
 export function runConfig(cfg: RunConfig, o: RunConfigOptions = {}): RunResult {
   validateConfig(cfg);
-  const common = o.variants === undefined ? fixedVariants(cfg) : undefined;
+  const planned = new Map<string, Variant[]>(cfg.datasets.map((id) => [id, o.variants?.[id] ?? variantsFor(cfg, id)]));
   const cutTimes = o.cutTimes ?? loadFrozen().cutTimes;
   for (const id of cfg.datasets) {
     if (cutTimes[id] === undefined) {
@@ -296,10 +313,16 @@ export function runConfig(cfg: RunConfig, o: RunConfigOptions = {}): RunResult {
   for (const id of cfg.datasets) {
     const dir = join(dataDir, id);
     inputs[id] = sha256Hex(readFileSync(join(dir, "manifest.json")));
-    const data = loadDataset(dir);
-    const variants = o.variants === undefined ? (common as Variant[]) : o.variants[id];
-    if (variants === undefined) throw new Error(`no variants were given for dataset ${id}`);
-    datasets.push(runDataset(id, data, { split: cfg.split, variants, pool: cfg.pool, mode: cfg.mode }, { expectedT: cutTimes[id] as number }));
+    let data = loadDataset(dir);
+    if (cfg.shuffle === true) data = { ...data, interactions: shuffleWithinPosts(data.interactions, loadFrozen().masterSeed) };
+    datasets.push(
+      runDataset(
+        id,
+        data,
+        { split: cfg.split, variants: planned.get(id) as Variant[], pool: cfg.pool, mode: cfg.mode, ...(cfg.tieBreak !== undefined ? { tieBreak: cfg.tieBreak } : {}) },
+        { expectedT: cutTimes[id] as number, ...(cfg.shuffle === true ? { label: `${id}-shuffled` } : {}) },
+      ),
+    );
   }
   return { datasets, inputs };
 }

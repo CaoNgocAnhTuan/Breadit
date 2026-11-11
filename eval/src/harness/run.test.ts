@@ -1,18 +1,21 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { scorer, userFeaturesAsOf } from "@breadit/ranking";
+import { cpSync, existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { countItems, poolSetting, runConfig, runDataset } from "./run.ts";
+import { countItems, poolSetting, prepare, prepareItem, runConfig, runDataset } from "./run.ts";
 import type { DatasetRun, PerUserRow, RunParams } from "./run.ts";
 import { resultTexts } from "./write.ts";
-import { fixedVariants } from "./config.ts";
+import { fixedVariants, variantsFor } from "./config.ts";
 import type { RunConfig } from "./config.ts";
-import { positiveEvents } from "./index-data.ts";
+import { followeeEngagement, positiveEvents } from "./index-data.ts";
+import { fastPostFeatures, userFeatureData } from "./post-features.ts";
 import { splitItems } from "./split.ts";
 import type { Event, SplitName } from "./split.ts";
 import { randomDataset, SMALL } from "./random-data.ts";
 import type { DatasetTables } from "./random-data.ts";
 import { loadDataset } from "../canonical/dataset.ts";
+import { tempDir } from "../checks/fixture.ts";
 import { bucketReport } from "../checks/buckets.ts";
 import { loadFrozen } from "../frozen.ts";
 import { METHOD_ORDER, ndcgAt, recallAt, f6 } from "../metrics.ts";
@@ -367,3 +370,114 @@ for (const id of ["syn-W2M-S", "syn-W2M-M"]) {
     assert.equal(counts.leftOut.find((r) => r.bucket === "all")?.nTestUsers, report.testUsers);
   });
 }
+
+// TC4 (design DW7, DW11): tieBreak, datasetParams, shuffle and the label in the run.
+test("tieBreak id-asc changes ranks only where scores tie (golden: hand work, and an oracle from the scores)", () => {
+  const desc = runDataset("golden", golden, params("validation"), { expectedT: GOLDEN_T });
+  const same = runDataset("golden", golden, params("validation", { tieBreak: "id-desc" }), { expectedT: GOLDEN_T });
+  assert.deepEqual(same.perUser, desc.perUser, "id-desc is the default");
+  const asc = runDataset("golden", golden, params("validation", { tieBreak: "id-asc" }), { expectedT: GOLDEN_T });
+  assert.equal(asc.perUser.length, desc.perUser.length);
+  // User 4: H-follow ties 8 with 9 at 25 (9 first with id-desc, 8 first with id-asc, so the item on post 9 goes from rank 1 to 2);
+  // BL3 ties 9 with 5 at 2 likes (post 9 goes from rank 2 to 3). No other method of user 4 has a tie.
+  assert.deepEqual(ranksOf(asc, 4), { ...USER4, "H-follow": 2, BL3: 3 });
+  // User 7: BL3 has four posts with 2 likes (2, 4, 5, 6). The item on post 2 goes from rank 4 to rank 1 (id asc puts 2 first).
+  assert.deepEqual(ranksOf(asc, 7), { ...USER7, BL3: 1 });
+  // The oracle: for every user and method, rank = 1 + (posts with a higher score) + (posts with an equal score that the
+  // tie-break puts first), from the scores of the scorers themselves. So a rank differs between the two orders only where the
+  // item's score ties with another post, and by the number of ties on each side.
+  const prep = prepare("golden", golden, "fast");
+  const items = splitItems(prep.events, GOLDEN_T, "validation");
+  let changed = 0;
+  for (const user of [...items.keys()].sort((x, y) => x - y)) {
+    const pi = prepareItem(prep, items.get(user) as Event, poolSetting("normal"));
+    if (!pi.inPool) continue;
+    const uf = userFeaturesAsOf(pi.userId, pi.asOf, userFeatureData(prep.idx, pi.user));
+    const eng = followeeEngagement(prep.idx, uf.followees, pi.asOf);
+    for (const v of fixedVariants(GOLDEN_CONFIG)) {
+      const score = scorer(v.method);
+      const ctx = { user: pi.userId, asOf: pi.asOf, uf, params: v.params };
+      const scores = pi.pool.map((post) => ({ id: post.id, s: score(ctx, post, fastPostFeatures(post, pi.asOf, eng, prep.idx)) }));
+      const mine = scores.find((x) => x.id === pi.ev.post) as { id: number; s: number };
+      const higher = scores.filter((x) => x.s > mine.s).length;
+      const tiedBigger = scores.filter((x) => x.s === mine.s && x.id > mine.id).length;
+      const tiedSmaller = scores.filter((x) => x.s === mine.s && x.id < mine.id).length;
+      const rd = (desc.perUser.find((r) => r.userId === user && r.method === v.label) as PerUserRow).rank;
+      const ra = (asc.perUser.find((r) => r.userId === user && r.method === v.label) as PerUserRow).rank;
+      assert.equal(rd, 1 + higher + tiedBigger, `id-desc user ${user} ${v.label}`);
+      assert.equal(ra, 1 + higher + tiedSmaller, `id-asc user ${user} ${v.label}`);
+      if (rd !== ra) changed++;
+    }
+  }
+  assert.ok(changed >= 5, "the golden data has too few ties to test the order");
+  // The rows differ in the rank column only.
+  for (let i = 0; i < desc.perUser.length; i++) {
+    assert.deepEqual({ ...(asc.perUser[i] as PerUserRow), rank: 0 }, { ...(desc.perUser[i] as PerUserRow), rank: 0 });
+  }
+});
+
+test("datasetParams: a two-dataset config gives each dataset the rows of a one-dataset run with its params", () => {
+  const dir = tempDir();
+  for (const name of ["golden-a", "golden-b"]) cpSync(GOLDEN, join(dir, name), { recursive: true });
+  const cutTimes = { "golden-a": GOLDEN_T, "golden-b": GOLDEN_T };
+  const two: RunConfig = {
+    ...GOLDEN_CONFIG,
+    datasets: ["golden-a", "golden-b"],
+    datasetParams: { "golden-b": { H: { alpha: 0, beta: 8 }, BL4: { divisor: 5000 }, "H-follow": { alpha: 4 } } },
+  };
+  const both = runConfig(two, { dataDir: dir, cutTimes });
+  const aOnly = runConfig({ ...GOLDEN_CONFIG, datasets: ["golden-a"] }, { dataDir: dir, cutTimes });
+  const bOnly = runConfig({ ...GOLDEN_CONFIG, datasets: ["golden-b"], params: { ...GOLDEN_CONFIG.params, H: { alpha: 0, beta: 8, m: 5 }, BL4: { divisor: 5000 }, "H-follow": { alpha: 4, m: 5 } } }, { dataDir: dir, cutTimes });
+  assert.deepEqual(both.datasets[0], aOnly.datasets[0]);
+  assert.deepEqual(both.datasets[1], bOnly.datasets[0]);
+  // the params really differ between the two datasets
+  assert.notDeepEqual(both.datasets[0]?.summary.map((r) => r.ndcg), both.datasets[1]?.summary.map((r) => r.ndcg));
+  assert.deepEqual(variantsFor(two, "golden-a"), fixedVariants(GOLDEN_CONFIG));
+});
+
+test("a config with tieBreak runs the harness with it, and one without runs as before", () => {
+  const plain = runConfig(GOLDEN_CONFIG, { dataDir: FIXTURES, cutTimes: { golden: GOLDEN_T } });
+  const asc = runConfig({ ...GOLDEN_CONFIG, tieBreak: "id-asc" }, { dataDir: FIXTURES, cutTimes: { golden: GOLDEN_T } });
+  assert.deepEqual(plain.datasets[0]?.perUser, runDataset("golden", golden, params("validation"), { expectedT: GOLDEN_T }).perUser);
+  assert.deepEqual(ranksOf(asc.datasets[0] as DatasetRun, 4), { ...USER4, "H-follow": 2, BL3: 3 });
+});
+
+test("keepPerUser false keeps no per-user row, and the summary and coverage stay the same", () => {
+  const keep = runDataset("golden", golden, params("validation"), { expectedT: GOLDEN_T });
+  const light = runDataset("golden", golden, params("validation"), { expectedT: GOLDEN_T, keepPerUser: false });
+  assert.ok(keep.perUser.length > 0);
+  assert.deepEqual(light.perUser, []);
+  assert.deepEqual(light.summary, keep.summary);
+  assert.deepEqual(light.coverage, keep.coverage);
+  assert.deepEqual(light.leftOut, keep.leftOut);
+});
+
+test("label: the dataset name in every row, with T checked against the source id", () => {
+  const run = runDataset("golden", golden, params("validation"), { expectedT: GOLDEN_T, label: "golden-shuffled" });
+  assert.equal(run.dataset, "golden-shuffled");
+  for (const rows of [run.perUser, run.summary, run.coverage, run.leftOut]) {
+    assert.ok(rows.length > 0);
+    for (const r of rows) assert.equal(r.dataset, "golden-shuffled");
+  }
+  assert.throws(() => runDataset("golden", golden, params("validation"), { expectedT: GOLDEN_T + 1, label: "golden-shuffled" }), /golden/);
+});
+
+test("shuffle run on syn-W2M-S: the label is syn-W2M-S-shuffled in every row, T is the T of syn-W2M-S, inputs are keyed by syn-W2M-S", () => {
+  const id = "syn-W2M-S";
+  const T = frozen.cutTimes[id] as number;
+  const cfg: RunConfig = { datasets: [id], split: "validation", methods: ["BL2", "H"], params: { H: { alpha: 1, beta: 1, m: "frozen" } }, pool: "normal", mode: "fast", shuffle: true };
+  const plain = runConfig({ ...cfg, shuffle: undefined }, { cutTimes: { [id]: T } });
+  const run = runConfig(cfg, { cutTimes: { [id]: T } });
+  assert.deepEqual(Object.keys(run.inputs), [id]);
+  assert.deepEqual(run.inputs, plain.inputs);
+  const d = run.datasets[0] as DatasetRun;
+  assert.equal(d.dataset, "syn-W2M-S-shuffled");
+  assert.equal(d.T, T);
+  assert.ok(d.perUser.length > 100);
+  for (const rows of [d.perUser, d.summary, d.coverage, d.leftOut]) for (const r of rows) assert.equal(r.dataset, "syn-W2M-S-shuffled");
+  // the shuffle changed something: the H rows differ from the unshuffled run
+  const h = (r: DatasetRun): string => r.perUser.filter((x) => x.method === "H").map((x) => `${x.userId}:${x.rank}`).join(",");
+  assert.notEqual(h(d), h(plain.datasets[0] as DatasetRun));
+  // a wrong cutTimes entry still stops the shuffled run (the check is on the source id)
+  assert.throws(() => runConfig(cfg, { cutTimes: { [id]: T + 1 } }), /syn-W2M-S/);
+});

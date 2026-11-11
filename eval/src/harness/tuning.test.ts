@@ -152,3 +152,40 @@ test("tuneConfig tunes each dataset of a config and needs a recorded T for every
   assert.deepEqual(Object.keys(out.variants), ["golden"]);
   assert.throws(() => tuneConfig({ ...CONFIG, split: "test", testApprovedBy: "author" }, { dataDir, cutTimes: { golden: GOLDEN_T } }), /validation/);
 });
+
+// TC5 (design F2): tuning keeps no per-user row, and the choice does not change.
+test("tuneDataset gives the same rows and variants with keepPerUser false as with true, on syn-W2M-S", () => {
+  const id = "syn-W2M-S";
+  const data = loadDataset(new URL(`../../data/${id}`, import.meta.url).pathname);
+  const T = frozen.cutTimes[id] as number;
+  const cfg: RunConfig = {
+    datasets: [id],
+    split: "validation",
+    methods: ["BL2", "BL2t", "BL4", "H-follow"],
+    params: { BL2t: { ageWeight: "grid" }, BL4: { divisor: "grid" }, "H-follow": { alpha: "grid", m: "frozen" } },
+    pool: "normal",
+    mode: "fast",
+  };
+  const light = tuneDataset(id, data, cfg, { expectedT: T, keepPerUser: false });
+  const heavy = tuneDataset(id, data, cfg, { expectedT: T, keepPerUser: true });
+  assert.equal(light.rows.length, 5 + 5 + 6);
+  assert.deepEqual(light.rows, heavy.rows);
+  assert.deepEqual(light.variants, heavy.variants);
+  // the default of tuneDataset is the light one: it gives the same rows
+  assert.deepEqual(tuneDataset(id, data, cfg, { expectedT: T }).rows, heavy.rows);
+});
+
+test("a run with keepPerUser false has an empty perUser and the same summary and coverage, on syn-W2M-S", () => {
+  const id = "syn-W2M-S";
+  const data = loadDataset(new URL(`../../data/${id}`, import.meta.url).pathname);
+  const T = frozen.cutTimes[id] as number;
+  const cfg: RunConfig = { datasets: [id], split: "validation", methods: ["BL2", "BL4"], params: { BL4: { divisor: 45000 } }, pool: "normal", mode: "fast" };
+  const rp = { split: "validation" as const, variants: fixedVariants(cfg), pool: "normal" as const, mode: "fast" as const };
+  const keep = runDataset(id, data, rp, { expectedT: T });
+  const light = runDataset(id, data, rp, { expectedT: T, keepPerUser: false });
+  assert.ok(keep.perUser.length > 100);
+  assert.deepEqual(light.perUser, []);
+  assert.deepEqual(light.summary, keep.summary);
+  assert.deepEqual(light.coverage, keep.coverage);
+  assert.deepEqual(light.leftOut, keep.leftOut);
+});

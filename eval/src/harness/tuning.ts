@@ -109,7 +109,8 @@ export function tuneDataset(datasetId: string, data: DatasetTables, cfg: RunConf
   if (gridVariants.length === 0) throw new Error('nothing to tune: no param of the config is "grid"');
 
   // One pass over the items: the pool and the features are shared by every grid point.
-  const run = runDataset(datasetId, data, { split: "validation", variants: gridVariants, pool: cfg.pool, mode: cfg.mode }, opts);
+  // The choice needs only the summary, so no per-user row is kept (design "Tuning memory"): on Digg it would be millions of rows.
+  const run = runDataset(datasetId, data, { split: "validation", variants: gridVariants, pool: cfg.pool, mode: cfg.mode }, { keepPerUser: false, ...opts });
   const rows: TuningRow[] = [];
   const variants: Variant[] = [];
   for (const plan of plans) {

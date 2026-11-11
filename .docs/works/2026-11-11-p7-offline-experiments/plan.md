@@ -56,9 +56,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
 
 #### Step 3: Shuffle, per-dataset variants, tie-break and lighter tuning in the run (effort S–M)
 
-- [ ] Tests first: **TC3** (`shuffle.test.ts`, new), **TC4** (`run.test.ts`), **TC5** (`tuning.test.ts`).
-- [ ] `eval/src/harness/shuffle.ts`: `shuffleWithinPosts(rows, masterSeed)` exactly as design "Shuffle". Posts in id order. Inside a post, the slots are its rows sorted by `(createdAt, eventId)`. Each slot keeps `eventId`, `createdAt` and `type`, and the post's users go back in a Fisher–Yates order from one `rng(masterSeed, "shuffle")` stream for the whole dataset. The output is sorted by `(createdAt, eventId)`.
-- [ ] `run.ts` (design: Code files):
+- [x] Tests first: **TC3** (`shuffle.test.ts`, new), **TC4** (`run.test.ts`), **TC5** (`tuning.test.ts`).
+- [x] `eval/src/harness/shuffle.ts`: `shuffleWithinPosts(rows, masterSeed)` exactly as design "Shuffle". Posts in id order. Inside a post, the slots are its rows sorted by `(createdAt, eventId)`. Each slot keeps `eventId`, `createdAt` and `type`, and the post's users go back in a Fisher–Yates order from one `rng(masterSeed, "shuffle")` stream for the whole dataset. The output is sorted by `(createdAt, eventId)`.
+- [x] `run.ts` (design: Code files):
   - `RunParams.tieBreak` (default `"id-desc"`), passed by `scoreItem` to `rankPool`.
   - `DatasetRunOptions.keepPerUser` (default true). When it is false, no `PerUserRow` is kept, but the ranks still go to `summarize` and coverage.
   - `DatasetRunOptions.label`: the dataset name written in every row (default: the dataset id).
@@ -68,9 +68,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
     - `expectedT` is always `cutTimes[id]`, the source id;
     - `inputs` stays keyed by the source id.
   - `rankAt` and the `rank` command keep the default order.
-- [ ] `tuning.ts`: `tuneDataset` runs with `keepPerUser: false` (design: "Tuning memory").
-- [ ] The golden, leakage and double-run tests of P5 pass unchanged.
-- [ ] Commit: `feat: eval shuffle, per-dataset params, tie-break and lighter tuning`
+- [x] `tuning.ts`: `tuneDataset` runs with `keepPerUser: false` (design: "Tuning memory").
+- [x] The golden, leakage and double-run tests of P5 pass unchanged.
+- [x] Commit: `feat: eval shuffle, per-dataset params, tie-break and lighter tuning`
 
 #### Step 4: `compare.csv`, `density.csv` and the verdicts (effort M)
 
