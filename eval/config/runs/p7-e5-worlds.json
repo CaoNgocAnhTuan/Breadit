@@ -6,32 +6,32 @@
   "datasetParams": {
     "syn-W0-M": {
       "H": {
-        "alpha": 16,
-        "beta": 16
+        "alpha": 32,
+        "beta": 512
       }
     },
     "syn-W1-M": {
       "H": {
-        "alpha": 16,
-        "beta": 16
+        "alpha": 256,
+        "beta": 1024
       }
     },
     "syn-W2H-M": {
       "H": {
-        "alpha": 16,
-        "beta": 16
+        "alpha": 1024,
+        "beta": 1024
       }
     },
     "syn-W2L-M": {
       "H": {
-        "alpha": 16,
-        "beta": 16
+        "alpha": 1024,
+        "beta": 512
       }
     },
     "syn-W2M-M": {
       "H": {
-        "alpha": 16,
-        "beta": 16
+        "alpha": 1024,
+        "beta": 1024
       }
     }
   },
@@ -50,8 +50,8 @@
   "mode": "fast",
   "params": {
     "H": {
-      "alpha": 16,
-      "beta": 16,
+      "alpha": 32,
+      "beta": 512,
       "m": "frozen"
     }
   },

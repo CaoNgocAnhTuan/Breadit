@@ -9,13 +9,18 @@
   "h0Gate": true,
   "methods": [
     "BL2",
-    "H"
+    "H",
+    "H-follow"
   ],
   "mode": "fast",
   "params": {
     "H": {
-      "alpha": 16,
-      "beta": 16,
+      "alpha": 1024,
+      "beta": 1024,
+      "m": "frozen"
+    },
+    "H-follow": {
+      "alpha": 1024,
       "m": "frozen"
     }
   },

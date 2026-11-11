@@ -6,7 +6,7 @@
   "datasetParams": {
     "digg2009": {
       "BL2t": {
-        "ageWeight": 1
+        "ageWeight": 4
       },
       "BL4": {
         "divisor": 45000
@@ -15,10 +15,10 @@
         "gravity": 1.5
       },
       "BL6": {
-        "alpha": 16
+        "alpha": 1024
       },
       "H": {
-        "alpha": 16,
+        "alpha": 1024,
         "beta": 0
       }
     },
@@ -27,17 +27,17 @@
         "ageWeight": 0.125
       },
       "BL4": {
-        "divisor": 180000
+        "divisor": 720000
       },
       "BL5": {
-        "gravity": 1.2
+        "gravity": 0.6
       },
       "BL6": {
         "alpha": 16
       },
       "H": {
-        "alpha": 16,
-        "beta": 16
+        "alpha": 1024,
+        "beta": 1024
       }
     }
   },
@@ -63,17 +63,17 @@
       "ageWeight": 0.125
     },
     "BL4": {
-      "divisor": 180000
+      "divisor": 720000
     },
     "BL5": {
-      "gravity": 1.2
+      "gravity": 0.6
     },
     "BL6": {
       "alpha": 16
     },
     "H": {
-      "alpha": 16,
-      "beta": 16,
+      "alpha": 1024,
+      "beta": 1024,
       "m": "frozen"
     }
   },

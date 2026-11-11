@@ -134,9 +134,9 @@ Added on 2026-11-11 at Stop A, by the author's decisions. Claude has already mad
   - TC10 and TC11: the H0 macros and the `e5` table read the H-follow row.
 - [x] Code: `stats.ts` (`h0Gate(rows, method = "H")`, nothing else), `compare.ts` (`verdictLines`), `config.ts` (the `h0Gate` check), `freeze.ts` (`TEST_RUNS`, `p7-h0`), and the report (`MACRO_SPECS`, table `e5`).
 - [x] `npm run verify -w @breadit/eval` passes. Commit: `feat: H0 gate on H-follow (amendment 1)`
-- [ ] Delete `.docs/results/p7-tune-*/` and `eval/results/p7-tune-*/`. Run both tuning configs again, adding each to the run log with its time and memory. Then run `freeze` and `freeze --check`. If Digg runs out of memory, stop and report (design F16).
-- [ ] Commit: `chore: P7 tuning on the wider grids, and the test configs`
-- [ ] **Stop A again**, with the same report as Step 7. Also name any value chosen at a grid edge (design F17).
+- [x] Delete `.docs/results/p7-tune-*/` and `eval/results/p7-tune-*/`. Run both tuning configs again, adding each to the run log with its time and memory. Then run `freeze` and `freeze --check`. If Digg runs out of memory, stop and report (design F16).
+- [x] Commit: `chore: P7 tuning on the wider grids, and the test configs`
+- [x] **Stop A again**, with the same report as Step 7. Also name any value chosen at a grid edge (design F17).
 
 #### Step 8: Approval and the H0 gate (effort XS, after the author's OK)
 

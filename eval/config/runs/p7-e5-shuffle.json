@@ -13,8 +13,8 @@
   "mode": "fast",
   "params": {
     "H": {
-      "alpha": 16,
-      "beta": 16,
+      "alpha": 1024,
+      "beta": 1024,
       "m": "frozen"
     }
   },
