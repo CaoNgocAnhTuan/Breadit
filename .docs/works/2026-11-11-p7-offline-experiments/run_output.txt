@@ -146,3 +146,119 @@ manifest sha256 6413fa7d4d2ebdaf8a92bc55f9dd86978b1ae83c65f0a83a2a7ab369399bb08f
 # syn-W0-M,none,H,BL2,10,all,542,0.011150,-0.000822,0.023427,,
 # syn-W0-M,none,H-follow,BL2,10,all,542,0.000770,-0.004285,0.006223,,
 
+## Step 9: the other test runs (test split, each once). Made one after the other by a shell script, in the order of the plan.
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-main
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-main
+
+syn-W2M-M  T 21412417  test  users 590  left out 49  per_user rows 4869
+digg2009  T 1246068297  test  users 68120  left out 3547  per_user rows 581157
+H1 syn-W2M-M: fail  p_holm 0.680332  ci_low -0.002358
+H1 digg2009: fail  p_holm 0.335466  ci_low 0.000015
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-main
+not committed (over the limit): per_user.csv in /Users/hung/Desktop/Breadit/eval/results/p7-main
+manifest sha256 f1f66628ec2ad72832fa1de336167d42ae95ab6936f3f38404c423c6c12459dc
+     2109.33 real      2088.94 user         6.59 sys
+          1313751040  maximum resident set size
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-e5-worlds
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-e5-worlds
+
+syn-W0-M  T 21412417  test  users 590  left out 48  per_user rows 1084
+syn-W1-M  T 21412417  test  users 590  left out 50  per_user rows 1080
+syn-W2L-M  T 21412417  test  users 590  left out 48  per_user rows 1084
+syn-W2M-M  T 21412417  test  users 590  left out 49  per_user rows 1082
+syn-W2H-M  T 21412417  test  users 590  left out 52  per_user rows 1076
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-e5-worlds
+manifest sha256 3c091c15fc5126382bb38459909aec1373080a297a779fe30d46d28583a50fe9
+       19.89 real        19.84 user         0.15 sys
+           188039168  maximum resident set size
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-e4-terms
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-e4-terms
+
+syn-W2M-M  T 21412417  test  users 590  left out 49  per_user rows 3246
+digg2009  T 1246068297  test  users 68120  left out 3547  per_user rows 387438
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-e4-terms
+not committed (over the limit): per_user.csv in /Users/hung/Desktop/Breadit/eval/results/p7-e4-terms
+manifest sha256 ec0e088276e5755c1b66c85c0c4facbaaaa6865a1b841675ee2215b41b8204d2
+     1500.71 real      1490.33 user         4.68 sys
+          1260961792  maximum resident set size
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-e4-m0
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-e4-m0
+
+syn-W2M-M  T 21412417  test  users 590  left out 49  per_user rows 1082
+digg2009  T 1246068297  test  users 68120  left out 3547  per_user rows 129146
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-e4-m0
+manifest sha256 bf3f85f03efe01210a9319a5136eada5c710738066ef3ae701acff8e4c88c7a1
+      336.88 real       332.92 user         3.04 sys
+          2170437632  maximum resident set size
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-e4-m2
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-e4-m2
+
+syn-W2M-M  T 21412417  test  users 590  left out 49  per_user rows 1082
+digg2009  T 1246068297  test  users 68120  left out 3547  per_user rows 129146
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-e4-m2
+manifest sha256 e23a0a5ae19cba722897587993f83f48218a75d9ef75e73abfa2a64f9f9c6f63
+      336.37 real       326.36 user         1.20 sys
+          1459453952  maximum resident set size
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-e4-m10
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-e4-m10
+
+syn-W2M-M  T 21412417  test  users 590  left out 49  per_user rows 1082
+digg2009  T 1246068297  test  users 68120  left out 3547  per_user rows 129146
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-e4-m10
+manifest sha256 001f62db2b9bae3dd0450ade60bbfeeadc2fa945a771cbee8a00e75bfdcd6f85
+      325.43 real       323.26 user         1.28 sys
+          1433927680  maximum resident set size
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-e6-ties
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-e6-ties
+
+syn-W2M-M  T 21412417  test  users 590  left out 49  per_user rows 4869
+digg2009  T 1246068297  test  users 68120  left out 3547  per_user rows 581157
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-e6-ties
+not committed (over the limit): per_user.csv in /Users/hung/Desktop/Breadit/eval/results/p7-e6-ties
+manifest sha256 0403d6606e68dc93a5382ece769c1b63dc2d98d65b39f1291f9372f157f7038c
+       96.22 real        94.61 user         0.86 sys
+          1429471232  maximum resident set size
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-e8-pool
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-e8-pool
+
+syn-W2M-M  T 21412417  test  users 590  left out 0  per_user rows 1770
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-e8-pool
+manifest sha256 b1b70c4885f85de3b1f36f61ca849ac51e55f4517715da2f8bf743af17760f86
+        8.49 real         8.42 user         0.08 sys
+           220561408  maximum resident set size
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-e5-shuffle
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-e5-shuffle
+
+syn-W2M-M-shuffled  T 21412417  test  users 588  left out 46  per_user rows 1084
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-e5-shuffle
+manifest sha256 abe71b605ce5f6b98cd8e33653328586b2aaa30077c22eac928dc3d707f24f58
+        3.87 real         3.92 user         0.05 sys
+           148029440  maximum resident set size
+

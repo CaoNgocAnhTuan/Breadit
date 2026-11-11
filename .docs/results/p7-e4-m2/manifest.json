@@ -1,0 +1,35 @@
+{
+  "files": {
+    "compare.csv": {
+      "rows": 36,
+      "sha256": "dc4c320b8fdc8f7b5d6781294f2b0dad5aa3d5a335ce2602877d363dc2523280"
+    },
+    "coverage.csv": {
+      "rows": 12,
+      "sha256": "c082fce8b2dc801b36df1fdcf2abafe5b8404662c54c75cfad635a868832fd1d"
+    },
+    "leftout.csv": {
+      "rows": 12,
+      "sha256": "b89ada73ebe62b1cc41d406aae06242873066933c18f50dd826caf76d629dead"
+    },
+    "per_user.csv": {
+      "rows": 130228,
+      "sha256": "cd7dac3d24dccf2b1874d2354039391b573e96acf459c87f7ac41656be698363"
+    },
+    "summary.csv": {
+      "rows": 72,
+      "sha256": "e36add5af496dea684561b676b2babb8a197dc7051d3bf6372d219369e21daf9"
+    }
+  },
+  "masterSeed": 20261014,
+  "node": "v22.23.4",
+  "runId": "p7-e4-m2",
+  "schemaVersion": 1,
+  "source": {
+    "configSha256": "bbf896055568ed6a55b3b41681731db302bae6c2b2d0d84aa65811f54c1f7fb9",
+    "datasets": {
+      "digg2009": "923e45e17c40b7fa3ae7356153d7f8813c93fbf24c2ee75e63ed36f89bcc4a85",
+      "syn-W2M-M": "a144074779cbd1187c825a8c872c9d9e196a90da5061067d8488ae63224962ed"
+    }
+  }
+}

@@ -147,8 +147,8 @@ Added on 2026-11-11 at Stop A, by the author's decisions. Claude has already mad
 
 #### Step 9: The other test runs (effort S, plus the run time)
 
-- [ ] Run the harness on `p7-main`, `p7-e5-worlds`, `p7-e4-terms`, `p7-e4-m0`, `p7-e4-m2`, `p7-e4-m10`, `p7-e6-ties`, `p7-e8-pool` and `p7-e5-shuffle`, in this order, each added to the run log with its H1 lines where there are any.
-- [ ] Commit: `chore: P7 test-split results (E1–E6, E8)` (`.docs/results/p7-*/` of these runs and the run log).
+- [x] Run the harness on `p7-main`, `p7-e5-worlds`, `p7-e4-terms`, `p7-e4-m0`, `p7-e4-m2`, `p7-e4-m10`, `p7-e6-ties`, `p7-e8-pool` and `p7-e5-shuffle`, in this order, each added to the run log with its H1 lines where there are any.
+- [x] Commit: `chore: P7 test-split results (E1–E6, E8)` (`.docs/results/p7-*/` of these runs and the run log).
 
 #### Step 10: The report (effort XS)
 

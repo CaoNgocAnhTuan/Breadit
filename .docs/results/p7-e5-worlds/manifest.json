@@ -1,0 +1,42 @@
+{
+  "files": {
+    "compare.csv": {
+      "rows": 90,
+      "sha256": "e656d386e267c6cfe97660b88c91697e0aa725b5dbb78e50e2764db8c0ee96cd"
+    },
+    "coverage.csv": {
+      "rows": 30,
+      "sha256": "f6642c3bc1bbd16088ed3cb11439f24167a0a2e9598f73294a2fe2e057fa987b"
+    },
+    "density.csv": {
+      "rows": 20,
+      "sha256": "66832042dfa26df0467d53de7e1ca0cbc4d33a3d8f70d9400b4009d1ec68f8e6"
+    },
+    "leftout.csv": {
+      "rows": 30,
+      "sha256": "d6c75487cf3ac2d4a78326c00c9aa12939ad4e9853b2872836c7ac763f24ce51"
+    },
+    "per_user.csv": {
+      "rows": 5406,
+      "sha256": "808766cdda47f8796b5a40ae52ff7c84bfab26b75beabd81d3478468028b75fc"
+    },
+    "summary.csv": {
+      "rows": 180,
+      "sha256": "77057cbc4398ccdeec9902f1dedc414f7bbf7200c7b089bd3eb0206683943c89"
+    }
+  },
+  "masterSeed": 20261014,
+  "node": "v22.23.4",
+  "runId": "p7-e5-worlds",
+  "schemaVersion": 1,
+  "source": {
+    "configSha256": "5fc9306f82f18234d73a2a6e1cdf837e92f3e994680958799b4d1c1ab94f1f16",
+    "datasets": {
+      "syn-W0-M": "2472c1e48ba8904456b5aef2673c7472b1fdb0f67c1f80d35195151ce8215d4b",
+      "syn-W1-M": "a0fba507997e94d2432d08b4a6c27e6c7abec74e6fad34dcc7450140a8c0d073",
+      "syn-W2H-M": "ef3e596056267d4e7de8cadb5cbd4537c1f7013c9c9c804e16a62db11e7b3e98",
+      "syn-W2L-M": "159ec321fed32c5a423c5d1899c24447b9eb2428bb24130ad8987753c47d568e",
+      "syn-W2M-M": "a144074779cbd1187c825a8c872c9d9e196a90da5061067d8488ae63224962ed"
+    }
+  }
+}

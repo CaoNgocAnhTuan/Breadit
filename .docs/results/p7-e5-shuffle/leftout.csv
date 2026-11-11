@@ -1,0 +1,7 @@
+dataset,split,bucket,n_test_users,n_left_out
+syn-W2M-M-shuffled,test,0,62,3
+syn-W2M-M-shuffled,test,1-4,127,10
+syn-W2M-M-shuffled,test,0-4,189,13
+syn-W2M-M-shuffled,test,5-19,191,12
+syn-W2M-M-shuffled,test,20+,208,21
+syn-W2M-M-shuffled,test,all,588,46
