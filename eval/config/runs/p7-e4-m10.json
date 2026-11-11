@@ -1,0 +1,38 @@
+{
+  "compare": {
+    "mode": "none",
+    "ref": "BL2"
+  },
+  "datasetParams": {
+    "digg2009": {
+      "H": {
+        "alpha": 16,
+        "beta": 0
+      }
+    },
+    "syn-W2M-M": {
+      "H": {
+        "alpha": 16,
+        "beta": 16
+      }
+    }
+  },
+  "datasets": [
+    "syn-W2M-M",
+    "digg2009"
+  ],
+  "methods": [
+    "BL2",
+    "H"
+  ],
+  "mode": "fast",
+  "params": {
+    "H": {
+      "alpha": 16,
+      "beta": 16,
+      "m": 10
+    }
+  },
+  "pool": "normal",
+  "split": "test"
+}

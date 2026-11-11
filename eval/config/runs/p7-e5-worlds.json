@@ -1,0 +1,60 @@
+{
+  "compare": {
+    "mode": "none",
+    "ref": "BL2"
+  },
+  "datasetParams": {
+    "syn-W0-M": {
+      "H": {
+        "alpha": 16,
+        "beta": 16
+      }
+    },
+    "syn-W1-M": {
+      "H": {
+        "alpha": 16,
+        "beta": 16
+      }
+    },
+    "syn-W2H-M": {
+      "H": {
+        "alpha": 16,
+        "beta": 16
+      }
+    },
+    "syn-W2L-M": {
+      "H": {
+        "alpha": 16,
+        "beta": 16
+      }
+    },
+    "syn-W2M-M": {
+      "H": {
+        "alpha": 16,
+        "beta": 16
+      }
+    }
+  },
+  "datasets": [
+    "syn-W0-M",
+    "syn-W1-M",
+    "syn-W2L-M",
+    "syn-W2M-M",
+    "syn-W2H-M"
+  ],
+  "density": true,
+  "methods": [
+    "BL2",
+    "H"
+  ],
+  "mode": "fast",
+  "params": {
+    "H": {
+      "alpha": 16,
+      "beta": 16,
+      "m": "frozen"
+    }
+  },
+  "pool": "normal",
+  "split": "test"
+}

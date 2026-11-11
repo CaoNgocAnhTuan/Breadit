@@ -1,0 +1,24 @@
+{
+  "compare": {
+    "mode": "none",
+    "ref": "BL2"
+  },
+  "datasets": [
+    "syn-W2M-M"
+  ],
+  "methods": [
+    "BL2",
+    "H"
+  ],
+  "mode": "fast",
+  "params": {
+    "H": {
+      "alpha": 16,
+      "beta": 16,
+      "m": "frozen"
+    }
+  },
+  "pool": "normal",
+  "shuffle": true,
+  "split": "test"
+}

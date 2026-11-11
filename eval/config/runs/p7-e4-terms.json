@@ -1,0 +1,88 @@
+{
+  "compare": {
+    "mode": "none",
+    "ref": "BL2"
+  },
+  "datasetParams": {
+    "digg2009": {
+      "H": {
+        "alpha": 16,
+        "beta": 0
+      },
+      "H-comm": {
+        "beta": 0
+      },
+      "H-follow": {
+        "alpha": 16
+      },
+      "H-noauthor": {
+        "alpha": 16,
+        "beta": 0
+      },
+      "H-noengager": {
+        "alpha": 16,
+        "beta": 0
+      }
+    },
+    "syn-W2M-M": {
+      "H": {
+        "alpha": 16,
+        "beta": 16
+      },
+      "H-comm": {
+        "beta": 16
+      },
+      "H-follow": {
+        "alpha": 16
+      },
+      "H-noauthor": {
+        "alpha": 16,
+        "beta": 16
+      },
+      "H-noengager": {
+        "alpha": 16,
+        "beta": 16
+      }
+    }
+  },
+  "datasets": [
+    "syn-W2M-M",
+    "digg2009"
+  ],
+  "methods": [
+    "BL2",
+    "H",
+    "H-follow",
+    "H-comm",
+    "H-noauthor",
+    "H-noengager"
+  ],
+  "mode": "fast",
+  "params": {
+    "H": {
+      "alpha": 16,
+      "beta": 16,
+      "m": "frozen"
+    },
+    "H-comm": {
+      "beta": 16,
+      "m": "frozen"
+    },
+    "H-follow": {
+      "alpha": 16,
+      "m": "frozen"
+    },
+    "H-noauthor": {
+      "alpha": 16,
+      "beta": 16,
+      "m": "frozen"
+    },
+    "H-noengager": {
+      "alpha": 16,
+      "beta": 16,
+      "m": "frozen"
+    }
+  },
+  "pool": "normal",
+  "split": "test"
+}

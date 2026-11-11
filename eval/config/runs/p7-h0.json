@@ -1,0 +1,24 @@
+{
+  "compare": {
+    "mode": "none",
+    "ref": "BL2"
+  },
+  "datasets": [
+    "syn-W0-M"
+  ],
+  "h0Gate": true,
+  "methods": [
+    "BL2",
+    "H"
+  ],
+  "mode": "fast",
+  "params": {
+    "H": {
+      "alpha": 16,
+      "beta": 16,
+      "m": "frozen"
+    }
+  },
+  "pool": "normal",
+  "split": "test"
+}

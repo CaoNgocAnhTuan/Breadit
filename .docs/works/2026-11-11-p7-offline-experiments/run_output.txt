@@ -1,0 +1,55 @@
+# P7 run log (Class R numbers: run time and peak memory are repeatable, never compared)
+# Machine: Darwin arm64, macOS 26.6.2, Node v22.23.4
+
+## Step 7: tuning on the validation split
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-tune-worlds
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-tune-worlds
+
+tuning: 144 grid points, 4 chosen
+syn-W0-M  T 21412417  validation  users 903  left out 0  per_user rows 1806
+syn-W1-M  T 21412417  validation  users 903  left out 0  per_user rows 1806
+syn-W2L-M  T 21412417  validation  users 903  left out 0  per_user rows 1806
+syn-W2H-M  T 21412417  validation  users 903  left out 0  per_user rows 1806
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-tune-worlds
+manifest sha256 a272b814149b1e5f8b899dfedfb7460c5ddd292218a409d6c3389a1ebe4d3f0f
+       43.37 real        41.87 user         0.43 sys
+           258293760  maximum resident set size
+
+$ /usr/bin/time -l npm run harness -w @breadit/eval -- p7-tune-main
+
+> @breadit/eval@0.1.0 harness
+> node --max-old-space-size=4096 src/cli/harness.ts p7-tune-main
+
+tuning: 114 grid points, 10 chosen
+syn-W2M-M  T 21412417  validation  users 903  left out 0  per_user rows 8127
+digg2009  T 1246068297  validation  users 127654  left out 3103  per_user rows 1120959
+results: /Users/hung/Desktop/Breadit/.docs/results/p7-tune-main
+not committed (over the limit): per_user.csv in /Users/hung/Desktop/Breadit/eval/results/p7-tune-main
+manifest sha256 e945d5df922aee0064b0d218086797077219b40c97a21ed19e6dead840362ca6
+     1422.56 real      1392.07 user        21.90 sys
+          2468741120  maximum resident set size
+
+## Step 7: freeze (the ten test configs from the tuning, not approved)
+
+$ npm run freeze -w @breadit/eval
+
+> @breadit/eval@0.1.0 freeze
+> node src/cli/freeze.ts
+
+rule check: 14 groups, 0 violations
+E8 baseline: BL6 (validation NDCG@10 0.018159, K 10, all users, syn-W2M-M)
+wrote 10 test configs to /Users/hung/Desktop/Breadit/eval/config/runs (not approved)
+
+$ npm run freeze -w @breadit/eval -- --check
+
+> @breadit/eval@0.1.0 freeze
+> node src/cli/freeze.ts --check
+
+rule check: 14 groups, 0 violations
+E8 baseline: BL6 (validation NDCG@10 0.018159, K 10, all users, syn-W2M-M)
+equal
+
+# No config under eval/config/runs/ has testApprovedBy. No run on the test split was made in Step 7.

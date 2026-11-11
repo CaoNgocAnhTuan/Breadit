@@ -1,0 +1,78 @@
+{
+  "datasetParams": {
+    "digg2009": {
+      "BL2t": {
+        "ageWeight": 1
+      },
+      "BL4": {
+        "divisor": 45000
+      },
+      "BL5": {
+        "gravity": 1.5
+      },
+      "BL6": {
+        "alpha": 16
+      },
+      "H": {
+        "alpha": 16,
+        "beta": 0
+      }
+    },
+    "syn-W2M-M": {
+      "BL2t": {
+        "ageWeight": 0.125
+      },
+      "BL4": {
+        "divisor": 180000
+      },
+      "BL5": {
+        "gravity": 1.2
+      },
+      "BL6": {
+        "alpha": 16
+      },
+      "H": {
+        "alpha": 16,
+        "beta": 16
+      }
+    }
+  },
+  "datasets": [
+    "syn-W2M-M",
+    "digg2009"
+  ],
+  "methods": [
+    "BL0",
+    "BL1",
+    "BL2",
+    "BL2t",
+    "BL3",
+    "BL4",
+    "BL5",
+    "BL6",
+    "H"
+  ],
+  "mode": "fast",
+  "params": {
+    "BL2t": {
+      "ageWeight": 0.125
+    },
+    "BL4": {
+      "divisor": 180000
+    },
+    "BL5": {
+      "gravity": 1.2
+    },
+    "BL6": {
+      "alpha": 16
+    },
+    "H": {
+      "alpha": 16,
+      "beta": 16,
+      "m": "frozen"
+    }
+  },
+  "pool": "normal",
+  "split": "test",
+  "tieBreak": "id-asc"
+}
