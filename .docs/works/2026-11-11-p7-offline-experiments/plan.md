@@ -88,8 +88,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
 
 #### Step 5: The `freeze` command (effort M)
 
-- [ ] Tests first: **TC8** (`freeze.test.ts`, new).
-- [ ] `eval/src/harness/freeze.ts` and `eval/src/cli/freeze.ts` (with `checkNode`); script `freeze` in `eval/package.json`. Design: Approach, "Freeze", and the two tables of "The runs".
+- [x] Tests first: **TC8** (`freeze.test.ts`, new).
+- [x] `eval/src/harness/freeze.ts` and `eval/src/cli/freeze.ts` (with `checkNode`); script `freeze` in `eval/package.json`. Design: Approach, "Freeze", and the two tables of "The runs".
   - **Inputs.** It reads `.docs/results/p7-tune-main/` and `.docs/results/p7-tune-worlds/` (a `--results-dir` option for tests). It checks the SHA-256 of `tuning.csv` and `summary.csv` against their run manifest and stops on a difference (F5).
   - **The §5 rule (DW1).** For each (dataset, tuned method), exactly one row has `chosen` = 1, and it has the highest `val_ndcg10`; ties go to the smaller value or pair, compared as `pickBest` does. Any violation stops the command. It prints one line with the number of checked groups and `0 violations`.
   - **`TEST_RUNS`.** The ten test configs of the design table, in that order.
@@ -97,7 +97,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
     - The E8 baseline is the highest `ndcg` (K 10, group all, `syn-W2M-M`) among BL0, BL1, BL2, BL2t, BL3, BL4, BL5 and BL6 in `p7-tune-main/summary.csv`, ties to the method order. If it is BL2, `p7-e8-pool` has only BL2 and H.
     - `mode` is `"fast"` for every config.
   - **Output.** Canonical JSON (`canonicalJson`) to `eval/config/runs/<runId>.json`, with no `testApprovedBy`. `--approve <name>` writes the same configs with `testApprovedBy` = name. `--check` rebuilds the configs in memory and compares them with the files, ignoring `testApprovedBy`. It prints `equal` or each difference, and exits non-zero on a difference.
-- [ ] Commit: `feat: eval freeze command (test configs from the tuning)`
+- [x] Commit: `feat: eval freeze command (test configs from the tuning)`
 
 #### Step 6: The report (effort M)
 
