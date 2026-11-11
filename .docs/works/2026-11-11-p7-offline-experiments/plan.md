@@ -101,16 +101,16 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
 
 #### Step 6: The report (effort M)
 
-- [ ] Tests first: **TC9** (`report/round.test.ts`), **TC10** (`report/macros.test.ts`), **TC11** (`report/report.test.ts`), all new.
-- [ ] `eval/src/report/` with `read.ts`, `round.ts`, `macros.ts`, `tables.ts` and `report.ts`, and `eval/src/cli/report.ts` (with `checkNode`); script `report` in `eval/package.json`. Design: Approach, "Report", and "Macros and tables".
+- [x] Tests first: **TC9** (`report/round.test.ts`), **TC10** (`report/macros.test.ts`), **TC11** (`report/report.test.ts`), all new.
+- [x] `eval/src/report/` with `read.ts`, `round.ts`, `macros.ts`, `tables.ts` and `report.ts`, and `eval/src/cli/report.ts` (with `checkNode`); script `report` in `eval/package.json`. Design: Approach, "Report", and "Macros and tables".
   - `readRun` reads a run folder and checks the SHA-256 of every file it reads against the run manifest. `per_user.csv` is never read.
   - `roundDecimal` works on the decimal string, half away from zero, and a negative zero prints without the sign. `formatP` gives `<0.001` under 0.001.
   - `MACRO_SPECS` holds the groups of the design table. `macroName` builds names from the words of the design, throws on anything but letters, and throws on a repeat.
   - `macros.csv` has the columns `name, value, file, row_key, column`. `file` is relative to `.docs/results/`. `row_key` is the row's key columns joined with `|`.
   - `buildTables` builds the nine tables of the design. `toLatex` gives a booktabs `tabular` with no float. `toMarkdown` gives a Markdown table. Both use `roundDecimal` and `formatP`.
   - `reportCommand` reads `REPORT_RUNS` (the twelve run ids), then writes `.docs/results/p7-report/` (a `--results-dir` and an `--out` for tests): `macros.csv`, `results-macros.tex`, `tables/<id>.tex`, `results.md`, `fig-e3-density.csv` (the four datasets of DW6) and `manifest.json`. It then runs `verifyMacros` and stops on any mismatch.
-- [ ] `npm run verify -w @breadit/eval` passes (DW11).
-- [ ] Commit: `feat: eval report (macros, tables, results.md)`
+- [x] `npm run verify -w @breadit/eval` passes (DW11).
+- [x] Commit: `feat: eval report (macros, tables, results.md)`
 
 #### Step 7: Tuning, then the test configs, then Stop A (effort S, plus about 30 minutes of runs)
 
