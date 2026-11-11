@@ -45,14 +45,14 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
 
 #### Step 2: Run config keys and `variantsFor` (effort S)
 
-- [ ] Tests first: **TC2** in `eval/src/harness/config.test.ts`.
-- [ ] `config.ts` (design: Approach, the six keys). Add the optional keys `datasetParams`, `tieBreak`, `shuffle`, `compare`, `density` and `h0Gate` to `RunConfig` and to the allowed key list. `validateConfig` checks, before any data is loaded:
+- [x] Tests first: **TC2** in `eval/src/harness/config.test.ts`.
+- [x] `config.ts` (design: Approach, the six keys). Add the optional keys `datasetParams`, `tieBreak`, `shuffle`, `compare`, `density` and `h0Gate` to `RunConfig` and to the allowed key list. `validateConfig` checks, before any data is loaded:
   - `datasetParams`: its dataset keys are in `datasets`, its methods are in `methods`, its params are required by the method (`REQUIRED_PARAMS`), and every value is a finite number (a `divisor` above 0). A config with any `"grid"` param cannot have it.
   - `tieBreak` is `"id-desc"` or `"id-asc"`. `shuffle`, `density` and `h0Gate` are booleans.
   - `compare` is `{ mode, ref }`, with `mode` `"families"` or `"none"` and `ref` in `methods`. `families` needs every dataset to be `syn-W2M-M` or `digg2009`, `ref` = BL2, and `methods` to hold H, BL2 and all seven F2 baselines (design F13).
   - `density` needs `compare` and H in `methods`. `h0Gate` needs `compare` mode `none` with `ref` BL2, H in `methods`, and `syn-W0-M` in `datasets`.
-- [ ] `variantsFor(cfg, datasetId)`: the variants of `fixedVariants`, with that dataset's `datasetParams` replacing the params it names.
-- [ ] Commit: `feat: eval run config keys for P7`
+- [x] `variantsFor(cfg, datasetId)`: the variants of `fixedVariants`, with that dataset's `datasetParams` replacing the params it names.
+- [x] Commit: `feat: eval run config keys for P7`
 
 #### Step 3: Shuffle, per-dataset variants, tie-break and lighter tuning in the run (effort S–M)
 
