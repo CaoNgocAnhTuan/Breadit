@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.24 · 2026-11-10 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.25 · 2026-11-11 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -24,7 +24,7 @@ Hypotheses are frozen before the first test-split run (section 7). If one change
 
 - **H1 (RQ1).** For users with 0–4 earlier interactions, the hybrid has higher NDCG@10 than BL2. It passes if the paired 95% confidence interval of the difference is above 0 after Holm correction. Two co-primary tests, each with this pass rule and each reported on its own. Test 1 is on synthetic data: the middle cell of world W2 (section 7), size M. The other two W2 cells are reported as a sweep. Test 2 is on real data: Digg 2009 (P4), if its pool at the cut time T keeps enough users with 0–4 earlier interactions (P2 checks this).
 - **H2 (RQ2).** The gain over BL2 grows with social density (number of followees, amount of friend engagement in the pool). It is about zero when the user follows nobody and has no community.
-- **H0 (sanity).** In the null world W0 (no social influence) the hybrid must not beat BL2. If it does, there is a bug or a leak. Stop and fix before any other result is used.
+- **H0 (sanity).** In the null world W0 (no social influence), H-follow (the hybrid with β = 0, at the α chosen on the middle W2 cell) must not beat BL2. Follows are random in W0, so a win means a bug or a leak. Stop and fix before any other result is used. The full hybrid is not the gate. Its community term counts the user's earlier positives in a community, and in the generator a community is a topic, so the term carries topic interest even in W0. This was found on the validation split on 2026-11-11, before any test-split run. E5 reports H − BL2 on W0 as this topic signal.
 
 If H1 or H2 fails, the thesis reports it as it is. A negative result with a clean protocol is still a valid result.
 
@@ -349,11 +349,11 @@ One source of truth. A change needs a new config version and a line in the chang
 | Bootstrap resamples / permutations | 10,000 / 10,000 | now |
 | Confidence level / Holm level | 95% / 0.05 | now |
 | Prior strength `m` | 5 (E4 tests 0, 2, 5, 10) | P5 |
-| α, β grid | 0, 1, 2, 4, 8, 16 (engagement points per unit) | P5 |
+| α, β grid | 0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1,024 (engagement points per unit); widened 2026-11-11, before any test-split run | P5 |
 | Window W / pool cap N_max | 7 days / 2,000 | P5 |
 | Cut time T | `q` = 0.8 (rule: `.docs/implementation-plan.md` §3.1). The three S datasets 21393508 and the five M datasets 21412417 (seconds from the base epoch); `digg2009` 1246068297 (Unix seconds). Computed with `cutTime` of `eval/src/checks/buckets.ts`; frozen 2026-11-02 | P5 |
 | Larger pool (W_L, N_L) for E8 | 14 days / 4,000; frozen 2026-11-02 | P5 |
-| Baseline grids | BL2t age weight 0.0625, 0.125, 0.25, 0.5, 1 per hour (production 0.25); BL4 time divisor 11,250, 22,500, 45,000, 90,000, 180,000 s (published 45,000); BL5 gravity 1.2, 1.5, 1.8, 2.1, 2.4 (published 1.8); frozen 2026-11-02 | P5 |
+| Baseline grids | BL2t age weight 0.0625, 0.125, 0.25, 0.5, 1, 2, 4 per hour (production 0.25); BL4 time divisor 11,250, 22,500, 45,000, 90,000, 180,000, 360,000, 720,000 s (published 45,000); BL5 gravity 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4 (published 1.8); frozen 2026-11-02, widened 2026-11-11 before any test-split run | P5 |
 | Dataset sizes | S 200 users, 4k posts · M 1,000 users, 20k posts (E7 uses M) | P3 |
 | Synthetic world parameters | in `eval/config/synthetic-v1.json` (SHA-256 `70341fd94eb40d549e8217fb8c39bcb105277afd25cd39d6b178273e5ff48007`, frozen 2026-11-02), calibrated to `.docs/datasets.md` where possible; W2 has three cells: low, middle and high influence at the middle homophily | P3 |
 | Primary W2 cell for H1 | the middle cell | P3 |
@@ -490,3 +490,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.22 · 2026-11-10 · An optional, gated Hive side check for the community term (author's request). P7: a "Hive side check" paragraph (role, method, gate, what happens if it passes) and the task `p7-hive-check` in the §4 Tasks column. §8: the Hive risks, one sentence in "Weak community evidence", and a line that Hive is outside the cut order. §11: item 8. Decision Q2 of 2026-10-26 stays until the gate passes. `.docs/implementation-plan.md` 1.5 adds task 9b. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.23 · 2026-11-10 · Task `p3-postgres-loader`: P3 status paragraph (P3 done); §4 rows P3 ✅ with `p3-postgres-loader` ✅ and P6 ▶ next; the status date. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.24 · 2026-11-10 · Task `p6-social-feed`: P6 status paragraph (P6 done); the P6 "Do" sentence no longer says the feed reuses `getFolloweesIds` and `getCommunityIds` (they hold no times, so the feed reads follows and memberships with their times), and the B6 reason now names the Communities feed; §4 rows P6 ✅ and P7 ▶ next. No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.25 · 2026-11-11 · Task `p7-offline-experiments`, Stop A, by the author's decision, after the validation tuning and before any test-split run. **H0 (§1):** the gate is now H-follow against BL2 on W0, not the full hybrid. On W0 validation, H at α = β = 16 scored NDCG@10 0.0202 against 0.0148 for BL2, nearly all from β, because the community term counts the user's earlier positives in a community, and a community is a topic in the generator. **§7:** the α, β grid now runs from 0 to 1,024 in powers of 2, because α = β = 16 (the top) was chosen on all five synthetic worlds and α = 16 on Digg. The baseline grids get two steps past each edge where a tuned value sat: BL2t 2 and 4, BL4 360,000 and 720,000, BL5 0.6 and 0.9. Each grid still holds the published or production value. The tuning runs again. §5 and §6 are byte-identical.

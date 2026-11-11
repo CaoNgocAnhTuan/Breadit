@@ -199,7 +199,7 @@ The super-plan (§1) asks for the paired confidence interval of the difference t
 
 ### 3.5 H0 gate
 
-In `syn-W0-M`, the bootstrap confidence interval of H − BL2 (NDCG@10, all users) must not lie above 0. It is a gate and not a member of a family. If it fails, stop (super-plan §1).
+In `syn-W0-M`, the bootstrap confidence interval of H-follow − BL2 (NDCG@10, all users) must not lie above 0. H-follow uses the α chosen for H on `syn-W2M-M` and the frozen `m`. It is a gate and not a member of a family. If it fails, stop (super-plan §1). Until 2026-11-11 the gate was H − BL2. It changed before any test-split run, because the community term carries topic interest in W0 (task 9, Stop A; super-plan 0.25).
 
 ### 3.6 Synthetic data
 
@@ -316,3 +316,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.5 · 2026-11-10 · Optional task 9b `p7-hive-check` (super-plan 0.22): its row and a note in §5, a cut-trigger row, a row in the §4 measurement plan, the §3.3 list of runs with no family, and a §6 bullet. No contract, rule or other task changed. Dates move only if the gate runs (tasks 10 to 13 by half a day).
 - 1.6 · 2026-11-10 · Task `p3-postgres-loader`: §2.5 says what the loader writes for task 8 (three tables of positives, repost rows left out of the live pool, the `eval_load` schema); §1 `eval/` row (loader done); §5 task 7 ✅, task 8 next, one line on the day late. No contract of task 7 changed.
 - 1.7 · 2026-11-10 · Task `p6-social-feed`: §1 feed rows ✅ and the decision on `getFolloweesIds` / `getCommunityIds` (not used by the feed module); §2.9 the parity sample is done (command, files); §5 task 8 ✅, task 9 next, one line on the schedule. No contract changed: the feed module calls the §2.6 signatures as they are.
+- 1.8 · 2026-11-11 · Task `p7-offline-experiments`, Stop A (super-plan 0.25): §3.5 gates H-follow − BL2 on W0, not H − BL2. The grids of super-plan §7 are wider; this file quotes none of them.

@@ -375,3 +375,28 @@ sequenceDiagram
 ### Data, schema and cache changes
 
 None in Prisma, Redis or the backend. `frozen-v1.json` and super-plan §7 are unchanged: the density bins reuse the history bucket edges, and the shuffle reuses the T of `syn-W2M-M`. New committed files are the twelve run configs and the results folders `.docs/results/p7-*/`. Digg `per_user.csv` files go to the git-ignored `eval/results/`, with their hashes in the committed manifests (P5 rule).
+
+### Amendment 1 (2026-11-11, at Stop A, the author's decisions)
+
+**What the tuning showed.** These are validation results only, in `.docs/results/p7-tune-*/` (commits `eeeb467` and `02e735f`).
+- **W0.** On `syn-W0-M`, H at α = β = 16 scored NDCG@10 0.020249 against 0.014765 for BL2. β alone (0/16) gave 0.020061, and α alone (16/0) gave 0.015128. The gain grows with history: in bucket 20+, NDCG@10 goes from 0.0207 to 0.0355.
+- **Why.** This is a reading of the code. The community term counts `c_u,c`, the user's earlier positives in community c, whether or not the user is a member. A community post has the topic of its community (`eval/src/generator/posts.ts`), and interactions follow topic interest (`interactions.ts`). So the term carries topic interest even in W0. It is not a leak: the P5 leakage test covers every feature.
+- **Grid edges.** α = β = 16, the top of the grid, was chosen on all five synthetic worlds, and α = 16 on Digg. BL2t (Digg, top), BL4 (`syn-W2M-M`, top) and BL5 (`syn-W2M-M`, bottom) also sat at an edge. On Digg, H (0.093133) ≈ BL2 (0.093128).
+
+**Decision 1: the H0 gate is on H-follow.** Super-plan §1 and blueprint §3.5 changed (super-plan 0.25, blueprint 1.8). This replaces the OQ1 line above and the §3.5 line of "Contract changes".
+- The gate row is (`syn-W0-M`, H-follow, BL2, K 10, all). H-follow uses the α chosen for H on `syn-W2M-M` and the frozen `m`.
+- `p7-h0` runs BL2, H and H-follow. H uses the `syn-W2M-M` values and is reported with no family, as the topic signal at those values.
+- `h0Gate(rows, method = "H")` in `stats.ts` takes the method as a parameter, with the old default. This is the only change to `stats.ts`. `verdictLines` passes `"H-follow"`.
+- The `h0Gate` config key needs H-follow in `methods`, `ref` BL2 and `syn-W0-M` in `datasets`.
+- The H0 macros and the H0 row of table `e5` read the H-follow row. Table `e5` also shows H − BL2 on W0, named as the topic signal.
+
+**Decision 2: wider grids.** Super-plan §7 and `frozen-v1.json` changed in the same commit:
+- α, β: 0 to 1,024 in powers of 2 (12 values);
+- BL2t adds 2 and 4, BL4 adds 360,000 and 720,000, BL5 adds 0.6 and 0.9.
+
+Claude made this change and fixed the three tuning tests that counted grid points (they now read the frozen grids). Then both tuning runs and `freeze` run again, from empty `p7-tune-*` folders. `p7-tune-main` grows from 114 to 177 grid points (H 144, BL6 12, BL2t 7, BL4 7, BL5 7), and `p7-tune-worlds` from 144 to 576.
+
+| # | What can go wrong | How we notice | How we resolve it |
+|---|---|---|---|
+| F16 | Digg tuning runs out of memory at 177 points | A heap error | The 114-point run peaked at 2.47 GB RSS. A linear guess for 177 points is about 3.2 GB. If it fails, stop and report; splitting by method (F2) is Claude's decision |
+| F17 | A new edge is chosen again (1,024, or a new baseline edge) | `tuning.csv` | Report it at the second Stop A. No second widening without the author |

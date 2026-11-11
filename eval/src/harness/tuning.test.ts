@@ -72,7 +72,9 @@ test("tuneDataset on golden: one row per grid point, the rows equal separate fix
   const out = tuneDataset("golden", golden, CONFIG, { expectedT: GOLDEN_T });
   const counts: Record<string, number> = {};
   for (const r of out.rows) counts[r.method] = (counts[r.method] ?? 0) + 1;
-  assert.deepEqual(counts, { BL2t: 5, BL4: 5, BL5: 5, BL6: 6, H: 36, "H-follow": 6, "H-comm": 6 });
+  const ab = frozen.alphaBetaGrid.length;
+  const g = frozen.baselineGrids;
+  assert.deepEqual(counts, { BL2t: g.BL2t.length, BL4: g.BL4.length, BL5: g.BL5.length, BL6: ab, H: ab * ab, "H-follow": ab, "H-comm": ab });
   // Each row equals the NDCG@10 of a separate run with that value fixed.
   const ndcg10 = (m: string, params: Record<string, number>): string => {
     const cfg: RunConfig = { ...CONFIG, methods: [m], params: { [m]: params } };
@@ -130,17 +132,18 @@ test("tuning.csv has the columns of blueprint 2.7 and a stable order", () => {
   const text = tuningText(out.rows);
   const lines = text.trimEnd().split("\n");
   assert.equal(lines[0], "dataset,method,param,value,val_ndcg10,chosen");
-  assert.equal(lines.length, 11);
+  const grids = frozen.baselineGrids;
+  assert.equal(lines.length, 1 + grids.BL2t.length + grids.BL4.length);
   // BL2t comes before BL4 (method order), values ascending inside a method.
   assert.deepEqual(
     lines.slice(1).map((l) => l.split(",").slice(1, 4).join(",")),
-    ["BL2t,ageWeight,0.0625", "BL2t,ageWeight,0.125", "BL2t,ageWeight,0.25", "BL2t,ageWeight,0.5", "BL2t,ageWeight,1", "BL4,divisor,11250", "BL4,divisor,22500", "BL4,divisor,45000", "BL4,divisor,90000", "BL4,divisor,180000"],
+    [...grids.BL2t.map((v) => `BL2t,ageWeight,${v}`), ...grids.BL4.map((v) => `BL4,divisor,${v}`)],
   );
   for (const l of lines.slice(1)) assert.match(l.split(",")[4] as string, /^\d\.\d{6}$/);
   assert.equal(lines.slice(1).filter((l) => l.endsWith(",1")).length, 2);
   const dir = tempDir();
   const entry = writeTuning(dir, out.rows);
-  assert.equal(entry.rows, 10);
+  assert.equal(entry.rows, grids.BL2t.length + grids.BL4.length);
   assert.equal(readFileSync(join(dir, "tuning.csv"), "utf8"), text);
 });
 
@@ -168,7 +171,7 @@ test("tuneDataset gives the same rows and variants with keepPerUser false as wit
   };
   const light = tuneDataset(id, data, cfg, { expectedT: T, keepPerUser: false });
   const heavy = tuneDataset(id, data, cfg, { expectedT: T, keepPerUser: true });
-  assert.equal(light.rows.length, 5 + 5 + 6);
+  assert.equal(light.rows.length, frozen.baselineGrids.BL2t.length + frozen.baselineGrids.BL4.length + frozen.alphaBetaGrid.length);
   assert.deepEqual(light.rows, heavy.rows);
   assert.deepEqual(light.variants, heavy.variants);
   // the default of tuneDataset is the light one: it gives the same rows

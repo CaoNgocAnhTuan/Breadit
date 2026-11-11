@@ -121,6 +121,23 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
 - [x] Commit: `chore: P7 test configs from the tuning (not approved)` (the ten configs and the run log).
 - [x] **Stop A.** Report the chosen values (every `chosen` = 1 row of both `tuning.csv` files), the E8 baseline, the freeze rule line, and the Digg tuning time and memory. Run nothing on the test split.
 
+#### Step 7b: Gate on H-follow, tune again, freeze again (design: Amendment 1) (effort S, plus about 1 hour of runs)
+
+Added on 2026-11-11 at Stop A, by the author's decisions. Claude has already made the frozen change (super-plan §1 and §7, blueprint §3.5, `frozen-v1.json`) and fixed the three tuning tests that counted grid points. This step may change `stats.ts`, but only `h0Gate`.
+
+- [ ] Tests first:
+  - `stats.test.ts`: `h0Gate` with no method still reads the H row; with `"H-follow"` it reads that row.
+  - TC2: `h0Gate` in a config needs H-follow.
+  - TC6: `verdictLines` gates on the H-follow row, and an H row alone gives no gate line.
+  - TC7: the command test uses H-follow.
+  - TC8: `p7-h0` has BL2, H and H-follow, with H-follow's α equal to H's α chosen on `syn-W2M-M`.
+  - TC10 and TC11: the H0 macros and the `e5` table read the H-follow row.
+- [ ] Code: `stats.ts` (`h0Gate(rows, method = "H")`, nothing else), `compare.ts` (`verdictLines`), `config.ts` (the `h0Gate` check), `freeze.ts` (`TEST_RUNS`, `p7-h0`), and the report (`MACRO_SPECS`, table `e5`).
+- [ ] `npm run verify -w @breadit/eval` passes. Commit: `feat: H0 gate on H-follow (amendment 1)`
+- [ ] Delete `.docs/results/p7-tune-*/` and `eval/results/p7-tune-*/`. Run both tuning configs again, adding each to the run log with its time and memory. Then run `freeze` and `freeze --check`. If Digg runs out of memory, stop and report (design F16).
+- [ ] Commit: `chore: P7 tuning on the wider grids, and the test configs`
+- [ ] **Stop A again**, with the same report as Step 7. Also name any value chosen at a grid edge (design F17).
+
 #### Step 8: Approval and the H0 gate (effort XS, after the author's OK)
 
 - [ ] Run `freeze --approve author`, then `freeze --check` (must print `equal`). Commit: `chore: the author approves the P7 test split`.
@@ -151,7 +168,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
 - [ ] If time runs short before Step 9 ends, propose the cuts of super-plan §8 to the author (the shuffle, then E8, then the finer E4). Do not cut quietly.
 - [ ] After Step 11: read the commits and the diff; `bash .claude/hooks/verify.sh`; the Acceptance items below.
 - [ ] Write `results-note.md` in this folder (DW13): the H0 gate, both H1 verdicts, the E1 and E2 tables from `results.md`, a short reading of E3 to E8, and the question of super-plan §11, item 7 (the default feed rule). English first, then a Vietnamese copy, as `.docs/supervisor-note.md`.
-- [ ] Docs (DW14):
+- [ ] Docs (DW14). Also replace every quote of the old α, β grid with the new one: `docs/System_Architecture.md`, and Guidance Manual 03, 05 and 09 in en and vi.
   - **`docs/System_Architecture.md`:** the report ✅, `freeze` and `report`, the P7 run configs and results in the tree, and the status table (task 9 ✅, task 10 next).
   - **Guidance Manual, en and vi, with the same content:** 05 (the tuning, the H0 gate params, the test split run once), 06 (`compare.csv`, the families, `density.csv`), 07 (the freeze, the report hashes, the double run), 09 (macro, freeze) and 10 (the "(after P7)" answers for E1, E4, E5, E6, Q22 and coverage, each naming its results file).
   - **`CLAUDE.md`:** the eval commands `freeze` and `report`.
