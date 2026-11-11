@@ -1,0 +1,10 @@
+{
+  "datasets": ["syn-W0-M", "syn-W1-M", "syn-W2L-M", "syn-W2H-M"],
+  "split": "validation",
+  "methods": ["BL2", "H"],
+  "params": {
+    "H": { "alpha": "grid", "beta": "grid", "m": "frozen" }
+  },
+  "pool": "normal",
+  "mode": "fast"
+}

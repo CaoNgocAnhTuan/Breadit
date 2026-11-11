@@ -1,0 +1,37 @@
+{
+  "files": {
+    "coverage.csv": {
+      "rows": 24,
+      "sha256": "b896a459845ed18fa196ec028bf783d8a4eb80107efff7f4daf10564f428ac34"
+    },
+    "leftout.csv": {
+      "rows": 24,
+      "sha256": "d2701253998e81b2a8ceb6b9cc8817eed632bbf020b6575228098be8d0fb61bb"
+    },
+    "per_user.csv": {
+      "rows": 7224,
+      "sha256": "c771e36f6b191b3d1817f9879c00db052324e9f45b36a1dbc13d6cb6c3a99e64"
+    },
+    "summary.csv": {
+      "rows": 144,
+      "sha256": "3b4d72867ff7c8a6e7cd01e12db19822681dd94d00d4bee94e5a4505aa3f173e"
+    },
+    "tuning.csv": {
+      "rows": 144,
+      "sha256": "ae08a6082fefdcdc61da9847c26efe7cf897a1f86fcd4b3d3d0c82a7ae8c5cd3"
+    }
+  },
+  "masterSeed": 20261014,
+  "node": "v22.23.4",
+  "runId": "p7-tune-worlds",
+  "schemaVersion": 1,
+  "source": {
+    "configSha256": "02d2cbfa01dc0930c22591b4d6e517bf42b9adf70a2a87bb8c624a84324d4f03",
+    "datasets": {
+      "syn-W0-M": "2472c1e48ba8904456b5aef2673c7472b1fdb0f67c1f80d35195151ce8215d4b",
+      "syn-W1-M": "a0fba507997e94d2432d08b4a6c27e6c7abec74e6fad34dcc7450140a8c0d073",
+      "syn-W2H-M": "ef3e596056267d4e7de8cadb5cbd4537c1f7013c9c9c804e16a62db11e7b3e98",
+      "syn-W2L-M": "159ec321fed32c5a423c5d1899c24447b9eb2428bb24130ad8987753c47d568e"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "datasets": ["syn-W2M-M", "digg2009"],
+  "split": "validation",
+  "methods": ["BL0", "BL1", "BL2", "BL2t", "BL3", "BL4", "BL5", "BL6", "H"],
+  "params": {
+    "BL2t": { "ageWeight": "grid" },
+    "BL4": { "divisor": "grid" },
+    "BL5": { "gravity": "grid" },
+    "BL6": { "alpha": "grid" },
+    "H": { "alpha": "grid", "beta": "grid", "m": "frozen" }
+  },
+  "pool": "normal",
+  "mode": "fast"
+}

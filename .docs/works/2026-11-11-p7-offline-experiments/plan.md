@@ -114,9 +114,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
 
 #### Step 7: Tuning, then the test configs, then Stop A (effort S, plus about 30 minutes of runs)
 
-- [ ] Write `eval/config/runs/p7-tune-main.json` and `p7-tune-worlds.json` by hand, as in the design's tuning table: split validation, pool normal, mode fast, every tuned param `"grid"`, `m` `"frozen"`.
-- [ ] Run the harness on each and add both to the run log. If Digg runs out of memory, stop and report (F2); do not split the config on your own.
-- [ ] Commit: `chore: P7 tuning on the validation split` (the two configs and `.docs/results/p7-tune-*/`).
+- [x] Write `eval/config/runs/p7-tune-main.json` and `p7-tune-worlds.json` by hand, as in the design's tuning table: split validation, pool normal, mode fast, every tuned param `"grid"`, `m` `"frozen"`.
+- [x] Run the harness on each and add both to the run log. If Digg runs out of memory, stop and report (F2); do not split the config on your own.
+- [x] Commit: `chore: P7 tuning on the validation split` (the two configs and `.docs/results/p7-tune-*/`).
 - [ ] Run `freeze`, then `freeze --check` (must print `equal`). Add both outputs to the run log.
 - [ ] Commit: `chore: P7 test configs from the tuning (not approved)` (the ten configs and the run log).
 - [ ] **Stop A.** Report the chosen values (every `chosen` = 1 row of both `tuning.csv` files), the E8 baseline, the freeze rule line, and the Digg tuning time and memory. Run nothing on the test split.
