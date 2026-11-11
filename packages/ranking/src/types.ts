@@ -77,5 +77,8 @@ export interface ScoreContext {
   params: Readonly<Record<string, number>>;
 }
 
+/** Order of posts with equal scores. "id-desc" is the production order; "id-asc" is the reversed one of E6. */
+export type TieBreak = 'id-desc' | 'id-asc';
+
 /** Returns scoreFixed, an integer. */
 export type Scorer = (ctx: ScoreContext, post: Post, pf: PostFeatures) => number;

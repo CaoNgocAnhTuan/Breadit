@@ -38,10 +38,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
 
 #### Step 1: Reversed tie-break in `@breadit/ranking` (effort XS)
 
-- [ ] Tests first: **TC1** in `packages/ranking/src/rank.spec.ts`.
-- [ ] `types.ts`: `export type TieBreak = "id-desc" | "id-asc"`, exported from `index.ts`. `rank.ts`: `rankPool(pool, score, tieBreak: TieBreak = "id-desc")`. With `"id-asc"`, equal scores sort by post id ascending. Nothing else changes (design: Approach, "Reversed tie-break").
-- [ ] The ranking tests pass, then build the package.
-- [ ] Commit: `feat: rankPool takes a tie-break order (E6)`
+- [x] Tests first: **TC1** in `packages/ranking/src/rank.spec.ts`.
+- [x] `types.ts`: `export type TieBreak = "id-desc" | "id-asc"`, exported from `index.ts`. `rank.ts`: `rankPool(pool, score, tieBreak: TieBreak = "id-desc")`. With `"id-asc"`, equal scores sort by post id ascending. Nothing else changes (design: Approach, "Reversed tie-break").
+- [x] The ranking tests pass, then build the package.
+- [x] Commit: `feat: rankPool takes a tie-break order (E6)`
 
 #### Step 2: Run config keys and `variantsFor` (effort S)
 

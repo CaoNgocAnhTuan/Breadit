@@ -61,4 +61,52 @@ describe('rankPool', () => {
   it('throws on a NaN score instead of ordering by chance', () => {
     expect(() => rankPool([post(1), post(2)], (p) => (p.id === 1 ? Number.NaN : 1))).toThrow(/NaN/);
   });
+
+  it('with no third argument, ties go by post id desc (the production order)', () => {
+    const pool = [post(1), post(2), post(3), post(4), post(5), post(6)];
+    const score = new Map([
+      [1, 10],
+      [2, 30],
+      [3, 20],
+      [4, 30],
+      [5, 10],
+      [6, 20],
+    ]);
+    const s = (p: Post): number => score.get(p.id) as number;
+    expect(rankPool(pool, s)).toEqual([4, 2, 6, 3, 5, 1]);
+    expect(rankPool(pool, s, 'id-desc')).toEqual(rankPool(pool, s));
+  });
+
+  it('with "id-asc", only the tied posts change order (id asc); other posts keep their place', () => {
+    const pool = [post(1), post(2), post(3), post(4), post(5), post(6)];
+    const score = new Map([
+      [1, 10],
+      [2, 30],
+      [3, 20],
+      [4, 30],
+      [5, 10],
+      [6, 20],
+    ]);
+    const s = (p: Post): number => score.get(p.id) as number;
+    // same score groups in the same order (30, 20, 10), ties by id ascending
+    expect(rankPool(pool, s, 'id-asc')).toEqual([2, 4, 3, 6, 1, 5]);
+    // a pool with no ties gives the same order for both tie-breaks
+    const noTies = new Map([
+      [1, 5],
+      [2, 9],
+      [3, 7],
+    ]);
+    const n = (p: Post): number => noTies.get(p.id) as number;
+    const three = [post(1), post(2), post(3)];
+    expect(rankPool(three, n, 'id-asc')).toEqual(rankPool(three, n, 'id-desc'));
+  });
+
+  it('gives the same id-asc order whatever the input order', () => {
+    const ids = [7, 3, 9, 1, 12, 5, 8, 2];
+    const pool = ids.map(post);
+    const score = (p: Post): number => p.id % 3;
+    const expected = rankPool(pool, score, 'id-asc');
+    expect(expected).toEqual([2, 5, 8, 1, 7, 3, 9, 12]);
+    expect(rankPool([...pool].reverse(), score, 'id-asc')).toEqual(expected);
+  });
 });

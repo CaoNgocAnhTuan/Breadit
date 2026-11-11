@@ -9,6 +9,7 @@ export type {
   Scorer,
   ScoreContext,
   Sec,
+  TieBreak,
   UserFeatures,
   UserId,
 } from './types';
