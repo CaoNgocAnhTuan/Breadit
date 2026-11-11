@@ -82,7 +82,9 @@ Only `syn-W2M-M` and `digg2009` get F1 and F2. Everything else (W0, W1, W2L, W2H
 
 **H1 passes on a dataset** when the F1 row "NDCG@10, group 0–4" has Holm-adjusted p < 0.05 **and** CI lower end > 0.
 
-**H0 gate:** on `syn-W0-M`, the CI of H − BL2 (NDCG@10, all users) must **not** lie above 0. It is a gate, not a family member.
+**H0 gate:** on `syn-W0-M`, the CI of H-follow − BL2 (NDCG@10, all users) must **not** lie above 0. It is a gate, not a family member. Until 2026-11-11 it used the full H (see [05 §11](05-evaluation-protocol.md)).
+
+Since task 9, the harness writes these rows itself: `compare.csv` (`family` F1, F2 or none, with `p_raw` and `p_holm` only in a family) and `density.csv` (H − BL2 on NDCG@10 in bins of the number of followees, for E3). It also prints the H1 lines and the H0 gate line.
 
 ## 8. Common random numbers
 

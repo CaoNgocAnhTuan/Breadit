@@ -67,6 +67,7 @@ masterSeed, epoch, node, files: { name: { rows, sha256 } }
 | Golden test | một dataset nhỏ đã kiểm tay cho ra đúng file CSV đã commit (P5) |
 | Leakage test | đổi mọi sự kiện sau t_u không làm đổi các dòng kết quả của u (P5) |
 | Harness chạy hai lần | hai lần chạy đầy đủ cho kết quả giống hệt từng byte (P5) |
+| P7 chạy hai lần ✅ | mọi run của P7 và report, chạy lại từ thư mục trống, cho file và manifest giống hệt từng byte (task 9) |
 | Parity test ✅ | app thật và harness cho cùng thứ tự: 300 trên 300 ở feed module và 300 trên 300 qua HTTP (task 8, `npm run test:parity -w @breadit/backend`) |
 | `thesis:repro` 🔜 | một lệnh dựng lại mọi thứ và so mọi hash với `.docs/results/manifest.json` (task 11) |
 
@@ -76,7 +77,7 @@ Một số giá trị phải được cố định **trước** khi chạy split
 
 ## 7. Từ một con số trong thesis truy ngược về nguồn
 
-Kế hoạch cho phần văn bản thesis (P9): một script report biến các CSV kết quả thành macro LaTeX (`results-macros.tex`) và một file `macros.csv` ghi lại, với mỗi macro, nó đến từ file nào và dòng nào. Văn bản chỉ dùng macro, không bao giờ gõ tay con số. Vậy:
+Đã làm trong task 9: `npm run report -w @breadit/eval` biến các CSV kết quả thành macro LaTeX (`results-macros.tex`), các bảng LaTeX, `results.md` (cùng các bảng ở dạng Markdown) và một file `macros.csv` ghi lại, với mỗi macro, nó đến từ file nào, dòng nào và cột nào. Nó kiểm tra mọi file đầu vào với manifest của run, và kiểm tra mọi macro với ô của nó. Văn bản chỉ dùng macro, không bao giờ gõ tay con số. Vậy:
 
 ```
 number in the PDF → macro name → macros.csv row → results CSV cell → manifest hash → command that made it

@@ -102,12 +102,14 @@ Kích thước bucket tại q = 0,8 (user test được giữ lại): `syn-W2M-M
 
 ## 10. Bước 8: tune, rồi chạy test một lần
 
-1. Chỉ trên item validation, thử mọi α, β trong {0, 1, 2, 4, 8, 16} cho H, và lưới của từng baseline.
+1. Chỉ trên item validation, thử mọi α, β trong {0, 1, 2, 4, …, 1,024} (lũy thừa của 2) cho H, và lưới của từng baseline.
 2. Chọn giá trị có NDCG@10 tốt nhất. Nếu hoà, chọn giá trị nhỏ hơn.
 3. Cố định (freeze) các lựa chọn.
 4. Chạy item test **một lần**. Split test chỉ chạy khi run config ghi `"testApprovedBy": "author"`.
 
 Tune trên split test giống như ôn thi bằng đáp án đề thi.
+
+Trong task 9 (2026-11-11), tuning chạy trên validation. Sau đó lưới được mở rộng một lần, vì giá trị 16 được chọn ở đỉnh lưới (super-plan 0.25), và tuning chạy lại. `npm run freeze` ghi các test config với các số đã chọn, tác giả duyệt chúng, và split test chạy một lần.
 
 ## 11. Bước 9: thống kê và kết luận
 
@@ -119,7 +121,7 @@ Với mỗi user i: `d_i = NDCG@10(H) − NDCG@10(BL2)`. Ghép cặp theo user l
 
 **H1 pass trên một dataset** khi, với NDCG@10 và nhóm 0–4, p sau Holm < 0,05 **và** đầu dưới của CI > 0. Kiểm trên `syn-W2M-M` và trên `digg2009`, mỗi cái riêng.
 
-**Cổng H0 trước tiên.** Trên thế giới null `syn-W0-M`, CI của H − BL2 (NDCG@10, mọi user) **không được** nằm hẳn trên 0. Trong W0 follow không có ảnh hưởng, nên nếu H "thắng" ở đó thì có gì đó sai (bug hoặc leak). Khi đó ta dừng lại và sửa trước khi tin bất kỳ kết quả nào khác.
+**Cổng H0 trước tiên.** Trên thế giới null `syn-W0-M`, CI của H-follow − BL2 (NDCG@10, mọi user) **không được** nằm hẳn trên 0. H-follow là hybrid không có community term, với α đã chọn trên `syn-W2M-M`. Trong W0 follow là ngẫu nhiên và không có ảnh hưởng, nên nếu H-follow "thắng" ở đó thì có gì đó sai (bug hoặc leak). Khi đó ta dừng lại và sửa trước khi tin bất kỳ kết quả nào khác. Trước 2026-11-11, cổng dùng H đầy đủ. Nó được đổi trước test split, vì community term đếm các positive trước đó của user trong một community, mà trong generator mỗi community là một topic, nên term này mang tín hiệu sở thích topic ngay cả trong W0 (super-plan 0.25).
 
 Chi tiết, kèm ví dụ tính tay, nằm trong [06 Thống kê](06-statistics.md).
 

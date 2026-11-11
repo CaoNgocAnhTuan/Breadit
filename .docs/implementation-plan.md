@@ -139,9 +139,11 @@ Written by the harness into `.docs/results/<runId>/`. Class D (super-plan §2). 
 
 E7 timing goes to `latency.csv` with the same row rules. It is Class R: its hash is recorded and never compared.
 
+**Task 9 (2026-11-12).** `density.csv` is on NDCG@10 (it has no `k` column), with bins of the user's number of followees on the history bucket edges. Rows of family none in `compare.csv` also serve E4, E5 and E8.
+
 ### 2.8 Macros (H-d)
 
-The report reads only the CSVs above. It writes `macros.csv` (`name, value, file, row_key`) and `results-macros.tex`. A macro name has letters only, because LaTeX does not allow digits. It is built from: experiment, dataset, metric, K in words, what. Example: `\eTwoDiggNdcgTenGain`. Every macro traces to one CSV cell through `macros.csv`.
+The report reads only the CSVs above. It writes `macros.csv` (`name, value, file, row_key, column`) and `results-macros.tex`. The `column` column was added in task 9, because a row key alone does not name the cell. A macro name has letters only, because LaTeX does not allow digits. It is built from: experiment, dataset, metric, K in words, what. Example: `\eTwoDiggNdcgTenGain`. Every macro traces to one CSV cell through `macros.csv`. **Task 9 (2026-11-12).** A macro value is its cell rounded to 3 decimals on the decimal string; a p-value under 0.001 is written `<0.001`. The report also writes nine LaTeX tables and `results.md` (the same tables in Markdown) to `.docs/results/p7-report/`.
 
 ### 2.9 Parity sample (H-e)
 
@@ -262,7 +264,7 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 
 ## 5. Task list
 
-Written on 2026-10-28; the Status column was last updated on 2026-11-10. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
+Written on 2026-10-28; the Status column was last updated on 2026-11-12. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
 
 | Status | # | Task | Phase | Depends on | Scope (short) | Days | Ends | Bugs placed here |
 |---|---|---|---|---|---|---|---|---|
@@ -274,9 +276,9 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-10. ✅ mea
 | ✅ 11-02 | 6 | `p5-eval-harness` | P5 ★ | 3, 4, 5 | harness, metrics, stats, scipy cross-check, golden, leakage and double-run tests, baseline table | 2 | 11-08 | — |
 | ✅ 11-10 | 7 | `p3-postgres-loader` | P3 | 3 | loader with explicit ids, `--rebase-to` | 1 | 11-09 | — |
 | ✅ 11-10 | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
-| ▶ next | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
+| ✅ 11-12 | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
 | ⬜ optional | 9b | `p7-hive-check` | P7 | 9, closed on 11-13 | gate: BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (section 3.2); then a Hive adapter and H-comm against BL2 (super-plan P7) | 0.5 for the gate | 11-14 | — |
-| ⬜ | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
+| ▶ next | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
 | ⬜ | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
 | ⬜ | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
 | ⬜ | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
@@ -317,3 +319,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.6 · 2026-11-10 · Task `p3-postgres-loader`: §2.5 says what the loader writes for task 8 (three tables of positives, repost rows left out of the live pool, the `eval_load` schema); §1 `eval/` row (loader done); §5 task 7 ✅, task 8 next, one line on the day late. No contract of task 7 changed.
 - 1.7 · 2026-11-10 · Task `p6-social-feed`: §1 feed rows ✅ and the decision on `getFolloweesIds` / `getCommunityIds` (not used by the feed module); §2.9 the parity sample is done (command, files); §5 task 8 ✅, task 9 next, one line on the schedule. No contract changed: the feed module calls the §2.6 signatures as they are.
 - 1.8 · 2026-11-11 · Task `p7-offline-experiments`, Stop A (super-plan 0.25): §3.5 gates H-follow − BL2 on W0, not H − BL2. The grids of super-plan §7 are wider; this file quotes none of them.
+- 1.9 · 2026-11-12 · Task `p7-offline-experiments` closed: §2.7 (`density.csv` on NDCG@10; family-none rows for E4, E5, E8), §2.8 (`macros.csv` gets the column `column`; the rounding rule; the tables and `results.md`), §5 task 9 ✅ and task 10 next, one day before the planned end of task 9.

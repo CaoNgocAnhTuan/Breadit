@@ -6,7 +6,7 @@ Những câu hội đồng hoặc reviewer có thể hỏi, mỗi câu có câu 
 
 Khi bảo vệ bằng tiếng Anh, dùng bản [English](../en/10-defense-qa.md): câu trả lời ở đó đã được viết để nói thành lời.
 
-Các câu có nhãn **(after P7)** phụ thuộc vào kết quả chưa có. Nội dung cuối cùng sẽ được viết khi chạy xong thí nghiệm. Trạng thái: 2026-11-10, sau P6.
+Các câu có nhãn **(after P7)** phụ thuộc vào kết quả chưa có. Từ task 9 (2026-11-12), chỉ còn E7 (task 10) mang nhãn này. Trạng thái: 2026-11-12, sau task 9.
 
 ---
 
@@ -22,11 +22,11 @@ Ba lý do. (1) Câu hỏi là *tín hiệu nào* giúp ích; một điểm tự 
 
 **Q3. Vì sao hybrid là "social-graph-aware" chứ không chỉ là "độ phổ biến cộng bạn bè"?**
 Vì trust được tính theo hành vi trước đây của chính user và được làm trơn. BL6 đúng là "độ phổ biến cộng số bạn bè", và nó là một baseline. Hiệu giữa H và BL6 cho thấy trọng số trust thêm được gì.
-*Bằng chứng:* [03 §5](03-hybrid-score.md); thí nghiệm E1 **(after P7)**.
+*Bằng chứng:* [03 §5](03-hybrid-score.md); E1 (`.docs/results/p7-main/summary.csv`): NDCG@10 trên `syn-W2M-M` là 0.054 cho H và 0.011 cho BL6; trên `digg2009` là 0.024 cho H và 0.025 cho BL6.
 
 **Q4. Vì sao dùng m-estimate smoothing? Vì sao m = 5?**
 Không làm trơn thì trust của user mới là 0/0. m-estimate (Cestnik 1990) là cách chuẩn để trộn một tỉ lệ quan sát với một prior. m = 5 nghĩa là "prior có giá trị bằng năm tương tác": sau 5 tương tác thì prior chiếm một nửa. Giá trị này được frozen trước mọi lần chạy test, và E4 báo cáo m = 0, 2, 5, 10 để người đọc thấy kết quả nhạy tới đâu.
-*Bằng chứng:* super-plan §6, §7; E4 **(after P7)**.
+*Bằng chứng:* super-plan §6, §7; E4 (`.docs/results/p7-e4-*/`): trên `syn-W2M-M`, phần tăng của H so với BL2 là +0.047, +0.051, +0.045 và +0.041 với m = 0, 2, 5 và 10. Trên `digg2009` là 0.000 với mọi m.
 
 **Q5. Vì sao điểm cần author term?**
 Công thức trong Orientation chỉ đếm bạn bè đã tương tác. Một bài mới của bạn bè mà chưa ai like sẽ được 0. RealGraph ở Twitter gán trọng số cho cạnh giữa các user và được dùng để xếp hạng tweet trong mạng lưới, điều này ủng hộ một liên kết trực tiếp tới tác giả. E4 (H-noauthor) đo phần này thêm được gì.
@@ -35,8 +35,8 @@ Công thức trong Orientation chỉ đếm bạn bè đã tương tác. Một b
 ## B. Dữ liệu
 
 **Q6. Kết quả có phải đã được cài sẵn trong dữ liệu synthetic không? Bạn sinh like từ follow mà.**
-Đó là rủi ro chính, và thiết kế trả lời nó theo bốn cách. (1) **W0**, thế giới null nơi follow không có ảnh hưởng: H không được thắng BL2 ở đó (cổng H0). (2) **W1**, nơi người giống nhau follow nhau nhưng vẫn không có ảnh hưởng: tách homophily khỏi influence. (3) Ba mức ảnh hưởng (W2L, W2M, W2H): mức cải thiện phải tăng theo ảnh hưởng. (4) **Digg 2009**, dữ liệu thật mà không ai đặt mức ảnh hưởng. Kết quả synthetic cho thấy cơ chế hoạt động; Digg là bằng chứng từ bên ngoài.
-*Bằng chứng:* super-plan §8; E5 **(after P7)**.
+Đó là rủi ro chính, và thiết kế trả lời nó theo bốn cách. (1) **W0**, thế giới null nơi follow không có ảnh hưởng: H-follow không được thắng BL2 ở đó (cổng H0). (2) **W1**, nơi người giống nhau follow nhau nhưng vẫn không có ảnh hưởng: tách homophily khỏi influence. (3) Ba mức ảnh hưởng (W2L, W2M, W2H): mức cải thiện phải tăng theo ảnh hưởng. (4) **Digg 2009**, dữ liệu thật mà không ai đặt mức ảnh hưởng. Kết quả synthetic cho thấy cơ chế hoạt động; Digg là bằng chứng từ bên ngoài.
+*Bằng chứng:* super-plan §8; E5 (`.docs/results/p7-e5-worlds/`, `p7-h0/`, `p7-e5-shuffle/`): phần tăng của H so với BL2 lớn dần theo influence: W0 +0.012, W1 +0.029, W2L +0.035, W2M +0.045, W2H +0.076. Cổng H0 pass (H-follow − BL2 trên W0 = 0.001, CI −0.004 đến 0.006). Phần tăng ở W0 và W1 đến từ community term, term này mang tín hiệu sở thích topic (super-plan 0.25). Khi xáo thời gian bên trong mỗi post, phần tăng trên W2M vẫn còn +0.042.
 
 **Q7. Sao lại là Digg 2009? Nó cũ rồi.**
 Đây là một trong rất ít dataset công khai có cả vote có ngày lẫn đồ thị follow có ngày trên cùng một đồng hồ, đúng thứ một feed cần. Việc chọn dùng các tiêu chí cố định, viết ra trước khi chọn. Tuổi của dữ liệu không ảnh hưởng câu hỏi: hành động của bạn bè có dự đoán được hành động của bạn không?
@@ -75,14 +75,14 @@ RQ1 nói về user có ít lịch sử, và 10 bài là khoảng một màn hìn
 
 **Q16. Vì sao tham chiếu là BL2 mà không phải BL5, baseline mạnh nhất?**
 H1 hỏi "có tốt hơn cái app đang làm không?" BL2 là điểm của production. H cũng được so với mọi baseline khác (family F2), nên người đọc thấy H đứng thế nào so với BL5.
-*Bằng chứng:* implementation-plan §3.3; E1 **(after P7)**.
+*Bằng chứng:* implementation-plan §3.3; E1 (`.docs/results/p7-main/`): trên `digg2009`, BL5 (0.199) và BL4 (0.197) cao hơn H (0.024) rất nhiều; trên `syn-W2M-M`, H (0.054) cao hơn mọi baseline rất nhiều.
 
 **Q17. Các baseline có được tune kỹ như phương pháp của bạn không?**
 Có. BL2t, BL4, BL5 và BL6 mỗi cái có một tham số được tune trên một lưới có chứa giá trị đã công bố, theo cùng luật như H. Điều này tránh vấn đề đã biết là chỉ thắng baseline yếu (Ferrari Dacrema và cộng sự 2019).
 
 **Q18. Các trường hợp hoà điểm ảnh hưởng kết quả thế nào?**
 Hoà điểm được tách bằng post id. E6 chạy lại toàn bộ với tie-break đảo ngược. Nếu kết luận thay đổi thì tie có ảnh hưởng, và thesis sẽ nói vậy.
-*Bằng chứng:* E6 **(after P7)**.
+*Bằng chứng:* E6 (`.docs/results/p7-e6-ties/`): đảo tie-break làm NDCG@10 thay đổi nhiều nhất 0.001, nên kết luận không đổi.
 
 ## D. Thống kê
 
@@ -96,8 +96,9 @@ Có 15 phép so sánh xác nhận mỗi dataset (3 giá trị K × 5 nhóm user)
 Thesis báo cáo đúng như vậy. Một kết quả âm với giao thức sạch vẫn là kết quả hợp lệ. Khi đó "For You" mặc định giữ nguyên, và Chương 6 bàn vì sao.
 *Bằng chứng:* super-plan §1, P7 "Default feed rule".
 
-**Q22. H1 có pass không?** **(after P7)**
-Ghi vào đây: dòng F1 cho `syn-W2M-M` và cho `digg2009` (hiệu trung bình, CI, p sau Holm), và kết quả cổng H0.
+**Q22. H1 có pass không?**
+Không, fail ở cả hai test. Trên `syn-W2M-M` (174 user cold-start), H − BL2 = +0.023 (CI −0.002 đến 0.051, p sau Holm 0.680). Trên `digg2009` (20,644 user), H − BL2 = +0.0001 (CI 0.00002 đến 0.0002, p sau Holm 0.335). Cổng H0 pass. Vì vậy "For You" mặc định giữ như hiện tại (Q21). Trên `syn-W2M-M`, phần tăng lớn ở user có 20 interaction trở lên (+0.078, p sau Holm 0.002), không phải ở user mới.
+*Bằng chứng:* `.docs/results/p7-main/compare.csv` (family F1), `.docs/results/p7-h0/compare.csv`; bảng e2 và e5 trong `.docs/results/p7-report/results.md`.
 
 ## E. Hệ thống
 
@@ -122,11 +123,11 @@ Nó là một công thức rẻ trên các số đếm mà database đã có. T�
 ## F. Giới hạn và đạo đức
 
 **Q28. Các giới hạn chính là gì?**
-Không có kiểm thử với user thật (chỉ offline); Digg nhỏ và cũ; bằng chứng về community chỉ từ synthetic; chỉ có positive (không có dislike hay thời gian xem); mỗi user một item held-out.
+Không có kiểm thử với user thật (chỉ offline); Digg nhỏ và cũ; bằng chứng về community chỉ từ synthetic; chỉ có positive (không có dislike hay thời gian xem); mỗi user một item held-out. α và β sau khi tune thường nằm ở đỉnh lưới (1,024). Trên Digg, các social term quá nhỏ so với số vote nên không đổi được thứ tự.
 
 **Q29. Feed social có tạo ra bong bóng lọc (filter bubble) không?**
 Có thể, một feed ưu tiên bạn bè có thể thu hẹp những gì người ta thấy. Coverage@K được báo cáo để cho thấy H có hiển thị ít bài khác nhau hơn các baseline không. Kiểm soát độ đa dạng là future work.
-*Bằng chứng:* coverage trong E1 **(after P7)**.
+*Bằng chứng:* E1 (`.docs/results/p7-main/coverage.csv`): Coverage@10 trên `syn-W2M-M` là 0.210 cho H và 0.250 cho BL2; trên `digg2009` là 0.144 cho cả hai. BL0 và BL1 (mới nhất trước) phủ nhiều post nhất.
 
 **Q30. Có thêm thời gian thì bạn sẽ làm gì?**
 Thêm các mô hình social có học (SoRec, SocialMF, graph neural network) làm baseline, một pilot với user thật hoặc A/B test, phản hồi tiêu cực, và xếp hạng có tính tới độ đa dạng.

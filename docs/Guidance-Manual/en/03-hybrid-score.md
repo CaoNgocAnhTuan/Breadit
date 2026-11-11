@@ -33,7 +33,7 @@ community(p, u, t) = (c_u,c(p) + m · [u is a member of c(p)] / |M_u|) / (N_u + 
 | `c_u,c` | u's earlier positives on posts in community c |
 | `M_u`, `|M_u|` | u's communities at t, and how many |
 | m | prior strength, frozen at 5 |
-| α, β | weights, tuned on the grid 0, 1, 2, 4, 8, 16 |
+| α, β | weights, tuned on the grid 0, 1, 2, 4, …, 1,024 (powers of 2) |
 | `[x]` | 1 if x is true, else 0 |
 
 Everything is counted **as of t**: only events before t (file 05).

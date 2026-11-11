@@ -82,7 +82,9 @@ Chỉ `syn-W2M-M` và `digg2009` có F1 và F2. Mọi thứ khác (W0, W1, W2L, 
 
 **H1 pass trên một dataset** khi dòng F1 "NDCG@10, nhóm 0–4" có p sau Holm < 0,05 **và** đầu dưới CI > 0.
 
-**Cổng H0:** trên `syn-W0-M`, CI của H − BL2 (NDCG@10, mọi user) **không được** nằm hẳn trên 0. Nó là một cổng chặn, không phải thành viên của family nào.
+**Cổng H0:** trên `syn-W0-M`, CI của H-follow − BL2 (NDCG@10, mọi user) **không được** nằm hẳn trên 0. Nó là một cổng chặn, không phải thành viên của family nào. Trước 2026-11-11, cổng dùng H đầy đủ (xem [05 §11](05-evaluation-protocol.md)).
+
+Từ task 9, harness tự ghi các dòng này: `compare.csv` (`family` là F1, F2 hoặc none; `p_raw` và `p_holm` chỉ có trong family) và `density.csv` (H − BL2 trên NDCG@10 theo nhóm số followee, cho E3). Nó cũng in các dòng H1 và dòng cổng H0.
 
 ## 8. Common random numbers
 

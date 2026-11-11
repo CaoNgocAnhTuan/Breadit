@@ -6,7 +6,7 @@ This document describes the system the thesis proposes: the Breadit platform fro
 
 Sources: [super-plan.md](../.docs/super-plan.md) (phases, protocol, the hybrid score, frozen values) and [implementation-plan.md](../.docs/implementation-plan.md) (module map, data contracts, task list). When this document and those two disagree, those two are right.
 
-**Status marks.** ✅ built and tested. 🔜 planned, with the task that builds it. Status on 2026-11-10.
+**Status marks.** ✅ built and tested. 🔜 planned, with the task that builds it. Status on 2026-11-12.
 
 ---
 
@@ -97,8 +97,6 @@ flowchart TB
         Loader["Postgres loader<br/>task 7"]:::offline
         Report["Report: macros for LaTeX<br/>task 9"]:::offline
     end
-
-    class Report planned
 
     Browser -->|"page request"| MW
     MW --> SSR
@@ -223,10 +221,11 @@ ESM. The `.ts` files run directly on the pinned Node 22 (type stripping), tests 
 - **Synthetic generator** ✅ (`src/generator/`). Five stages, each with its own seeded random stream: users (hidden interests, skewed activity), follows, communities and memberships, posts, interactions. Five worlds: W0 (no social influence), W1 (shared tastes, no influence) and W2 at low, middle and high influence. Two sizes: S (200 users, 4,000 posts) and M (1,000 users, 20,000 posts). Parameters are in `config/synthetic-v1.json` and calibrated to Digg where Digg has a number.
 - **Digg 2009 adapter** ✅ (`src/adapters/`). Reads the two password-protected zips in memory (its own ZipCrypto reader, nothing is extracted) and writes 336,047 users, 3,553 stories, 3,007,345 likes and 1,729,983 dated follows. Digg has no communities, so the community term is tested on synthetic data only.
 - **Checks** ✅ (`src/checks/`). Format, calibration against Digg, the social lift from W0 to W2H, the cut time T and the history bucket table.
-- **Harness** ✅ (`src/harness/`, `metrics.ts`, `stats.ts`). Runs a committed run config: picks each user's validation or test item, builds the pool and features as of that item's time, ranks with each method, and records the item's rank. Then it computes Recall@K, NDCG@K and coverage (K = 5, 10, 20), tunes parameters on the validation split, and compares methods with a paired bootstrap and a randomization test (10,000 each) with Holm correction.
+- **Harness** ✅ (`src/harness/`, `metrics.ts`, `stats.ts`). Runs a committed run config: picks each user's validation or test item, builds the pool and features as of that item's time, ranks with each method, and records the item's rank. Then it computes Recall@K, NDCG@K and coverage (K = 5, 10, 20), tunes parameters on the validation split, and compares methods with a paired bootstrap and a randomization test (10,000 each) with Holm correction. Since task 9 it also writes `compare.csv` (families F1 and F2 on `syn-W2M-M` and `digg2009`, or rows with no family), `density.csv` (E3), the H1 lines and the H0 gate line. A failed H0 gate stops the command after the files are written. Optional config keys give per-dataset params, a reversed tie-break (E6), the timestamp shuffle (E5) and the comparisons.
 - **`rank` command** ✅. Prints one ranking for one user at one time. The parity test uses it.
 - **Postgres loader** ✅ (task 7, `src/loader/`). `npm run load` writes a synthetic canonical dataset into its own Postgres schema `eval_load` (never `public`) with explicit ids, so the live app can run on it (parity test, E7, demo). It empties the schema and writes every row in one transaction. A like and a comment keep their `event_id`, and a repost becomes a `Post` row with `rePostId`. `npm run load:check` reads the rows back and checks that the six CSV files equal the manifest. It is the only part of `eval/` that imports `@prisma/client`. A demo-only `--rebase-to <time>` shifts all times by one constant so the last event lands on that time. Experiments never use it.
-- **Report** 🔜 (task 9, `src/report/`). Turns the results CSVs into `macros.csv` and `results-macros.tex`, so the thesis text never contains a typed number.
+- **`freeze` command** ✅ (task 9, `src/harness/freeze.ts`). Reads the committed tuning results, checks the tuning rule, and writes the ten P7 test configs with the chosen numbers. `--approve author` adds the author's approval of the test split, and `--check` proves that the configs still equal the tuning.
+- **Report** ✅ (task 9, `src/report/`). `npm run report` reads the P7 results folders (each file checked against its run manifest) and writes `.docs/results/p7-report/`: `macros.csv`, `results-macros.tex`, nine LaTeX tables, `results.md` (the same tables in Markdown) and the E3 figure data. Every macro traces to one CSV cell, so the thesis text never contains a typed number.
 
 ### 4.5 Data stores and files
 
@@ -264,7 +263,7 @@ Why this shape (super-plan §6):
 - **One curve instead of phases.** The prior's weight `m / (N_u + m)` falls smoothly as the user's history grows. History buckets (0, 1–4, 5–19, 20+) are used only for reporting.
 - **The author term.** A new post by a followee counts even before anyone engaged with it.
 
-α and β are tuned on the validation split from the grid 0, 1, 2, 4, 8, 16 and then frozen.
+α and β are tuned on the validation split from the grid 0, 1, 2, 4, …, 1,024 (powers of 2; widened on 2026-11-11, before the test split) and then frozen.
 
 ---
 
@@ -465,7 +464,7 @@ Breadit/
 │   │   ├── frozen-v1.json            # the frozen values of super-plan §7 (seed, K, grids, T, pool sizes)
 │   │   ├── synthetic-v1.json         # generator parameters (SHA-256 frozen 2026-11-02)
 │   │   ├── digg2009.json             # Digg zip URLs and SHA-256
-│   │   └── runs/                     # one JSON per harness run · p5-baseline.json
+│   │   └── runs/                     # one JSON per harness run · p5-baseline, p7-tune-*, the ten P7 test configs
 │   ├── src/
 │   │   ├── rng.ts                    # rng(masterSeed, stage): seeded sfc32 streams
 │   │   ├── frozen.ts                 # loads frozen-v1.json, checks the Node version
@@ -473,14 +472,14 @@ Breadit/
 │   │   ├── generator/                # users, follows, communities, posts, interactions (+ interest, alloc helpers)
 │   │   ├── adapters/                 # zip.ts (ZipCrypto reader), digg-parse.ts, digg.ts
 │   │   ├── checks/                   # format, calibration, social lift, cut time T and bucket table
-│   │   ├── harness/                  # split, index-data, post-features, run, tuning, write, config, commands
+│   │   ├── harness/                  # split, index-data, post-features, run, tuning, write, config, commands, compare, shuffle, freeze
 │   │   ├── metrics.ts                # Recall@K, NDCG@K, coverage
 │   │   ├── stats.ts                  # paired bootstrap, randomization test, Holm
 │   │   ├── results-csv.ts            # writes results CSVs and their hashes
-│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank, load, load-check, parity
+│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank, load, load-check, parity, freeze, report
 │   │   ├── loader/                   # writes a synthetic dataset into the Postgres schema eval_load (the only Prisma user here)
 │   │   ├── parity/                   # the parity sample: 100 (user, asOf) pairs and the harness orders
-│   │   ├── report/ 🔜                # task 9 · results CSVs → macros.csv and results-macros.tex
+│   │   ├── report/                   # task 9 · results CSVs → macros.csv, results-macros.tex, tables, results.md
 │   │   └── *.test.ts                 # node --test tests (golden, leakage, double run, scipy cross-check, ...)
 │   ├── data/                         # git-ignored · canonical datasets, rebuilt by `gen` and `adapt:digg`
 │   └── results/                      # git-ignored · per_user.csv files over 5 MB (hash kept in the manifest)
@@ -496,7 +495,7 @@ Breadit/
 │   ├── datasets.md                   # why Digg 2009, how to download it, calibration targets
 │   ├── literature.md · related-work.md
 │   ├── Bugs Report.md                # known bugs and the task that fixes each
-│   ├── results/                      # committed results, one folder per run (p5-baseline/, p6-parity/)
+│   ├── results/                      # committed results, one folder per run (p5-baseline/, p6-parity/, p7-*/, p7-report/)
 │   ├── works/                        # one folder per task: design.md + plan.md
 │   └── latex/ 🔜                     # P9 · the thesis LaTeX, copied from Latex/
 │
@@ -528,7 +527,7 @@ Breadit/
 | Harness, metrics, statistics, baseline table | P5 · task 6 | ✅ |
 | Postgres loader | P3 · task 7 | ✅ |
 | Feed module, `algo`, `asOf` flag, parity test, toggle | P6 · task 8 | ✅ |
-| Experiments E1–E6, E8, report and macros | P7 · task 9 | 🔜 next |
-| Cost benchmark E7 | P7 · task 10 | 🔜 |
+| Experiments E1–E6, E8, report and macros | P7 · task 9 | ✅ |
+| Cost benchmark E7 | P7 · task 10 | 🔜 next |
 | `npm run thesis:repro`, default `algo` | P8 · task 11 | 🔜 |
 | Slides and demo | P10 · task 13 | 🔜 |

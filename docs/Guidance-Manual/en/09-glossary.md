@@ -14,7 +14,7 @@ Every term and symbol used in the thesis, in one place. Each entry is one or two
 | **Gap 1** | The pre-thesis "For You" feed is not personalized by anything except who you follow; it is newest first. The thesis starts here. |
 | **RQ1** | Does adding social-graph signals (follow trust, community affinity) improve "For You" over the current heuristic, especially for users with little history? |
 | **RQ2** | How does the amount of social interaction change ranking quality? From what level does the social signal start to help? |
-| **H0** (sanity) | In the null world W0 the hybrid must **not** beat BL2. If it does, there is a bug or a leak. It is a gate: checked first. |
+| **H0** (sanity) | In the null world W0, H-follow (the hybrid without the community term) must **not** beat BL2. If it does, there is a bug or a leak. It is a gate: checked first. Until 2026-11-11 it used the full hybrid. |
 | **H1** | For users with 0–4 earlier interactions, H has a higher NDCG@10 than BL2. Tested twice: on `syn-W2M-M` and on `digg2009`. |
 | **H2** | The gain of H over BL2 grows with social density and is about zero for a user with no followee and no community. |
 | **Co-primary tests** | The two H1 tests (synthetic and Digg). Each has its own pass rule and is reported on its own. |
@@ -36,7 +36,7 @@ Every term and symbol used in the thesis, in one place. Each entry is one or two
 | **Community affinity** | The same idea for a community c: `(c_u,c + m·[member]/|M_u|) / (N_u + m)`. |
 | **Social term** | Trust of the post's author (if u follows them) plus trust of every followee who engaged with the post before t. |
 | **Author term / engager term** | The two parts of the social term. Ablations H-noauthor and H-noengager switch one off. |
-| **α (alpha)** | Weight of the social term, in engagement points. Tuned on the grid 0, 1, 2, 4, 8, 16 (frozen grid). |
+| **α (alpha)** | Weight of the social term, in engagement points. Tuned on the grid 0, 1, 2, 4, …, 1,024 (powers of 2; frozen grid, widened on 2026-11-11 before the test split). |
 | **β (beta)** | Weight of the community term. Same grid. |
 | **m** (prior strength) | How many "imaginary" interactions the prior is worth. Frozen at 5; E4 also tries 0, 2, 5, 10. |
 | **m-estimate smoothing** | Mixing an observed rate with a prior: `(count + m·prior) / (total + m)`. It avoids 0/0 for a new user (Cestnik 1990). |
@@ -102,7 +102,9 @@ Every term and symbol used in the thesis, in one place. Each entry is one or two
 | **Family F1** | Confirmatory: H − BL2, for each K and groups 0, 1–4, 0–4, 5–19, 20+. 15 tests per dataset. |
 | **Family F2** | Secondary: H − each other baseline, for each K and groups 0–4, 5–19, 20+, all. 84 tests per dataset. |
 | **H1 verdict** | On the F1 row NDCG@10, group 0–4: Holm-adjusted p < 0.05 **and** CI lower end > 0. |
-| **H0 gate** | On `syn-W0-M`, the CI of H − BL2 (NDCG@10, all users) must not lie above 0. |
+| **H0 gate** | On `syn-W0-M`, the CI of H-follow − BL2 (NDCG@10, all users) must not lie above 0. |
+| **freeze** (command) | `npm run freeze -w @breadit/eval` writes the P7 test configs from the committed tuning, with the chosen numbers. `--approve author` adds the author's approval of the test split, and `--check` proves the configs still equal the tuning. |
+| **Macro** | A LaTeX command, such as `\eTwoDiggNdcgTenZeroFourGain`, that prints one number of the results. `macros.csv` names the CSV cell it comes from, so the thesis has no typed numbers. |
 | **Common random numbers** | Every comparison restarts its random stream, so all comparisons use the same resamples. |
 
 ## F. Data

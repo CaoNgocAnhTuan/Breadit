@@ -1,6 +1,6 @@
 # Plan: P7 offline experiments E1–E6, E8, report and macros
 
-Status: approved · 2026-11-11
+Status: done · 2026-11-12
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-experiments/`
 
 ---
@@ -164,18 +164,18 @@ Added on 2026-11-11 at Stop A, by the author's decisions. Claude has already mad
 
 ## Claude's part
 
-- [ ] At Stop A: read the commits and the diff against the design, then show the author the chosen values and ask for the test split OK (OQ7). Then send Sonnet back for Steps 8 to 11.
-- [ ] If time runs short before Step 9 ends, propose the cuts of super-plan §8 to the author (the shuffle, then E8, then the finer E4). Do not cut quietly.
-- [ ] After Step 11: read the commits and the diff; `bash .claude/hooks/verify.sh`; the Acceptance items below.
-- [ ] Write `results-note.md` in this folder (DW13): the H0 gate, both H1 verdicts, the E1 and E2 tables from `results.md`, a short reading of E3 to E8, and the question of super-plan §11, item 7 (the default feed rule). English first, then a Vietnamese copy, as `.docs/supervisor-note.md`.
-- [ ] Docs (DW14). Also replace every quote of the old α, β grid with the new one: `docs/System_Architecture.md`, and Guidance Manual 03, 05 and 09 in en and vi.
+- [x] At Stop A: read the commits and the diff against the design, then show the author the chosen values and ask for the test split OK (OQ7). Then send Sonnet back for Steps 8 to 11.
+- [x] If time runs short before Step 9 ends, propose the cuts of super-plan §8 to the author (the shuffle, then E8, then the finer E4). Do not cut quietly.
+- [x] After Step 11: read the commits and the diff; `bash .claude/hooks/verify.sh`; the Acceptance items below.
+- [x] Write `results-note.md` in this folder (DW13): the H0 gate, both H1 verdicts, the E1 and E2 tables from `results.md`, a short reading of E3 to E8, and the question of super-plan §11, item 7 (the default feed rule). English first, then a Vietnamese copy, as `.docs/supervisor-note.md`.
+- [x] Docs (DW14). Also replace every quote of the old α, β grid with the new one: `docs/System_Architecture.md`, and Guidance Manual 03, 05 and 09 in en and vi.
   - **`docs/System_Architecture.md`:** the report ✅, `freeze` and `report`, the P7 run configs and results in the tree, and the status table (task 9 ✅, task 10 next).
   - **Guidance Manual, en and vi, with the same content:** 05 (the tuning, the H0 gate params, the test split run once), 06 (`compare.csv`, the families, `density.csv`), 07 (the freeze, the report hashes, the double run), 09 (macro, freeze) and 10 (the "(after P7)" answers for E1, E4, E5, E6, Q22 and coverage, each naming its results file).
   - **`CLAUDE.md`:** the eval commands `freeze` and `report`.
   - **`.docs/implementation-plan.md`:** the three lines of design "Contract changes" (§2.7, §2.8, §3.5), §5 task 9 ✅ and task 10 next, and a change-log line.
   - **`.docs/super-plan.md`:** a P7 status paragraph, the §4 row (P7: 1 of its tasks done), §11 item 7 (sent with the results), and a change-log line. No §7 change.
   - Commit: `docs: close p7-offline-experiments`.
-- [ ] Fill in the Result, then close the task.
+- [x] Fill in the Result, then close the task.
 
 ## Tests
 
@@ -200,21 +200,59 @@ DW1 to DW10 and DW12 to DW15 are also Acceptance items on the real results. DW8 
 
 ## Acceptance
 
-- [ ] The freeze line on the committed tuning: every (dataset, tuned method) checked, `0 violations` (DW1)
-- [ ] `freeze --check` prints `equal`. In `git log`, the commit with the ten test configs comes before the approval commit, and both come before the first test-split results commit (DW2)
-- [ ] The run log has the `H0 gate:` line of `p7-h0` with `ci_low`, and the gate passed before any other test run (DW3)
-- [ ] `p7-main/compare.csv`: 15 F1 rows and 84 F2 rows for each of `syn-W2M-M` and `digg2009`, all with `p_raw` and `p_holm`. Every row of family none in the other runs has both empty (DW4)
-- [ ] The run log has one `H1` line for each of `syn-W2M-M` and `digg2009`, and each equals the §3.4 rule applied by hand to its F1 row (DW5)
-- [ ] `p7-report/fig-e3-density.csv`: the four datasets with four bins each. Per dataset, the `n` over the bins equals the kept test users of its run's `leftout.csv`, group all (DW6)
-- [ ] The folders of `p7-e4-*`, `p7-e5-*`, `p7-e6-ties` and `p7-e8-pool` each hold `summary.csv` and a manifest. `p7-e6-ties` has the nine methods of `p7-main`. The E5 runs have their compare rows (DW7)
-- [ ] `npm run test -w @breadit/ranking` passes. With db and redis up and `syn-W2M-M` in `eval_load`, `npm run test:parity -w @breadit/backend` gives 300 of 300 full orders and 300 of 300 first two pages (DW8)
-- [ ] The Step 11 lines of the run log: no change under `.docs/results/` and `eval/config/runs/`, and every ignored `per_user.csv` matches its manifest (DW9)
-- [ ] The report's own check passed. Every name in `macros.csv` matches `^[A-Za-z]+$`, and `results-macros.tex` has as many `\newcommand` lines as `macros.csv` has rows. Five macros picked by hand equal their cells (DW10)
-- [ ] `npm run verify -w @breadit/eval` passes (DW11), and `bash .claude/hooks/verify.sh` passes
-- [ ] The run log has the command, time and peak memory of every run (DW12)
-- [ ] `results-note.md` has the H0 gate, both H1 verdicts, the main tables and the §11 item 7 question (DW13)
-- [ ] The docs of "Claude's part": the report and task 9 are ✅, and the "(after P7)" answers are written, the same in en and vi (DW14)
-- [ ] `git diff --stat` of the task commits: only the paths DW15 allows (DW15)
+- [x] The freeze line on the committed tuning: every (dataset, tuned method) checked, `0 violations` (DW1)
+- [x] `freeze --check` prints `equal`. In `git log`, the commit with the ten test configs comes before the approval commit, and both come before the first test-split results commit (DW2)
+- [x] The run log has the `H0 gate:` line of `p7-h0` with `ci_low`, and the gate passed before any other test run (DW3)
+- [x] `p7-main/compare.csv`: 15 F1 rows and 84 F2 rows for each of `syn-W2M-M` and `digg2009`, all with `p_raw` and `p_holm`. Every row of family none in the other runs has both empty (DW4)
+- [x] The run log has one `H1` line for each of `syn-W2M-M` and `digg2009`, and each equals the §3.4 rule applied by hand to its F1 row (DW5)
+- [x] `p7-report/fig-e3-density.csv`: the four datasets with four bins each. Per dataset, the `n` over the bins equals the kept test users of its run's `leftout.csv`, group all (DW6)
+- [x] The folders of `p7-e4-*`, `p7-e5-*`, `p7-e6-ties` and `p7-e8-pool` each hold `summary.csv` and a manifest. `p7-e6-ties` has the nine methods of `p7-main`. The E5 runs have their compare rows (DW7)
+- [x] `npm run test -w @breadit/ranking` passes. With db and redis up and `syn-W2M-M` in `eval_load`, `npm run test:parity -w @breadit/backend` gives 300 of 300 full orders and 300 of 300 first two pages (DW8)
+- [x] The Step 11 lines of the run log: no change under `.docs/results/` and `eval/config/runs/`, and every ignored `per_user.csv` matches its manifest (DW9)
+- [x] The report's own check passed. Every name in `macros.csv` matches `^[A-Za-z]+$`, and `results-macros.tex` has as many `\newcommand` lines as `macros.csv` has rows. Five macros picked by hand equal their cells (DW10)
+- [x] `npm run verify -w @breadit/eval` passes (DW11), and `bash .claude/hooks/verify.sh` passes
+- [x] The run log has the command, time and peak memory of every run (DW12)
+- [x] `results-note.md` has the H0 gate, both H1 verdicts, the main tables and the §11 item 7 question (DW13)
+- [x] The docs of "Claude's part": the report and task 9 are ✅, and the "(after P7)" answers are written, the same in en and vi (DW14)
+- [x] `git diff --stat` of the task commits: only the paths DW15 allows (DW15)
 
 ## Result
 
+**Delivered, 2026-11-12.** The offline experiments E1 to E6 and E8 ran once on the test split, after the tuning was frozen and the author approved it. The report turns them into macros and tables.
+
+- **Code.** `rankPool` takes a tie-break order (default unchanged). The harness has six optional config keys (`datasetParams`, `tieBreak`, `shuffle`, `compare`, `density`, `h0Gate`). It writes `compare.csv` (F1, F2 or none, with Holm) and `density.csv`, prints the H1 and H0 lines, and stops on a failed gate. Tuning keeps no per-user rows. New: `shuffle.ts`, `compare.ts`, `freeze.ts` (`npm run freeze`), and `src/report/` (`npm run report`).
+- **Runs.** 2 tuning configs and 10 test configs (written by `freeze`). The results are in `.docs/results/p7-*/`. `p7-report/` holds 70 macros, 9 LaTeX tables, `results.md` and `fig-e3-density.csv`.
+- **Verdicts.**
+  - H0 gate: passes (H-follow − BL2 on W0, NDCG@10 0.001, CI −0.004 to 0.006).
+  - H1 fails on both co-primary tests: `syn-W2M-M` +0.023, Holm p 0.680; `digg2009` +0.000117, Holm p 0.335.
+  - By the default feed rule, "For You" stays as it is today (P8 applies this).
+- **Tests.** Ranking 85; eval 383 (379 before the task's last step, plus 4 for the gate change); backend unit 189; integration 146. `verify.sh` passes every step. Parity 102 of 102 (300 full orders and 300 first two pages).
+- **Double run (DW9).** Every P7 run and the report, made again from empty folders, give byte-identical files and manifests. The 4 git-ignored `per_user.csv` files match their manifest hashes.
+- **Commits.**
+  - Code: `cfc09e2`, `2d1615d`, `b84fa47`, `0ea4ecb`, `4e24a0a`, `4159874`.
+  - First tuning: `eeeb467`, `02e735f`.
+  - The frozen change at Stop A: `92e8d6d` (Claude).
+  - Step 7b: `604c14a`, `33cb847`.
+  - Test split: `64ea5eb`, `9d42f3d`, `ad31d5d`.
+  - Report: `5f3eebc`.
+  - Double run: `7b4c012` (Claude).
+  - Docs: `docs: close p7-offline-experiments`.
+  - Nothing is pushed.
+
+**What differed from the plan.**
+1. **Amendment 1, at Stop A (the author's decisions).** On W0 validation, the full hybrid beat BL2 through the community term, which carries topic interest, and α = β = 16 sat at the top of the grid. The H0 gate moved to H-follow, the grids were widened (super-plan 0.25, blueprint 1.8), `h0Gate` in `stats.ts` got a `method` parameter, and the tuning ran again (Step 7b). Claude fixed the three tuning tests that counted grid points.
+2. **Second Stop A.** 1,024 was chosen again at the new top on several datasets (design F17). The author approved the test split anyway; the edge choices are a limitation (on `syn-W2M-M`, +0.5% from 512 to 1,024).
+3. **Small deviations by the implementer.**
+   - `compare.ts` writes a row with n = 0 with empty numbers (`writeCompareRows`); `stats.ts` writer is unchanged.
+   - A test helper `src/report/fixture.ts`.
+   - `fig-e3-density.csv` has an `n` column (DW6 reads it).
+   - `tuneDataset` defaults to `keepPerUser: false`.
+   - For the compare, freeze and report modules, the tests were written first but not run against the missing code.
+4. **Step 11.** The agent stopped on a network error while its double-run script was running. The script finished on its own, and Claude did the check, the run log and the commit.
+5. **Run time** was longer than the design guessed (F3, F14): Digg tuning 66 min; on Digg, the statistics took 36 min in `p7-main` and 26 min in `p7-e4-terms`. One full pass takes about 2.5 hours.
+
+**Open points for the author.**
+- The tables and macros round to 3 decimals, so the Digg gains (about 0.0001) print as 0.000. Proposal for task 11: more decimals for gains, or significant digits.
+- Speed for `thesis:repro` (task 11): run the configs in parallel processes, and compute a rank by counting instead of sorting the whole pool.
+- The supervisor's answers to the two questions of `results-note.md`.
+- Task 9b (Hive) can still run, since task 9 closed before 11-13. It needs the author's BigQuery decision (super-plan §11, item 8).

@@ -67,6 +67,7 @@ masterSeed, epoch, node, files: { name: { rows, sha256 } }
 | Golden test | a tiny hand-checked dataset gives exactly the committed CSV (P5) |
 | Leakage test | changing every event after t_u leaves u's rows unchanged (P5) |
 | Harness double run | two full runs give byte-identical results (P5) |
+| P7 double run ✅ | every P7 run and the report, made again from empty folders, give byte-identical files and manifests (task 9) |
 | Parity test ✅ | the live app and the harness give the same order: 300 of 300 at the feed module and 300 of 300 over HTTP (task 8, `npm run test:parity -w @breadit/backend`) |
 | `thesis:repro` 🔜 | one command rebuilds everything and compares every hash with `.docs/results/manifest.json` (task 11) |
 
@@ -76,7 +77,7 @@ Some values must be fixed **before** the test split runs, or they could be tuned
 
 ## 7. From a number in the thesis back to its source
 
-The plan for the thesis text (P9): a report script turns result CSVs into LaTeX macros (`results-macros.tex`) and a `macros.csv` that records, for each macro, the file and row it came from. The text uses only macros, never typed numbers. So:
+Built in task 9: `npm run report -w @breadit/eval` turns the result CSVs into LaTeX macros (`results-macros.tex`), LaTeX tables, `results.md` (the same tables in Markdown) and a `macros.csv` that records, for each macro, the file, the row and the column it came from. It checks every input file against its run manifest, and every macro against its cell. The text uses only macros, never typed numbers. So:
 
 ```
 number in the PDF → macro name → macros.csv row → results CSV cell → manifest hash → command that made it

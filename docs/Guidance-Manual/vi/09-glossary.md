@@ -16,7 +16,7 @@ Thuật ngữ chuyên ngành được giữ nguyên tiếng Anh, vì thesis và 
 | **Gap 1** | Feed "For You" thời pre-thesis không được cá nhân hoá bằng gì ngoài danh sách người bạn follow; nó chỉ xếp mới nhất trước. Thesis bắt đầu từ đây. |
 | **RQ1** | Thêm tín hiệu social graph (follow trust, community affinity) có làm "For You" tốt hơn heuristic hiện tại không, nhất là với user có ít lịch sử? |
 | **RQ2** | Mức độ tương tác xã hội ảnh hưởng thế nào tới chất lượng xếp hạng? Từ mức nào thì tín hiệu social bắt đầu có ích? |
-| **H0** (kiểm tra tỉnh táo) | Trong thế giới null W0, hybrid **không được** thắng BL2. Nếu thắng thì có bug hoặc leak. Đây là một cổng chặn: kiểm tra đầu tiên. |
+| **H0** (kiểm tra tỉnh táo) | Trong thế giới null W0, H-follow (hybrid không có community term) **không được** thắng BL2. Nếu thắng thì có bug hoặc leak. Đây là một cổng chặn: kiểm tra đầu tiên. Trước 2026-11-11, nó dùng hybrid đầy đủ. |
 | **H1** | Với user có 0–4 tương tác trước đó, H có NDCG@10 cao hơn BL2. Kiểm định hai lần: trên `syn-W2M-M` và trên `digg2009`. |
 | **H2** | Mức cải thiện của H so với BL2 tăng theo mật độ social, và gần bằng 0 với user không follow ai và không ở community nào. |
 | **Co-primary tests** (hai kiểm định chính) | Hai kiểm định H1 (synthetic và Digg). Mỗi cái có luật pass riêng và được báo cáo riêng. |
@@ -38,7 +38,7 @@ Thuật ngữ chuyên ngành được giữ nguyên tiếng Anh, vì thesis và 
 | **Community affinity** | Cùng ý tưởng đó cho một community c: `(c_u,c + m·[là thành viên]/|M_u|) / (N_u + m)`. |
 | **Social term** | Trust của tác giả bài (nếu u follow họ) cộng trust của mọi followee đã tương tác với bài trước t. |
 | **Author term / engager term** | Hai phần của social term. Hai ablation H-noauthor và H-noengager tắt từng phần. |
-| **α (alpha)** | Trọng số của social term, tính bằng điểm engagement. Tune trên lưới 0, 1, 2, 4, 8, 16 (lưới frozen). |
+| **α (alpha)** | Trọng số của social term, tính bằng điểm engagement. Tune trên lưới 0, 1, 2, 4, …, 1,024 (lũy thừa của 2; lưới frozen, mở rộng ngày 2026-11-11 trước test split). |
 | **β (beta)** | Trọng số của community term. Cùng lưới. |
 | **m** (prior strength) | Prior có giá trị bằng bao nhiêu tương tác "giả định". Frozen bằng 5; E4 thử thêm 0, 2, 5, 10. |
 | **m-estimate smoothing** | Trộn một tỉ lệ quan sát được với một prior: `(count + m·prior) / (total + m)`. Tránh phép chia 0/0 cho user mới (Cestnik 1990). |
@@ -104,7 +104,9 @@ Thuật ngữ chuyên ngành được giữ nguyên tiếng Anh, vì thesis và 
 | **Family F1** | Nhóm xác nhận: H − BL2, cho mỗi K và các nhóm 0, 1–4, 0–4, 5–19, 20+. 15 kiểm định mỗi dataset. |
 | **Family F2** | Nhóm phụ: H − từng baseline khác, cho mỗi K và các nhóm 0–4, 5–19, 20+, all. 84 kiểm định mỗi dataset. |
 | **H1 verdict** (kết luận H1) | Trên dòng F1 với NDCG@10, nhóm 0–4: p sau Holm < 0,05 **và** đầu dưới của CI > 0. |
-| **H0 gate** | Trên `syn-W0-M`, CI của H − BL2 (NDCG@10, mọi user) không được nằm hẳn trên 0. |
+| **H0 gate** | Trên `syn-W0-M`, CI của H-follow − BL2 (NDCG@10, mọi user) không được nằm hẳn trên 0. |
+| **freeze** (lệnh) | `npm run freeze -w @breadit/eval` ghi các test config của P7 từ kết quả tuning đã commit, với các số đã chọn. `--approve author` thêm việc tác giả duyệt test split, và `--check` chứng minh các config vẫn khớp với tuning. |
+| **Macro** | Một lệnh LaTeX, ví dụ `\eTwoDiggNdcgTenZeroFourGain`, in ra một con số của kết quả. `macros.csv` ghi nó đến từ ô CSV nào, nên thesis không có con số gõ tay. |
 | **Common random numbers** | Mỗi phép so sánh khởi động lại luồng ngẫu nhiên của nó, nên mọi phép so sánh dùng cùng các mẫu lấy lại. |
 
 ## F. Dữ liệu

@@ -102,12 +102,14 @@ Bucket sizes at q = 0.8 (kept test users): `syn-W2M-M` has 174 in 0–4 (59 in 0
 
 ## 10. Step 8: tuning, then one test run
 
-1. On validation items only, try every α, β in {0, 1, 2, 4, 8, 16} for H, and each baseline's grid.
+1. On validation items only, try every α, β in {0, 1, 2, 4, …, 1,024} (powers of 2) for H, and each baseline's grid.
 2. Pick the value with the best NDCG@10. On a tie, pick the smaller value.
 3. Freeze the choices.
 4. Run the test items **once**. The test split runs only when the run config says `"testApprovedBy": "author"`.
 
 Tuning on the test split would be like studying with the exam answers.
+
+In task 9 (2026-11-11) the tuning ran on validation. Then the grids were widened once, because 16 was chosen at the top (super-plan 0.25), and the tuning ran again. `npm run freeze` wrote the test configs with the chosen numbers, the author approved them, and the test split ran once.
 
 ## 11. Step 9: statistics and the verdict
 
@@ -119,7 +121,7 @@ For every user i: `d_i = NDCG@10(H) − NDCG@10(BL2)`. Pairing by user removes t
 
 **H1 passes on a dataset** when, for NDCG@10 and group 0–4, the Holm-adjusted p < 0.05 **and** the lower end of the CI > 0. It is tested on `syn-W2M-M` and on `digg2009`, each on its own.
 
-**H0 gate first.** On the null world `syn-W0-M`, the CI of H − BL2 (NDCG@10, all users) must **not** lie above 0. In W0 follows carry no influence, so if H "wins" there, something is wrong (a bug or a leak). Then we stop and fix before trusting any other result.
+**H0 gate first.** On the null world `syn-W0-M`, the CI of H-follow − BL2 (NDCG@10, all users) must **not** lie above 0. H-follow is the hybrid without the community term, at the α chosen on `syn-W2M-M`. In W0 follows are random and carry no influence, so if H-follow "wins" there, something is wrong (a bug or a leak). Then we stop and fix before trusting any other result. Until 2026-11-11 the gate used the full H. It changed before the test split, because the community term counts the user's earlier positives in a community, and in the generator a community is a topic, so the term carries topic interest even in W0 (super-plan 0.25).
 
 The details, with worked examples, are in [06 Statistics](06-statistics.md).
 

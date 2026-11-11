@@ -33,7 +33,7 @@ community(p, u, t) = (c_u,c(p) + m · [u is a member of c(p)] / |M_u|) / (N_u + 
 | `c_u,c` | số positive trước đây của u trên bài thuộc community c |
 | `M_u`, `|M_u|` | các community của u tại t, và số lượng |
 | m | prior strength, frozen bằng 5 |
-| α, β | trọng số, tune trên lưới 0, 1, 2, 4, 8, 16 |
+| α, β | trọng số, tune trên lưới 0, 1, 2, 4, …, 1,024 (lũy thừa của 2) |
 | `[x]` | 1 nếu x đúng, ngược lại 0 |
 
 Mọi thứ được đếm **tại thời điểm t**: chỉ các sự kiện trước t (file 05).

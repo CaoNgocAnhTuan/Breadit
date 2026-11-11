@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.25 · 2026-11-11 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.26 · 2026-11-12 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -79,7 +79,7 @@ These facts were checked in the code on 2026-10-22, after the bug sweep (Bugs Re
 
 The phases are in dependency order. Each phase becomes one or more tasks (column "Tasks", started with `/task` or `/bugfix`). A phase is done when its "Done when" passes. ★ marks a supervisor checkpoint: send the result and wait for the answer before the next phase depends on it.
 
-**Status marks.** ✅ done (its "Done when" passes). 🟡 every output is written, but the "Done when" waits for someone else. ⬜ not started. ▶ next to start. "Late" means the planned end date in `.docs/implementation-plan.md` §5 has passed. A ✅ next to a task name means that task folder is closed. Last updated: 2026-11-10.
+**Status marks.** ✅ done (its "Done when" passes). 🟡 every output is written, but the "Done when" waits for someone else. ⬜ not started. ▶ next to start. "Late" means the planned end date in `.docs/implementation-plan.md` §5 has passed. A ✅ next to a task name means that task folder is closed. Last updated: 2026-11-12.
 
 | Status | Phase | Output | Done when | Tasks |
 |---|---|---|---|---|
@@ -90,7 +90,7 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 11-02 | P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` ✅ |
 | ✅ 11-02 (★ note ready to send) | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package` ✅, `p5-eval-harness` ✅ |
 | ✅ 11-10 | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` ✅ |
-| ▶ next | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments`, `p7-cost-benchmark`, `p7-hive-check` (optional, gated) |
+| ▶ 1 of 2 tasks done (★ note ready to send) | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments` ✅, `p7-cost-benchmark`, `p7-hive-check` (optional, gated) |
 | ⬜ | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
 | ⬜ | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
 | ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-defense-package` |
@@ -246,6 +246,13 @@ E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, d
 - **Method.** H-comm against BL2 only. So real data still does not test the follow and community terms together.
 - **Gate.** At most half a day, and only if `p7-offline-experiments` closes on time (11-13). It passes only if BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (the threshold of `.docs/implementation-plan.md` §3.2). If it fails, stop: Hive goes to future work, with what was checked.
 - **If the gate passes.** This changes decision Q2 of 2026-10-26 (`.docs/datasets.md` §7: the community term on synthetic data only). Add a line to the change log here and tell the supervisor (§11, item 8).
+
+**Status (2026-11-12, task 9 done).** Task `p7-offline-experiments` (`.docs/works/2026-11-11-p7-offline-experiments/`).
+- **Before the test split** (0.25): the H0 gate moved to H-follow and the grids were widened. The tuning ran twice on validation, `freeze` wrote the ten test configs, and the author approved them. The test split ran once.
+- **H0 gate:** passes. H-follow − BL2 on W0 is 0.001 (NDCG@10, CI −0.004 to 0.006).
+- **H1:** fails on both co-primary tests: `syn-W2M-M` +0.023 (Holm p 0.680) and `digg2009` +0.0001 (Holm p 0.335). By the default feed rule, "For You" stays as it is today; P8 applies this.
+- **Other results.** On `syn-W2M-M`, H is about 6 times BL2 over all users, mostly from the community term and for users with a long history. On `digg2009` the social terms change almost nothing, and BL4 and BL5 are about 8 times BL2. The tables are in `.docs/results/p7-report/results.md`, and the note for the supervisor is `results-note.md` in the task folder.
+- **Double run:** every P7 run and the report, made again from empty folders, gave byte-identical files and manifests (`run_output.txt` of the task, Step 11). So the P7 "Done when" (hash check against the manifest) passes for task 9. P7 now waits for task 10.
 
 ### P8: Repro package and freeze
 
@@ -459,7 +466,7 @@ The thesis results do not need the schema migration: generated data has no dupli
 4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval.
 5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `Latex/` and `docs/` needs the author's request.
 6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). Status 2026-11-02: (a) ✅ set in P2 and checked in P3 and P4; (b) still open, for P5; (c) ✅ set in P2. The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. Set in P2: `.docs/implementation-plan.md` §3.1 and §3.2, checked on Digg in its §3.7; the P3 check is in its §3.6. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family. Set in P2: `.docs/implementation-plan.md` §3.3 (families F1 and F2 per dataset).
-7. **Default feed rule** (P7). Does the supervisor agree that "For You" switches to `social` only when H1 passes on both co-primary tests and the H0 gate passes? Ask with the P7 results.
+7. **Default feed rule** (P7). Does the supervisor agree that "For You" switches to `social` only when H1 passes on both co-primary tests and the H0 gate passes? Ask with the P7 results. Asked on 2026-11-12 with the P7 results (`results-note.md` of task `p7-offline-experiments`): H1 failed on both tests, so the default stays as it is today unless the supervisor says otherwise.
 8. **Hive side check** (P7). BigQuery needs a Google Cloud account with billing: the author decides before 11-13 whether to open one. If the gate passes, tell the supervisor that the community term gets real side evidence (decision Q2 changes).
 
 ---
@@ -491,3 +498,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.23 · 2026-11-10 · Task `p3-postgres-loader`: P3 status paragraph (P3 done); §4 rows P3 ✅ with `p3-postgres-loader` ✅ and P6 ▶ next; the status date. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.24 · 2026-11-10 · Task `p6-social-feed`: P6 status paragraph (P6 done); the P6 "Do" sentence no longer says the feed reuses `getFolloweesIds` and `getCommunityIds` (they hold no times, so the feed reads follows and memberships with their times), and the B6 reason now names the Communities feed; §4 rows P6 ✅ and P7 ▶ next. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.25 · 2026-11-11 · Task `p7-offline-experiments`, Stop A, by the author's decision, after the validation tuning and before any test-split run. **H0 (§1):** the gate is now H-follow against BL2 on W0, not the full hybrid. On W0 validation, H at α = β = 16 scored NDCG@10 0.0202 against 0.0148 for BL2, nearly all from β, because the community term counts the user's earlier positives in a community, and a community is a topic in the generator. **§7:** the α, β grid now runs from 0 to 1,024 in powers of 2, because α = β = 16 (the top) was chosen on all five synthetic worlds and α = 16 on Digg. The baseline grids get two steps past each edge where a tuned value sat: BL2t 2 and 4, BL4 360,000 and 720,000, BL5 0.6 and 0.9. Each grid still holds the published or production value. The tuning runs again. §5 and §6 are byte-identical.
+- 0.26 · 2026-11-12 · Task `p7-offline-experiments` closed: P7 status paragraph (the H0 gate passes, H1 fails on both co-primary tests, the main results, the double run); §4 row P7 (1 of 2 tasks done, ★ note ready to send); §11 item 7 (asked with the results). No frozen value changed beyond 0.25; §5, §6 and §7 are byte-identical.
