@@ -23,5 +23,6 @@
     }
   },
   "pool": "large",
-  "split": "test"
+  "split": "test",
+  "testApprovedBy": "author"
 }

@@ -20,5 +20,6 @@
   },
   "pool": "normal",
   "shuffle": true,
-  "split": "test"
+  "split": "test",
+  "testApprovedBy": "author"
 }

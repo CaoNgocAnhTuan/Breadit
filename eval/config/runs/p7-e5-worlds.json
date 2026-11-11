@@ -56,5 +56,6 @@
     }
   },
   "pool": "normal",
-  "split": "test"
+  "split": "test",
+  "testApprovedBy": "author"
 }

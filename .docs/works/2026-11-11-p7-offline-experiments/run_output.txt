@@ -107,3 +107,24 @@ E8 baseline: BL6 (validation NDCG@10 0.018159, K 10, all users, syn-W2M-M)
 equal
 
 # No config under eval/config/runs/ has testApprovedBy. No run on the test split was made in Step 7b.
+
+## Step 8: the author approves the P7 test split (2026-11-11)
+
+$ npm run freeze -w @breadit/eval -- --approve author
+
+> @breadit/eval@0.1.0 freeze
+> node src/cli/freeze.ts --approve author
+
+rule check: 14 groups, 0 violations
+E8 baseline: BL6 (validation NDCG@10 0.018159, K 10, all users, syn-W2M-M)
+wrote 10 test configs to /Users/hung/Desktop/Breadit/eval/config/runs with testApprovedBy "author"
+
+$ npm run freeze -w @breadit/eval -- --check
+
+> @breadit/eval@0.1.0 freeze
+> node src/cli/freeze.ts --check
+
+rule check: 14 groups, 0 violations
+E8 baseline: BL6 (validation NDCG@10 0.018159, K 10, all users, syn-W2M-M)
+equal
+
