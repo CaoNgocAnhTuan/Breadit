@@ -1,13 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { harnessCommand, rankCommand } from "./commands.ts";
-import { prepare, rankAt, runDataset } from "./run.ts";
+import { computeCutTime, prepare, rankAt, runDataset } from "./run.ts";
 import { fixedVariants } from "./config.ts";
 import type { RunConfig } from "./config.ts";
 import { loadDataset } from "../canonical/dataset.ts";
-import { tempDir } from "../checks/fixture.ts";
+import { tempDir, writeFixture } from "../checks/fixture.ts";
+import { sha256Hex } from "../canonical/csv.ts";
 import { loadFrozen } from "../frozen.ts";
 import { positiveEvents } from "./index-data.ts";
 import { splitItems } from "./split.ts";
@@ -147,4 +148,99 @@ test("harness with a grid config tunes first, writes tuning.csv, and runs the ch
   harnessCommand([writeConfig(tempDir(), { methods: ["BL2t"], params: { BL2t: { ageWeight: value } } }), "--out", fixed]);
   const pick = (dir: string): string[] => readFileSync(join(dir, "summary.csv"), "utf8").split("\n").filter((l) => l.includes(",BL2t,"));
   assert.deepEqual(pick(out), pick(fixed));
+});
+
+// TC7 (design DW3, DW7): the harness command writes compare.csv and density.csv, and checks the H0 gate.
+// A small world named syn-W0-M (the gate needs that name). Twelve users follow user 100, who liked an old post P first; each of
+// the twelve then likes P as their only positive. Twelve newer posts, each liked by user 102, rank above P for BL2 (P is old).
+// H with a large alpha puts P first, so H beats BL2 for each of the twelve; with alpha 0, H is BL2.
+const DAY = 86400;
+function gateWorld(): { dataDir: string; cutTimes: Record<string, number> } {
+  const rows = (n: number): number[] => Array.from({ length: n }, (_, i) => i);
+  const viewers = rows(12).map((i) => i + 1);
+  const users = [...viewers, 100, 101, 102, 103].map((user_id) => ({ user_id, joined_at: 0 }));
+  const follows = viewers.map((follower_id) => ({ follower_id, followee_id: 100, created_at: 0 }));
+  const posts = [{ post_id: 1, author_id: 101, community_id: null, created_at: 0 }, ...rows(12).map((j) => ({ post_id: 2 + j, author_id: 101, community_id: null, created_at: 6 * DAY + j * 60 }))];
+  const like = (event_id: number, user_id: number, post_id: number, created_at: number) => ({ event_id, user_id, post_id, type: "like", created_at });
+  const interactions = [
+    like(1, 100, 1, 3600),
+    ...rows(12).map((j) => like(2 + j, 102, 2 + j, 6 * DAY + 7200 + j * 10)),
+    ...viewers.map((i) => like(13 + i, i, 1, 6.5 * DAY + i * 60)),
+    ...rows(12).map((j) => like(26 + j, 103, 2 + j, 6.8 * DAY + j * 60)),
+  ];
+  const one = writeFixture({ users, follows, posts, interactions }, { datasetId: "syn-W0-M" });
+  const dataDir = tempDir();
+  cpSync(one, join(dataDir, "syn-W0-M"), { recursive: true });
+  const ds = loadDataset(join(dataDir, "syn-W0-M"));
+  return { dataDir, cutTimes: { "syn-W0-M": computeCutTime(positiveEvents(ds)) } };
+}
+
+function gateConfig(alpha: number, over: Partial<RunConfig> = {}): RunConfig {
+  return {
+    datasets: ["syn-W0-M"],
+    split: "validation",
+    methods: ["BL2", "H"],
+    params: { H: { alpha, beta: 1, m: "frozen" } },
+    pool: "normal",
+    mode: "fast",
+    compare: { mode: "none", ref: "BL2" },
+    density: true,
+    h0Gate: true,
+    ...over,
+  };
+}
+
+test("harness with compare, density and h0Gate writes compare.csv and density.csv, lists both in the manifest, prints one H0 gate line", () => {
+  const world = gateWorld();
+  const cfg = writeConfig(tempDir(), gateConfig(0), "gate.json");
+  const a = tempDir();
+  const b = tempDir();
+  const outA = harnessCommand([cfg, "--out", a], world);
+  const outB = harnessCommand([cfg, "--out", b], world);
+  assert.deepEqual(readdirSync(a).sort((x, y) => (x < y ? -1 : 1)), ["compare.csv", "coverage.csv", "density.csv", "leftout.csv", "manifest.json", "per_user.csv", "summary.csv"]);
+  for (const f of readdirSync(a)) assert.equal(readFileSync(join(a, f), "utf8"), readFileSync(join(b, f), "utf8"), f);
+  const gate = outA.filter((l) => l.startsWith("H0 gate:"));
+  assert.equal(gate.length, 1);
+  assert.match(gate[0] as string, /^H0 gate: pass {2}ci_low 0\.000000$/);
+  assert.deepEqual(outA.map((l) => l.replaceAll(a, "<out>")), outB.map((l) => l.replaceAll(b, "<out>")));
+  const manifest = JSON.parse(readFileSync(join(a, "manifest.json"), "utf8")) as { files: Record<string, { rows: number; sha256: string }> };
+  for (const f of ["compare.csv", "density.csv"]) {
+    assert.equal(manifest.files[f]?.sha256, sha256Hex(readFileSync(join(a, f), "utf8")), f);
+  }
+  // 1 method (H) x 3 K x 6 groups, family none, no p-value; density: 4 bins, n sums to the kept users
+  const compare = readFileSync(join(a, "compare.csv"), "utf8").trimEnd().split("\n");
+  assert.equal(compare.length, 1 + 18);
+  assert.equal(manifest.files["compare.csv"]?.rows, 18);
+  for (const l of compare.slice(1)) assert.match(l, /^syn-W0-M,none,H,BL2,\d+,[^,]+,\d+,[^,]*,[^,]*,[^,]*,,$/);
+  const density = readFileSync(join(a, "density.csv"), "utf8").trimEnd().split("\n");
+  assert.equal(density[0], "dataset,density_bin,method,ref,n,mean_diff,ci_low,ci_high");
+  assert.deepEqual(density.slice(1).map((l) => l.split(",").slice(0, 2).join(",")), ["syn-W0-M,0", "syn-W0-M,1-4", "syn-W0-M,5-19", "syn-W0-M,20+"]);
+  const kept = readFileSync(join(a, "leftout.csv"), "utf8").trimEnd().split("\n").find((l) => l.split(",")[2] === "all") as string;
+  assert.equal(density.slice(1).reduce((n, l) => n + Number(l.split(",")[4]), 0), Number(kept.split(",")[3]) - Number(kept.split(",")[4]));
+  assert.match(density[3] as string, /^syn-W0-M,5-19,H,BL2,0,,,$/);
+});
+
+test("when the H0 gate fails the command throws, after compare.csv, density.csv and the manifest are written", () => {
+  const world = gateWorld();
+  const cfg = writeConfig(tempDir(), gateConfig(1000), "gate.json");
+  const out = tempDir();
+  assert.throws(() => harnessCommand([cfg, "--out", out], world), (e: Error) => /H0 gate failed/.test(e.message) && /H0 gate: fail {2}ci_low 0\.\d{6}/.test(e.message));
+  assert.deepEqual(readdirSync(out).sort((x, y) => (x < y ? -1 : 1)), ["compare.csv", "coverage.csv", "density.csv", "leftout.csv", "manifest.json", "per_user.csv", "summary.csv"]);
+  const manifest = JSON.parse(readFileSync(join(out, "manifest.json"), "utf8")) as { files: Record<string, { sha256: string }> };
+  for (const f of ["compare.csv", "density.csv", "summary.csv"]) assert.equal(manifest.files[f]?.sha256, sha256Hex(readFileSync(join(out, f), "utf8")), f);
+  // the gate row of compare.csv: H - BL2, K 10, all, with the interval above 0
+  const gate = readFileSync(join(out, "compare.csv"), "utf8").split("\n").find((l) => l.startsWith("syn-W0-M,none,H,BL2,10,all,")) as string;
+  const cells = gate.split(",");
+  assert.equal(cells[6], "15");
+  assert.ok(Number(cells[8]) > 0, gate);
+});
+
+test("a config with compare but no density writes no density.csv, and compare needs no gate", () => {
+  const world = gateWorld();
+  const cfg = writeConfig(tempDir(), gateConfig(0, { density: undefined, h0Gate: undefined }), "plain.json");
+  const out = tempDir();
+  const lines = harnessCommand([cfg, "--out", out], world);
+  assert.ok(existsSync(join(out, "compare.csv")));
+  assert.ok(!existsSync(join(out, "density.csv")));
+  assert.ok(!lines.some((l) => l.startsWith("H0 gate")));
 });

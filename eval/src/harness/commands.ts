@@ -5,12 +5,14 @@ import type { MethodId } from "@breadit/ranking";
 import { loadDataset } from "../canonical/dataset.ts";
 import { sha256Hex } from "../canonical/csv.ts";
 import { loadFrozen } from "../frozen.ts";
+import { compareRows, densityRows, verdictLines, writeCompareRows, writeDensity } from "./compare.ts";
 import { REQUIRED_PARAMS, parseRunConfig, resolveParam } from "./config.ts";
 import type { ParamValue, RunConfig, Variant } from "./config.ts";
 import { computeCutTime, countItems, defaultDataDir, prepare, rankAt, runConfig } from "./run.ts";
 import { positiveEvents } from "./index-data.ts";
 import { tuneConfig, writeTuning } from "./tuning.ts";
 import { writeResults } from "./write.ts";
+import { statOpts } from "../stats.ts";
 import { GROUPS, METHOD_ORDER } from "../metrics.ts";
 import type { FileEntry } from "../canonical/csv.ts";
 
@@ -22,6 +24,8 @@ const REPO_ROOT = new URL("../../../", import.meta.url).pathname;
 export interface CommandEnv {
   /** The folder with one subfolder per dataset id (default: eval/data). */
   dataDir?: string;
+  /** Dataset id to its recorded T (default: cutTimes of frozen-v1.json). For tests, as `RunConfigOptions` has it. */
+  cutTimes?: Record<string, number>;
 }
 
 function configPath(arg: string): string {
@@ -78,13 +82,28 @@ export function harnessCommand(argv: string[], env: CommandEnv = {}): string[] {
   const hasGrid = Object.values(cfg.params).some((p) => Object.values(p).includes("grid"));
   const extraFiles: Record<string, FileEntry> = {};
   let variants: Record<string, Variant[]> | undefined;
+  const cutTimes = env.cutTimes !== undefined ? { cutTimes: env.cutTimes } : {};
   if (hasGrid) {
-    const tuned = tuneConfig(cfg, { dataDir });
+    const tuned = tuneConfig(cfg, { dataDir, ...cutTimes });
     extraFiles["tuning.csv"] = writeTuning(outDir, tuned.rows);
     variants = tuned.variants;
     lines.push(`tuning: ${tuned.rows.length} grid points, ${tuned.rows.filter((r) => r.chosen).length} chosen`);
   }
-  const result = runConfig(cfg, { dataDir, ...(variants ? { variants } : {}) });
+  const result = runConfig(cfg, { dataDir, ...cutTimes, ...(variants ? { variants } : {}) });
+  // compare.csv and density.csv (design "Statistics", "Density"), and the verdict lines. They are written before the manifest.
+  let verdicts: { lines: string[]; gateFailed: boolean } = { lines: [], gateFailed: false };
+  if (cfg.compare !== undefined) {
+    const stats = statOpts();
+    const rows = compareRows(result, cfg, stats);
+    extraFiles["compare.csv"] = writeCompareRows(outDir, rows);
+    if (cfg.density === true) {
+      extraFiles["density.csv"] = writeDensity(
+        outDir,
+        result.datasets.flatMap((d) => densityRows(d, (cfg.compare as { ref: string }).ref, stats)),
+      );
+    }
+    verdicts = verdictLines(rows, cfg);
+  }
   const manifest = writeResults(result, {
     runId,
     outDir,
@@ -97,9 +116,13 @@ export function harnessCommand(argv: string[], env: CommandEnv = {}): string[] {
     const all = d.leftOut.find((r) => r.bucket === "all");
     lines.push(`${d.dataset}  T ${d.T}  ${d.split}  users ${all?.nTestUsers ?? 0}  left out ${all?.nLeftOut ?? 0}  per_user rows ${d.perUser.length}`);
   }
+  lines.push(...verdicts.lines);
   lines.push(`results: ${outDir}`);
   if (manifest.external) lines.push(`not committed (over the limit): ${manifest.external.join(", ")} in ${externalDir}`);
   lines.push(`manifest sha256 ${sha256Hex(readFileSync(join(outDir, "manifest.json")))}`);
+  // A failed H0 gate stops the task (super-plan section 1). Every file and the manifest are written first, for the bug hunt, and
+  // the error stops a script from going on by mistake.
+  if (verdicts.gateFailed) throw new Error(["H0 gate failed: the files are written, and no other test result may be used. Look for a bug or a leak.", ...lines].join("\n"));
   return lines;
 }
 

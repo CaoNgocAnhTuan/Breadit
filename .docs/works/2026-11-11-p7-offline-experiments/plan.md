@@ -74,8 +74,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
 
 #### Step 4: `compare.csv`, `density.csv` and the verdicts (effort M)
 
-- [ ] Tests first: **TC6** (`compare.test.ts`, new) and **TC7** (`commands.test.ts`).
-- [ ] `eval/src/harness/compare.ts` (design: Approach, "Statistics" and "Density"). It reuses `compareRow`, `applyHolm`, `pairedBootstrap`, `h1Verdict`, `h0Gate` and `writeCompare` from `stats.ts`, `ndcgAt` and `groupsOf` from `metrics.ts`, `bucketOf` from `checks/buckets.ts`, and `statOpts()`.
+- [x] Tests first: **TC6** (`compare.test.ts`, new) and **TC7** (`commands.test.ts`).
+- [x] `eval/src/harness/compare.ts` (design: Approach, "Statistics" and "Density"). It reuses `compareRow`, `applyHolm`, `pairedBootstrap`, `h1Verdict`, `h0Gate` and `writeCompare` from `stats.ts`, `ndcgAt` and `groupsOf` from `metrics.ts`, `bucketOf` from `checks/buckets.ts`, and `statOpts()`.
   - `compareRows(result, cfg, o)`. Per dataset, the user's NDCG@K per method comes from the `perUser` ranks.
     - `families`: F1 (15 rows) and F2 (84 rows) exactly as the design lists them. A family row with n = 0 stops the run and names the row (F6).
     - `none`: every method except `ref`, each K and each group; a row with n = 0 has empty numbers.
@@ -83,8 +83,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-11-p7-offline-exp
   - `densityRows(run, ref, o)`: H − ref on NDCG@10. The bins come from `bucketOf(nFollowees)`, in the order of the history buckets. A bin with no user gets n = 0 and empty numbers.
   - `writeDensity(dir, rows)`: the columns of blueprint §2.7, 6 decimals, rows sorted by dataset, then bin order.
   - `verdictLines(rows, cfg)`: in `families` mode, one `H1 <dataset>: pass|fail` line per dataset with `p_holm` and `ci_low`; with `h0Gate`, the `H0 gate: pass|fail` line with `ci_low`; and `gateFailed`.
-- [ ] `commands.ts`: after `runConfig`, when `compare` is set, write `compare.csv` (and `density.csv` when `density` is set) and pass them to `writeResults` through `extraFiles`. Print the verdict lines. If `gateFailed`, throw `H0 gate failed …` after every file and the manifest are written. `CommandEnv` gets an optional `cutTimes` for tests, as `RunConfigOptions` already has.
-- [ ] Commit: `feat: eval compare.csv, density.csv and the H1 and H0 verdicts`
+- [x] `commands.ts`: after `runConfig`, when `compare` is set, write `compare.csv` (and `density.csv` when `density` is set) and pass them to `writeResults` through `extraFiles`. Print the verdict lines. If `gateFailed`, throw `H0 gate failed …` after every file and the manifest are written. `CommandEnv` gets an optional `cutTimes` for tests, as `RunConfigOptions` already has.
+- [x] Commit: `feat: eval compare.csv, density.csv and the H1 and H0 verdicts`
 
 #### Step 5: The `freeze` command (effort M)
 
