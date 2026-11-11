@@ -254,21 +254,41 @@ test("verdictLines: an H1 line for each dataset by h1Verdict, the H0 gate line b
   assert.deepEqual(verdictLines(rows, { ...cfg, compare: { mode: "none", ref: "BL2" } }), { lines: [], gateFailed: false });
 });
 
-test("verdictLines: the H0 gate passes when H is not above BL2 and fails when its interval lies above 0", () => {
-  const methods = ["BL2", "H"];
+test("verdictLines: the H0 gate is on the H-follow row: it passes when H-follow is not above BL2 and fails when its interval lies above 0", () => {
+  const methods = ["BL2", "H-follow"];
   const cfg: RunConfig = { ...noneCfg(["syn-W0-M"], methods), h0Gate: true };
-  // H equals BL2 everywhere: the interval is [0, 0], the gate passes
+  // H-follow equals BL2 everywhere: the interval is [0, 0], the gate passes
   const same = compareRows({ datasets: [fake("syn-W0-M", FIVE, methods, () => 3)], inputs: {} }, cfg, OPTS);
   const pass = verdictLines(same, cfg);
-  const g1 = h0Gate(same);
+  const g1 = h0Gate(same, "H-follow");
   assert.equal(g1.pass, true);
   assert.deepEqual(pass, { lines: [`H0 gate: pass  ci_low ${f6(g1.row.ciLow)}`], gateFailed: false });
-  // H is first for every user and BL2 is far down: the interval lies above 0, the gate fails
-  const better = compareRows({ datasets: [fake("syn-W0-M", FIVE, methods, (m) => (m === "H" ? 1 : 9))], inputs: {} }, cfg, OPTS);
-  const g2 = h0Gate(better);
+  // H-follow is first for every user and BL2 is far down: the interval lies above 0, the gate fails
+  const better = compareRows({ datasets: [fake("syn-W0-M", FIVE, methods, (m) => (m === "H-follow" ? 1 : 9))], inputs: {} }, cfg, OPTS);
+  const g2 = h0Gate(better, "H-follow");
   assert.equal(g2.pass, false);
   assert.deepEqual(verdictLines(better, cfg), { lines: [`H0 gate: fail  ci_low ${f6(g2.row.ciLow)}`], gateFailed: true });
   // no user at all for the gate row: an error, not a silent fail
   const none = compareRows({ datasets: [fake("syn-W0-M", {}, methods, () => 3)], inputs: {} }, cfg, OPTS);
   assert.throws(() => verdictLines(none, cfg), /gate/);
+});
+
+test("verdictLines: with BL2, H and H-follow the gate reads H-follow, whatever H does; an H row alone gives no gate line", () => {
+  const three = ["BL2", "H", "H-follow"];
+  const cfg: RunConfig = { ...noneCfg(["syn-W0-M"], three), params: { H: { alpha: 1, beta: 1, m: 5 }, "H-follow": { alpha: 1, m: 5 } }, h0Gate: true };
+  // H is far above BL2 (the topic signal), H-follow equals BL2: the gate passes
+  const topic = compareRows({ datasets: [fake("syn-W0-M", FIVE, three, (m) => (m === "H" ? 1 : 4))], inputs: {} }, cfg, OPTS);
+  assert.equal(h0Gate(topic).pass, false, "the H row alone would fail");
+  const v = verdictLines(topic, cfg);
+  assert.equal(v.gateFailed, false);
+  assert.equal(v.lines.length, 1);
+  const gf = h0Gate(topic, "H-follow");
+  assert.deepEqual(v.lines, [`H0 gate: pass  ci_low ${f6(gf.row.ciLow)}`]);
+  assert.equal(gf.row.method, "H-follow");
+  // H-follow above BL2 and H at BL2: the gate fails
+  const reverse = compareRows({ datasets: [fake("syn-W0-M", FIVE, three, (m) => (m === "H-follow" ? 1 : 9))], inputs: {} }, cfg, OPTS);
+  assert.equal(verdictLines(reverse, cfg).gateFailed, true);
+  // rows of H only: there is no H-follow row, so no gate line (an error, not a line made from the H row)
+  const hOnly = compareRows({ datasets: [fake("syn-W0-M", FIVE, ["BL2", "H"], () => 3)], inputs: {} }, { ...cfg, methods: ["BL2", "H"] }, OPTS);
+  assert.throws(() => verdictLines(hOnly, cfg), /H-follow/);
 });

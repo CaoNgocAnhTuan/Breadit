@@ -188,10 +188,13 @@ export function writeDensity(dir: string, rows: readonly DensityRow[]): FileEntr
   );
 }
 
+/** The method of the H0 gate (amendment 1). H-follow has no community term, and in W0 that term of H carries a topic signal. */
+export const H0_GATE_METHOD = "H-follow";
+
 /**
  * The lines the harness prints after a run with a verdict. In mode `families`: one `H1 <dataset>: pass|fail` line per dataset
- * (blueprint 3.4, `h1Verdict`). With `h0Gate`: the `H0 gate: pass|fail` line (blueprint 3.5, `h0Gate`). `gateFailed` is true when
- * the gate fails.
+ * (blueprint 3.4, `h1Verdict`). With `h0Gate`: the `H0 gate: pass|fail` line (blueprint 3.5, `h0Gate` on the H-follow row). `gateFailed` is
+ * true when the gate fails.
  */
 export function verdictLines(rows: readonly CompareRow[], cfg: RunConfig): { lines: string[]; gateFailed: boolean } {
   const lines: string[] = [];
@@ -203,8 +206,8 @@ export function verdictLines(rows: readonly CompareRow[], cfg: RunConfig): { lin
   }
   let gateFailed = false;
   if (cfg.h0Gate === true) {
-    const g = h0Gate(rows);
-    if (g.row.n === 0) throw new Error("the H0 gate row (syn-W0-M, H - BL2, K 10, all) has no user, so the gate cannot be checked");
+    const g = h0Gate(rows, H0_GATE_METHOD);
+    if (g.row.n === 0) throw new Error(`the H0 gate row (syn-W0-M, ${H0_GATE_METHOD} - BL2, K 10, all) has no user, so the gate cannot be checked`);
     lines.push(`H0 gate: ${g.pass ? "pass" : "fail"}  ci_low ${f6(g.row.ciLow)}`);
     gateFailed = !g.pass;
   }

@@ -234,9 +234,12 @@ export function h1Verdict(rows: readonly CompareRow[]): { pass: boolean; row: Co
   return { pass: row.pHolm < statOpts().holmLevel && row.ciLow > 0, row };
 }
 
-/** H0 gate (blueprint section 3.5): on syn-W0-M the interval of H - BL2 (NDCG@10, all users) must not lie above 0. */
-export function h0Gate(rows: readonly CompareRow[]): { pass: boolean; row: CompareRow } {
-  const row = findOne(rows, "the H0 gate (syn-W0-M, H - BL2, K 10, all)", (r) => r.dataset === "syn-W0-M" && r.method === "H" && r.ref === "BL2" && r.k === 10 && r.bucket === "all");
+/**
+ * H0 gate (blueprint section 3.5): on syn-W0-M the interval of `method` - BL2 (NDCG@10, all users) must not lie above 0.
+ * `method` is "H" by default. P7 gates on "H-follow" (amendment 1: the community term of H carries the topic signal in W0).
+ */
+export function h0Gate(rows: readonly CompareRow[], method = "H"): { pass: boolean; row: CompareRow } {
+  const row = findOne(rows, `the H0 gate (syn-W0-M, ${method} - BL2, K 10, all)`, (r) => r.dataset === "syn-W0-M" && r.method === method && r.ref === "BL2" && r.k === 10 && r.bucket === "all");
   return { pass: row.ciLow <= 0, row };
 }
 

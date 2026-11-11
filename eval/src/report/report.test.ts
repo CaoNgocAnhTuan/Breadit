@@ -8,6 +8,7 @@ import { buildTables, cellText, toLatex, toMarkdown } from "./tables.ts";
 import type { Table } from "./tables.ts";
 import { readRun } from "./read.ts";
 import { parseCsv } from "./read.ts";
+import { roundDecimal } from "./round.ts";
 import { sha256Hex } from "../canonical/csv.ts";
 import { tempDir } from "../checks/fixture.ts";
 
@@ -83,7 +84,7 @@ test("an input file that differs from its run manifest stops the report, and so 
   }
   const dir = tempDir();
   writeResultsFixture(dir);
-  editResultsFile(dir, "p7-h0", "compare.csv", (t) => t.replace(/^(syn-W0-M,none,H,BL2,10,all,\d+,)[^,]+/m, "$10.123456"), true);
+  editResultsFile(dir, "p7-h0", "compare.csv", (t) => t.replace(/^(syn-W0-M,none,H-follow,BL2,10,all,\d+,)[^,]+/m, "$10.123456"), true);
   report(dir, tempDir()); // a rewritten run with its manifest fixed is read as it is
   const noRun = tempDir();
   writeResultsFixture(noRun);
@@ -172,6 +173,35 @@ test("each table has the same rounded numbers in its .tex and in results.md, and
   assert.equal(e2[7], macros.get("eTwoWTwoMNdcgTenZeroFourCiHigh"));
   assert.equal(e2[8], macros.get("eTwoWTwoMNdcgTenZeroFourPHolm"));
   assert.equal(e2[2], macros.get("eTwoWTwoMNdcgTenZeroFourN"));
+});
+
+test("table e5: the H0 gate row has the numbers of the H-follow row of p7-h0 (as the macros), and the H row of p7-h0 is shown as the topic signal", () => {
+  const dir = tempDir();
+  writeResultsFixture(dir);
+  const out = tempDir();
+  report(dir, out);
+  const md = readFileSync(join(out, "results.md"), "utf8");
+  const section = md.split("\n## ").slice(1).find((s) => s.startsWith("e5: ")) as string;
+  const rows = mdCells(section);
+  const compare = readRun(dir, "p7-h0").files.get("compare.csv")!.rows;
+  const cells = (method: string): string[] => {
+    const r = compare.find((x) => x.dataset === "syn-W0-M" && x.method === method && x.ref === "BL2" && x.k === "10" && x.bucket === "all")!;
+    return [roundDecimal(r.mean_diff as string, 3), roundDecimal(r.ci_low as string, 3), roundDecimal(r.ci_high as string, 3)];
+  };
+  const gate = rows.filter((r) => /^H0 gate/.test(r[0] as string));
+  assert.equal(gate.length, 1);
+  assert.match(gate[0]?.[0] as string, /H-follow/);
+  assert.deepEqual((gate[0] as string[]).slice(3, 6), cells("H-follow"));
+  const macros = new Map(parseCsv(readFileSync(join(out, "macros.csv"), "utf8"), "m").rows.map((r) => [r.name as string, r.value as string]));
+  assert.deepEqual((gate[0] as string[]).slice(3, 6), [macros.get("hZeroWZeroNdcgHFollowTenAllGain"), macros.get("hZeroWZeroNdcgHFollowTenAllCiLow"), macros.get("hZeroWZeroNdcgHFollowTenAllCiHigh")]);
+  const topic = rows.filter((r) => /topic signal/.test(r[0] as string));
+  assert.equal(topic.length, 1);
+  assert.match(topic[0]?.[0] as string, /^H on /);
+  assert.deepEqual((topic[0] as string[]).slice(3, 6), cells("H"));
+  // the two rows differ in the fixture, so a table that read the wrong row would fail the two checks above
+  assert.notDeepEqual(cells("H"), cells("H-follow"));
+  // and the table has the five own-tuned worlds, the gate, the topic signal and the shuffle row
+  assert.equal(rows.length, 5 + 1 + 1 + 1);
 });
 
 test("toLatex and toMarkdown round with the same rule, escape LaTeX marks, and put a minus sign and < in math mode", () => {

@@ -184,11 +184,13 @@ test("every number of a config equals a chosen row; m is frozen except in the sw
   const cfgDir = tempDir();
   freeze(dir, cfgDir);
   const cfg = (id: string): RunConfig => readConfig(cfgDir, id) as unknown as RunConfig;
-  // p7-h0: syn-W0-M, H with the values chosen on syn-W2M-M, compare none, the gate
+  // p7-h0 (amendment 1): syn-W0-M, BL2, H and H-follow, with the values chosen for H on syn-W2M-M, compare none, the gate (on H-follow)
   const h0 = cfg("p7-h0");
   assert.deepEqual(h0.datasets, ["syn-W0-M"]);
-  assert.deepEqual(h0.methods, ["BL2", "H"]);
-  assert.deepEqual(h0.params, { H: { ...chosenNumbers("syn-W2M-M", "H"), m: "frozen" } });
+  assert.deepEqual(h0.methods, ["BL2", "H", "H-follow"]);
+  const hw2m = chosenNumbers("syn-W2M-M", "H");
+  assert.deepEqual(h0.params, { H: { ...hw2m, m: "frozen" }, "H-follow": { alpha: hw2m.alpha, m: "frozen" } });
+  assert.ok(!("datasetParams" in h0));
   assert.deepEqual(h0.compare, { mode: "none", ref: "BL2" });
   assert.equal(h0.h0Gate, true);
   assert.equal(h0.pool, "normal");

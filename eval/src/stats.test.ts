@@ -188,6 +188,31 @@ test("h0Gate passes when the CI does not lie above 0", () => {
   assert.throws(() => h0Gate([row({})]), /no row/);
 });
 
+// Amendment 1: the gate method is a parameter. No argument reads the H row, as before; "H-follow" reads the H-follow row.
+test("h0Gate reads the H row with no method, and the row of the method it is given", () => {
+  const w0 = (over: Partial<CompareRow>): CompareRow =>
+    row({ dataset: "syn-W0-M", family: "none", bucket: "all", pRaw: null, pHolm: null, ...over });
+  const h = w0({ method: "H", ciLow: 0.02, ciHigh: 0.05 }); // H is above 0: it would fail
+  const hf = w0({ method: "H-follow", ciLow: -0.01, ciHigh: 0.01 }); // H-follow is not: it passes
+  assert.equal(h0Gate([h, hf]).pass, false);
+  assert.equal(h0Gate([h, hf]).row, h);
+  assert.equal(h0Gate([h, hf], "H").row, h);
+  assert.equal(h0Gate([h, hf], "H-follow").pass, true);
+  assert.equal(h0Gate([h, hf], "H-follow").row, hf);
+  assert.equal(h0Gate([hf, h], "H-follow").row, hf);
+  // the other way round
+  const hf2 = w0({ method: "H-follow", ciLow: 0.002, ciHigh: 0.02 });
+  assert.equal(h0Gate([w0({ method: "H", ciLow: -0.01, ciHigh: 0.01 }), hf2], "H-follow").pass, false);
+  // a row of another method is not read, and a missing row names the method
+  assert.throws(() => h0Gate([h], "H-follow"), /H-follow/);
+  assert.throws(() => h0Gate([hf]), /no row/);
+  // other columns of the row still count: dataset, ref, K and group
+  assert.throws(() => h0Gate([w0({ method: "H-follow", dataset: "syn-W1-M" })], "H-follow"), /no row/);
+  assert.throws(() => h0Gate([w0({ method: "H-follow", k: 5 })], "H-follow"), /no row/);
+  assert.throws(() => h0Gate([w0({ method: "H-follow", bucket: "0-4" })], "H-follow"), /no row/);
+  assert.throws(() => h0Gate([w0({ method: "H-follow", ref: "BL1" })], "H-follow"), /no row/);
+});
+
 test("pairedDifferences subtracts in user_id order and rejects different user sets", () => {
   const a = new Map([[3, 0.5], [1, 1], [2, 0.25]]);
   const b = new Map([[2, 0.25], [3, 0.125], [1, 0.5]]);

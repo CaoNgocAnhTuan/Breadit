@@ -36,7 +36,7 @@ interface FixtureRun {
 export const FIXTURE_RUNS: readonly FixtureRun[] = [
   { id: "p7-tune-main", split: "validation", datasets: MAIN, methods: NINE, tuning: ["BL2t", "BL4", "BL5", "BL6", "H"] },
   { id: "p7-tune-worlds", split: "validation", datasets: ["syn-W0-M", "syn-W1-M", "syn-W2L-M", "syn-W2H-M"], methods: ["BL2", "H"], tuning: ["H"] },
-  { id: "p7-h0", split: "test", datasets: ["syn-W0-M"], methods: ["BL2", "H"], compare: "none" },
+  { id: "p7-h0", split: "test", datasets: ["syn-W0-M"], methods: ["BL2", "H", "H-follow"], compare: "none" },
   { id: "p7-main", split: "test", datasets: MAIN, methods: NINE, compare: "families", density: true },
   { id: "p7-e5-worlds", split: "test", datasets: ["syn-W0-M", "syn-W1-M", "syn-W2L-M", "syn-W2M-M", "syn-W2H-M"], methods: SWEEP_METHODS, compare: "none", density: true },
   { id: "p7-e4-terms", split: "test", datasets: MAIN, methods: TERMS, compare: "none" },

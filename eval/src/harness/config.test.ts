@@ -163,17 +163,25 @@ test("compare: mode and ref are checked, and families needs the nine methods on 
   assert.throws(() => validateConfig(base({ ...nineMethods(), compare: { mode: "families", ref: "BL0" } })), /BL2/);
 });
 
-test("density needs compare and H, h0Gate needs compare none with ref BL2, H and syn-W0-M", () => {
+test("density needs compare and H, h0Gate needs compare none with ref BL2, H-follow and syn-W0-M", () => {
   validateConfig(base({ compare: { mode: "none", ref: "BL2" }, density: true }));
   assert.throws(() => validateConfig(base({ density: true })), /compare/);
   assert.throws(() => validateConfig(base({ methods: ["BL2", "BL4"], params: { BL4: { divisor: 1 } }, compare: { mode: "none", ref: "BL2" }, density: true })), /H/);
-  const gate = { datasets: ["syn-W0-M"], methods: ["BL2", "H"], params: { H: { alpha: 1, beta: 1, m: "frozen" as const } } };
+  // amendment 1: the gate is on H-follow
+  const gate = { datasets: ["syn-W0-M"], methods: ["BL2", "H-follow"], params: { "H-follow": { alpha: 1, m: "frozen" as const } } };
   validateConfig(base({ ...gate, compare: { mode: "none", ref: "BL2" }, h0Gate: true }));
   validateConfig(base({ ...gate, compare: { mode: "none", ref: "BL2" }, h0Gate: false }));
+  // H may be in the run too (p7-h0 has BL2, H and H-follow)
+  validateConfig(base({ ...gate, methods: ["BL2", "H", "H-follow"], params: { H: { alpha: 1, beta: 1, m: "frozen" }, "H-follow": { alpha: 1, m: "frozen" } }, compare: { mode: "none", ref: "BL2" }, h0Gate: true }));
   assert.throws(() => validateConfig(base({ ...gate, h0Gate: true })), /compare/);
-  assert.throws(() => validateConfig(base({ ...gate, compare: { mode: "none", ref: "H" }, h0Gate: true })), /BL2/);
+  assert.throws(() => validateConfig(base({ ...gate, compare: { mode: "none", ref: "H-follow" }, h0Gate: true })), /BL2/);
   assert.throws(() => validateConfig(base({ ...gate, datasets: ["syn-W1-M"], compare: { mode: "none", ref: "BL2" }, h0Gate: true })), /syn-W0-M/);
-  assert.throws(() => validateConfig(base({ ...gate, methods: ["BL2"], params: {}, compare: { mode: "none", ref: "BL2" }, h0Gate: true })), /H/);
+  assert.throws(() => validateConfig(base({ ...gate, methods: ["BL2"], params: {}, compare: { mode: "none", ref: "BL2" }, h0Gate: true })), /H-follow/);
+  // H alone is not enough any more
+  assert.throws(
+    () => validateConfig(base({ ...gate, methods: ["BL2", "H"], params: { H: { alpha: 1, beta: 1, m: "frozen" } }, compare: { mode: "none", ref: "BL2" }, h0Gate: true })),
+    /H-follow/,
+  );
   assert.throws(() => validateConfig(base({ ...nineMethods(), datasets: ["syn-W0-M"], h0Gate: true })), /syn-W0-M|none/);
 });
 

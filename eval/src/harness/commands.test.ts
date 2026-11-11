@@ -175,12 +175,13 @@ function gateWorld(): { dataDir: string; cutTimes: Record<string, number> } {
   return { dataDir, cutTimes: { "syn-W0-M": computeCutTime(positiveEvents(ds)) } };
 }
 
-function gateConfig(alpha: number, over: Partial<RunConfig> = {}): RunConfig {
+/** The gate is on H-follow (amendment 1). `alphaFollow` is the alpha of H-follow, `alphaH` the alpha of H (no community in this world). */
+function gateConfig(alphaFollow: number, over: Partial<RunConfig> = {}, alphaH = alphaFollow): RunConfig {
   return {
     datasets: ["syn-W0-M"],
     split: "validation",
-    methods: ["BL2", "H"],
-    params: { H: { alpha, beta: 1, m: "frozen" } },
+    methods: ["BL2", "H", "H-follow"],
+    params: { H: { alpha: alphaH, beta: 1, m: "frozen" }, "H-follow": { alpha: alphaFollow, m: "frozen" } },
     pool: "normal",
     mode: "fast",
     compare: { mode: "none", ref: "BL2" },
@@ -207,11 +208,11 @@ test("harness with compare, density and h0Gate writes compare.csv and density.cs
   for (const f of ["compare.csv", "density.csv"]) {
     assert.equal(manifest.files[f]?.sha256, sha256Hex(readFileSync(join(a, f), "utf8")), f);
   }
-  // 1 method (H) x 3 K x 6 groups, family none, no p-value; density: 4 bins, n sums to the kept users
+  // 2 methods (H and H-follow) x 3 K x 6 groups, family none, no p-value; density: 4 bins, n sums to the kept users
   const compare = readFileSync(join(a, "compare.csv"), "utf8").trimEnd().split("\n");
-  assert.equal(compare.length, 1 + 18);
-  assert.equal(manifest.files["compare.csv"]?.rows, 18);
-  for (const l of compare.slice(1)) assert.match(l, /^syn-W0-M,none,H,BL2,\d+,[^,]+,\d+,[^,]*,[^,]*,[^,]*,,$/);
+  assert.equal(compare.length, 1 + 36);
+  assert.equal(manifest.files["compare.csv"]?.rows, 36);
+  for (const l of compare.slice(1)) assert.match(l, /^syn-W0-M,none,H(-follow)?,BL2,\d+,[^,]+,\d+,[^,]*,[^,]*,[^,]*,,$/);
   const density = readFileSync(join(a, "density.csv"), "utf8").trimEnd().split("\n");
   assert.equal(density[0], "dataset,density_bin,method,ref,n,mean_diff,ci_low,ci_high");
   assert.deepEqual(density.slice(1).map((l) => l.split(",").slice(0, 2).join(",")), ["syn-W0-M,0", "syn-W0-M,1-4", "syn-W0-M,5-19", "syn-W0-M,20+"]);
@@ -228,11 +229,26 @@ test("when the H0 gate fails the command throws, after compare.csv, density.csv 
   assert.deepEqual(readdirSync(out).sort((x, y) => (x < y ? -1 : 1)), ["compare.csv", "coverage.csv", "density.csv", "leftout.csv", "manifest.json", "per_user.csv", "summary.csv"]);
   const manifest = JSON.parse(readFileSync(join(out, "manifest.json"), "utf8")) as { files: Record<string, { sha256: string }> };
   for (const f of ["compare.csv", "density.csv", "summary.csv"]) assert.equal(manifest.files[f]?.sha256, sha256Hex(readFileSync(join(out, f), "utf8")), f);
-  // the gate row of compare.csv: H - BL2, K 10, all, with the interval above 0
-  const gate = readFileSync(join(out, "compare.csv"), "utf8").split("\n").find((l) => l.startsWith("syn-W0-M,none,H,BL2,10,all,")) as string;
+  // the gate row of compare.csv: H-follow - BL2, K 10, all, with the interval above 0
+  const gate = readFileSync(join(out, "compare.csv"), "utf8").split("\n").find((l) => l.startsWith("syn-W0-M,none,H-follow,BL2,10,all,")) as string;
   const cells = gate.split(",");
   assert.equal(cells[6], "15");
   assert.ok(Number(cells[8]) > 0, gate);
+});
+
+test("the gate reads the H-follow row: H far above BL2 does not fail it, and H-follow far above BL2 does", () => {
+  const world = gateWorld();
+  // H has a large alpha (a topic signal) and H-follow has none: the gate passes, and the H row of compare.csv lies above 0
+  const out = tempDir();
+  const lines = harnessCommand([writeConfig(tempDir(), gateConfig(0, {}, 1000), "topic.json"), "--out", out], world);
+  assert.ok(lines.some((l) => /^H0 gate: pass {2}ci_low 0\.000000$/.test(l)), lines.join("\n"));
+  const rows = readFileSync(join(out, "compare.csv"), "utf8").split("\n");
+  const h = (rows.find((l) => l.startsWith("syn-W0-M,none,H,BL2,10,all,")) as string).split(",");
+  const hf = (rows.find((l) => l.startsWith("syn-W0-M,none,H-follow,BL2,10,all,")) as string).split(",");
+  assert.ok(Number(h[8]) > 0, "H is above BL2 in this world");
+  assert.equal(Number(hf[8]), 0);
+  // the other way round: H-follow has the large alpha, H has none: the gate fails
+  assert.throws(() => harnessCommand([writeConfig(tempDir(), gateConfig(1000, {}, 0), "follow.json"), "--out", tempDir()], world), /H0 gate failed/);
 });
 
 test("a config with compare but no density writes no density.csv, and compare needs no gate", () => {

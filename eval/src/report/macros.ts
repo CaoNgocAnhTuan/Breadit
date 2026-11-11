@@ -130,8 +130,8 @@ function build(): MacroSpec[] {
     for (const column of ["mean_diff", "ci_low", "ci_high", "p_holm", "n"]) out.push(cmp("eTwo", "p7-main", d, "F1", "H", "0-4", column));
     for (const g of ["0", "1-4"]) out.push(cmp("eTwo", "p7-main", d, "F1", "H", g, "mean_diff"));
   }
-  // H0 gate: K 10, all users: gain and interval.
-  for (const column of ["mean_diff", "ci_low", "ci_high"]) out.push(cmp("hZero", "p7-h0", "syn-W0-M", "none", "H", "all", column));
+  // H0 gate (amendment 1: on H-follow): K 10, all users: gain and interval.
+  for (const column of ["mean_diff", "ci_low", "ci_high"]) out.push(cmp("hZero", "p7-h0", "syn-W0-M", "none", "H-follow", "all", column, `Ndcg${word(METHOD_WORD, "H-follow", "method")}`));
   // E1: NDCG@10 and Coverage@10 of H and BL2.
   for (const d of MAIN_DATASETS) {
     for (const m of ["H", "BL2"]) out.push(sum("eOne", "p7-main", d, m));

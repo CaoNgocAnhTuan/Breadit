@@ -70,8 +70,15 @@ test("buildMacros: each value is its cell after roundDecimal / formatP (counts p
   assert.equal(pick("eTwoDiggNdcgTenZeroFourGain").rowKey, "digg2009|F1|H|BL2|10|0-4");
   assert.equal(pick("eTwoDiggNdcgTenZeroFourGain").column, "mean_diff");
   assert.equal(pick("eTwoWTwoMNdcgTenZeroFourN").column, "n");
-  assert.equal(pick("hZeroWZeroNdcgTenAllGain").file, "p7-h0/compare.csv");
-  assert.equal(pick("hZeroWZeroNdcgTenAllGain").rowKey, "syn-W0-M|none|H|BL2|10|all");
+  // amendment 1: the H0 macros read the H-follow row of p7-h0, not the H row
+  assert.equal(pick("hZeroWZeroNdcgHFollowTenAllGain").file, "p7-h0/compare.csv");
+  assert.equal(pick("hZeroWZeroNdcgHFollowTenAllGain").rowKey, "syn-W0-M|none|H-follow|BL2|10|all");
+  assert.equal(pick("hZeroWZeroNdcgHFollowTenAllCiLow").column, "ci_low");
+  assert.equal(pick("hZeroWZeroNdcgHFollowTenAllCiHigh").column, "ci_high");
+  assert.ok(!byName.has("hZeroWZeroNdcgTenAllGain"), "no H0 macro on the H row");
+  const h0 = macros.filter((m) => m.file === "p7-h0/compare.csv");
+  assert.equal(h0.length, 3);
+  for (const m of h0) assert.ok(m.rowKey.startsWith("syn-W0-M|none|H-follow|BL2|"), m.name);
   assert.equal(pick("eOneDiggNdcgHTenAllValue").file, "p7-main/summary.csv");
   assert.equal(pick("eOneDiggNdcgHTenAllValue").rowKey, "digg2009|test|H|10|all");
   assert.equal(pick("eOneWTwoMCovBLTwoTenAllValue").file, "p7-main/coverage.csv");

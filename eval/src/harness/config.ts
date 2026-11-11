@@ -188,7 +188,7 @@ function validateP7Keys(c: RunConfig): void {
   if (c.h0Gate === true) {
     if (c.compare === undefined || c.compare.mode !== "none") throw new Error('"h0Gate" needs "compare" with mode "none"');
     if (c.compare.ref !== "BL2") throw new Error(`"h0Gate" needs compare.ref "BL2", got ${c.compare.ref}`);
-    if (!c.methods.includes("H")) throw new Error('"h0Gate" needs H in "methods"');
+    if (!c.methods.includes("H-follow")) throw new Error('"h0Gate" needs H-follow in "methods": the H0 gate is on the H-follow row (amendment 1)');
     if (!c.datasets.includes("syn-W0-M")) throw new Error('"h0Gate" needs the dataset "syn-W0-M"');
   }
 }

@@ -58,7 +58,8 @@ const TERMS = ["BL2", "H", "H-follow", "H-comm", "H-noauthor", "H-noengager"];
 
 /** The ten test configs, in run order (design, "The runs"). */
 export const TEST_RUNS: readonly TestRun[] = [
-  { runId: "p7-h0", forWhat: "H0 gate", datasets: ["syn-W0-M"], methods: ["BL2", "H"], from: MAIN, compare: NONE_BL2, h0Gate: true },
+  // Amendment 1: the gate is on H-follow (alpha chosen for H on syn-W2M-M). H runs too, with the same values: it is the topic signal, with no family.
+  { runId: "p7-h0", forWhat: "H0 gate", datasets: ["syn-W0-M"], methods: ["BL2", "H", "H-follow"], from: MAIN, compare: NONE_BL2, h0Gate: true },
   { runId: "p7-main", forWhat: "E1, E2, E3 (Digg)", datasets: [MAIN, DIGG], methods: NINE, from: "own", compare: { mode: "families", ref: "BL2" }, density: true },
   {
     runId: "p7-e5-worlds",

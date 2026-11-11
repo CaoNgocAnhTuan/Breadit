@@ -226,14 +226,16 @@ function e4Table(runs: RunFilesMap): Table {
 
 function e5Table(runs: RunFilesMap): Table {
   const rows: Cell[][] = [];
-  const add = (label: string, run: string, dataset: string): void => {
-    const r = pick(rowsOf(runs, run, "compare.csv"), { dataset, method: "H", ref: "BL2", k: "10", bucket: "all" }, `${run}/compare.csv`);
+  const add = (label: string, run: string, dataset: string, method = "H"): void => {
+    const r = pick(rowsOf(runs, run, "compare.csv"), { dataset, method, ref: "BL2", k: "10", bucket: "all" }, `${run}/compare.csv`);
     rows.push([text(label), text(dataset), int(cellOf(r, "n", "compare")), dec(cellOf(r, "mean_diff", "compare")), dec(cellOf(r, "ci_low", "compare")), dec(cellOf(r, "ci_high", "compare"))]);
   };
   for (const dataset of ["syn-W0-M", "syn-W1-M", "syn-W2L-M", "syn-W2M-M", "syn-W2H-M"]) add("own tuning", "p7-e5-worlds", dataset);
-  add("H0 gate (values of syn-W2M-M)", "p7-h0", "syn-W0-M");
+  // Amendment 1: the H0 gate is the H-follow row. H with the same values shows the topic signal of the community term.
+  add("H0 gate: H-follow (alpha of syn-W2M-M)", "p7-h0", "syn-W0-M", "H-follow");
+  add("H on W0, values of syn-W2M-M (topic signal)", "p7-h0", "syn-W0-M", "H");
   add("timestamps shuffled", "p7-e5-shuffle", "syn-W2M-M-shuffled");
-  return { id: "e5", caption: "Gain of H over BL2 in each world, NDCG@10 (K = 10, all users, no p-value)", columns: ["Run", "Dataset", "Users", "Gain", "CI low", "CI high"], rows };
+  return { id: "e5", caption: "Gain over BL2 in each world, NDCG@10 (K = 10, all users, no p-value). The H0 gate is the H-follow row", columns: ["Run", "Dataset", "Users", "Gain", "CI low", "CI high"], rows };
 }
 
 function e6Table(runs: RunFilesMap): Table {
