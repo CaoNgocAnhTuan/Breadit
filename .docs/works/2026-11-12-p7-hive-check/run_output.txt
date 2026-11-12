@@ -1,0 +1,18 @@
+p7-hive-check run log
+
+2026-11-12  Step 3, Q0a in the BigQuery console (sandbox project of the author, no billing)
+  SELECT table_id, row_count, size_bytes FROM `steemit-307308.hive_zurich.__TABLES__` ORDER BY table_id;
+  -> Access Denied: Table steemit-307308:hive_zurich.__TABLES__: User does not have permission to query table
+     steemit-307308:hive_zurich.__TABLES__, or perhaps it does not exist.  Project: steemit-307308  bigquery.tables.getData
+  Dry-run bytes: not shown (the query failed on permission).
+
+2026-11-12  Star project steemit-307308 in the console
+  -> Error starring resource
+
+2026-11-12  Data check
+  SELECT timestamp FROM `steemit-307308.hive_zurich.block_data_48000001_50000000_33` LIMIT 5;
+  -> Access Denied: Table steemit-307308:hive_zurich.block_data_48000001_50000000_33: User does not have permission to
+     query table steemit-307308:hive_zurich.block_data_48000001_50000000_33, or perhaps it does not exist.
+     Project: steemit-307308  bigquery.tables.getData
+
+Gate: FAIL (BigQuery cannot run, design F1). gate.ts was not run: there is no raw data.
