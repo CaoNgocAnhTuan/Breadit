@@ -12,8 +12,8 @@ import { roundDecimal } from "./round.ts";
 import { sha256Hex } from "../canonical/csv.ts";
 import { tempDir } from "../checks/fixture.ts";
 
-// TC11 (design DW6, DW9, DW10): the report on a hand-made results folder for the twelve run ids.
-const TABLE_IDS = ["tuning", "leftout", "e1", "e2", "e3", "e4", "e5", "e6", "e8"];
+// TC11 (design DW6, DW9, DW10) and TC5 of task p7-cost-benchmark (DW6): the report on a hand-made results folder for the thirteen run ids.
+const TABLE_IDS = ["tuning", "leftout", "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"];
 const FILES = ["fig-e3-density.csv", "macros.csv", "manifest.json", "results-macros.tex", "results.md", ...TABLE_IDS.map((t) => `tables/${t}.tex`)];
 
 function report(dir: string, out: string): string[] {
@@ -29,8 +29,9 @@ function listFiles(dir: string): string[] {
   return out.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 
-test("REPORT_RUNS is the twelve runs of P7, and the fixture has the same twelve", () => {
-  assert.equal(REPORT_RUNS.length, 12);
+test("REPORT_RUNS is the twelve runs of P7 and the E7 benchmark, and the fixture has the same thirteen", () => {
+  assert.equal(REPORT_RUNS.length, 13);
+  assert.equal(REPORT_RUNS[12], "p7-e7");
   assert.deepEqual([...REPORT_RUNS], FIXTURE_RUNS.map((r) => r.id));
 });
 
@@ -74,10 +75,10 @@ test("two runs give byte-identical files", () => {
 });
 
 test("an input file that differs from its run manifest stops the report, and so does a missing run", () => {
-  for (const [run, file] of [["p7-main", "summary.csv"], ["p7-tune-worlds", "tuning.csv"], ["p7-e8-pool", "compare.csv"], ["p7-e5-worlds", "density.csv"]]) {
+  for (const [run, file] of [["p7-main", "summary.csv"], ["p7-tune-worlds", "tuning.csv"], ["p7-e8-pool", "compare.csv"], ["p7-e5-worlds", "density.csv"], ["p7-e7", "latency.csv"], ["p7-e7", "queries.csv"]]) {
     const dir = tempDir();
     writeResultsFixture(dir);
-    editResultsFile(dir, run as string, file as string, (t) => t.replace(/0\.(\d)/, "0.9$1"));
+    editResultsFile(dir, run as string, file as string, (t) => t.replace(/(\d)\.(\d)/, "$1.9$2"));
     const out = tempDir();
     assert.throws(() => report(dir, out), (e: Error) => e.message.includes(run as string) && e.message.includes(file as string) && /manifest/.test(e.message), `${run}/${file}`);
     assert.deepEqual(readdirSync(out), [], "nothing was written");
@@ -228,7 +229,34 @@ test("toLatex and toMarkdown round with the same rule, escape LaTeX marks, and p
   assert.equal(cellText({ v: "-0.000400", kind: "dec" }), "0.000");
 });
 
-test("buildTables gives the nine tables of the design in order", () => {
+test("TC5: the E7 table has one row per algo, and its cells are the cells of latency.csv and queries.csv rounded like the macros", () => {
+  const dir = tempDir();
+  writeResultsFixture(dir);
+  const out = tempDir();
+  report(dir, out);
+  const md = readFileSync(join(out, "results.md"), "utf8");
+  const section = md.split("\n## ").slice(1).find((s) => s.startsWith("e7: ")) as string;
+  assert.ok(section, "e7 is in results.md");
+  const rows = mdCells(section);
+  assert.deepEqual(rows.map((r) => r[0]), ["chrono", "engagement", "social"]);
+  const lat = readRun(dir, "p7-e7").files.get("latency.csv")!.rows;
+  const qs = readRun(dir, "p7-e7").files.get("queries.csv")!.rows;
+  const macros = new Map(parseCsv(readFileSync(join(out, "macros.csv"), "utf8"), "m").rows.map((r) => [r.name as string, r.value as string]));
+  const word: Record<string, string> = { chrono: "Chrono", engagement: "Engagement", social: "Social" };
+  for (const row of rows) {
+    const algo = row[0] as string;
+    const l = lat.find((r) => r.algo === algo)!;
+    const q = qs.find((r) => r.algo === algo)!;
+    assert.deepEqual(row.slice(1), [roundDecimal(l.median_ms as string, 3), roundDecimal(l.ci_low_ms as string, 3), roundDecimal(l.ci_high_ms as string, 3), roundDecimal(l.p95_ms as string, 3), roundDecimal(q.mean as string, 3), q.min as string, q.max as string], algo);
+    assert.equal(row[1], macros.get(`eSeven${word[algo]}Median`));
+    assert.equal(row[2], macros.get(`eSeven${word[algo]}CiLow`));
+    assert.equal(row[3], macros.get(`eSeven${word[algo]}CiHigh`));
+    assert.equal(row[4], macros.get(`eSeven${word[algo]}PNinetyFive`));
+    assert.equal(row[5], macros.get(`eSeven${word[algo]}QueriesMean`));
+  }
+});
+
+test("buildTables gives the ten tables of the design in order", () => {
   const dir = tempDir();
   writeResultsFixture(dir);
   const runs = new Map(REPORT_RUNS.map((r) => [r, readRun(dir, r)]));

@@ -127,7 +127,7 @@ export function figE3Rows(runs: RunFilesMap): FigRow[] {
   return out;
 }
 
-// ---- the nine tables ----
+// ---- the ten tables ----
 
 function tuningTable(runs: RunFilesMap): Table {
   const rows = ["p7-tune-main", "p7-tune-worlds"].flatMap((run) => rowsOf(runs, run, "tuning.csv").filter((r) => r.chosen === "1"));
@@ -247,6 +247,31 @@ function e6Table(runs: RunFilesMap): Table {
   return { id: "e6", caption: "NDCG@10, all users, with the normal and the reversed tie-break", columns, rows };
 }
 
+function e7Table(runs: RunFilesMap): Table {
+  const latency = rowsOf(runs, "p7-e7", "latency.csv");
+  const queries = rowsOf(runs, "p7-e7", "queries.csv");
+  const rows = ["chrono", "engagement", "social"].map((algo) => {
+    const l = pick(latency, { algo }, "p7-e7/latency.csv");
+    const q = pick(queries, { algo }, "p7-e7/queries.csv");
+    return [
+      text(algo),
+      dec(cellOf(l, "median_ms", "latency")),
+      dec(cellOf(l, "ci_low_ms", "latency")),
+      dec(cellOf(l, "ci_high_ms", "latency")),
+      dec(cellOf(l, "p95_ms", "latency")),
+      dec(cellOf(q, "mean", "queries")),
+      int(cellOf(q, "min", "queries")),
+      int(cellOf(q, "max", "queries")),
+    ];
+  });
+  return {
+    id: "e7",
+    caption: "Cost of the three feeds, page 1 on one machine with the page cache off: median of the kept runs with its 95% bootstrap interval, p95, and Prisma queries per request",
+    columns: ["Algo", "Median (ms)", "CI low", "CI high", "p95 (ms)", "Queries (mean)", "Queries (min)", "Queries (max)"],
+    rows,
+  };
+}
+
 function e8Table(runs: RunFilesMap): Table {
   const methods = [...new Set(rowsOf(runs, "p7-e8-pool", "summary.csv").map((r) => r.method as string))].sort((a, b) => METHOD_ORDER.indexOf(a) - METHOD_ORDER.indexOf(b));
   const dataset = "syn-W2M-M";
@@ -260,7 +285,7 @@ function e8Table(runs: RunFilesMap): Table {
   return { id: "e8", caption: `NDCG@10 on ${dataset} with the normal and the larger pool`, columns: ["Method", "Normal, all", "Normal, 0-4", "Larger pool, all", "Larger pool, 0-4"], rows };
 }
 
-/** The nine tables, in the order of the design. */
+/** The ten tables, in the order of the design. */
 export function buildTables(runs: RunFilesMap): Table[] {
-  return [tuningTable(runs), leftoutTable(runs), e1Table(runs), e2Table(runs), e3Table(runs), e4Table(runs), e5Table(runs), e6Table(runs), e8Table(runs)];
+  return [tuningTable(runs), leftoutTable(runs), e1Table(runs), e2Table(runs), e3Table(runs), e4Table(runs), e5Table(runs), e6Table(runs), e7Table(runs), e8Table(runs)];
 }

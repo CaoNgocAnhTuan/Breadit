@@ -10,13 +10,13 @@ import { parseCsv, readRun } from "./read.ts";
 import type { RunFiles, RunFilesMap } from "./read.ts";
 import { buildTables, figE3Rows, toLatex, toMarkdown } from "./tables.ts";
 
-// The report (design "Report"): reads the twelve P7 runs, checks every file against its run manifest, and writes macros.csv,
+// The report (design "Report"): reads the thirteen P7 runs, checks every file against its run manifest, and writes macros.csv,
 // results-macros.tex, one table file per table, results.md, fig-e3-density.csv and manifest.json into .docs/results/p7-report/.
 // Nothing here reads the clock or the folder name, so two runs write the same bytes.
 
 const REPO_ROOT = new URL("../../../", import.meta.url).pathname;
 
-/** The twelve runs of P7: two tuning runs and ten test runs. */
+/** The thirteen runs of P7: two tuning runs, ten test runs and the E7 cost benchmark. */
 export const REPORT_RUNS: readonly string[] = [
   "p7-tune-main",
   "p7-tune-worlds",
@@ -30,12 +30,13 @@ export const REPORT_RUNS: readonly string[] = [
   "p7-e6-ties",
   "p7-e8-pool",
   "p7-e5-shuffle",
+  "p7-e7",
 ];
 
 const FIG_HEADER = ["dataset", "bin", "n", "mean_diff", "ci_low", "ci_high"] as const;
 
 function resultsMd(tables: { caption: string; id: string; md: string }[], macros: readonly MacroRow[]): string {
-  const lines = ["# P7 results", "", "Written by `npm run report -w @breadit/eval` from the results of the twelve P7 runs. Do not edit: change the results and run it again.", ""];
+  const lines = ["# P7 results", "", "Written by `npm run report -w @breadit/eval` from the results of the thirteen P7 runs. Do not edit: change the results and run it again.", ""];
   for (const t of tables) lines.push(`## ${t.id}: ${t.caption}`, "", t.md);
   lines.push("## Macros", "", "| Macro | Value | Cell |", "| --- | ---: | --- |");
   for (const m of macros) lines.push(`| \\${m.name} | ${m.value} | ${m.file} ${m.rowKey} ${m.column} |`);

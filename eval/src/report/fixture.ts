@@ -7,7 +7,7 @@ import { GROUPS, f6, methodIndex } from "../metrics.ts";
 import { csvText } from "../results-csv.ts";
 import { pickBest } from "../harness/tuning.ts";
 
-// Test helper: a results folder with the twelve P7 runs and hand-made numbers, the shapes the harness writes (summary, coverage, leftout,
+// Test helper: a results folder with the thirteen P7 runs (the twelve of the harness and the E7 benchmark) and hand-made numbers, the shapes the harness writes (summary, coverage, leftout,
 // compare, density, tuning, manifest). The numbers come from a hash of the row, so every run of a test gives the same files. Not used by
 // production code.
 
@@ -31,6 +31,8 @@ interface FixtureRun {
   compare?: "families" | "none";
   density?: boolean;
   tuning?: string[];
+  /** The E7 run: latency.csv, queries.csv and runs.csv instead of the summary files. */
+  e7?: boolean;
 }
 
 export const FIXTURE_RUNS: readonly FixtureRun[] = [
@@ -46,6 +48,7 @@ export const FIXTURE_RUNS: readonly FixtureRun[] = [
   { id: "p7-e6-ties", split: "test", datasets: MAIN, methods: NINE },
   { id: "p7-e8-pool", split: "test", datasets: ["syn-W2M-M"], methods: ["BL2", "BL4", "H"], compare: "none" },
   { id: "p7-e5-shuffle", split: "test", datasets: ["syn-W2M-M-shuffled"], methods: SWEEP_METHODS, compare: "none" },
+  { id: "p7-e7", split: "test", datasets: [], methods: [], e7: true },
 ];
 
 /** A number from a hash of `seed`, in [lo, hi), with 6 decimals. */
@@ -176,6 +179,39 @@ function tuning(run: FixtureRun): Table {
   return { header: ["dataset", "method", "param", "value", "val_ndcg10", "chosen"], rows };
 }
 
+const E7_ALGOS = ["chrono", "engagement", "social"];
+
+/** latency.csv of the E7 run: one row per algo, the columns of eval/src/bench/e7.ts. */
+function e7Latency(run: FixtureRun): Table {
+  const rows = E7_ALGOS.map((algo) => {
+    const median = Number(num(`l${run.id}|${algo}`, 10, 60));
+    const half = Number(num(`h${run.id}|${algo}`, 0.2, 3));
+    return { algo, runs: "4", median_ms: f6(median), ci_low_ms: f6(median - half), ci_high_ms: f6(median + half), p95_ms: f6(median * 2) };
+  });
+  return { header: ["algo", "runs", "median_ms", "ci_low_ms", "ci_high_ms", "p95_ms"], rows };
+}
+
+/** queries.csv of the E7 run. */
+function e7Queries(run: FixtureRun): Table {
+  const rows = E7_ALGOS.map((algo) => {
+    const mean = Number(num(`q${run.id}|${algo}`, 17, 22));
+    return { algo, requests: "100", mean: f6(mean), min: String(Math.floor(mean) - 2), max: String(Math.ceil(mean) + 1) };
+  });
+  return { header: ["algo", "requests", "mean", "min", "max"], rows };
+}
+
+/** runs.csv of the E7 run: 5 rounds x 3 algos, round 1 is warm-up. */
+function e7Runs(run: FixtureRun): Table {
+  const rows: Rec[] = [];
+  for (let round = 1; round <= 5; round++) {
+    for (const algo of E7_ALGOS) {
+      const median = Number(num(`r${run.id}|${algo}|${round}`, 10, 60));
+      rows.push({ round: String(round), algo, warmup: String(round === 1), requests: "100", failed: "0", min_ms: f6(median / 2), median_ms: f6(median), p95_ms: f6(median * 2), max_ms: f6(median * 3) });
+    }
+  }
+  return { header: ["round", "algo", "warmup", "requests", "failed", "min_ms", "median_ms", "p95_ms", "max_ms"], rows };
+}
+
 /** The key columns of each results file: the cells that name a row (the macros trace a value by them). Same as macros.ts. */
 const KEY_OF: Record<string, string[]> = {
   "compare.csv": ["dataset", "family", "method", "ref", "k", "bucket"],
@@ -184,6 +220,9 @@ const KEY_OF: Record<string, string[]> = {
   "leftout.csv": ["dataset", "split", "bucket"],
   "density.csv": ["dataset", "density_bin", "method", "ref"],
   "tuning.csv": ["dataset", "method", "param", "value"],
+  "latency.csv": ["algo"],
+  "queries.csv": ["algo"],
+  "runs.csv": ["round", "algo"],
 };
 
 export interface FixtureOptions {
@@ -191,11 +230,13 @@ export interface FixtureOptions {
   cells?: Record<string, string>;
 }
 
-/** Writes the twelve run folders under `dir`, each with its CSV files and a manifest that matches them. */
+/** Writes the thirteen run folders under `dir`, each with its CSV files and a manifest that matches them. */
 export function writeResultsFixture(dir: string, o: FixtureOptions = {}): void {
   const used = new Set<string>();
   for (const run of FIXTURE_RUNS) {
-    const files: Record<string, Table> = { "summary.csv": summary(run), "coverage.csv": coverage(run), "leftout.csv": leftout(run) };
+    const files: Record<string, Table> = run.e7
+      ? { "latency.csv": e7Latency(run), "queries.csv": e7Queries(run), "runs.csv": e7Runs(run) }
+      : { "summary.csv": summary(run), "coverage.csv": coverage(run), "leftout.csv": leftout(run) };
     if (run.compare) files["compare.csv"] = compare(run);
     if (run.density) files["density.csv"] = density(run);
     if (run.tuning) files["tuning.csv"] = tuning(run);

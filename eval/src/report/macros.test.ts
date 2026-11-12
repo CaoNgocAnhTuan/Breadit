@@ -16,7 +16,7 @@ function load(dir: string): RunFilesMap {
 /** The cell of a macro, found by hand: file is <run>/<csv>, row_key the key cells joined with "|". */
 function cellOf(runs: RunFilesMap, m: MacroRow): string {
   const [run, csv] = m.file.split("/") as [string, string];
-  const keys: Record<string, number> = { "compare.csv": 6, "summary.csv": 5, "coverage.csv": 4, "leftout.csv": 3, "density.csv": 4 };
+  const keys: Record<string, number> = { "compare.csv": 6, "summary.csv": 5, "coverage.csv": 4, "leftout.csv": 3, "density.csv": 4, "latency.csv": 1, "queries.csv": 1 };
   const table = runs.get(run)?.files.get(csv);
   assert.ok(table, `${m.file} is not in the fixture`);
   const cols = table.header.slice(0, keys[csv] as number);
@@ -37,8 +37,10 @@ test("macroName: letters only, and it throws on a digit, on an empty name and on
   assert.throws(() => macroName(["e", "One"], used), /twice|already|repeat/);
 });
 
-test("MACRO_SPECS: about 70 specs, every name is letters only and none repeats", () => {
-  assert.ok(MACRO_SPECS.length >= 60 && MACRO_SPECS.length <= 80, `${MACRO_SPECS.length} specs`);
+test("MACRO_SPECS: 70 specs of the P7 runs and 15 of E7, every name is letters only and none repeats", () => {
+  const e7 = MACRO_SPECS.filter((s) => s.run === "p7-e7");
+  assert.equal(e7.length, 15);
+  assert.equal(MACRO_SPECS.length - e7.length, 70, "the macros of the other runs are the same as before E7");
   const used = new Set<string>();
   for (const s of MACRO_SPECS) {
     const name = macroName(s.parts, used);
@@ -91,6 +93,16 @@ test("buildMacros: each value is its cell after roundDecimal / formatP (counts p
   assert.equal(pick("eFiveWTwoMShuffledNdcgTenAllCiLow").rowKey, "syn-W2M-M-shuffled|none|H|BL2|10|all");
   assert.equal(pick("eSixDiggNdcgBLTwoTenAllValue").file, "p7-e6-ties/summary.csv");
   assert.equal(pick("eEightWTwoMNdcgHTenAllValue").file, "p7-e8-pool/summary.csv");
+  // E7 (task p7-cost-benchmark): latency.csv and queries.csv, one row per algo
+  assert.equal(pick("eSevenSocialMedian").file, "p7-e7/latency.csv");
+  assert.equal(pick("eSevenSocialMedian").rowKey, "social");
+  assert.equal(pick("eSevenSocialMedian").column, "median_ms");
+  assert.equal(pick("eSevenChronoCiLow").column, "ci_low_ms");
+  assert.equal(pick("eSevenEngagementCiHigh").column, "ci_high_ms");
+  assert.equal(pick("eSevenChronoPNinetyFive").column, "p95_ms");
+  assert.equal(pick("eSevenEngagementQueriesMean").file, "p7-e7/queries.csv");
+  assert.equal(pick("eSevenEngagementQueriesMean").column, "mean");
+  assert.equal(macros.filter((m) => m.file.startsWith("p7-e7/")).length, 15);
   assert.ok(!byName.has("eFourDiggNdcgHCommTenAllGain"), "the Digg table of E4 leaves out H-comm");
   assert.ok(byName.has("eFourWTwoMNdcgHCommTenAllGain"));
   // the macros are the same on a second build

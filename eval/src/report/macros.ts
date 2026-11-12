@@ -34,6 +34,9 @@ export const KEY_COLUMNS: Readonly<Record<string, readonly string[]>> = {
   "leftout.csv": ["dataset", "split", "bucket"],
   "density.csv": ["dataset", "density_bin", "method", "ref"],
   "tuning.csv": ["dataset", "method", "param", "value"],
+  // E7 (task p7-cost-benchmark): one row per algo.
+  "latency.csv": ["algo"],
+  "queries.csv": ["algo"],
 };
 
 const LETTERS = /^[A-Za-z]+$/;
@@ -79,6 +82,7 @@ const METHOD_WORD: Readonly<Record<string, string>> = {
   "H-noauthor": "HNoauthor",
   "H-noengager": "HNoengager",
 };
+const ALGO_WORD: Readonly<Record<string, string>> = { chrono: "Chrono", engagement: "Engagement", social: "Social" };
 const K_WORD: Readonly<Record<number, string>> = { 5: "Five", 10: "Ten", 20: "Twenty" };
 const GROUP_WORD: Readonly<Record<string, string>> = { "0": "Zero", "1-4": "OneFour", "0-4": "ZeroFour", "5-19": "FiveNineteen", "20+": "TwentyPlus", all: "All" };
 const WHAT_WORD: Readonly<Record<string, string>> = {
@@ -178,10 +182,17 @@ function build(): MacroSpec[] {
   // E6 and E8: NDCG@10 of H and BL2 with the reversed tie-break and with the larger pool.
   for (const d of MAIN_DATASETS) for (const m of ["H", "BL2"]) out.push(sum("eSix", "p7-e6-ties", d, m));
   for (const m of ["H", "BL2"]) out.push(sum("eEight", "p7-e8-pool", "syn-W2M-M", m));
+  // E7: the cost of the three feeds. Median latency of the kept runs with its interval and p95 (latency.csv, ms), and the mean Prisma queries per request.
+  for (const algo of ["chrono", "engagement", "social"]) {
+    for (const [what, column] of [["Median", "median_ms"], ["CiLow", "ci_low_ms"], ["CiHigh", "ci_high_ms"], ["PNinetyFive", "p95_ms"]] as const) {
+      out.push({ parts: ["eSeven", word(ALGO_WORD, algo, "algo"), what], run: "p7-e7", file: "latency.csv", key: { algo }, column });
+    }
+    out.push({ parts: ["eSeven", word(ALGO_WORD, algo, "algo"), "QueriesMean"], run: "p7-e7", file: "queries.csv", key: { algo }, column: "mean" });
+  }
   return out;
 }
 
-/** The macros of the report (about 70): the numbers the text is likely to cite. */
+/** The macros of the report (about 85): the numbers the text is likely to cite. */
 export const MACRO_SPECS: readonly MacroSpec[] = build();
 
 function rowKeyOf(file: string, row: Readonly<Record<string, string>>): string {
