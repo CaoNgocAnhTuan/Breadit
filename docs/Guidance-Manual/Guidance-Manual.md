@@ -41,4 +41,4 @@ Also read · Đọc thêm: [System_Architecture.md](../System_Architecture.md) (
 
 - Names, numbers and frozen values are copied exactly from `.docs/super-plan.md` and `.docs/implementation-plan.md`, which stay the source of truth. · Tên, số liệu và giá trị frozen được chép đúng từ super-plan và implementation-plan; hai file đó vẫn là nguồn chuẩn.
 - Worked examples are checked with the real code (`@breadit/ranking`). · Các ví dụ tính tay được kiểm bằng code thật.
-- Answers marked **(after P7)** are filled in when the experiments are done. · Các câu trả lời có nhãn **(after P7)** sẽ được điền khi chạy xong thí nghiệm.
+- Answers marked **(after P7)** were filled in when the experiments were done. No answer has this mark since task 10 (2026-11-12). · Các câu trả lời có nhãn **(after P7)** đã được điền khi chạy xong thí nghiệm. Từ task 10 (2026-11-12) không còn câu nào mang nhãn này.

@@ -185,7 +185,17 @@ Changing the formula later (a new term, new weights) means a new method id in `@
 
 ### 5.2 Faster and cheaper (cost)
 
-E7 measures latency and query count for `chrono`, `engagement` and `social` (Class R: median of 4 kept runs with a CI). The levers, roughly from cheap to expensive:
+E7 measured the cost of page 1 for `chrono`, `engagement` and `social` (task 10, 2026-11-12). Setup: the 100 parity pairs, one virtual user, the page cache off, one machine (Apple M1, Postgres and Redis in Docker), 5 rounds with the first dropped. The latency is Class R: the median of the 4 kept run medians with a 95% bootstrap interval. The query count is exact.
+
+| `algo` | Median (ms) | 95% interval | p95 (ms) | Prisma queries per request |
+|---|---:|---|---:|---:|
+| `chrono` | 36.854 | 35.434 to 38.407 | 42.950 | 19.650 |
+| `engagement` | 36.315 | 36.029 to 36.805 | 44.668 | 19.630 |
+| `social` | 38.061 | 36.366 to 38.434 | 45.881 | 19.650 |
+
+The three feeds cost about the same, and the intervals overlap. They run the same queries (17 to 21 by user, about 19.6 to 19.7 on average), so the formula adds little: the difference between feeds is 1 to 2 ms of about 37. The numbers compare the feeds on one machine; they are not absolute speed. Source: `.docs/results/p7-e7/` and table e7 of the report (macros `eSeven*`).
+
+The levers, roughly from cheap to expensive. Task 10 only measured; any speed-up must keep `npm run test:parity` passing:
 
 | Lever | Idea | Watch out |
 |---|---|---|

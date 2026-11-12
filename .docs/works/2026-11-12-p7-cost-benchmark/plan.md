@@ -19,7 +19,7 @@ All commits go on `test-app` and are never pushed. Steps 2, 6 and the acceptance
 
 - [x] 6. **Run E7 and the report.** Run the E7 runner with its defaults on a quiet machine. Check that all 15 runs have 0 failed requests and that `.docs/results/p7-e7/` holds the files of DW3. Commit the results. Then run the report and check that `git diff` of `.docs/results/p7-report/` only adds E7 lines and the new table (DW6). Commit the report. If a run fails (F3), stop and report the round, the algo and the status codes; do not change the limit or the profile to make it pass. (Design: Workflow; Spec DW3, DW6.) Commits: `chore: p7-e7 results` and `chore: p7-report with E7`
 
-- [ ] 7. **Docs.** With the numbers of step 6:
+- [x] 7. **Docs.** With the numbers of step 6:
   - `docs/System_Architecture.md`: E7 ✅ in the status table, and the sentence "E7 measures the cost" gets the result (macro names, not new numbers typed by hand where a macro exists).
   - `docs/Guidance-Manual/en/08-system-and-feed.md` §5.2 and `10-defense-qa.md`: the E7 answers lose "(after P7)" and give the result; then the same changes in `vi/`.
   - `.docs/Bugs Report.md`: N6 moves to the resolved list with the commit of step 1; the counts at the top change; the E7 row of the phase table says done. The T3 note: E7 ran with the cache off.

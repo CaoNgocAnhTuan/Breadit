@@ -185,7 +185,17 @@ const order = rankPool(pool, (p) => score(ctx, p, feats.get(p.id)!));
 
 ### 5.2 Nhanh hơn và rẻ hơn (chi phí)
 
-E7 đo độ trễ và số query cho `chrono`, `engagement` và `social` (Class R: trung vị của 4 lần chạy được giữ, kèm CI). Các đòn bẩy, xếp gần đúng từ rẻ tới đắt:
+E7 đã đo chi phí của trang 1 cho `chrono`, `engagement` và `social` (task 10, 2026-11-12). Thiết lập: 100 cặp parity, một virtual user, cache trang tắt, một máy (Apple M1, Postgres và Redis trong Docker), 5 vòng và bỏ vòng đầu. Độ trễ thuộc Class R: trung vị của 4 trung vị được giữ, kèm khoảng tin cậy bootstrap 95%. Số query là số chính xác.
+
+| `algo` | Trung vị (ms) | Khoảng tin cậy 95% | p95 (ms) | Query Prisma mỗi request |
+|---|---:|---|---:|---:|
+| `chrono` | 36.854 | 35.434 đến 38.407 | 42.950 | 19.650 |
+| `engagement` | 36.315 | 36.029 đến 36.805 | 44.668 | 19.630 |
+| `social` | 38.061 | 36.366 đến 38.434 | 45.881 | 19.650 |
+
+Ba feed tốn gần như nhau, và các khoảng tin cậy chồng lên nhau. Chúng chạy cùng các query (17 đến 21 tuỳ user, trung bình khoảng 19.6 đến 19.7), nên công thức thêm rất ít: chênh giữa các feed là 1 đến 2 ms trên khoảng 37. Các con số chỉ so sánh các feed trên một máy; chúng không phải tốc độ tuyệt đối. Nguồn: `.docs/results/p7-e7/` và bảng e7 của report (macro `eSeven*`).
+
+Các đòn bẩy, xếp gần đúng từ rẻ tới đắt. Task 10 chỉ đo; mọi cách tăng tốc phải giữ `npm run test:parity` pass:
 
 | Đòn bẩy | Ý tưởng | Cần lưu ý |
 |---|---|---|

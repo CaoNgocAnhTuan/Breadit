@@ -6,7 +6,7 @@ Những câu hội đồng hoặc reviewer có thể hỏi, mỗi câu có câu 
 
 Khi bảo vệ bằng tiếng Anh, dùng bản [English](../en/10-defense-qa.md): câu trả lời ở đó đã được viết để nói thành lời.
 
-Các câu có nhãn **(after P7)** phụ thuộc vào kết quả chưa có. Từ task 9 (2026-11-12), chỉ còn E7 (task 10) mang nhãn này. Trạng thái: 2026-11-12, sau task 9.
+Các câu có nhãn **(after P7)** từng phụ thuộc vào kết quả chưa có. Từ task 10 (2026-11-12), không còn câu nào mang nhãn này. Trạng thái: 2026-11-12, sau task 10.
 
 ---
 
@@ -111,11 +111,11 @@ Có. Mọi sự ngẫu nhiên đến từ một seed, điểm là số nguyên, 
 *Bằng chứng:* super-plan §2.
 
 **Q25. Feed mới tốn bao nhiêu?**
-E7 đo độ trễ và số query cho `chrono`, `engagement` và `social` bằng k6 trên cỡ M: 5 lần chạy, bỏ lần đầu, lấy trung vị kèm CI. Một lần chạy chỉ được tính nếu không có request lỗi nào.
-*Bằng chứng:* E7 **(after P7)**.
+Gần như nhau ở cả ba feed. E7 chạy k6 trên `syn-W2M-M`, cache trang tắt, trên một máy: 5 lần chạy, bỏ lần đầu, lấy trung vị kèm CI, và một lần chạy chỉ được tính nếu không có request lỗi nào. Trang 1 có trung vị 38.1 ms với `social`, 36.9 ms với `chrono` và 36.3 ms với `engagement`, và một request gửi khoảng 19.6 đến 19.7 query Prisma ở cả ba. Các khoảng tin cậy chồng lên nhau, nên công thức thêm rất ít. Các con số chỉ so sánh các feed trên một máy; chúng không phải tốc độ tuyệt đối.
+*Bằng chứng:* E7 (task 10): `.docs/results/p7-e7/`, bảng e7 trong `.docs/results/p7-report/`, `docs/System_Architecture.md` §6.5.
 
 **Q26. Sao điểm được tính mỗi request mà không lưu sẵn trong bảng?**
-Nó là một công thức rẻ trên các số đếm mà database đã có. Tính mỗi request giữ feed luôn mới và không cần batch job. E7 cho thấy cách này có đủ nhanh không.
+Nó là một công thức rẻ trên các số đếm mà database đã có. Tính mỗi request giữ feed luôn mới và không cần batch job. E7 cho thấy chi phí: trung vị 38.1 ms cho trang 1 với `social`, so với 36.9 ms với `chrono`.
 
 **Q27. Sao code xếp hạng nằm trong một package riêng?**
 Để evaluation chạy đúng code của production mà không cần khởi động server, database hay cache. Backend import package đó; không ai import phần evaluation.

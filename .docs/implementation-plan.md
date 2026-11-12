@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.10 · 2026-11-12 · Status: approved 2026-10-28
+Version 1.11 · 2026-11-12 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -62,7 +62,7 @@ P8 merges all of them into `.docs/results/manifest.json` and compares.
 
 ### 2.4 PRNG
 
-`eval/src/rng.ts` has `rng(masterSeed, stage)` as in super-plan §2. The stage names are fixed: `users`, `follows`, `communities`, `posts`, `interactions` (P3); `bootstrap`, `permutation` (P5); `parity` (P6); `shuffle` (P7). A new stage gets a new name. Names are never reused.
+`eval/src/rng.ts` has `rng(masterSeed, stage)` as in super-plan §2. The stage names are fixed: `users`, `follows`, `communities`, `posts`, `interactions` (P3); `bootstrap`, `permutation` (P5); `parity` (P6); `shuffle`, `bootstrap-median` (P7). A new stage gets a new name. Names are never reused.
 
 ### 2.5 User ids in the app and in the CSVs
 
@@ -278,8 +278,8 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-12. ✅ mea
 | ✅ 11-10 | 8 | `p6-social-feed` | P6 | 5, 7 | feed module, `algo`, default `algo` from an env variable, `asOf` flag, parity test, frontend toggle, D1 product rule | 2 | 11-11 | T3, B6, R2, T6 (distinct followees) |
 | ✅ 11-12 | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
 | ✅ 11-12 (gate failed) | 9b | `p7-hive-check` | P7 | 9, closed on 11-13 | gate: BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (section 3.2); then a Hive adapter and H-comm against BL2 (super-plan P7) | 0.5 for the gate | 11-14 | — |
-| ▶ next | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
-| ⬜ | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
+| ✅ 11-12 | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
+| ▶ next | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
 | ⬜ | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
 | ⬜ | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
 
@@ -321,3 +321,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.8 · 2026-11-11 · Task `p7-offline-experiments`, Stop A (super-plan 0.25): §3.5 gates H-follow − BL2 on W0, not H − BL2. The grids of super-plan §7 are wider; this file quotes none of them.
 - 1.9 · 2026-11-12 · Task `p7-offline-experiments` closed: §2.7 (`density.csv` on NDCG@10; family-none rows for E4, E5, E8), §2.8 (`macros.csv` gets the column `column`; the rounding rule; the tables and `results.md`), §5 task 9 ✅ and task 10 next, one day before the planned end of task 9.
 - 1.10 · 2026-11-12 · Task `p7-hive-check` closed, gate failed (super-plan 0.27): §5 row 9b ✅ (gate failed), §6 the Hive bullet. The Hive row of §4 is not run. No contract, rule or frozen value changed.
+- 1.11 · 2026-11-12 · Task `p7-cost-benchmark` (E7): §2.4 the new stage name `bootstrap-median` (bootstrap of the E7 run medians); §5 task 10 ✅ and task 11 next. No contract, rule or frozen value changed.

@@ -367,6 +367,25 @@ The parity test proves that the live feed and the harness give the same order.
 
 Result on 2026-11-10: 300 of 300 for (a) and 300 of 300 for (b), in about 34 s. Live time is Unix seconds and harness time is seconds from the base epoch. Every score uses a time difference or rises with the post time, so the orders are equal; the test compares orders, not score values. When α, β, the dataset or the package changes, run `parity` again and commit its output.
 
+### 6.5 Cost benchmark E7 ✅ (task 10)
+
+E7 asks what each `algo` feed costs: the time of page 1 and the number of Prisma queries per request. It uses the 100 (user, `asOf`) pairs of the parity test, on `syn-W2M-M` in `eval_load`. `npm run bench:e7` does four steps:
+
+1. **Prepare.** A Jest project of the backend (`bench:prepare`) sends each request over Fastify `inject`, counts its Prisma queries and signs the session cookies. It counts twice and stops if one count differs. The pool pings of Prisma (`SELECT 1`) are not counted.
+2. **Backend.** The runner starts the backend with `run-safe.sh`: schema `eval_load`, page cache off, `asOf` on, Redis database 3, `THROTTLE_LIMIT=1000000`. With the default limit of 1,000 per minute, k6 would get 429 (bug N6).
+3. **k6.** 5 rounds of the three `algo` feeds, in a rotated order. A run is 100 requests, one virtual user, no sleep. Round 1 is warm-up. One failed request stops everything.
+4. **Summary.** `npm run e7:summary -w @breadit/eval` writes `.docs/results/p7-e7/`: for each `algo`, the median of the 4 kept run medians with a 95% bootstrap interval, the p95 and the query counts. `npm run report` adds the macros `eSeven*` and the table e7.
+
+Result on one machine (Apple M1, Postgres and Redis in Docker), page cache off, with the placeholder α = β = 1 (the cost does not depend on them):
+
+| `algo` | Median (ms) | 95% interval | p95 (ms) | Prisma queries per request |
+|---|---:|---|---:|---:|
+| `chrono` | 36.854 | 35.434 to 38.407 | 42.950 | 19.650 |
+| `engagement` | 36.315 | 36.029 to 36.805 | 44.668 | 19.630 |
+| `social` | 38.061 | 36.366 to 38.434 | 45.881 | 19.650 |
+
+The three feeds run the same queries (17 to 21 for a request, by user) and the intervals overlap, so the formula adds little to the cost of loading the pool. The query count is Class D. The latency is Class R: it compares the feeds on one machine and is not absolute speed. The numbers are in `.docs/results/p7-report/` (macros `eSeven*`, table e7).
+
 ---
 
 ## 7. Determinism
@@ -390,7 +409,7 @@ How the code keeps Class D:
 
 **Evaluation outside the backend.** `eval/` reads files, not the database or the API, so a run is fast, has no cache or rate limit in the way, and can be repeated byte for byte. The backend never imports it, so evaluation code can never reach production.
 
-**Scores at request time, not a precomputed table.** The hybrid is a cheap formula over counts the database already has. Computing it per request keeps the feed fresh and needs no batch job or extra table. E7 measures the cost.
+**Scores at request time, not a precomputed table.** The hybrid is a cheap formula over counts the database already has. Computing it per request keeps the feed fresh and needs no batch job or extra table. E7 measured the cost (§6.5): page 1 takes about 36 to 38 ms at the median, with about 19.6 to 19.7 Prisma queries, for all three `algo` feeds.
 
 **The live app passes "now" as `asOf`.** It calls the same functions as the evaluation, so the only gap is how the data is loaded, and the parity test covers that gap.
 
@@ -438,11 +457,13 @@ Breadit/
 │       │   ├── feed/                 # FeedService (loads from Prisma, calls @breadit/ranking), config, cursor, options
 │       │   ├── auth/                 # JWT cookie, guards, OTP and reset email
 │       │   ├── cache/                # CacheService: Redis JSON cache, version-based invalidation
+│       │   ├── throttle/             # readThrottleLimit: THROTTLE_LIMIT, default 1,000 per 60 s (N6)
 │       │   ├── block/                # BlockService: removes blocked peers from every listing
 │       │   ├── notifications/        # Socket.IO gateway and notification rows
 │       │   └── users/ comments/ interactions/ communities/ messages/ search/ hashtags/ uploads/ admin/ health/ ...
 │       ├── test/it/                  # integration tests · Postgres schema it_test, Redis db 1
 │       ├── test/parity/              # parity test · reads eval_load (never writes), Redis db 2
+│       ├── test/bench/               # E7 prepare step · counts Prisma queries per request, signs session cookies · eval_load, Redis db 2
 │       └── Dockerfile                # builds @breadit/ranking first · runs `prisma migrate deploy` on start
 │
 ├── packages/
@@ -476,10 +497,11 @@ Breadit/
 │   │   ├── metrics.ts                # Recall@K, NDCG@K, coverage
 │   │   ├── stats.ts                  # paired bootstrap, randomization test, Holm
 │   │   ├── results-csv.ts            # writes results CSVs and their hashes
-│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank, load, load-check, parity, freeze, report
+│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank, load, load-check, parity, freeze, report, e7-summary
 │   │   ├── loader/                   # writes a synthetic dataset into the Postgres schema eval_load (the only Prisma user here)
 │   │   ├── parity/                   # the parity sample: 100 (user, asOf) pairs and the harness orders
 │   │   ├── report/                   # task 9 · results CSVs → macros.csv, results-macros.tex, tables, results.md
+│   │   ├── bench/                    # task 10 · E7 summary: latency median with bootstrap CI, query counts
 │   │   └── *.test.ts                 # node --test tests (golden, leakage, double run, scipy cross-check, ...)
 │   ├── data/                         # git-ignored · canonical datasets, rebuilt by `gen` and `adapt:digg`
 │   └── results/                      # git-ignored · per_user.csv files over 5 MB (hash kept in the manifest)
@@ -505,7 +527,7 @@ Breadit/
 │   └── Pre-thesis/                   # the pre-thesis package: report chapters, diagrams, ADRs, k6 scripts · frozen
 ├── Latex/                            # pre-thesis report template · not edited
 ├── .claude/                          # workflow harness: /task, /bugfix, /approve, hooks, rules, templates
-├── scripts/                          # verify-bug-sweep.sh, verify-socket.cjs, dataset-humans.ps1
+├── scripts/                          # verify-bug-sweep.sh, verify-socket.cjs, dataset-humans.ps1, e7/ (E7 k6 script and runner)
 ├── docker-compose.yml                # db (Postgres 16), redis (Redis 7), backend, frontend
 ├── Makefile                          # rebuild, backend-rebuild, frontend-rebuild, logs
 ├── package.json                      # npm workspaces: apps/*, packages/*, eval
@@ -528,6 +550,6 @@ Breadit/
 | Postgres loader | P3 · task 7 | ✅ |
 | Feed module, `algo`, `asOf` flag, parity test, toggle | P6 · task 8 | ✅ |
 | Experiments E1–E6, E8, report and macros | P7 · task 9 | ✅ |
-| Cost benchmark E7 | P7 · task 10 | 🔜 next |
+| Cost benchmark E7 | P7 · task 10 | ✅ |
 | `npm run thesis:repro`, default `algo` | P8 · task 11 | 🔜 |
 | Slides and demo | P10 · task 13 | 🔜 |

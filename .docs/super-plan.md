@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.27 · 2026-11-12 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.28 · 2026-11-12 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -90,7 +90,7 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 11-02 | P4 Public dataset adapter (Digg 2009) | The P1 dataset in the canonical format | The adapter output hash is stable | `p4-digg-adapter` ✅ |
 | ✅ 11-02 (★ note ready to send) | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package` ✅, `p5-eval-harness` ✅ |
 | ✅ 11-10 | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` ✅ |
-| ▶ 1 of 2 tasks done (★ note ready to send) | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments` ✅, `p7-cost-benchmark`, `p7-hive-check` ✅ (gate failed) |
+| ✅ 11-12 (★ note ready to send) | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments` ✅, `p7-cost-benchmark` ✅, `p7-hive-check` ✅ (gate failed) |
 | ⬜ | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
 | ⬜ | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
 | ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-defense-package` |
@@ -248,12 +248,13 @@ E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, d
 - **If the gate passes.** This changes decision Q2 of 2026-10-26 (`.docs/datasets.md` §7: the community term on synthetic data only). Add a line to the change log here and tell the supervisor (§11, item 8).
 - **Status (2026-11-12): gate failed.** Task `p7-hive-check` (`.docs/works/2026-11-12-p7-hive-check/gate.md`). BigQuery did not run: from a sandbox project, both the table list and a data table of `steemit-307308.hive_zurich` gave `Access Denied` (`bigquery.tables.getData`), so the dataset is no longer readable from outside. HiveSQL, the other source, is paid (registration 1 HBD, then 5 HBD a day) and keeps follows and community subscriptions only as current state, with no join time, so the as-of rule cannot use them. Hive goes to future work. Decision Q2 stays: the community term is tested on synthetic data only.
 
-**Status (2026-11-12, task 9 done).** Task `p7-offline-experiments` (`.docs/works/2026-11-11-p7-offline-experiments/`).
+**Status (2026-11-12, tasks 9 and 10 done).** Task `p7-offline-experiments` (`.docs/works/2026-11-11-p7-offline-experiments/`).
 - **Before the test split** (0.25): the H0 gate moved to H-follow and the grids were widened. The tuning ran twice on validation, `freeze` wrote the ten test configs, and the author approved them. The test split ran once.
 - **H0 gate:** passes. H-follow − BL2 on W0 is 0.001 (NDCG@10, CI −0.004 to 0.006).
 - **H1:** fails on both co-primary tests: `syn-W2M-M` +0.023 (Holm p 0.680) and `digg2009` +0.0001 (Holm p 0.335). By the default feed rule, "For You" stays as it is today; P8 applies this.
 - **Other results.** On `syn-W2M-M`, H is about 6 times BL2 over all users, mostly from the community term and for users with a long history. On `digg2009` the social terms change almost nothing, and BL4 and BL5 are about 8 times BL2. The tables are in `.docs/results/p7-report/results.md`, and the note for the supervisor is `results-note.md` in the task folder.
-- **Double run:** every P7 run and the report, made again from empty folders, gave byte-identical files and manifests (`run_output.txt` of the task, Step 11). So the P7 "Done when" (hash check against the manifest) passes for task 9. P7 now waits for task 10.
+- **Double run:** every P7 run and the report, made again from empty folders, gave byte-identical files and manifests (`run_output.txt` of the task, Step 11). So the P7 "Done when" (hash check against the manifest) passes for task 9.
+- **E7 (task 10, `p7-cost-benchmark`):** done. Page 1 takes a median of 36.9 ms (`chrono`), 36.3 ms (`engagement`) and 38.1 ms (`social`), with about 19.6 to 19.7 Prisma queries per request, on one machine with the page cache off. The intervals overlap. N6 is fixed (`THROTTLE_LIMIT`). The files are in `.docs/results/p7-e7/` and the macros `eSeven*` in `.docs/results/p7-report/`.
 
 ### P8: Repro package and freeze
 
@@ -365,7 +366,7 @@ One source of truth. A change needs a new config version and a line in the chang
 | Dataset sizes | S 200 users, 4k posts · M 1,000 users, 20k posts (E7 uses M) | P3 |
 | Synthetic world parameters | in `eval/config/synthetic-v1.json` (SHA-256 `70341fd94eb40d549e8217fb8c39bcb105277afd25cd39d6b178273e5ff48007`, frozen 2026-11-02), calibrated to `.docs/datasets.md` where possible; W2 has three cells: low, middle and high influence at the middle homophily | P3 |
 | Primary W2 cell for H1 | the middle cell | P3 |
-| k6 runs / load profile | 5 runs, first dropped / set in P7 | P7 |
+| k6 runs / load profile | 5 runs, first dropped / one virtual user, 100 requests per run (page 1 of one `algo` for the 100 pairs of `.docs/results/p6-parity/pairs.csv`, in file order, no sleep), page cache off, seed 20261014 (the parity sample's); set 2026-11-12 (task `p7-cost-benchmark`) | P7 |
 
 ---
 
@@ -501,3 +502,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.25 · 2026-11-11 · Task `p7-offline-experiments`, Stop A, by the author's decision, after the validation tuning and before any test-split run. **H0 (§1):** the gate is now H-follow against BL2 on W0, not the full hybrid. On W0 validation, H at α = β = 16 scored NDCG@10 0.0202 against 0.0148 for BL2, nearly all from β, because the community term counts the user's earlier positives in a community, and a community is a topic in the generator. **§7:** the α, β grid now runs from 0 to 1,024 in powers of 2, because α = β = 16 (the top) was chosen on all five synthetic worlds and α = 16 on Digg. The baseline grids get two steps past each edge where a tuned value sat: BL2t 2 and 4, BL4 360,000 and 720,000, BL5 0.6 and 0.9. Each grid still holds the published or production value. The tuning runs again. §5 and §6 are byte-identical.
 - 0.26 · 2026-11-12 · Task `p7-offline-experiments` closed: P7 status paragraph (the H0 gate passes, H1 fails on both co-primary tests, the main results, the double run); §4 row P7 (1 of 2 tasks done, ★ note ready to send); §11 item 7 (asked with the results). No frozen value changed beyond 0.25; §5, §6 and §7 are byte-identical.
 - 0.27 · 2026-11-12 · Task `p7-hive-check` closed, gate failed (`.docs/works/2026-11-12-p7-hive-check/gate.md`): SoChainDB on BigQuery gives `Access Denied` to an outside project; HiveSQL is paid and has no join or follow times. P7: a Hive status line; §4 row P7 (`p7-hive-check` ✅, gate failed); §8 the Hive risk; §11 item 8 closed. Decision Q2 stays. No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.28 · 2026-11-12 · Task `p7-cost-benchmark` (E7). **§7:** the row "k6 runs / load profile" is set, as the author confirmed at the Design approval: one virtual user, 100 requests per run (page 1 of one `algo` for the 100 parity pairs in file order, no sleep), page cache off, the seed of the parity sample (20261014). P7 status paragraph (E7 result); §4 row P7 ✅ (2 of 2 tasks). No other frozen value changed; §5 and §6 are byte-identical.

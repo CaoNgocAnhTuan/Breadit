@@ -4,7 +4,7 @@
 
 Questions a committee or a reviewer is likely to ask, each with a short answer and where the evidence is. Learn the short answer first. Open the evidence when you need detail.
 
-Answers marked **(after P7)** depend on results that do not exist yet. Since task 9 (2026-11-12), only E7 (task 10) is still marked. Status: 2026-11-12, after task 9.
+Answers marked **(after P7)** depended on results that did not exist yet. Since task 10 (2026-11-12), no answer has this mark. Status: 2026-11-12, after task 10.
 
 ---
 
@@ -109,11 +109,11 @@ Yes. All randomness comes from one seed, scores are integers, ties are total, fi
 *Evidence:* super-plan §2.
 
 **Q25. What does the new feed cost?**
-E7 measures latency and query count for `chrono`, `engagement` and `social` with k6 on size M: 5 runs, the first dropped, median with a CI. A run counts only with zero failed requests.
-*Evidence:* E7 **(after P7)**.
+About the same for all three feeds. E7 ran k6 on `syn-W2M-M` with the page cache off on one machine: 5 runs, the first dropped, median with a CI, and a run counts only with zero failed requests. Page 1 takes a median of 38.1 ms for `social`, 36.9 ms for `chrono` and 36.3 ms for `engagement`, and a request sends about 19.6 to 19.7 Prisma queries for all three. The intervals overlap, so the formula adds little. The numbers compare the feeds on one machine; they are not absolute speed.
+*Evidence:* E7 (task 10): `.docs/results/p7-e7/`, table e7 in `.docs/results/p7-report/`, `docs/System_Architecture.md` §6.5.
 
 **Q26. Why is the score computed per request and not stored in a table?**
-It is a cheap formula over counts the database already has. Computing it per request keeps the feed fresh and needs no batch job. E7 shows whether this is fast enough.
+It is a cheap formula over counts the database already has. Computing it per request keeps the feed fresh and needs no batch job. E7 shows the cost: a median of 38.1 ms for page 1 with `social`, against 36.9 ms with `chrono`.
 
 **Q27. Why put the ranking code in a separate package?**
 So that the evaluation runs exactly the production code without starting the server, the database or the cache. The backend imports the package; nothing imports the evaluation.
