@@ -1,6 +1,6 @@
 # Plan: Hive side check for the community term
 
-Status: approved · 2026-11-12
+Status: done · 2026-11-12
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-12-p7-hive-check/`
 
 ---
