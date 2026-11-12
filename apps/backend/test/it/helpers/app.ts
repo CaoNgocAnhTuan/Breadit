@@ -1,3 +1,4 @@
+import type { Type } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import * as fs from 'fs';
@@ -5,12 +6,23 @@ import { AppModule } from '../../../src/app.module';
 import { MAX_UPLOAD_BYTES, setupApp } from '../../../src/app.setup';
 import { multipart, type MultipartFile } from './multipart';
 
-/** Boots the real app (same setup as `main.ts`) without listening on a port. */
-export async function createTestApp(): Promise<NestFastifyApplication> {
+/** A provider to replace in the app before it compiles (`useClass` or `useValue`). */
+export type ProviderOverride = { provide: Type | string | symbol } & ({ useClass: Type } | { useValue: unknown });
+
+/**
+ * Boots the real app (same setup as `main.ts`) without listening on a port.
+ * `overrides` replaces providers before compile; with none, the app is the real one.
+ */
+export async function createTestApp(overrides: ProviderOverride[] = []): Promise<NestFastifyApplication> {
   const uploadDir = process.env.UPLOAD_DIR as string;
   fs.mkdirSync(uploadDir, { recursive: true });
 
-  const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+  let builder = Test.createTestingModule({ imports: [AppModule] });
+  for (const o of overrides) {
+    const over = builder.overrideProvider(o.provide);
+    builder = 'useClass' in o ? over.useClass(o.useClass) : over.useValue(o.useValue);
+  }
+  const moduleRef = await builder.compile();
   const app = moduleRef.createNestApplication<NestFastifyApplication>(
     new FastifyAdapter({ logger: false, bodyLimit: MAX_UPLOAD_BYTES }),
   );

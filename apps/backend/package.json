@@ -8,7 +8,8 @@
     "start": "node dist/main.js",
     "test": "jest --selectProjects unit --passWithNoTests",
     "test:it": "jest --selectProjects it --runInBand --forceExit",
-    "test:parity": "jest --selectProjects parity --runInBand --forceExit"
+    "test:parity": "jest --selectProjects parity --runInBand --forceExit",
+    "bench:prepare": "jest --selectProjects bench --runInBand --forceExit"
   },
   "dependencies": {
     "@breadit/ranking": "0.1.0",

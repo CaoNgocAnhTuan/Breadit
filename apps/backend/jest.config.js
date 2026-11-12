@@ -37,5 +37,16 @@ module.exports = {
       setupFiles: ['<rootDir>/test/parity/env.ts'],
       globalSetup: '<rootDir>/test/parity/global-setup.ts',
     },
+    {
+      // E7 prepare step (task p7-cost-benchmark): counts the Prisma queries of each feed request and writes the raw
+      // files of the benchmark. Same data and checks as the parity test (schema `eval_load`, Redis db 2).
+      // Run it with `npm run bench:prepare -w @breadit/backend`, or through `npm run bench:e7`. It never writes Postgres.
+      ...common,
+      displayName: 'bench',
+      rootDir: '.',
+      testMatch: ['<rootDir>/test/bench/**/*.bench-spec.ts'],
+      setupFiles: ['<rootDir>/test/parity/env.ts', '<rootDir>/test/bench/env.ts'],
+      globalSetup: '<rootDir>/test/parity/global-setup.ts',
+    },
   ],
 };
