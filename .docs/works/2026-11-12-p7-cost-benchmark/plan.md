@@ -1,6 +1,6 @@
 # Plan: P7 cost benchmark (E7)
 
-Status: approved · 2026-11-12
+Status: done · 2026-11-12
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-12-p7-cost-benchmark/`
 
 All commits go on `test-app` and are never pushed. Steps 2, 6 and the acceptance items need `docker compose up db redis -d` and `syn-W2M-M` loaded into `eval_load` without `--rebase-to`. Step 6 also needs k6 (installed: v1.7.1).
