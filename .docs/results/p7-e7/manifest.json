@@ -1,0 +1,83 @@
+{
+  "bootstrap": {
+    "keptRunsPerAlgo": 4,
+    "level": 0.95,
+    "resamples": 10000,
+    "stream": "bootstrap-median",
+    "unit": "run median"
+  },
+  "dataset": {
+    "id": "syn-W2M-M",
+    "manifestSha256": "a144074779cbd1187c825a8c872c9d9e196a90da5061067d8488ae63224962ed"
+  },
+  "environment": {
+    "asOfEnabled": true,
+    "backend": "node dist/main.js, built and started by .claude/hooks/run-safe.sh on localhost",
+    "cacheEnabled": false,
+    "cores": 8,
+    "cpuModel": "Apple M1",
+    "docker": "29.9.2",
+    "k6": "k6 v1.7.1 (commit/devel, go1.26.1, darwin/arm64)",
+    "loadAverageAtStart": [
+      5.35,
+      5.9,
+      4.74
+    ],
+    "loadProfile": {
+      "algoOrder": "rotated by one algo each round (round 1: chrono, engagement, social)",
+      "executor": "shared-iterations",
+      "iterations": 100,
+      "order": "the 100 pairs of .docs/results/p6-parity/pairs.csv, in file order",
+      "request": "GET /api/posts?algo=<algo>&asOf=<as_of_unix of the pair>, page 1",
+      "rounds": 5,
+      "sleep": "none",
+      "vus": 1,
+      "warmupRounds": 1
+    },
+    "memoryBytes": 17179869184,
+    "node": "v22.23.4",
+    "os": "Darwin 25.6.0 arm64",
+    "postgres": "postgres (PostgreSQL) 16.15",
+    "postgresImage": "postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea id sha256:ef738a34a8651d11b2bace81c55c7e2187f786b484add6c83070884340074368",
+    "redisDatabase": 3,
+    "redisImage": "redis:7-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499 id sha256:ec4f171e9ff071bb2a1c936057d3be00206069b028b6c0d61df2477e1dd02c42",
+    "schema": "eval_load",
+    "throttleLimit": 1000000
+  },
+  "files": {
+    "latency.csv": {
+      "rows": 3,
+      "sha256": "7ad05f279acdcd377d36e5b456821bea9670dc47fbf3ebb7dfe68ee7af894215"
+    },
+    "queries-raw.csv": {
+      "rows": 300,
+      "sha256": "884975299a6d0635c0ad5c59099307cfcc770055b5a36343cadc7ad5e3c4f2e3"
+    },
+    "queries.csv": {
+      "rows": 3,
+      "sha256": "6f51c7b4be0cfe1714ad391831565f8faad433261305fbbdbfb5937e172af894"
+    },
+    "runs.csv": {
+      "rows": 15,
+      "sha256": "473ccd196c9ce28f62682eabd06509f8de59400bad58b114e28b8c45fb19ea12"
+    }
+  },
+  "masterSeed": 20261014,
+  "node": "v22.23.4",
+  "params": {
+    "alpha": 1,
+    "beta": 1,
+    "m": 5,
+    "methods": {
+      "chrono": "BL0",
+      "engagement": "BL2",
+      "social": "H"
+    },
+    "pool": {
+      "maxPosts": 2000,
+      "windowSec": 604800
+    }
+  },
+  "runId": "p7-e7",
+  "schemaVersion": 1
+}
