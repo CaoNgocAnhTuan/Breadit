@@ -123,7 +123,7 @@ A follow counts for a test only if it is dated before that test's time, so no la
 - Synthetic results show that the **mechanism** works when the effect exists; they are not proof about real users.
 - Digg: 3,553 stories over 36 days, only front-page stories (all already popular, which helps popularity baselines); about 41% of voters are not in the friend table; the graph is one crawl from July 2009.
 - On Digg, 55% of kept cold-start test users follow nobody at their test time; for them H equals BL2.
-- No dataset found has follows, interactions and communities together, so community evidence is synthetic only.
+- No dataset found has follows, interactions and communities together, so community evidence is synthetic only. Hive was the one real candidate. Task `p7-hive-check` (2026-11-12) could not get its data. The SoChainDB copy on BigQuery refused access. HiveSQL is paid and keeps community joins and follows with no time. So Hive is future work.
 
 ## 11. Check yourself
 

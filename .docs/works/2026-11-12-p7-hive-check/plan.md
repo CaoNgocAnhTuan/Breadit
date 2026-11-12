@@ -62,10 +62,10 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-12-p7-hive-check/
 
 #### Step 3: The queries (Claude and the author, effort S)
 
-- [ ] Claude writes `queries/q0.sql` (design: Code files): the table list and the column names of `steemit-307308.hive_zurich`, with each table's first and last block time.
-- [ ] The author opens a Google Cloud project (sandbox first, Spec Open question 1), runs Q0, and gives Claude the result. If Q0 cannot run, this is design F1: the author decides on billing at once, or the gate fails.
+- [x] Claude writes `queries/q0.sql` (design: Code files): the table list and the column names of `steemit-307308.hive_zurich`, with each table's first and last block time.
+- [x] The author opens a Google Cloud project (sandbox first, Spec Open question 1), runs Q0, and gives Claude the result. If Q0 cannot run, this is design F1: the author decides on billing at once, or the gate fails.
 - [ ] Claude writes `queries/q1.sql` to `q6.sql` with the real column names and the `_TABLE_SUFFIX` ranges from Q0 (design F2, F3). Every query returns plain strings and integer Unix seconds, in the columns `HiveRaw` expects.
-- [ ] Commit: `docs: p7-hive-check queries`
+- [x] Commit: `docs: p7-hive-check queries`
 
 #### Step 4: The data (the author, with Claude; effort S)
 
@@ -77,8 +77,8 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-12-p7-hive-check/
 #### Step 5: Run the gate, then Stop G (Claude, effort XS)
 
 - [ ] Run the gate CLI on `datasets/raw/hive/`. Copy the printed lines to the run log.
-- [ ] Commit: `chore: p7-hive-check gate result` (`gate.md`, the run log).
-- [ ] **Stop G.** Show the author `gate.md`. On a fail, or if Step 3 or 4 was not done by 11-14: skip to "Claude's part, on a fail". On a pass: Stage 2.
+- [x] Commit: `chore: p7-hive-check gate result` (`gate.md`, the run log).
+- [x] **Stop G.** Show the author `gate.md`. On a fail, or if Step 3 or 4 was not done by 11-14: skip to "Claude's part, on a fail". On a pass: Stage 2.
 
 ### Stage 2: only on a pass
 
@@ -119,9 +119,9 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-12-p7-hive-check/
 
 ## Claude's part
 
-- [ ] After Steps 1–2: read the commits and the diff against the design. Check that `git diff --stat` shows nothing under `eval/` (DW4).
-- [ ] Steps 3–5 with the author, as written above.
-- [ ] **On a fail (at Stop G).** Docs (DW3), one commit `docs: close p7-hive-check (gate failed)`:
+- [x] After Steps 1–2: read the commits and the diff against the design. Check that `git diff --stat` shows nothing under `eval/` (DW4).
+- [x] Steps 3–5 with the author, as written above.
+- [x] **On a fail (at Stop G).** Docs (DW3), one commit `docs: close p7-hive-check (gate failed)`:
   - `.docs/super-plan.md`: §4 row P7 (`p7-hive-check` closed, gate failed), the "Hive side check" paragraph gets a status line with the gate number, §8 the Hive risk with what was found, §11 item 8 closed, a change-log line. Decision Q2 stays.
   - `.docs/implementation-plan.md`: row 9b "gate failed" with the date, and a change-log line.
   - `.docs/datasets.md`: a short Hive section (source, slice, gate number, why not used).
@@ -133,7 +133,7 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-12-p7-hive-check/
   - `docs/Guidance-Manual/{en,vi}/04-data.md` (Hive data), `05-evaluation-protocol.md` (the Hive run, no family) and `10-defense-qa.md` (a question on the community term on real data); same content in both languages.
   - `docs/System_Architecture.md`: the Hive adapter, config and results in the tree.
   - `CLAUDE.md`: the `adapt:hive` command.
-- [ ] `bash .claude/hooks/verify.sh`, the Acceptance items, the Result, then close the task.
+- [x] `bash .claude/hooks/verify.sh`, the Acceptance items, the Result, then close the task.
 
 ## Tests
 
@@ -150,15 +150,28 @@ Eval tests run under `node --test` with no Docker. The task-folder tests run the
 
 ## Acceptance
 
-- [ ] DW1: the run log and `gate.md` hold the dry-run bytes and the row counts of Q1–Q6, with the date → present for every query (or `gate.md` says why BigQuery could not run).
-- [ ] DW2: `gate.md` has the verdict, T, the bucket table and the gate number → "pass" exactly when the gate number is at least 100.
-- [ ] DW3: `git diff` of the super-plan and the blueprint at the close → the lines of "Claude's part" for the outcome, and no change to §5, §6 or the rest of §7 (only the new T, on a pass).
-- [ ] DW4: at Stop G, `git diff --stat` since the task's first commit → nothing under `eval/`, `packages/` or `apps/`; `npm run verify -w @breadit/eval` passes.
-- [ ] DW5: `git status --ignored datasets/raw/` → the Hive files are ignored; no list of Hive account names and no name-to-id map in any commit of the task (the 20 community ids `hive-NNNNNN` may be committed).
+- [x] DW1: the run log and `gate.md` hold the dry-run bytes and the row counts of Q1–Q6, with the date → present for every query (or `gate.md` says why BigQuery could not run).
+- [x] DW2: `gate.md` has the verdict, T, the bucket table and the gate number → "pass" exactly when the gate number is at least 100.
+- [x] DW3: `git diff` of the super-plan and the blueprint at the close → the lines of "Claude's part" for the outcome, and no change to §5, §6 or the rest of §7 (only the new T, on a pass).
+- [x] DW4: at Stop G, `git diff --stat` since the task's first commit → nothing under `eval/`, `packages/` or `apps/`; `npm run verify -w @breadit/eval` passes.
+- [x] DW5: `git status --ignored datasets/raw/` → the Hive files are ignored; no list of Hive account names and no name-to-id map in any commit of the task (the 20 community ids `hive-NNNNNN` may be committed).
 - [ ] DW6 (pass only): the two adapter manifests are byte-identical, and the eval `check` passes for `hive-2021q1`.
 - [ ] DW7 (pass only): `.docs/results/p7-hive/` has `summary.csv` and `compare.csv` with H-comm, H-follow and H − BL2 and no p-value; its manifest hashes match the files.
 - [ ] Pass only: every value in `p7-hive.json` equals a `chosen` = 1 row of `p7-hive-tune/tuning.csv`.
-- [ ] `bash .claude/hooks/verify.sh` → every check passes.
+- [x] `bash .claude/hooks/verify.sh` → every check passes.
 
 ## Result
+
+Closed on 2026-11-12. **Gate failed** at Step 3 (design F1), so Stage 2 did not start. The author decided to close the task.
+
+- **Done.** Steps 1–2 by Sonnet: `hive-transform.ts` and `gate.ts` in this folder, with 26 tests (TC1: 12, TC2: 14), all passing. Nothing under `eval/`, `packages/` or `apps/` changed (DW4). Step 3: `queries/q0.sql`. The author opened a BigQuery sandbox project and ran Q0a and a direct read of `block_data_48000001_50000000_33`. Both gave `Access Denied` (`bigquery.tables.getData` on `steemit-307308`), and starring the project failed. The texts are in `gate.md` and `run_output.txt`.
+- **Other source checked.** HiveSQL, at the author's request: paid (registration 1 HBD, then 5 HBD a day), and `CommunitiesSubscribers` and `Followers` have no join or follow time. Not used (`gate.md`).
+- **Not done, because the gate failed.** Q1–Q6, Step 4 (no data, no `sources.json`), the gate run of Step 5 (no gate number, no T, no bucket table), and Stage 2 (Steps 6–10, TC3–TC5). DW6 and DW7 do not apply. DW1 and DW2 are met by the "BigQuery could not run" branch of the Spec.
+- **Differences from the plan.**
+  - Sonnet made three small changes. `subscribes` has no command column, so Q5 would export only `subscribe`. `runGate` also checks each file's row count against `sources.json`. `runGate` takes the path of `sources.json` as a third parameter.
+  - `design.md` and `plan.md` were not in git at the start. `plan.md` entered with Step 1; Claude committed `design.md` (`295a10c`).
+  - Step 5's commit holds `gate.md` written by Claude from the errors, not by `gate.ts`.
+- **Commits.** `1597841` feat: Hive transform for the p7-hive-check gate · `5d8c973` feat: gate script for p7-hive-check · `295a10c` docs: p7-hive-check spec and design · `bf696d6` docs: p7-hive-check queries · `8c940fc` chore: p7-hive-check gate result · and the close commit `docs: close p7-hive-check (gate failed)`.
+- **Docs updated.** `.docs/super-plan.md` 0.27 (P7 Hive status, §4 row P7, §8, §11 item 8, change log), `.docs/implementation-plan.md` 1.10 (row 9b, §6, change log), `.docs/datasets.md` §9 (new), `docs/Guidance-Manual/en/04-data.md` and `vi/04-data.md` (§10, one sentence on Hive). `docs/System_Architecture.md` names no Hive part, so it is unchanged. Decision Q2 stays; no frozen value changed.
+- **Verify.** `verify.sh`: every check passes (ranking 85, backend unit 189, eval verify). The integration tests were skipped because db and redis were not running; this task changes no backend code.
 

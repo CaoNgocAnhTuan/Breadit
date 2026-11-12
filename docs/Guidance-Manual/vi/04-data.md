@@ -123,7 +123,7 @@ Một follow chỉ được tính cho một lần test nếu ngày của nó tr�
 - Kết quả synthetic cho thấy **cơ chế** hoạt động khi hiệu ứng có thật; chúng không phải bằng chứng về user thật.
 - Digg: 3.553 bài trong 36 ngày, chỉ bài lên trang nhất (bài nào cũng đã phổ biến, có lợi cho baseline phổ biến); khoảng 41% người vote không có trong bảng friend; đồ thị là một lần crawl từ tháng 7/2009.
 - Trên Digg, 55% user test cold-start được giữ lại không follow ai tại thời điểm test của họ; với họ H bằng BL2.
-- Không tìm được dataset nào có cùng lúc follow, tương tác và community, nên bằng chứng về community chỉ từ synthetic.
+- Không tìm được dataset nào có cùng lúc follow, tương tác và community, nên bằng chứng về community chỉ từ synthetic. Hive là ứng viên thật duy nhất. Task `p7-hive-check` (2026-11-12) không lấy được dữ liệu của nó. Bản SoChainDB trên BigQuery từ chối truy cập. HiveSQL phải trả phí và lưu việc join community và follow mà không có thời gian. Vì vậy Hive là hướng phát triển sau (future work).
 
 ## 11. Tự kiểm tra
 

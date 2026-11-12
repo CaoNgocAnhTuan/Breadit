@@ -258,3 +258,11 @@ Two more facts for the P4 text (the license sentence was applied in commit `eb9a
 - Hogg, Lerman (2012), Social Dynamics of Digg, EPJ Data Science 1(5): named on the Digg page (the paper was not opened).
 - Tang, Epinions and Ciao: https://www.cse.msu.edu/~tangjili/datasetcode/truststudy.htm (live host refused the connection; Internet Archive snapshot 20260913164449 opened). Trust README in the same snapshot: `README_trust_timestamp.txt` (opened 2026-10-27).
 - Weibo: https://ieee-dataport.org/node/13574 (page opened); https://openi.pcl.ac.cn/GuhuangAI/TransHawkes (page opened); https://lists.aoir.org/archives/list/air-l@lists.aoir.org/thread/M5G6GPRDYFS6YLPTK4PJ45BIZB2YSJBV/ (page opened). Not opened: https://datahub.hku.hk/articles/dataset/Weiboscope_Open_Data/16674565 (HTTP 403 and a bot check), https://service.tib.eu/ldmservice/dataset/weiboscope-dataset (bot check page). Web search results for Weibo sets: search only.
+
+## 9. Hive side check (task `p7-hive-check`, 2026-11-12)
+
+Hive was the one real candidate with community posts, dated votes and dated community joins (super-plan P7). The gate failed, so Hive is not used, and decision Q2 (section 7) stays: the community term is tested on synthetic data only.
+
+- **SoChainDB** (Nguyen et al., SIGIR '22, CC BY-SA 4.0), BigQuery project `steemit-307308`, dataset `hive_zurich`. From a sandbox project of the author, the table list (`__TABLES__`) and a data table (`block_data_48000001_50000000_33`) both gave `Access Denied` (`bigquery.tables.getData`). The project could not be starred. So the dataset is no longer readable from outside. Billing would not change a missing grant.
+- **HiveSQL** (hivesql.io, MS SQL Server). Paid: registration 1 HBD, then 5 HBD a day or 50 HBD a month (the page's button says 40), paid from a Hive account. `CommunitiesSubscribers` and `Followers` hold the current state only, with no join or follow time. `TxCustoms` holds the operations, but its docs page lists no time column. The history range and any rule on publishing extracted data are not stated.
+- **Kept for later.** The SQL of the first query, the transform to the canonical format and the gate script, with 26 tests, are in `.docs/works/2026-11-12-p7-hive-check/`. The details and the error texts are in its `gate.md`.
