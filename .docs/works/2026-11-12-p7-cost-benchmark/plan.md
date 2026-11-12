@@ -43,15 +43,46 @@ All commits go on `test-app` and are never pushed. Steps 2, 6 and the acceptance
 
 Claude does these after step 7, with the backend from `run-safe.sh` where needed, and stops it after.
 
-- [ ] DW2: backend on `eval_load` with `THROTTLE_LIMIT` set to the E7 value, 1,300 calls to `/api/posts` from one IP within a minute → no 429. Restart with `THROTTLE_LIMIT` unset → the 1,001st call in a minute gives 429.
-- [ ] DW2 (start rule): start the backend with `THROTTLE_LIMIT=abc` → it does not start, and the log names `THROTTLE_LIMIT`.
-- [ ] DW3: `.docs/results/p7-e7/` has `latency.csv` (3 algos), `queries.csv`, `runs.csv` (15 rows, 0 failed, round 1 marked warm-up) and `manifest.json` with the machine, versions, cache off, the throttle limit and the dataset hash.
-- [ ] DW4: run the prepare step a second time → `queries-raw.csv` is byte-identical to the first.
-- [ ] DW5: the runner with `--throttle-limit 50` → it stops with an error naming `http_req_failed`, the backend is stopped, and no new `latency.csv` is written (the committed one is unchanged).
-- [ ] DW6: `git diff` of `macros.csv` and `results-macros.tex` from step 6 → only added lines.
-- [ ] DW7: `test:parity` passes.
-- [ ] DW8: `verify.sh` passes.
-- [ ] DW9: `git diff` of the docs of step 7 → E7 done, no E7 "(after P7)" left in `en/` or `vi/`, N6 resolved with its commit.
+- [x] DW2: backend on `eval_load` with `THROTTLE_LIMIT` set to the E7 value, 1,300 calls to `/api/posts` from one IP within a minute → no 429. Restart with `THROTTLE_LIMIT` unset → the 1,001st call in a minute gives 429.
+- [x] DW2 (start rule): start the backend with `THROTTLE_LIMIT=abc` → it does not start, and the log names `THROTTLE_LIMIT`.
+- [x] DW3: `.docs/results/p7-e7/` has `latency.csv` (3 algos), `queries.csv`, `runs.csv` (15 rows, 0 failed, round 1 marked warm-up) and `manifest.json` with the machine, versions, cache off, the throttle limit and the dataset hash.
+- [x] DW4: run the prepare step a second time → `queries-raw.csv` is byte-identical to the first.
+- [x] DW5: the runner with `--throttle-limit 50` → it stops with an error naming `http_req_failed`, the backend is stopped, and no new `latency.csv` is written (the committed one is unchanged).
+- [x] DW6: `git diff` of `macros.csv` and `results-macros.tex` from step 6 → only added lines.
+- [x] DW7: `test:parity` passes.
+- [x] DW8: `verify.sh` passes.
+- [x] DW9: `git diff` of the docs of step 7 → E7 done, no E7 "(after P7)" left in `en/` or `vi/`, N6 resolved with its commit.
 
 ## Result
 
+
+Done on 2026-11-12. Implemented by Sonnet, then verified by Claude. All 7 steps and all 9 acceptance items pass.
+
+**E7 result** (`.docs/results/p7-e7/`, Apple M1, page cache off, α = β = 1). Each value is the median of the 4 kept run medians, with its 95% bootstrap CI:
+- `chrono`: 36.9 ms [35.4, 38.4], p95 43.0 ms.
+- `engagement`: 36.3 ms [36.0, 36.8], p95 44.7 ms.
+- `social`: 38.1 ms [36.4, 38.4], p95 45.9 ms.
+- Queries per request: 19.65 / 19.63 / 19.65 on average, 17 to 21 for all three. `FeedService.rank` loads the same data for every `algo`; only the scorer differs.
+
+All 15 runs had 0 failed requests. The whole run takes about 95 s. The load average was about 5 on 8 cores at the start (recorded in `environment.json`), so the machine was not quiet.
+
+**Tests.** Backend unit 203 (14 new), bench 4, parity 102, IT 146, eval 411, ranking 85. `verify.sh`: all PASS.
+
+**Commits.** `c5cdec4`, `6fa6ee9`, `f611e97`, `b5d3743`, `7ac7e5c`, `c74a3ff`, `6505a16`, `4aa8a2d`, plus the closing commit of this task.
+
+**Acceptance.**
+- DW2: with `THROTTLE_LIMIT=1000000`, 1,300 calls gave no 429. With it unset, the first 429 came at call 1,001. `abc` stops the app with an error that names `THROTTLE_LIMIT`.
+- DW4: a rerun of the prepare step gave the same `queries-raw.csv` SHA-256 (`884975…`).
+- DW5: `--throttle-limit 50` exits 1 with "50 of 100 requests failed … 429 x 50". The backend is stopped, and the committed results do not change.
+- DW6: `macros.csv` and `results-macros.tex` only gained lines (30).
+
+**Differences from the plan.**
+1. **Pool pings are not counted.** `CountingPrisma` ignores the statement `SELECT 1`. Without this rule, two passes differed by 1 to 3 queries on 3 of the 300 requests (F8). Prisma's connection pool sends these pings itself, and the app never sends `SELECT 1` (no raw query in `apps/backend/src`).
+2. **New PRNG stage name.** `bootstrap-median` was added to `STAGE_NAMES` in `eval/src/rng.ts`, to its test, and to `.docs/implementation-plan.md` §2.4. The design did not list `rng.ts`.
+3. **Extra summary file.** The summary logic is in `eval/src/bench/write.ts`, with `write.test.ts`, following the pattern of `parity/write.ts`.
+4. **Runner details.** The runner builds `@breadit/shared` and `@breadit/ranking` first, and stops only a backend it started itself.
+5. **Report.** `buildTables` now gives ten tables, and `results.md` says "thirteen runs".
+
+**Open.**
+- `CLAUDE.md` does not mention `bench:e7`, `bench:prepare`, `e7:summary` or `THROTTLE_LIMIT` yet. It was left for the author.
+- A rerun on a quiet machine is optional.
