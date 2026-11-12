@@ -1,6 +1,6 @@
 # P7 results
 
-Written by `npm run report -w @breadit/eval` from the results of the twelve P7 runs. Do not edit: change the results and run it again.
+Written by `npm run report -w @breadit/eval` from the results of the thirteen P7 runs. Do not edit: change the results and run it again.
 
 ## tuning: Values chosen on the validation split (the highest NDCG@10, a tie to the smaller value)
 
@@ -137,6 +137,14 @@ Written by `npm run report -w @breadit/eval` from the results of the twelve P7 r
 | BL6 | 0.011 | 0.011 | 0.025 | 0.025 |
 | H | 0.054 | 0.054 | 0.024 | 0.024 |
 
+## e7: Cost of the three feeds, page 1 on one machine with the page cache off: median of the kept runs with its 95% bootstrap interval, p95, and Prisma queries per request
+
+| Algo | Median (ms) | CI low | CI high | p95 (ms) | Queries (mean) | Queries (min) | Queries (max) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| chrono | 36.854 | 35.434 | 38.407 | 42.950 | 19.650 | 17 | 21 |
+| engagement | 36.315 | 36.029 | 36.805 | 44.668 | 19.630 | 17 | 21 |
+| social | 38.061 | 36.366 | 38.434 | 45.881 | 19.650 | 17 | 21 |
+
 ## e8: NDCG@10 on syn-W2M-M with the normal and the larger pool
 
 | Method | Normal, all | Normal, 0-4 | Larger pool, all | Larger pool, 0-4 |
@@ -190,6 +198,21 @@ Written by `npm run report -w @breadit/eval` from the results of the twelve P7 r
 | \eOneWTwoMNdcgBLTwoTenAllValue | 0.009 | p7-main/summary.csv syn-W2M-M|test|BL2|10|all ndcg |
 | \eOneWTwoMNdcgHTenAllValue | 0.054 | p7-main/summary.csv syn-W2M-M|test|H|10|all ndcg |
 | \eOneWTwoMTestUsersAllN | 590 | p7-main/leftout.csv syn-W2M-M|test|all n_test_users |
+| \eSevenChronoCiHigh | 38.407 | p7-e7/latency.csv chrono ci_high_ms |
+| \eSevenChronoCiLow | 35.434 | p7-e7/latency.csv chrono ci_low_ms |
+| \eSevenChronoMedian | 36.854 | p7-e7/latency.csv chrono median_ms |
+| \eSevenChronoPNinetyFive | 42.950 | p7-e7/latency.csv chrono p95_ms |
+| \eSevenChronoQueriesMean | 19.650 | p7-e7/queries.csv chrono mean |
+| \eSevenEngagementCiHigh | 36.805 | p7-e7/latency.csv engagement ci_high_ms |
+| \eSevenEngagementCiLow | 36.029 | p7-e7/latency.csv engagement ci_low_ms |
+| \eSevenEngagementMedian | 36.315 | p7-e7/latency.csv engagement median_ms |
+| \eSevenEngagementPNinetyFive | 44.668 | p7-e7/latency.csv engagement p95_ms |
+| \eSevenEngagementQueriesMean | 19.630 | p7-e7/queries.csv engagement mean |
+| \eSevenSocialCiHigh | 38.434 | p7-e7/latency.csv social ci_high_ms |
+| \eSevenSocialCiLow | 36.366 | p7-e7/latency.csv social ci_low_ms |
+| \eSevenSocialMedian | 38.061 | p7-e7/latency.csv social median_ms |
+| \eSevenSocialPNinetyFive | 45.881 | p7-e7/latency.csv social p95_ms |
+| \eSevenSocialQueriesMean | 19.650 | p7-e7/queries.csv social mean |
 | \eSixDiggNdcgBLTwoTenAllValue | 0.024 | p7-e6-ties/summary.csv digg2009|test|BL2|10|all ndcg |
 | \eSixDiggNdcgHTenAllValue | 0.024 | p7-e6-ties/summary.csv digg2009|test|H|10|all ndcg |
 | \eSixWTwoMNdcgBLTwoTenAllValue | 0.009 | p7-e6-ties/summary.csv syn-W2M-M|test|BL2|10|all ndcg |

@@ -5,16 +5,16 @@
       "sha256": "5315b3ce910bda260d1359dcbe88b1f62dcb68e0c10d42d2aacacf8573a0f864"
     },
     "macros.csv": {
-      "rows": 71,
-      "sha256": "9ef3576dee924ba7ac2a573152074cf5d3219b3a17d87f83ea349adcfd08729c"
+      "rows": 86,
+      "sha256": "e7730366b48353df7b6d1c064bbcb625c57d26c540b4d839d788a03357c20102"
     },
     "results-macros.tex": {
-      "rows": 71,
-      "sha256": "3a1b3fa4b51c1493731b3495a23305b94ee8359eb1854e8ccaefaf92604575fb"
+      "rows": 86,
+      "sha256": "74b3cc2d54a6501243e8f453f18db27629264774b720bc775dd3cf3f1299278e"
     },
     "results.md": {
-      "rows": 221,
-      "sha256": "80251c553217168efd15b83b93567b934f41106d449a954c50644dec495b7e63"
+      "rows": 244,
+      "sha256": "031ebc481aa3abecf3c9493e77b7ce18d4d49f1b28803092060cb2215ad1d468"
     },
     "tables/e1.tex": {
       "rows": 16,
@@ -40,6 +40,10 @@
       "rows": 16,
       "sha256": "130369860c897f9642ffe2d3c69a846d340ec87fa7081c9d10f8ab9dacf9c82a"
     },
+    "tables/e7.tex": {
+      "rows": 10,
+      "sha256": "9b811b72f180fdbfb8c8f283161127abec9badbd6be9b78c09e5414c412439a9"
+    },
     "tables/e8.tex": {
       "rows": 10,
       "sha256": "ce7c3d9f65aeab57c4f13d7d7e9db4b7b99e976d43e4458b1068e09ab18776b8"
@@ -61,6 +65,7 @@
     "p7-e5-shuffle": "abe71b605ce5f6b98cd8e33653328586b2aaa30077c22eac928dc3d707f24f58",
     "p7-e5-worlds": "3c091c15fc5126382bb38459909aec1373080a297a779fe30d46d28583a50fe9",
     "p7-e6-ties": "0403d6606e68dc93a5382ece769c1b63dc2d98d65b39f1291f9372f157f7038c",
+    "p7-e7": "88bcf1a4043b1d529fd30f06a6af98081d276abecb8db62dcbb38ae463014f3c",
     "p7-e8-pool": "b1b70c4885f85de3b1f36f61ca849ac51e55f4517715da2f8bf743af17760f86",
     "p7-h0": "6413fa7d4d2ebdaf8a92bc55f9dd86978b1ae83c65f0a83a2a7ab369399bb08f",
     "p7-main": "f1f66628ec2ad72832fa1de336167d42ae95ab6936f3f38404c423c6c12459dc",
