@@ -19,13 +19,14 @@ import { UsersModule } from './users/users.module';
 import { AdminModule } from './admin/admin.module';
 import { CommentsModule } from './comments/comments.module';
 import { CacheModule } from './cache/cache.module';
+import { THROTTLE_TTL_MS, readThrottleLimit } from './throttle/throttle.config';
 import Redis from 'ioredis';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ThrottlerModule.forRoot({
-      throttlers: [{ ttl: 60000, limit: 1000 }],
+      throttlers: [{ ttl: THROTTLE_TTL_MS, limit: readThrottleLimit(process.env) }],
       storage: new ThrottlerStorageRedisService(
         new Redis(process.env.REDIS_URL ?? 'redis://redis:6379'),
       ),

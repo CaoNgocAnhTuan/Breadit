@@ -112,6 +112,7 @@ Copy `.env.example` to `.env`:
 | `REDIS_HTTP_CACHE_ENABLED` | `false` turns off the Redis JSON cache (default `true`) |
 | `FEED_DEFAULT_ALGO` | The ranking of the logged-in "For You" when the request has no `algo`: `chrono`, `engagement` or `social`. Unset means the pre-thesis For You (your and your followees' posts, newest first). Another value stops the backend at start |
 | `FEED_ASOF_ENABLED` | Test only. `true` lets `GET /api/posts` take `asOf` (Unix seconds) to rank the feed at a past time. The backend refuses to start with it when `NODE_ENV=production` |
+| `THROTTLE_LIMIT` | Requests per 60 s per route per IP (default `1000`). It must be a positive whole number; another value stops the backend at start. The E7 benchmark (`npm run bench:e7`) raises it, because k6 sends every call from one IP and would get 429 |
 
 `STORAGE_DRIVER` is in `.env.example` but the code does not read it (Bugs Report R4).
 
