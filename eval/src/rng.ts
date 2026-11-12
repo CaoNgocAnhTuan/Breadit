@@ -11,6 +11,7 @@ export const STAGE_NAMES = [
   "permutation",
   "parity",
   "shuffle",
+  "bootstrap-median",
 ] as const;
 
 export type StageName = (typeof STAGE_NAMES)[number];

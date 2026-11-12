@@ -76,7 +76,7 @@ test("int(n) has no obvious bias", () => {
 
 test("a stage name outside blueprint section 2.4 is a runtime error", () => {
   assert.deepEqual([...STAGE_NAMES], [
-    "users", "follows", "communities", "posts", "interactions", "bootstrap", "permutation", "parity", "shuffle",
+    "users", "follows", "communities", "posts", "interactions", "bootstrap", "permutation", "parity", "shuffle", "bootstrap-median",
   ]);
   // @ts-expect-error not a stage name
   assert.throws(() => rng(seed, "usres"), /stage/);

@@ -15,6 +15,7 @@
     "report": "node src/cli/report.ts",
     "rank": "node --max-old-space-size=4096 src/cli/rank.ts",
     "parity": "node --max-old-space-size=4096 src/cli/parity.ts",
+    "e7:summary": "node src/cli/e7-summary.ts",
     "load": "node src/cli/load.ts",
     "load:check": "node src/cli/load-check.ts"
   },
