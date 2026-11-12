@@ -49,16 +49,16 @@ Design: [design.md](design.md) · Folder: `.docs/works/2026-11-12-p7-hive-check/
 
 #### Step 2: The gate script (Sonnet, effort S)
 
-- [ ] Tests first: **TC2** in `gate.test.ts` (task folder, the test file of design `gate.ts`).
-- [ ] `gate.ts` (design: Approach, "The gate reuses the eval code"). `runGate(rawDir, scratchDir): GateResult`:
+- [x] Tests first: **TC2** in `gate.test.ts` (task folder, the test file of design `gate.ts`).
+- [x] `gate.ts` (design: Approach, "The gate reuses the eval code"). `runGate(rawDir, scratchDir): GateResult`:
   - read `sources.json`, check every raw file's SHA-256, and stop on any difference;
   - call `toHiveCanonical`, write the six tables with `writeTable` to `scratchDir`, with a manifest whose `source.kind` is `"hive"`;
   - run `checkFormat` and keep its result lines (the `community-non-member` count is reported, not fatal; any other error stops the gate);
   - `loadDataset`, then `bucketReport` with `cutQuantile`, `windowDays` and `poolCap` from `loadFrozen()`;
   - walk the test users with `testItems`, `earlierEvents`, `buildIndex`, `inPool` and `bucketOf`, and count the kept users of bucket 0–4 with a membership whose `joined_at < t_u`;
   - the share of likes within 300 seconds of their post (design F9).
-- [ ] A small CLI at the bottom of `gate.ts` (raw folder and scratch folder as arguments) writes `gate.md` in the task folder: verdict (pass if the gate number is at least `KEPT_THRESHOLD`), T in Unix seconds and ISO, the bucket table, the gate number, the drop counts, the `checkFormat` lines and the 5-minute share. The scratch folder is outside the repo (design F10).
-- [ ] Commit: `feat: gate script for p7-hive-check`
+- [x] A small CLI at the bottom of `gate.ts` (raw folder and scratch folder as arguments) writes `gate.md` in the task folder: verdict (pass if the gate number is at least `KEPT_THRESHOLD`), T in Unix seconds and ISO, the bucket table, the gate number, the drop counts, the `checkFormat` lines and the 5-minute share. The scratch folder is outside the repo (design F10).
+- [x] Commit: `feat: gate script for p7-hive-check`
 
 #### Step 3: The queries (Claude and the author, effort S)
 
