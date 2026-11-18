@@ -1,0 +1,74 @@
+node v22.23.4, npm 10.9.9, db is up, both Digg zips are there
+this repo: HEAD 701a1ab on test-app; status of this working tree:
+   M .docs/implementation-plan.md
+   M .docs/super-plan.md
+   M .docs/works/2026-11-18-p8-repro/plan.md
+  ?? .docs/works/2026-11-18-p8-repro/clean_clone_output.txt
+  ?? .docs/works/2026-11-18-p8-repro/repro_output.txt
+---- git clone --branch test-app
+clone HEAD: 701a1ab
+---- npm ci
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated nestjs-throttler-storage-redis@0.5.1: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
+> breadit@0.1.0 prepare
+> husky
+
+
+added 1014 packages, and audited 1020 packages in 12s
+
+232 packages are looking for funding
+  run `npm fund` for details
+
+54 vulnerabilities (6 low, 19 moderate, 26 high, 3 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+---- npm run thesis:repro (under caffeinate -i when it exists)
+
+> breadit@0.1.0 thesis:repro
+> node scripts/repro/thesis-repro.mjs
+
+ok    checks (Node v22.23.4, merged manifest, clean tree, Digg zips, db and redis)  0.4 s
+note  p7-e7 (Class R, latency) is kept as a report input and is not compared
+ok    01 build-ranking              1.0 s
+ok    02 prisma-generate            1.4 s
+ok    03 clean                      0.0 s
+ok    04 gen                        6.3 s
+ok    05 adapt-digg                 6.5 s
+ok    06 check                      8.2 s
+ok    07 harness-p5-baseline        0.4 s
+ok    08 harness-p7-tune-worlds     153.6 s
+ok    09 harness-p7-tune-main       3917.6 s
+ok    10 freeze-check               0.3 s
+ok    11 harness-p7-h0              6.7 s
+ok    12 harness-p7-main            2065.8 s
+ok    13 harness-p7-e5-worlds       19.5 s
+ok    14 harness-p7-e4-terms        1476.5 s
+ok    15 harness-p7-e4-m0           319.1 s
+ok    16 harness-p7-e4-m2           324.7 s
+ok    17 harness-p7-e4-m10          323.6 s
+ok    18 harness-p7-e6-ties         90.7 s
+ok    19 harness-p7-e8-pool         8.1 s
+ok    20 harness-p7-e5-shuffle      3.7 s
+ok    21 parity                     0.4 s
+ok    22 load                       5.1 s
+ok    23 load-check                 0.6 s
+ok    24 test-parity                38.0 s
+ok    25 report                     0.2 s
+ok    26 compare                    0.5 s
+every hash is equal: 160 files in 16 folders and 9 datasets (total 8778.9 s)
+exit 0  npm run thesis:repro
+---- git status --short in the clone
+PASS  git status --short is empty
+RESULT: ALL PASS
+cleanup: removed /var/folders/wk/wqg1xf3130g_tcp6099t3kjh0000gp/T//breadit-p8-clone.uYbnoe

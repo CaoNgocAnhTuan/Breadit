@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.28 · 2026-11-12 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.30 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -79,7 +79,7 @@ These facts were checked in the code on 2026-10-22, after the bug sweep (Bugs Re
 
 The phases are in dependency order. Each phase becomes one or more tasks (column "Tasks", started with `/task` or `/bugfix`). A phase is done when its "Done when" passes. ★ marks a supervisor checkpoint: send the result and wait for the answer before the next phase depends on it.
 
-**Status marks.** ✅ done (its "Done when" passes). 🟡 every output is written, but the "Done when" waits for someone else. ⬜ not started. ▶ next to start. "Late" means the planned end date in `.docs/implementation-plan.md` §5 has passed. A ✅ next to a task name means that task folder is closed. Last updated: 2026-11-12.
+**Status marks.** ✅ done (its "Done when" passes). 🟡 every output is written, but the "Done when" waits for someone else. ⬜ not started. ▶ next to start. "Late" means the planned end date in `.docs/implementation-plan.md` §5 has passed. A ✅ next to a task name means that task folder is closed. Last updated: 2026-11-19.
 
 | Status | Phase | Output | Done when | Tasks |
 |---|---|---|---|---|
@@ -91,8 +91,8 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 11-02 (★ note ready to send) | P5 Ranking package and harness ★ | `packages/ranking`, harness, baseline table | Golden, leakage and double-run tests pass | `p5-ranking-package` ✅, `p5-eval-harness` ✅ |
 | ✅ 11-10 | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` ✅ |
 | ✅ 11-12 (★ note ready to send) | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments` ✅, `p7-cost-benchmark` ✅, `p7-hive-check` ✅ (gate failed) |
-| ⬜ | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` |
-| ⬜ | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
+| ✅ 11-19 (tag proposed) | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` ✅ |
+| ▶ next | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
 | ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-defense-package` |
 
 The Tasks column comes from the P2 blueprint. Its task list (`.docs/implementation-plan.md` §5) gives the order, the dependencies, a day budget per task and a trigger date for each cut of §8.
@@ -214,7 +214,7 @@ The `reasons` list per post is cut in v0.2. The score's three terms are still in
 
 **Status (2026-11-10, done).** Task `p6-social-feed` (`.docs/works/2026-11-10-p6-social-feed/`).
 - **Feed.** `apps/backend/src/feed/` (`FeedService.rank`) loads plain arrays and calls the package. `GET /api/posts?algo=` takes `chrono` (BL0), `engagement` (BL2) or `social` (H) on the logged-in For You. The cursor `t:score:id` ranks every page at the same time.
-- **Config.** `FEED_DEFAULT_ALGO` sets the default; unset keeps today's For You. The test-only `asOf` needs `FEED_ASOF_ENABLED=true`, and the backend refuses that flag in production. α and β of `social` are placeholders (1 and 1) in `feed/feed.constants.ts` until P7; P8 writes the tuned values there.
+- **Config.** `FEED_DEFAULT_ALGO` sets the default; unset keeps today's For You. The test-only `asOf` needs `FEED_ASOF_ENABLED=true`, and the backend refuses that flag in production. α and β of `social` are placeholders (1 and 1) in `feed/feed.constants.ts` until P7; P8 writes the tuned values there. Done on 2026-11-18 (task `p8-repro`): α = β = 1024, see the P8 status.
 - **Bugs.** Explore uses one time per request (T4). B6, T3 and the D1 rule are fixed, and pending posts stay out of the pool (R2).
 - **Parity.** `npm run parity -w @breadit/eval` drew 100 pairs of `syn-W2M-M` (25 per history bucket) and committed the harness orders in `.docs/results/p6-parity/`. Two runs were byte-identical. `npm run test:parity -w @breadit/backend` on `eval_load` gives 300 of 300 full orders at the feed module and 300 of 300 first two pages over HTTP, in about 34 s.
 - **Toggle.** The frontend toggle was checked in Chrome.
@@ -255,10 +255,19 @@ E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, d
 - **Other results.** On `syn-W2M-M`, H is about 6 times BL2 over all users, mostly from the community term and for users with a long history. On `digg2009` the social terms change almost nothing, and BL4 and BL5 are about 8 times BL2. The tables are in `.docs/results/p7-report/results.md`, and the note for the supervisor is `results-note.md` in the task folder.
 - **Double run:** every P7 run and the report, made again from empty folders, gave byte-identical files and manifests (`run_output.txt` of the task, Step 11). So the P7 "Done when" (hash check against the manifest) passes for task 9.
 - **E7 (task 10, `p7-cost-benchmark`):** done. Page 1 takes a median of 36.9 ms (`chrono`), 36.3 ms (`engagement`) and 38.1 ms (`social`), with about 19.6 to 19.7 Prisma queries per request, on one machine with the page cache off. The intervals overlap. N6 is fixed (`THROTTLE_LIMIT`). The files are in `.docs/results/p7-e7/` and the macros `eSeven*` in `.docs/results/p7-report/`.
+- **E7 rerun (2026-11-18, task `p8-repro`).** The first E7 measured the placeholder weights (α = β = 1). It was run again, once, with the tuned weights the app now uses. Medians: 35.9 ms (`chrono`), 35.9 ms (`engagement`) and 35.8 ms (`social`); queries per request 19.65, 19.63 and 19.70; 15 runs, 0 failed requests. The intervals still overlap. The machine was not quiet (load average 3.4 at the start). The files and the `eSeven*` macros above now hold these numbers; only the E7 lines of the report changed.
 
 ### P8: Repro package and freeze
 
 **Do.** Set the default `algo` by the default feed rule (P7). Add `npm run thesis:repro`. It needs `npm ci` and Docker db and redis. It generates the datasets, runs the Digg adapter (P4, unless the cut order of §8 dropped it), runs all experiments, writes the tables and macros, and compares every hash with `.docs/results/manifest.json`. It fails on any difference. Tag the result `v2-thesis-experiments` (the author approves the tag).
+
+**Status (2026-11-19, done).** Task `p8-repro` (`.docs/works/2026-11-18-p8-repro/`), closed on 2026-11-19. Every step and acceptance item passes; `verify.sh` passes.
+- **Default feed.** H1 failed (P7 status), so by the default feed rule "For You" stays as it is today. `FEED_DEFAULT_ALGO` stays empty; no code changed.
+- **α and β in the app.** `SOCIAL_PARAMS` is now α = 1024, β = 1024, the `syn-W2M-M` values of the approved config `eval/config/runs/p7-main.json` (Digg got β = 0 only because β has no effect there). A unit test ties the app to that file. 1024 is the top of the §7 grid, so the tuning hit its edge: a point for Chapter 6. The parity sample was drawn again with these values (`pairs.csv` unchanged), and the parity test gives 300 of 300 at the feed module and 300 of 300 over HTTP. E7 was run again (P7 status).
+- **`npm run thesis:repro`** (`scripts/repro/thesis-repro.mjs`). It checks first (Node, the Digg zips with their SHA-256, Docker, no uncommitted results) and stops within a second when one is missing. Then it deletes every Class D result and `eval/data/`, rebuilds them (datasets, the 13 harness runs, the parity sample, the live parity test, the report) and compares every hash with the merged manifest. E7 is not rebuilt (Class R). About 3 hours.
+- **Merged manifest.** `.docs/results/manifest.json` holds the SHA-256 of the 16 results manifests (`p7-e7` marked Class R, not compared) and of the 9 dataset manifests. `npm run results:manifest -w @breadit/eval` compares the tree with it: today 160 files are equal.
+- **The two full runs.** On this machine, `npm run thesis:repro` gave exit 0 in 8,988 s (about 2 h 30 min): 26 of 26 steps ok, and every hash equal (160 files in 16 folders and 9 datasets). After it, `.docs/results/` and `eval/config/runs/` had no change. On a clean clone of `test-app` at `701a1ab` (`npm ci`, then the command), it gave the same result in 8,779 s, and `git status --short` in the clone was empty. The outputs are `repro_output.txt` and `clean_clone_output.txt` in the task folder.
+- **Tag.** `v2-thesis-experiments` is proposed on the closing commit of the task (§11, item 4). The author makes it.
 
 **Done when.** The command passes on a clean clone.
 
@@ -465,10 +474,10 @@ The thesis results do not need the schema migration: generated data has no dupli
 1. **What happens on 2026-11-20.** The written submission or the defense? It decides when P10 must be done.
 2. **The university's thesis rules.** Format, length and required chapters. Check the chapter map in P9 against them.
 3. ✅ **D1.** Can a non-member post into a community (Bugs Report §4)? Decided on 2026-10-28: no, a community post needs membership. The generator follows it (P3); the backend rule is in task `p6-social-feed`.
-4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval.
+4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval. The tag was proposed on 2026-11-19, when task `p8-repro` closed: on its closing commit `docs: p8-repro runs and status`. The clean-clone run passed on `701a1ab`, and the closing commit changes only docs (nothing in code, `.docs/results/` or `eval/config/`).
 5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `Latex/` and `docs/` needs the author's request.
 6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). Status 2026-11-02: (a) ✅ set in P2 and checked in P3 and P4; (b) still open, for P5; (c) ✅ set in P2. The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. Set in P2: `.docs/implementation-plan.md` §3.1 and §3.2, checked on Digg in its §3.7; the P3 check is in its §3.6. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family. Set in P2: `.docs/implementation-plan.md` §3.3 (families F1 and F2 per dataset).
-7. **Default feed rule** (P7). Does the supervisor agree that "For You" switches to `social` only when H1 passes on both co-primary tests and the H0 gate passes? Ask with the P7 results. Asked on 2026-11-12 with the P7 results (`results-note.md` of task `p7-offline-experiments`): H1 failed on both tests, so the default stays as it is today unless the supervisor says otherwise.
+7. **Default feed rule** (P7). Does the supervisor agree that "For You" switches to `social` only when H1 passes on both co-primary tests and the H0 gate passes? Ask with the P7 results. Asked on 2026-11-12 with the P7 results (`results-note.md` of task `p7-offline-experiments`): H1 failed on both tests, so the default stays as it is today unless the supervisor says otherwise. P8 applied this on 2026-11-18: `FEED_DEFAULT_ALGO` stays empty. If the supervisor wants another default, it is one env variable.
 8. ✅ **Hive side check** (P7). Closed on 2026-11-12: the author opened a BigQuery sandbox project, and the SoChainDB dataset refused access, so the gate failed. Nothing to tell the supervisor beyond the limit already in Chapter 6: the community term has synthetic evidence only, and Hive is future work.
 
 ---
@@ -503,3 +512,5 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.26 · 2026-11-12 · Task `p7-offline-experiments` closed: P7 status paragraph (the H0 gate passes, H1 fails on both co-primary tests, the main results, the double run); §4 row P7 (1 of 2 tasks done, ★ note ready to send); §11 item 7 (asked with the results). No frozen value changed beyond 0.25; §5, §6 and §7 are byte-identical.
 - 0.27 · 2026-11-12 · Task `p7-hive-check` closed, gate failed (`.docs/works/2026-11-12-p7-hive-check/gate.md`): SoChainDB on BigQuery gives `Access Denied` to an outside project; HiveSQL is paid and has no join or follow times. P7: a Hive status line; §4 row P7 (`p7-hive-check` ✅, gate failed); §8 the Hive risk; §11 item 8 closed. Decision Q2 stays. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.28 · 2026-11-12 · Task `p7-cost-benchmark` (E7). **§7:** the row "k6 runs / load profile" is set, as the author confirmed at the Design approval: one virtual user, 100 requests per run (page 1 of one `algo` for the 100 parity pairs in file order, no sleep), page cache off, the seed of the parity sample (20261014). P7 status paragraph (E7 result); §4 row P7 ✅ (2 of 2 tasks). No other frozen value changed; §5 and §6 are byte-identical.
+- 0.29 · 2026-11-18 · Task `p8-repro` started (code and data steps done, the two full runs going): P8 status paragraph; §4 row P8 ▶ (late); P6 Config line (α and β written); a P7 bullet on the E7 rerun with the tuned weights (the `eSeven*` numbers changed); §11 items 4 (when the tag is proposed) and 7 (P8 applied the rule). No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.30 · 2026-11-19 · Task `p8-repro` closed: P8 status paragraph (done; the two full runs pass, on this machine and on a clean clone); §4 rows P8 ✅ (tag proposed) and P9 ▶ next; §11 item 4 (the tag proposed on the closing commit). No frozen value changed; §5, §6 and §7 are byte-identical.

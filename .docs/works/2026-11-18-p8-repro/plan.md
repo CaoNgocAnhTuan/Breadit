@@ -1,6 +1,6 @@
 # Plan: Repro command and freeze
 
-Status: approved · 2026-11-18
+Status: done · 2026-11-19
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-18-p8-repro/`
 
 All commits go on `test-app` and are never pushed. Steps 1–3 and most acceptance items need `docker compose up db redis -d`. Step 3 also needs k6 (installed at `/opt/homebrew/bin/k6`). Run one thing at a time that uses `eval_load` or Redis databases 2 and 3 (Design F10).
@@ -43,15 +43,42 @@ Sonnet does Steps 1–7. The two long runs (about 3 hours each, Design F11) are 
 
 Claude does these after Step 7. Each long run uses `caffeinate -i`.
 
-- [ ] DW5: with a Digg zip renamed, then with `db` stopped, then with an uncommitted change in `.docs/results/` → each run stops within a few seconds, names what is wrong, and deletes nothing. Restore each time.
-- [ ] DW1: the repro command on this machine → exit 0, one line per step, the last line says every hash is equal. The step lines and the run time go to `repro_output.txt` in the task folder.
-- [ ] DW2: right after DW1, `git status --short .docs/results/ eval/config/runs/` → no line.
-- [ ] DW3: `.docs/results/manifest.json` → 16 folders (15 Class D, `p7-e7` Class R) and 9 datasets.
-- [ ] DW6: `check_clean_clone.sh` after DW1 has finished → exit 0 and an empty `git status --short` in the clone; the output is in `clean_clone_output.txt`.
-- [ ] DW7, DW8, DW9, DW10: TC1, TC3, TC5 and TC4 pass (from Steps 1–3).
-- [ ] DW11: the grep of the Spec over `docs/System_Architecture.md` and `docs/Guidance-Manual/` → no line.
-- [ ] `verify.sh` passes.
+- [x] DW5: with a Digg zip renamed, then with `db` stopped, then with an uncommitted change in `.docs/results/` → each run stops within a few seconds, names what is wrong, and deletes nothing. Restore each time.
+- [x] DW1: the repro command on this machine → exit 0, one line per step, the last line says every hash is equal. The step lines and the run time go to `repro_output.txt` in the task folder.
+- [x] DW2: right after DW1, `git status --short .docs/results/ eval/config/runs/` → no line.
+- [x] DW3: `.docs/results/manifest.json` → 16 folders (15 Class D, `p7-e7` Class R) and 9 datasets.
+- [x] DW6: `check_clean_clone.sh` after DW1 has finished → exit 0 and an empty `git status --short` in the clone; the output is in `clean_clone_output.txt`.
+- [x] DW7, DW8, DW9, DW10: TC1, TC3, TC5 and TC4 pass (from Steps 1–3).
+- [x] DW11: the grep of the Spec over `docs/System_Architecture.md` and `docs/Guidance-Manual/` → no line.
+- [x] `verify.sh` passes.
 
 When the acceptance items pass, Claude commits the two output files with the super-plan P8 status, the §4 row, §11 item 4 (the tag proposal) and a change-log line (no frozen value changes), and the blueprint §5 row 11. Commit: `docs: p8-repro runs and status`. The Result proposes the tag `v2-thesis-experiments` on that commit. The author makes the tag.
 
 ## Result
+
+Done on 2026-11-19. Steps 1–7 were implemented by Sonnet and verified by Claude. All 7 steps and all 8 acceptance items pass.
+
+**The two full runs.**
+- DW1, this machine: `npm run thesis:repro` gave exit 0. All 26 steps were ok, and the last line was `every hash is equal: 160 files in 16 folders and 9 datasets (total 8987.6 s)`. The run went from 2026-11-18 22:01:59 to 2026-11-19 00:31:47, on HEAD `701a1ab` with Node v22.23.4. DW2: right after it, `git status --short .docs/results/ eval/config/runs/` gave no line. The output is in `repro_output.txt`.
+- DW6, clean clone: `check_clean_clone.sh` printed `RESULT: ALL PASS` (exit 0). It cloned `test-app` at `701a1ab`, ran `npm ci`, then ran the repro: 26 of 26 steps ok, every hash equal, 8778.9 s. `git status --short` in the clone was empty. The script ran from 01:11:34 to 03:38:17. The output is in `clean_clone_output.txt`.
+- The longest steps were the same on both runs: `harness-p7-tune-main` (about 3,950 s), `harness-p7-main` (about 2,100 s) and `harness-p7-e4-terms` (about 1,490 s).
+
+**What changed in the app and the results.**
+- `SOCIAL_PARAMS` is α = 1024, β = 1024, the `syn-W2M-M` values of `eval/config/runs/p7-main.json`. TC1 ties the app to that file. `FEED_DEFAULT_ALGO` stays empty, because H1 failed (default feed rule).
+- The parity sample was drawn again: `pairs.csv` is byte-identical, and 95 of the 100 `social` rows of `expected.csv` changed. The parity test gives 300 of 300 at the feed module and 300 of 300 over HTTP.
+- E7 was run again with the tuned weights: 15 runs, 0 failed requests, medians 35.9 / 35.9 / 35.8 ms (`chrono` / `engagement` / `social`). In `p7-report/` only the E7 lines changed.
+- `.docs/results/manifest.json` lists 16 results folders (15 Class D, `p7-e7` Class R) and 9 datasets.
+
+**Tests.** Ranking 85, backend unit 204 (TC1 is new), IT 146, eval 427 (TC2, 16 new), parity 300 + 300. `verify.sh`: all PASS.
+
+**Commits.** `c6b9f08`, `71f4702`, `59cde05`, `c6c98d3`, `398e95b`, `e565391`, `07685c0`, `701a1ab`, and the closing commit `docs: p8-repro runs and status`.
+
+**Differences from the plan.**
+1. The machine was not quiet for the E7 rerun (load average 3.4 at the start). The numbers were kept. E7 is Class R, so a rerun on a quiet machine with `npm run bench:e7` is optional and changes only the E7 lines.
+2. DW6 did not start right after DW1. The Mac was on battery, so a wait loop started it at 01:11, once the charger was in. The run itself was as planned.
+
+**Tag proposal.** Tag `v2-thesis-experiments` on the closing commit `docs: p8-repro runs and status`. The clean-clone run passed on `701a1ab`. The closing commit changes only docs (the super-plan, the blueprint and this task folder), with nothing in code, `.docs/results/` or `eval/config/`. The author makes the tag. Nothing is pushed.
+
+**Open.**
+- α = β = 1024 is the top of the frozen grid (§7), so the tuning hit its edge. This is a point for Chapter 6, not a change.
+- P1 still waits for the supervisor. If the supervisor wants another default feed, it is one env variable (`FEED_DEFAULT_ALGO`).

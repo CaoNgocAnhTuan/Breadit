@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.11 · 2026-11-12 · Status: approved 2026-10-28
+Version 1.13 · 2026-11-19 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -10,7 +10,7 @@ How the pieces of P3 to P10 fit together in the code. A thing is here only if tw
 | Module | Owner task | May import | What it holds |
 |---|---|---|---|
 | `packages/ranking` (`@breadit/ranking`) | `p5-ranking-package` ✅ (2026-11-02) | the Node standard library only | Types, `buildPool`, as-of feature functions, every scorer, `rankPool`, and `computeExploreScoreFixed` moved from `posts.service.ts`. Pure: no Nest, Prisma, Redis, clock or randomness. Builds to `dist/` with `tsc`, like `@breadit/shared` |
-| `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it ✅ (2026-11-02; `rng.ts`, `canonical/`, `generator/`, `checks/`, `config/`; `adapters/digg.ts` by `p4-digg-adapter` ✅; `harness/`, `metrics.ts`, `stats.ts` by `p5-eval-harness` ✅; `loader/` by `p3-postgres-loader` ✅ (2026-11-10); report still to come) | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `config/` |
+| `eval/` (`@breadit/eval`, added to the root `workspaces`) | `p3-synthetic-generator` creates it ✅ (2026-11-02; `rng.ts`, `canonical/`, `generator/`, `checks/`, `config/`; `adapters/digg.ts` by `p4-digg-adapter` ✅; `harness/`, `metrics.ts`, `stats.ts` by `p5-eval-harness` ✅; `loader/` by `p3-postgres-loader` ✅ (2026-11-10); `report/` by `p7-offline-experiments` ✅ (2026-11-12); `bench/` by `p7-cost-benchmark` ✅ (2026-11-12); `repro/` (the merged manifest) by `p8-repro` ✅ (2026-11-19)) | `@breadit/ranking`; `@prisma/client` in `src/loader/` only | `src/rng.ts`, `src/canonical/` (CSV and manifest), `src/generator/`, `src/loader/`, `src/adapters/digg.ts`, `src/harness/`, `src/metrics.ts`, `src/stats.ts`, `src/report/`, `src/bench/`, `src/repro/`, `config/` |
 | Backend feed module `apps/backend/src/feed/` | `p6-social-feed` ✅ (2026-11-10) | `@breadit/ranking`, `PrismaService`, `BlockService` | A thin service that loads data and calls `buildPool` and a scorer. `PostsService.findAll` calls it when `algo` is set. Explore imports `computeExploreScoreFixed` from `@breadit/ranking` (done in `p5-ranking-package`) |
 | Frontend toggle | `p6-social-feed` ✅ (2026-11-10) | the API only | `algo` in `app/(board)/page.tsx`, `Feed.tsx`, `InfiniteFeed.tsx` |
 
@@ -151,6 +151,8 @@ The report reads only the CSVs above. It writes `macros.csv` (`name, value, file
 
 **Done (task 8, 2026-11-10).** `npm run parity -w @breadit/eval -- --param alpha=<a> --param beta=<b>` draws 25 pairs per history bucket and writes `.docs/results/p6-parity/`: `pairs.csv`, `expected.csv` (pool size, SHA-256 of the full harness order and top 20, for each pair and `algo`) and `manifest.json` (params, algo-to-method map, dataset hash, row counts and first post time). `npm run test:parity -w @breadit/backend` compares the live feed with it on `eval_load`.
 
+**Drawn again (task 11, 2026-11-18)** with the tuned α and β that the app now uses (`SOCIAL_PARAMS`, the `syn-W2M-M` values of `eval/config/runs/p7-main.json`). `pairs.csv` is byte-identical, because the draw does not read α or β. Only `social` rows of `expected.csv` changed (95 of 100). The parity test gives 300 of 300 again.
+
 ## 3. Cut time T and Holm family
 
 This part is written and committed before the script reads the real Digg files. So the Digg counts cannot bend the rule.
@@ -264,7 +266,7 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 
 ## 5. Task list
 
-Written on 2026-10-28; the Status column was last updated on 2026-11-12. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
+Written on 2026-10-28; the Status column was last updated on 2026-11-19. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
 
 | Status | # | Task | Phase | Depends on | Scope (short) | Days | Ends | Bugs placed here |
 |---|---|---|---|---|---|---|---|---|
@@ -279,11 +281,13 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-12. ✅ mea
 | ✅ 11-12 | 9 | `p7-offline-experiments` † | P7 ★ | 6 | E1–E6, E8, report and macros | 2 | 11-13 | — |
 | ✅ 11-12 (gate failed) | 9b | `p7-hive-check` | P7 | 9, closed on 11-13 | gate: BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (section 3.2); then a Hive adapter and H-comm against BL2 (super-plan P7) | 0.5 for the gate | 11-14 | — |
 | ✅ 11-12 | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
-| ▶ next | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
-| ⬜ | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
+| ✅ 11-19 | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
+| ▶ | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
 | ⬜ | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
 
 Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Task 7 closed on 11-10, one day after its planned end. Task 8 closed on 11-10, one day before its planned end, so the plan is on time again. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
+
+On 2026-11-18, task 11 started three days after its planned end. Its code and data steps were done the same day. The two full repro runs (one on this machine, one on a clean clone) both passed in the night, and the task closed on 11-19, four days after its planned end. Task 12 (writing) and task 13 now only have the spare days 11-19 and 11-20.
 
 **Task 9b is optional** (added 2026-11-10). Its gate runs right after task 9, only if task 9 closes on 11-13, and takes at most half a day. Tasks 10 to 13 then move half a day later, into the spare day 11-19. The whole Hive work was estimated at 2–3 days, more than the spare days left. So if the gate passes, the author decides then whether to run the rest or to put Hive in future work.
 
@@ -322,3 +326,5 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.9 · 2026-11-12 · Task `p7-offline-experiments` closed: §2.7 (`density.csv` on NDCG@10; family-none rows for E4, E5, E8), §2.8 (`macros.csv` gets the column `column`; the rounding rule; the tables and `results.md`), §5 task 9 ✅ and task 10 next, one day before the planned end of task 9.
 - 1.10 · 2026-11-12 · Task `p7-hive-check` closed, gate failed (super-plan 0.27): §5 row 9b ✅ (gate failed), §6 the Hive bullet. The Hive row of §4 is not run. No contract, rule or frozen value changed.
 - 1.11 · 2026-11-12 · Task `p7-cost-benchmark` (E7): §2.4 the new stage name `bootstrap-median` (bootstrap of the E7 run medians); §5 task 10 ✅ and task 11 next. No contract, rule or frozen value changed.
+- 1.12 · 2026-11-18 · Task `p8-repro` started: §1 `eval/` row (`report/`, `bench/`, `repro/`); §2.3 the merged manifest exists; §2.9 the parity sample drawn again with the tuned α and β; §5 task 11 started, one paragraph on the schedule. No contract, rule or frozen value changed.
+- 1.13 · 2026-11-19 · Task `p8-repro` closed: §1 `eval/` row (`repro/` ✅); §5 task 11 ✅ and task 12 ▶, the schedule paragraph. No contract, rule or frozen value changed.
