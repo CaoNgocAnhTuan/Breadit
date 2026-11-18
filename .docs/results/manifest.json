@@ -1,0 +1,98 @@
+{
+  "datasets": {
+    "digg2009": {
+      "manifestSha256": "923e45e17c40b7fa3ae7356153d7f8813c93fbf24c2ee75e63ed36f89bcc4a85"
+    },
+    "syn-W0-M": {
+      "manifestSha256": "2472c1e48ba8904456b5aef2673c7472b1fdb0f67c1f80d35195151ce8215d4b"
+    },
+    "syn-W0-S": {
+      "manifestSha256": "949e5a4a8ffa210984dbafebde237f41fea709bdbcdea0df4e94b520dd155dce"
+    },
+    "syn-W1-M": {
+      "manifestSha256": "a0fba507997e94d2432d08b4a6c27e6c7abec74e6fad34dcc7450140a8c0d073"
+    },
+    "syn-W1-S": {
+      "manifestSha256": "eed4873bd666673bc9be4e119ab2ec3e9dddbf1f46ffba04d667c4b3fd027b12"
+    },
+    "syn-W2H-M": {
+      "manifestSha256": "ef3e596056267d4e7de8cadb5cbd4537c1f7013c9c9c804e16a62db11e7b3e98"
+    },
+    "syn-W2L-M": {
+      "manifestSha256": "159ec321fed32c5a423c5d1899c24447b9eb2428bb24130ad8987753c47d568e"
+    },
+    "syn-W2M-M": {
+      "manifestSha256": "a144074779cbd1187c825a8c872c9d9e196a90da5061067d8488ae63224962ed"
+    },
+    "syn-W2M-S": {
+      "manifestSha256": "cc06e0804d652b827149ef04b7c6a9feb266298a616a5fa1b161ed1f899e823c"
+    }
+  },
+  "results": {
+    "p5-baseline": {
+      "class": "D",
+      "manifestSha256": "f76463b298299f6d37a28478a71045ea64fbcfd7eac0f18542ceef297fb61481"
+    },
+    "p6-parity": {
+      "class": "D",
+      "manifestSha256": "0b35ef29f59cf264d0e546a5699217cfce26249f6d6299949c79c68aace6635b"
+    },
+    "p7-e4-m0": {
+      "class": "D",
+      "manifestSha256": "bf3f85f03efe01210a9319a5136eada5c710738066ef3ae701acff8e4c88c7a1"
+    },
+    "p7-e4-m10": {
+      "class": "D",
+      "manifestSha256": "001f62db2b9bae3dd0450ade60bbfeeadc2fa945a771cbee8a00e75bfdcd6f85"
+    },
+    "p7-e4-m2": {
+      "class": "D",
+      "manifestSha256": "e23a0a5ae19cba722897587993f83f48218a75d9ef75e73abfa2a64f9f9c6f63"
+    },
+    "p7-e4-terms": {
+      "class": "D",
+      "manifestSha256": "ec0e088276e5755c1b66c85c0c4facbaaaa6865a1b841675ee2215b41b8204d2"
+    },
+    "p7-e5-shuffle": {
+      "class": "D",
+      "manifestSha256": "abe71b605ce5f6b98cd8e33653328586b2aaa30077c22eac928dc3d707f24f58"
+    },
+    "p7-e5-worlds": {
+      "class": "D",
+      "manifestSha256": "3c091c15fc5126382bb38459909aec1373080a297a779fe30d46d28583a50fe9"
+    },
+    "p7-e6-ties": {
+      "class": "D",
+      "manifestSha256": "0403d6606e68dc93a5382ece769c1b63dc2d98d65b39f1291f9372f157f7038c"
+    },
+    "p7-e7": {
+      "class": "R",
+      "manifestSha256": "0517843d647f741a38f5450cc4b99a63af58ce3a28b728cdbc91131efc9b04ec"
+    },
+    "p7-e8-pool": {
+      "class": "D",
+      "manifestSha256": "b1b70c4885f85de3b1f36f61ca849ac51e55f4517715da2f8bf743af17760f86"
+    },
+    "p7-h0": {
+      "class": "D",
+      "manifestSha256": "6413fa7d4d2ebdaf8a92bc55f9dd86978b1ae83c65f0a83a2a7ab369399bb08f"
+    },
+    "p7-main": {
+      "class": "D",
+      "manifestSha256": "f1f66628ec2ad72832fa1de336167d42ae95ab6936f3f38404c423c6c12459dc"
+    },
+    "p7-report": {
+      "class": "D",
+      "manifestSha256": "5830faf906eefeb82b8cd04945d9814443997d3e24176cf2e5de7a089bf619b3"
+    },
+    "p7-tune-main": {
+      "class": "D",
+      "manifestSha256": "49b24031277ad2263f03e957a3823971cc4341e2cc67fc2f93a1eac17ee00383"
+    },
+    "p7-tune-worlds": {
+      "class": "D",
+      "manifestSha256": "63c32579669669dfd32f65c3a4c765458951625ce68ad110da7ddc8df86d494f"
+    }
+  },
+  "schemaVersion": 1
+}
