@@ -16,8 +16,11 @@ export const POOL_PARAMS: PoolParams = { windowSec: 7 * 86400, maxPosts: 2000 };
 /** Frozen value of super-plan section 7: the prior strength m. */
 export const PRIOR_M = 5;
 
-// alpha and beta: placeholder until P7; task 11 writes the tuned values.
-export const SOCIAL_PARAMS = { alpha: 1, beta: 1 } as const;
+/**
+ * alpha and beta of H: the tuned values of P7, approved by the author. The source is
+ * `datasetParams["syn-W2M-M"].H` of eval/config/runs/p7-main.json; a unit test checks that they are equal.
+ */
+export const SOCIAL_PARAMS = { alpha: 1024, beta: 1024 } as const;
 
 /** The params the scorer of an `algo` needs (a missing one makes the scorer throw). */
 export function methodParams(algo: FeedAlgo): Record<string, number> {

@@ -24,9 +24,17 @@ describe('feed constants (TC2)', () => {
     expect(PRIOR_M).toBe(frozen.priorStrength);
   });
 
-  it('alpha and beta of the placeholder are in the grid of section 7', () => {
+  it('alpha and beta are in the grid of section 7', () => {
     expect(frozen.alphaBetaGrid).toContain(SOCIAL_PARAMS.alpha);
     expect(frozen.alphaBetaGrid).toContain(SOCIAL_PARAMS.beta);
+  });
+
+  it('TC1: alpha and beta equal the approved H params of syn-W2M-M in p7-main.json', () => {
+    const p7Main = JSON.parse(
+      readFileSync(path.resolve(__dirname, '../../../../eval/config/runs/p7-main.json'), 'utf8'),
+    ) as { datasetParams: Record<string, { H: { alpha: number; beta: number } }> };
+    const h = p7Main.datasetParams['syn-W2M-M'].H;
+    expect({ alpha: SOCIAL_PARAMS.alpha, beta: SOCIAL_PARAMS.beta }).toEqual({ alpha: h.alpha, beta: h.beta });
   });
 
   it('maps chrono to BL0, engagement to BL2 and social to H', () => {
