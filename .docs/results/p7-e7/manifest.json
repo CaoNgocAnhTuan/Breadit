@@ -19,9 +19,9 @@
     "docker": "29.9.2",
     "k6": "k6 v1.7.1 (commit/devel, go1.26.1, darwin/arm64)",
     "loadAverageAtStart": [
-      5.35,
-      5.9,
-      4.74
+      3.38,
+      3.28,
+      2.61
     ],
     "loadProfile": {
       "algoOrder": "rotated by one algo each round (round 1: chrono, engagement, social)",
@@ -47,26 +47,26 @@
   "files": {
     "latency.csv": {
       "rows": 3,
-      "sha256": "7ad05f279acdcd377d36e5b456821bea9670dc47fbf3ebb7dfe68ee7af894215"
+      "sha256": "64c6a4dfe33e0693971d448f0e843430149df091de001d3557a65ee88f157831"
     },
     "queries-raw.csv": {
       "rows": 300,
-      "sha256": "884975299a6d0635c0ad5c59099307cfcc770055b5a36343cadc7ad5e3c4f2e3"
+      "sha256": "9f26feeb1218bcb37c0be087db749ad7c1c3f1bb64cea59768c8cffb64d0a62d"
     },
     "queries.csv": {
       "rows": 3,
-      "sha256": "6f51c7b4be0cfe1714ad391831565f8faad433261305fbbdbfb5937e172af894"
+      "sha256": "ec5c5f0d06ce4fc5b0bf02746036cb9ef7ca28eb97ff1dc99203474c489dcc5e"
     },
     "runs.csv": {
       "rows": 15,
-      "sha256": "473ccd196c9ce28f62682eabd06509f8de59400bad58b114e28b8c45fb19ea12"
+      "sha256": "bc4d9be88028ffaf1ee1836202307b05dbee4677b4fdfc0c22d22fe25991fe9b"
     }
   },
   "masterSeed": 20261014,
   "node": "v22.23.4",
   "params": {
-    "alpha": 1,
-    "beta": 1,
+    "alpha": 1024,
+    "beta": 1024,
     "m": 5,
     "methods": {
       "chrono": "BL0",
