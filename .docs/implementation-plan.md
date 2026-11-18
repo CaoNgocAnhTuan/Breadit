@@ -58,7 +58,7 @@ Dataset ids: `syn-<world>-<size>` with world `W0`, `W1`, `W2L`, `W2M` or `W2H`, 
 - `node` (`process.version`)
 - `files`: name to `rows` and `sha256`
 
-P8 merges all of them into `.docs/results/manifest.json` and compares.
+P8 merges all of them into `.docs/results/manifest.json` and compares. Done (task 11, 2026-11-18): the file holds the SHA-256 of the manifest of each results folder (`p7-e7` is marked Class R and not compared) and of each dataset manifest; `npm run results:manifest -w @breadit/eval` compares the tree with it (`eval/src/repro/merged.ts`), and `npm run thesis:repro` ends with that compare.
 
 ### 2.4 PRNG
 

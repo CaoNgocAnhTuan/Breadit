@@ -6,7 +6,7 @@
 
 Sources: the code (`apps/backend/src/posts/`, `packages/ranking/src/`, `apps/frontend/src/components/`), super-plan P6 and P7, implementation-plan §1 and §2.6. Diagrams: [System_Architecture.md](../../System_Architecture.md). Terms: [09 Glossary](09-glossary.md).
 
-**Status.** Every section describes the code as it is on 2026-11-10, after task 8 (`p6-social-feed`) built the social feed. The design of task 8 is in `.docs/works/2026-11-10-p6-social-feed/design.md`.
+**Status.** Every section describes the code as it is on 2026-11-18, after task 8 (`p6-social-feed`) built the social feed and task 11 (`p8-repro`) put the tuned α and β in it. The design of task 8 is in `.docs/works/2026-11-10-p6-social-feed/design.md`.
 
 ---
 
@@ -151,7 +151,7 @@ sequenceDiagram
 
 Follows and memberships are read with their times, not from the cached `getFolloweesIds` / `getCommunityIds`, because the as-of rule needs the times. The candidate query has no row limit, so `buildPool` sees the same set as the evaluation (implementation-plan §2.6). Positives are loaded only for the pool posts, after `buildPool`.
 
-**Parameters** (`feed/feed.constants.ts`). `chrono` = BL0 (followee posts first, then newest first), `engagement` = BL2 (the Explore score on the shared pool), `social` = H. α and β of H are placeholders (α = β = 1) until P7 tunes them; task 11 writes the tuned values in this file. `m`, W and N_max are the values of super-plan §7, and a unit test checks them against `eval/config/frozen-v1.json`. The default `algo` comes from `FEED_DEFAULT_ALGO`; when it is not set, For You behaves exactly as before.
+**Parameters** (`feed/feed.constants.ts`). `chrono` = BL0 (followee posts first, then newest first), `engagement` = BL2 (the Explore score on the shared pool), `social` = H. α and β of H are the tuned values of P7 (α = β = 1024): the `syn-W2M-M` values of `eval/config/runs/p7-main.json`, and a unit test checks that they are equal to that file. `m`, W and N_max are the values of super-plan §7, and a unit test checks them against `eval/config/frozen-v1.json`. The default `algo` comes from `FEED_DEFAULT_ALGO`; when it is not set, For You behaves exactly as before.
 
 **The call** (shortened from `FeedService.rank`):
 
@@ -179,21 +179,21 @@ const order = rankPool(pool, (p) => score(ctx, p, feats.get(p.id)!));
 This is the thesis question, and it is answered **offline**, not by trying things in the app:
 1. Tune α and β on the validation split (P7), by NDCG@10.
 2. Freeze them, run the test split once, read H1 and H0.
-3. If H1 passes on both co-primary tests and H0 passes, the default `algo` becomes `social` (the default feed rule). This is a configuration change, not a code change.
+3. If H1 passes on both co-primary tests and H0 passes, the default `algo` becomes `social` (the default feed rule). This is a configuration change, not a code change. H1 failed on both tests, so the default stays as it is (P8): `FEED_DEFAULT_ALGO` is empty, and `social` is available with the toggle.
 
 Changing the formula later (a new term, new weights) means a new method id in `@breadit/ranking`, a new offline run, and a new comparison. Never tune on what looks good in the app.
 
 ### 5.2 Faster and cheaper (cost)
 
-E7 measured the cost of page 1 for `chrono`, `engagement` and `social` (task 10, 2026-11-12). Setup: the 100 parity pairs, one virtual user, the page cache off, one machine (Apple M1, Postgres and Redis in Docker), 5 rounds with the first dropped. The latency is Class R: the median of the 4 kept run medians with a 95% bootstrap interval. The query count is exact.
+E7 measured the cost of page 1 for `chrono`, `engagement` and `social` (task 10, 2026-11-12; run again with the tuned α and β on 2026-11-18). Setup: the 100 parity pairs, one virtual user, the page cache off, one machine (Apple M1, Postgres and Redis in Docker), 5 rounds with the first dropped. The latency is Class R: the median of the 4 kept run medians with a 95% bootstrap interval. The query count is exact.
 
 | `algo` | Median (ms) | 95% interval | p95 (ms) | Prisma queries per request |
 |---|---:|---|---:|---:|
-| `chrono` | 36.854 | 35.434 to 38.407 | 42.950 | 19.650 |
-| `engagement` | 36.315 | 36.029 to 36.805 | 44.668 | 19.630 |
-| `social` | 38.061 | 36.366 to 38.434 | 45.881 | 19.650 |
+| `chrono` | 35.851 | 35.615 to 36.005 | 40.011 | 19.650 |
+| `engagement` | 35.879 | 34.634 to 36.289 | 40.447 | 19.630 |
+| `social` | 35.836 | 34.906 to 36.102 | 39.766 | 19.700 |
 
-The three feeds cost about the same, and the intervals overlap. They run the same queries (17 to 21 by user, about 19.6 to 19.7 on average), so the formula adds little: the difference between feeds is 1 to 2 ms of about 37. The numbers compare the feeds on one machine; they are not absolute speed. Source: `.docs/results/p7-e7/` and table e7 of the report (macros `eSeven*`).
+The three feeds cost about the same, and the intervals overlap. They run the same queries (17 to 21 by user, about 19.6 to 19.7 on average), so the formula adds little: the difference between feeds is under 0.1 ms of about 36. The numbers compare the feeds on one machine; they are not absolute speed. Source: `.docs/results/p7-e7/` and table e7 of the report (macros `eSeven*`).
 
 The levers, roughly from cheap to expensive. Task 10 only measured; any speed-up must keep `npm run test:parity` passing:
 
@@ -210,7 +210,7 @@ The levers, roughly from cheap to expensive. Task 10 only measured; any speed-up
 
 **Every optimization must keep the parity test green.** For 100 sampled (user, time) pairs, the live order must equal the evaluation order. If an optimization changes the pool or a feature, the app no longer runs what the thesis measured, and the results stop describing the app.
 
-How to run it: `npm run load -w @breadit/eval -- syn-W2M-M` (without `--rebase-to`), then `npm run test:parity -w @breadit/backend`. It compares the full order at `FeedService.rank` and the first two HTTP pages for each pair and each `algo`, against the committed sample in `.docs/results/p6-parity/` (made by `npm run parity -w @breadit/eval`). On 2026-11-10: 300 of 300 and 300 of 300. When α, β, the dataset or the package changes, make the sample again and commit it.
+How to run it: `npm run load -w @breadit/eval -- syn-W2M-M` (without `--rebase-to`), then `npm run test:parity -w @breadit/backend`. It compares the full order at `FeedService.rank` and the first two HTTP pages for each pair and each `algo`, against the committed sample in `.docs/results/p6-parity/` (made by `npm run parity -w @breadit/eval`). On 2026-11-18, with α = β = 1024: 300 of 300 and 300 of 300. When α, β, the dataset or the package changes, make the sample again and commit it. `npm run thesis:repro` runs this whole check again (document 07).
 
 ## 6. What does not change
 

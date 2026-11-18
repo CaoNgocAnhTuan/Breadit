@@ -6,7 +6,7 @@
 
 Nguồn: code (`apps/backend/src/posts/`, `packages/ranking/src/`, `apps/frontend/src/components/`), super-plan P6 và P7, implementation-plan §1 và §2.6. Sơ đồ: [System_Architecture.md](../../System_Architecture.md). Thuật ngữ: [09 Bảng thuật ngữ](09-glossary.md).
 
-**Trạng thái.** Mọi mục mô tả code như hiện tại, ngày 2026-11-10, sau khi task 8 (`p6-social-feed`) đã build social feed. Design của task 8 nằm ở `.docs/works/2026-11-10-p6-social-feed/design.md`.
+**Trạng thái.** Mọi mục mô tả code như hiện tại, ngày 2026-11-18, sau khi task 8 (`p6-social-feed`) đã build social feed và task 11 (`p8-repro`) đã đưa α và β đã tune vào đó. Design của task 8 nằm ở `.docs/works/2026-11-10-p6-social-feed/design.md`.
 
 ---
 
@@ -151,7 +151,7 @@ sequenceDiagram
 
 Follow và membership được đọc kèm thời điểm, không lấy từ danh sách đã cache của `getFolloweesIds` / `getCommunityIds`, vì luật as-of cần thời điểm. Query ứng viên không giới hạn số dòng, để `buildPool` thấy cùng tập bài như evaluation (implementation-plan §2.6). Positive chỉ được nạp cho các bài trong pool, sau `buildPool`.
 
-**Tham số** (`feed/feed.constants.ts`). `chrono` = BL0 (bài của followee trước, rồi mới nhất trước), `engagement` = BL2 (điểm Explore trên pool chung), `social` = H. α và β của H là giá trị tạm (α = β = 1) cho tới khi P7 tune chúng; task 11 ghi giá trị đã tune vào file này. `m`, W và N_max là các giá trị ở super-plan §7, và một unit test so chúng với `eval/config/frozen-v1.json`. `algo` mặc định lấy từ `FEED_DEFAULT_ALGO`; nếu không đặt thì For You chạy y như trước.
+**Tham số** (`feed/feed.constants.ts`). `chrono` = BL0 (bài của followee trước, rồi mới nhất trước), `engagement` = BL2 (điểm Explore trên pool chung), `social` = H. α và β của H là giá trị đã tune ở P7 (α = β = 1024): các giá trị của `syn-W2M-M` trong `eval/config/runs/p7-main.json`, và một unit test kiểm tra chúng bằng file đó. `m`, W và N_max là các giá trị ở super-plan §7, và một unit test so chúng với `eval/config/frozen-v1.json`. `algo` mặc định lấy từ `FEED_DEFAULT_ALGO`; nếu không đặt thì For You chạy y như trước.
 
 **Lời gọi** (rút gọn từ `FeedService.rank`):
 
@@ -179,21 +179,21 @@ const order = rankPool(pool, (p) => score(ctx, p, feats.get(p.id)!));
 Đây là câu hỏi của thesis, và nó được trả lời **offline**, không phải bằng cách thử trên app:
 1. Tune α và β trên split validation (P7), theo NDCG@10.
 2. Freeze chúng, chạy split test một lần, đọc kết quả H1 và H0.
-3. Nếu H1 pass trên cả hai kiểm định chính và H0 pass, `algo` mặc định chuyển thành `social` (luật đổi feed mặc định). Đây là thay đổi cấu hình, không phải thay đổi code.
+3. Nếu H1 pass trên cả hai kiểm định chính và H0 pass, `algo` mặc định chuyển thành `social` (luật đổi feed mặc định). Đây là thay đổi cấu hình, không phải thay đổi code. H1 đã fail trên cả hai kiểm định, nên mặc định giữ nguyên (P8): `FEED_DEFAULT_ALGO` để trống, và `social` có sẵn qua nút toggle.
 
 Đổi công thức về sau (thêm term, đổi trọng số) nghĩa là thêm một method id mới trong `@breadit/ranking`, chạy offline lại, và so sánh lại. Đừng bao giờ tune theo cảm giác "trông đẹp" trên app.
 
 ### 5.2 Nhanh hơn và rẻ hơn (chi phí)
 
-E7 đã đo chi phí của trang 1 cho `chrono`, `engagement` và `social` (task 10, 2026-11-12). Thiết lập: 100 cặp parity, một virtual user, cache trang tắt, một máy (Apple M1, Postgres và Redis trong Docker), 5 vòng và bỏ vòng đầu. Độ trễ thuộc Class R: trung vị của 4 trung vị được giữ, kèm khoảng tin cậy bootstrap 95%. Số query là số chính xác.
+E7 đã đo chi phí của trang 1 cho `chrono`, `engagement` và `social` (task 10, 2026-11-12; chạy lại với α và β đã tune ngày 2026-11-18). Thiết lập: 100 cặp parity, một virtual user, cache trang tắt, một máy (Apple M1, Postgres và Redis trong Docker), 5 vòng và bỏ vòng đầu. Độ trễ thuộc Class R: trung vị của 4 trung vị được giữ, kèm khoảng tin cậy bootstrap 95%. Số query là số chính xác.
 
 | `algo` | Trung vị (ms) | Khoảng tin cậy 95% | p95 (ms) | Query Prisma mỗi request |
 |---|---:|---|---:|---:|
-| `chrono` | 36.854 | 35.434 đến 38.407 | 42.950 | 19.650 |
-| `engagement` | 36.315 | 36.029 đến 36.805 | 44.668 | 19.630 |
-| `social` | 38.061 | 36.366 đến 38.434 | 45.881 | 19.650 |
+| `chrono` | 35.851 | 35.615 đến 36.005 | 40.011 | 19.650 |
+| `engagement` | 35.879 | 34.634 đến 36.289 | 40.447 | 19.630 |
+| `social` | 35.836 | 34.906 đến 36.102 | 39.766 | 19.700 |
 
-Ba feed tốn gần như nhau, và các khoảng tin cậy chồng lên nhau. Chúng chạy cùng các query (17 đến 21 tuỳ user, trung bình khoảng 19.6 đến 19.7), nên công thức thêm rất ít: chênh giữa các feed là 1 đến 2 ms trên khoảng 37. Các con số chỉ so sánh các feed trên một máy; chúng không phải tốc độ tuyệt đối. Nguồn: `.docs/results/p7-e7/` và bảng e7 của report (macro `eSeven*`).
+Ba feed tốn gần như nhau, và các khoảng tin cậy chồng lên nhau. Chúng chạy cùng các query (17 đến 21 tuỳ user, trung bình khoảng 19.6 đến 19.7), nên công thức thêm rất ít: chênh giữa các feed là dưới 0.1 ms trên khoảng 36. Các con số chỉ so sánh các feed trên một máy; chúng không phải tốc độ tuyệt đối. Nguồn: `.docs/results/p7-e7/` và bảng e7 của report (macro `eSeven*`).
 
 Các đòn bẩy, xếp gần đúng từ rẻ tới đắt. Task 10 chỉ đo; mọi cách tăng tốc phải giữ `npm run test:parity` pass:
 
@@ -210,7 +210,7 @@ Các đòn bẩy, xếp gần đúng từ rẻ tới đắt. Task 10 chỉ đo; 
 
 **Mọi tối ưu phải giữ parity test xanh.** Với 100 cặp (user, thời điểm) lấy mẫu, thứ tự trên app phải bằng thứ tự của evaluation. Nếu một tối ưu làm đổi pool hoặc một feature, app không còn chạy đúng thứ mà thesis đã đo, và các kết quả không còn mô tả app nữa.
 
-Cách chạy: `npm run load -w @breadit/eval -- syn-W2M-M` (không có `--rebase-to`), rồi `npm run test:parity -w @breadit/backend`. Test so toàn bộ thứ tự ở `FeedService.rank` và hai trang HTTP đầu tiên cho mỗi cặp và mỗi `algo`, với mẫu đã commit trong `.docs/results/p6-parity/` (tạo bởi `npm run parity -w @breadit/eval`). Ngày 2026-11-10: 300 trên 300 và 300 trên 300. Khi α, β, dataset hoặc package thay đổi, hãy tạo lại mẫu và commit nó.
+Cách chạy: `npm run load -w @breadit/eval -- syn-W2M-M` (không có `--rebase-to`), rồi `npm run test:parity -w @breadit/backend`. Test so toàn bộ thứ tự ở `FeedService.rank` và hai trang HTTP đầu tiên cho mỗi cặp và mỗi `algo`, với mẫu đã commit trong `.docs/results/p6-parity/` (tạo bởi `npm run parity -w @breadit/eval`). Ngày 2026-11-18, với α = β = 1024: 300 trên 300 và 300 trên 300. Khi α, β, dataset hoặc package thay đổi, hãy tạo lại mẫu và commit nó. `npm run thesis:repro` chạy lại toàn bộ kiểm tra này (tài liệu 07).
 
 ## 6. Những gì không đổi
 

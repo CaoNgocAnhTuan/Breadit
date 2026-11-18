@@ -69,7 +69,7 @@ masterSeed, epoch, node, files: { name: { rows, sha256 } }
 | Harness double run | two full runs give byte-identical results (P5) |
 | P7 double run ✅ | every P7 run and the report, made again from empty folders, give byte-identical files and manifests (task 9) |
 | Parity test ✅ | the live app and the harness give the same order: 300 of 300 at the feed module and 300 of 300 over HTTP (task 8, `npm run test:parity -w @breadit/backend`) |
-| `thesis:repro` 🔜 | one command rebuilds everything and compares every hash with `.docs/results/manifest.json` (task 11) |
+| `thesis:repro` ✅ | one command rebuilds every Class D result and compares every hash with `.docs/results/manifest.json` (task 11, `npm run thesis:repro`) |
 
 ## 6. Frozen values
 
@@ -88,7 +88,9 @@ number in the PDF → macro name → macros.csv row → results CSV cell → man
 1. Clone, `nvm use`, `npm ci`.
 2. `npm run gen -w @breadit/eval` and compare the dataset manifests.
 3. Run a harness config and compare `.docs/results/<runId>/manifest.json`.
-4. Later: `npm run thesis:repro` does all of it in one step.
+4. `npm run thesis:repro` does all of it in one step. It needs Docker `db` and `redis` and the two Digg zips, and it takes about 3 hours. It deletes the Class D results, rebuilds them from nothing, and compares every hash with `.docs/results/manifest.json`. It stops at the first step that fails and at the first hash that differs, and it names the file.
+
+**The merged manifest.** `.docs/results/manifest.json` holds the SHA-256 of the manifest of each of the 16 results folders and of the 9 dataset manifests. Each of those manifests lists its files with their SHA-256, so one compare checks every file, including the git-ignored ones. The E7 folder is marked Class R (latency never gives the same bytes), so it is listed but not compared.
 
 ## 9. Check yourself
 

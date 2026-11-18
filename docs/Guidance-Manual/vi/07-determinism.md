@@ -69,7 +69,7 @@ masterSeed, epoch, node, files: { name: { rows, sha256 } }
 | Harness chạy hai lần | hai lần chạy đầy đủ cho kết quả giống hệt từng byte (P5) |
 | P7 chạy hai lần ✅ | mọi run của P7 và report, chạy lại từ thư mục trống, cho file và manifest giống hệt từng byte (task 9) |
 | Parity test ✅ | app thật và harness cho cùng thứ tự: 300 trên 300 ở feed module và 300 trên 300 qua HTTP (task 8, `npm run test:parity -w @breadit/backend`) |
-| `thesis:repro` 🔜 | một lệnh dựng lại mọi thứ và so mọi hash với `.docs/results/manifest.json` (task 11) |
+| `thesis:repro` ✅ | một lệnh dựng lại mọi kết quả Class D và so mọi hash với `.docs/results/manifest.json` (task 11, `npm run thesis:repro`) |
 
 ## 6. Các giá trị frozen
 
@@ -90,7 +90,9 @@ number in the PDF → macro name → macros.csv row → results CSV cell → man
 1. Clone, `nvm use`, `npm ci`.
 2. `npm run gen -w @breadit/eval` rồi so các manifest của dataset.
 3. Chạy một harness config rồi so `.docs/results/<runId>/manifest.json`.
-4. Về sau: `npm run thesis:repro` làm tất cả trong một bước.
+4. `npm run thesis:repro` làm tất cả trong một bước. Nó cần Docker `db` và `redis` cùng hai file zip Digg, và chạy khoảng 3 giờ. Nó xoá các kết quả Class D, dựng lại từ đầu, rồi so mọi hash với `.docs/results/manifest.json`. Nó dừng ở bước đầu tiên bị lỗi và ở hash đầu tiên khác, và nêu tên file.
+
+**Manifest gộp.** `.docs/results/manifest.json` giữ SHA-256 của manifest của từng thư mục trong 16 thư mục kết quả và của 9 manifest dataset. Mỗi manifest đó liệt kê các file của nó kèm SHA-256, nên một lần so sánh kiểm tra mọi file, kể cả file bị git bỏ qua. Thư mục E7 được đánh dấu Class R (độ trễ không bao giờ cho cùng các byte), nên nó được liệt kê nhưng không bị so sánh.
 
 ## 9. Tự kiểm tra
 

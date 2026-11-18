@@ -136,4 +136,5 @@ Every term and symbol used in the thesis, in one place. Each entry is one or two
 | **sfc32** | The small, fast random generator used. Seeded from SHA-256. |
 | **SHA-256** | A fingerprint of a file. If one byte changes, the hash changes. |
 | **Frozen value** | A value fixed before the test split runs (super-plan §7). Changing it needs a new config version and a change-log line. |
-| **`thesis:repro`** | Planned command (task 11) that rebuilds every dataset and result and compares all hashes. |
+| **`thesis:repro`** | The command of task 11 that deletes and rebuilds every Class D dataset and result, then compares all hashes with the merged manifest. About 3 hours. |
+| **Merged manifest** | `.docs/results/manifest.json`: the SHA-256 of the manifest of every results folder and of every dataset. `npm run results:manifest -w @breadit/eval` compares the tree with it. |

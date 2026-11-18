@@ -6,7 +6,7 @@ This document describes the system the thesis proposes: the Breadit platform fro
 
 Sources: [super-plan.md](../.docs/super-plan.md) (phases, protocol, the hybrid score, frozen values) and [implementation-plan.md](../.docs/implementation-plan.md) (module map, data contracts, task list). When this document and those two disagree, those two are right.
 
-**Status marks.** ✅ built and tested. 🔜 planned, with the task that builds it. Status on 2026-11-12.
+**Status marks.** ✅ built and tested. 🔜 planned, with the task that builds it. Status on 2026-11-18.
 
 ---
 
@@ -33,7 +33,7 @@ The key idea: **the live app and the evaluation call the same ranking code.** On
 | Quality measurement | none (only latency and cache hits) | Recall@K, NDCG@K, coverage, paired bootstrap and randomization test with Holm correction |
 | Data for evaluation | `seed.ts` (not deterministic), `humans_v1` (0 likes, 0 follows) | seeded synthetic worlds and Digg 2009, in one canonical CSV format |
 
-The default "For You" stays as today until the experiments are done. It becomes `social` only if hypothesis H1 passes on both main tests and the null-world check H0 passes (super-plan §4, P7 "Default feed rule"). The default is read from an environment variable, so this switch changes configuration, not code.
+The default "For You" stays as today. It would become `social` only if hypothesis H1 passed on both main tests and the null-world check H0 passed (super-plan §4, P7 "Default feed rule"). H1 failed on both main tests, so `FEED_DEFAULT_ALGO` stays empty and no code changes (P8). The default is read from an environment variable, so the switch would have changed configuration, not code. `social` stays available with the toggle, with the tuned α and β.
 
 ---
 
@@ -167,7 +167,7 @@ What the thesis changes:
   - after `buildPool`, the likes, comments and reposts on the pool posts.
   
   Then it calls `userFeaturesAsOf`, `buildPool`, `postFeaturesAsOf`, `scorer(...)` and `rankPool`. It has no ranking logic of its own. Follows and memberships are read with their times, not from the cached `getFolloweesIds` / `getCommunityIds`, because the as-of rule needs the times. Comments and reposts count only when not deleted, as in `engagementSelect`.
-- **`algo` option** ✅. `GET /api/posts?algo=` with `chrono` (BL0: followee posts first, then newest first), `engagement` (BL2, the Explore score on the shared pool) or `social` (the hybrid H). `algo` works only on the logged-in For You. An unknown value or a mix with `feed`, `user` or `communityId` gives 400, and a guest gets 401. α and β of `social` are placeholders (1 and 1) in `feed/feed.constants.ts` until P7 tunes them; task 11 writes the tuned values there. `m`, W and N_max are the §7 values, and a unit test checks them against `eval/config/frozen-v1.json`.
+- **`algo` option** ✅. `GET /api/posts?algo=` with `chrono` (BL0: followee posts first, then newest first), `engagement` (BL2, the Explore score on the shared pool) or `social` (the hybrid H). `algo` works only on the logged-in For You. An unknown value or a mix with `feed`, `user` or `communityId` gives 400, and a guest gets 401. α and β of `social` are the tuned values of P7, α = 1024 and β = 1024, in `feed/feed.constants.ts`. They are the `syn-W2M-M` values of `eval/config/runs/p7-main.json`, and a unit test checks that they are equal to that file. `m`, W and N_max are the §7 values, and a unit test checks them against `eval/config/frozen-v1.json`.
 - **Paging.** Pages of 10. The cursor is `t:score:id`: the next page is ranked again at the same time t and starts after that item, so pages never repeat or skip a post. Without `asOf`, a cursor older than 24 h gives 400.
 - **Default `algo`** ✅ comes from `FEED_DEFAULT_ALGO`. When it is not set, "For You" behaves exactly as today. A wrong value stops the backend at start. Docker Compose passes it to the backend.
 - **Test-only `asOf` parameter** ✅. Unix seconds, accepted only when `FEED_ASOF_ENABLED=true`. The backend refuses to start with the flag on and `NODE_ENV=production`, and Docker Compose never passes it. It lets the parity test ask "what would the feed have been at time t". Only creates can be replayed: a delete or an unlike that happened after t is already gone.
@@ -353,19 +353,34 @@ flowchart LR
     PG --> App["live app<br/>parity test · demo"]
 ```
 
-The nine datasets are the eight synthetic ones (five worlds at size M, three at size S) and `digg2009`. `npm run thesis:repro` 🔜 (task 11) runs the whole pipeline again and compares every hash with `.docs/results/manifest.json`.
+The nine datasets are the eight synthetic ones (five worlds at size M, three at size S) and `digg2009`.
+
+### 6.3.1 One command for every Class D result ✅ (P8)
+
+`npm run thesis:repro` (script `scripts/repro/thesis-repro.mjs`) rebuilds every Class D result and compares every hash with `.docs/results/manifest.json`. It needs Node from `.nvmrc`, `docker compose up db redis -d` and the two Digg zips in `datasets/raw/digg2009/`. It takes about 3 hours (the two Digg runs are the slowest).
+
+1. **Checks** (a few seconds, nothing is written): Node, the merged manifest, no uncommitted change in `.docs/results/` or `eval/config/`, the SHA-256 of both Digg zips, Docker with `db` and `redis` ready. All problems are listed together and the command stops.
+2. **Build and clean:** `@breadit/ranking` and the Prisma client are built. Then every Class D folder named in the merged manifest (`.docs/results/<id>/` and `eval/results/<id>/`) and `eval/data/` are deleted, so every file is rebuilt from nothing. `p7-e7` stays.
+3. **Data:** `gen`, `adapt:digg`, `check`.
+4. **Runs:** `p5-baseline`, the two P7 tuning runs, `freeze --check` (it writes nothing), then the ten approved test configs, `p7-h0` first. The command never tunes and never writes a config.
+5. **Parity:** `parity` with α and β read from `p7-main.json`, `load` and `load:check` of `syn-W2M-M`, then `npm run test:parity -w @breadit/backend`.
+6. **Report and compare:** `report`, then `npm run results:manifest -w @breadit/eval`. It fails on any difference and names the file.
+
+Each step writes its output to `eval/results/repro/<nn>-<name>.log` (git-ignored). The terminal shows one line per step. The first failing step stops the command, prints the last 30 lines of its log and exits 1.
+
+**The merged manifest** `.docs/results/manifest.json` holds the SHA-256 of the manifest of each of the 16 results folders and of the 9 dataset manifests (`eval/data/<id>/manifest.json`). Each of those manifests lists its files with their SHA-256, so the compare also checks every file, including the git-ignored ones (`per_user.csv`, `orders.csv`). It also finds a file that a manifest does not list. `p7-e7` is marked Class R: latency is repeatable but never byte-equal, so it is a report input and is not compared. The code is `eval/src/repro/merged.ts`. `npm run results:manifest -w @breadit/eval -- --write` makes the file; without `--write` it checks the tree.
 
 ### 6.4 Parity test ✅ (task 8)
 
 The parity test proves that the live feed and the harness give the same order.
 
-1. `npm run parity -w @breadit/eval -- --param alpha=1 --param beta=1` draws 100 (user, `asOf`) pairs from `syn-W2M-M` with the `parity` random stream, 25 in each history bucket. For each pair and each `algo` (`chrono` = BL0, `engagement` = BL2, `social` = H) it ranks the pool with the harness (`rankAt`, the same path as the `rank` command). It writes the pool size, the SHA-256 of the full order and the top 20 to `.docs/results/p6-parity/` (committed, with a manifest). The full orders go to the git-ignored `eval/results/p6-parity/orders.csv`.
+1. `npm run parity -w @breadit/eval -- --param alpha=1024 --param beta=1024` draws 100 (user, `asOf`) pairs from `syn-W2M-M` with the `parity` random stream, 25 in each history bucket. For each pair and each `algo` (`chrono` = BL0, `engagement` = BL2, `social` = H) it ranks the pool with the harness (`rankAt`, the same path as the `rank` command). It writes the pool size, the SHA-256 of the full order and the top 20 to `.docs/results/p6-parity/` (committed, with a manifest). The full orders go to the git-ignored `eval/results/p6-parity/orders.csv`.
 2. `npm run load -w @breadit/eval -- syn-W2M-M` loads the same dataset into the Postgres schema `eval_load`, without `--rebase-to`.
 3. `npm run test:parity -w @breadit/backend` starts the app on `eval_load`, with the cache off and the `asOf` flag on. First it checks that the row counts and the first post time equal the parity manifest, and that the backend's α, β, `m` and algo map equal the sample. Then, for each pair and `algo`:
    - (a) `FeedService.rank` must give the same full order (size and SHA-256);
    - (b) the first two pages of `GET /api/posts?algo=…&asOf=…` must equal the harness top 20.
 
-Result on 2026-11-10: 300 of 300 for (a) and 300 of 300 for (b), in about 34 s. Live time is Unix seconds and harness time is seconds from the base epoch. Every score uses a time difference or rises with the post time, so the orders are equal; the test compares orders, not score values. When α, β, the dataset or the package changes, run `parity` again and commit its output.
+Result on 2026-11-18, with the tuned α = β = 1024: 300 of 300 for (a) and 300 of 300 for (b), in about 33 s. The sample was first drawn on 2026-11-10 with α = β = 1; the draw of the 100 pairs does not read α or β, so `pairs.csv` did not change and only the `social` rows of `expected.csv` did. Live time is Unix seconds and harness time is seconds from the base epoch. Every score uses a time difference or rises with the post time, so the orders are equal; the test compares orders, not score values. When α, β, the dataset or the package changes, run `parity` again and commit its output. `npm run thesis:repro` runs this whole check again (section 6.3.1).
 
 ### 6.5 Cost benchmark E7 ✅ (task 10)
 
@@ -376,13 +391,13 @@ E7 asks what each `algo` feed costs: the time of page 1 and the number of Prisma
 3. **k6.** 5 rounds of the three `algo` feeds, in a rotated order. A run is 100 requests, one virtual user, no sleep. Round 1 is warm-up. One failed request stops everything.
 4. **Summary.** `npm run e7:summary -w @breadit/eval` writes `.docs/results/p7-e7/`: for each `algo`, the median of the 4 kept run medians with a 95% bootstrap interval, the p95 and the query counts. `npm run report` adds the macros `eSeven*` and the table e7.
 
-Result on one machine (Apple M1, Postgres and Redis in Docker), page cache off, with the placeholder α = β = 1 (the cost does not depend on them):
+Result on one machine (Apple M1, Postgres and Redis in Docker), page cache off, with the tuned α = β = 1024 (E7 was run again on 2026-11-18 with them; the cost does not depend on α and β):
 
 | `algo` | Median (ms) | 95% interval | p95 (ms) | Prisma queries per request |
 |---|---:|---|---:|---:|
-| `chrono` | 36.854 | 35.434 to 38.407 | 42.950 | 19.650 |
-| `engagement` | 36.315 | 36.029 to 36.805 | 44.668 | 19.630 |
-| `social` | 38.061 | 36.366 to 38.434 | 45.881 | 19.650 |
+| `chrono` | 35.851 | 35.615 to 36.005 | 40.011 | 19.650 |
+| `engagement` | 35.879 | 34.634 to 36.289 | 40.447 | 19.630 |
+| `social` | 35.836 | 34.906 to 36.102 | 39.766 | 19.700 |
 
 The three feeds run the same queries (17 to 21 for a request, by user) and the intervals overlap, so the formula adds little to the cost of loading the pool. The query count is Class D. The latency is Class R: it compares the feeds on one machine and is not absolute speed. The numbers are in `.docs/results/p7-report/` (macros `eSeven*`, table e7).
 
@@ -409,7 +424,7 @@ How the code keeps Class D:
 
 **Evaluation outside the backend.** `eval/` reads files, not the database or the API, so a run is fast, has no cache or rate limit in the way, and can be repeated byte for byte. The backend never imports it, so evaluation code can never reach production.
 
-**Scores at request time, not a precomputed table.** The hybrid is a cheap formula over counts the database already has. Computing it per request keeps the feed fresh and needs no batch job or extra table. E7 measured the cost (§6.5): page 1 takes about 36 to 38 ms at the median, with about 19.6 to 19.7 Prisma queries, for all three `algo` feeds.
+**Scores at request time, not a precomputed table.** The hybrid is a cheap formula over counts the database already has. Computing it per request keeps the feed fresh and needs no batch job or extra table. E7 measured the cost (§6.5): page 1 takes about 36 ms at the median, with about 19.6 to 19.7 Prisma queries, for all three `algo` feeds.
 
 **The live app passes "now" as `asOf`.** It calls the same functions as the evaluation, so the only gap is how the data is loaded, and the parity test covers that gap.
 
@@ -497,10 +512,11 @@ Breadit/
 │   │   ├── metrics.ts                # Recall@K, NDCG@K, coverage
 │   │   ├── stats.ts                  # paired bootstrap, randomization test, Holm
 │   │   ├── results-csv.ts            # writes results CSVs and their hashes
-│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank, load, load-check, parity, freeze, report, e7-summary
+│   │   ├── cli/                      # entry points: generate, adapt-digg, check, harness, rank, load, load-check, parity, freeze, report, e7-summary, results-manifest
 │   │   ├── loader/                   # writes a synthetic dataset into the Postgres schema eval_load (the only Prisma user here)
 │   │   ├── parity/                   # the parity sample: 100 (user, asOf) pairs and the harness orders
 │   │   ├── report/                   # task 9 · results CSVs → macros.csv, results-macros.tex, tables, results.md
+│   │   ├── repro/                    # task 11 · the merged manifest: hashes every results and dataset manifest, compares the tree
 │   │   ├── bench/                    # task 10 · E7 summary: latency median with bootstrap CI, query counts
 │   │   └── *.test.ts                 # node --test tests (golden, leakage, double run, scipy cross-check, ...)
 │   ├── data/                         # git-ignored · canonical datasets, rebuilt by `gen` and `adapt:digg`
@@ -517,7 +533,7 @@ Breadit/
 │   ├── datasets.md                   # why Digg 2009, how to download it, calibration targets
 │   ├── literature.md · related-work.md
 │   ├── Bugs Report.md                # known bugs and the task that fixes each
-│   ├── results/                      # committed results, one folder per run (p5-baseline/, p6-parity/, p7-*/, p7-report/)
+│   ├── results/                      # committed results, one folder per run (p5-baseline/, p6-parity/, p7-*/, p7-report/) · manifest.json is the merged manifest
 │   ├── works/                        # one folder per task: design.md + plan.md
 │   └── latex/ 🔜                     # P9 · the thesis LaTeX, copied from Latex/
 │
@@ -527,7 +543,7 @@ Breadit/
 │   └── Pre-thesis/                   # the pre-thesis package: report chapters, diagrams, ADRs, k6 scripts · frozen
 ├── Latex/                            # pre-thesis report template · not edited
 ├── .claude/                          # workflow harness: /task, /bugfix, /approve, hooks, rules, templates
-├── scripts/                          # verify-bug-sweep.sh, verify-socket.cjs, dataset-humans.ps1, e7/ (E7 k6 script and runner)
+├── scripts/                          # verify-bug-sweep.sh, verify-socket.cjs, dataset-humans.ps1, e7/ (E7 k6 script and runner), repro/ (thesis-repro.mjs, `npm run thesis:repro`)
 ├── docker-compose.yml                # db (Postgres 16), redis (Redis 7), backend, frontend
 ├── Makefile                          # rebuild, backend-rebuild, frontend-rebuild, logs
 ├── package.json                      # npm workspaces: apps/*, packages/*, eval
@@ -551,5 +567,6 @@ Breadit/
 | Feed module, `algo`, `asOf` flag, parity test, toggle | P6 · task 8 | ✅ |
 | Experiments E1–E6, E8, report and macros | P7 · task 9 | ✅ |
 | Cost benchmark E7 | P7 · task 10 | ✅ |
-| `npm run thesis:repro`, default `algo` | P8 · task 11 | 🔜 |
+| `npm run thesis:repro`, merged manifest, tuned α and β in the app | P8 · task 11 | ✅ |
+| Default `algo`: For You stays as it is (H1 failed on both main tests) | P8 · task 11 | ✅ no code change |
 | Slides and demo | P10 · task 13 | 🔜 |

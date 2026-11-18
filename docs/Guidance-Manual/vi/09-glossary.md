@@ -138,4 +138,5 @@ Thuật ngữ chuyên ngành được giữ nguyên tiếng Anh, vì thesis và 
 | **sfc32** | Bộ sinh số ngẫu nhiên nhỏ và nhanh được dùng. Seed được lấy từ SHA-256. |
 | **SHA-256** | Dấu vân tay của một file. Đổi một byte là hash đổi. |
 | **Frozen value** | Giá trị được cố định trước khi chạy split test (super-plan §7). Muốn đổi cần config version mới và một dòng change log. |
-| **`thesis:repro`** | Lệnh dự kiến (task 11) dựng lại mọi dataset và kết quả rồi so sánh mọi hash. |
+| **`thesis:repro`** | Lệnh của task 11: xoá rồi dựng lại mọi dataset và kết quả Class D, rồi so mọi hash với manifest gộp. Khoảng 3 giờ. |
+| **Manifest gộp** | `.docs/results/manifest.json`: SHA-256 của manifest của mọi thư mục kết quả và mọi dataset. `npm run results:manifest -w @breadit/eval` so cây thư mục với nó. |

@@ -6,7 +6,7 @@ Những câu hội đồng hoặc reviewer có thể hỏi, mỗi câu có câu 
 
 Khi bảo vệ bằng tiếng Anh, dùng bản [English](../en/10-defense-qa.md): câu trả lời ở đó đã được viết để nói thành lời.
 
-Các câu có nhãn **(after P7)** từng phụ thuộc vào kết quả chưa có. Từ task 10 (2026-11-12), không còn câu nào mang nhãn này. Trạng thái: 2026-11-12, sau task 10.
+Các câu có nhãn **(after P7)** từng phụ thuộc vào kết quả chưa có. Từ task 10 (2026-11-12), không còn câu nào mang nhãn này. Trạng thái: 2026-11-18, sau task 11.
 
 ---
 
@@ -107,15 +107,15 @@ Cả hai gọi cùng một package, `@breadit/ranking`, nên chỉ khác ở cá
 *Bằng chứng:* `docs/System_Architecture.md` §6.4; task 8 (`.docs/results/p6-parity/`, `npm run test:parity -w @breadit/backend`).
 
 **Q24. Người khác có tái lập được các con số không?**
-Có. Mọi sự ngẫu nhiên đến từ một seed, điểm là số nguyên, tie-break toàn phần, file ở định dạng chuẩn, và mỗi đầu ra có SHA-256 trong manifest. Double-run test chứng minh đầu ra giống hệt từng byte. `npm run thesis:repro` (task 11) dựng lại mọi thứ và so mọi hash.
+Có. Mọi sự ngẫu nhiên đến từ một seed, điểm là số nguyên, tie-break toàn phần, file ở định dạng chuẩn, và mỗi đầu ra có SHA-256 trong manifest. Double-run test chứng minh đầu ra giống hệt từng byte. `npm run thesis:repro` xoá và dựng lại mọi kết quả Class D, trong khoảng 3 giờ, rồi so mọi hash với `.docs/results/manifest.json`. Độ trễ thuộc Class R, nên lặp lại được nhưng không giống hệt từng byte, và không bị so sánh.
 *Bằng chứng:* super-plan §2.
 
 **Q25. Feed mới tốn bao nhiêu?**
-Gần như nhau ở cả ba feed. E7 chạy k6 trên `syn-W2M-M`, cache trang tắt, trên một máy: 5 lần chạy, bỏ lần đầu, lấy trung vị kèm CI, và một lần chạy chỉ được tính nếu không có request lỗi nào. Trang 1 có trung vị 38.1 ms với `social`, 36.9 ms với `chrono` và 36.3 ms với `engagement`, và một request gửi khoảng 19.6 đến 19.7 query Prisma ở cả ba. Các khoảng tin cậy chồng lên nhau, nên công thức thêm rất ít. Các con số chỉ so sánh các feed trên một máy; chúng không phải tốc độ tuyệt đối.
+Gần như nhau ở cả ba feed. E7 chạy k6 trên `syn-W2M-M`, cache trang tắt, trên một máy: 5 lần chạy, bỏ lần đầu, lấy trung vị kèm CI, và một lần chạy chỉ được tính nếu không có request lỗi nào. Trang 1 có trung vị 35.8 ms với `social`, 35.9 ms với `chrono` và 35.9 ms với `engagement` (chạy với α và β đã tune), và một request gửi khoảng 19.6 đến 19.7 query Prisma ở cả ba. Các khoảng tin cậy chồng lên nhau, nên công thức thêm rất ít. Các con số chỉ so sánh các feed trên một máy; chúng không phải tốc độ tuyệt đối.
 *Bằng chứng:* E7 (task 10): `.docs/results/p7-e7/`, bảng e7 trong `.docs/results/p7-report/`, `docs/System_Architecture.md` §6.5.
 
 **Q26. Sao điểm được tính mỗi request mà không lưu sẵn trong bảng?**
-Nó là một công thức rẻ trên các số đếm mà database đã có. Tính mỗi request giữ feed luôn mới và không cần batch job. E7 cho thấy chi phí: trung vị 38.1 ms cho trang 1 với `social`, so với 36.9 ms với `chrono`.
+Nó là một công thức rẻ trên các số đếm mà database đã có. Tính mỗi request giữ feed luôn mới và không cần batch job. E7 cho thấy chi phí: trung vị 35.8 ms cho trang 1 với `social`, so với 35.9 ms với `chrono`.
 
 **Q27. Sao code xếp hạng nằm trong một package riêng?**
 Để evaluation chạy đúng code của production mà không cần khởi động server, database hay cache. Backend import package đó; không ai import phần evaluation.

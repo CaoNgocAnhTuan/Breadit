@@ -4,7 +4,7 @@
 
 Questions a committee or a reviewer is likely to ask, each with a short answer and where the evidence is. Learn the short answer first. Open the evidence when you need detail.
 
-Answers marked **(after P7)** depended on results that did not exist yet. Since task 10 (2026-11-12), no answer has this mark. Status: 2026-11-12, after task 10.
+Answers marked **(after P7)** depended on results that did not exist yet. Since task 10 (2026-11-12), no answer has this mark. Status: 2026-11-18, after task 11.
 
 ---
 
@@ -105,15 +105,15 @@ Both call the same package, `@breadit/ranking`, so only data loading differs. A 
 *Evidence:* `docs/System_Architecture.md` §6.4; task 8 (`.docs/results/p6-parity/`, `npm run test:parity -w @breadit/backend`).
 
 **Q24. Can someone reproduce your numbers?**
-Yes. All randomness comes from one seed, scores are integers, ties are total, files are canonical, and each output has a SHA-256 in a manifest. A double-run test proves byte-identical output. `npm run thesis:repro` (task 11) rebuilds everything and compares every hash.
+Yes. All randomness comes from one seed, scores are integers, ties are total, files are canonical, and each output has a SHA-256 in a manifest. A double-run test proves byte-identical output. `npm run thesis:repro` deletes and rebuilds every Class D result, in about 3 hours, and compares every hash with `.docs/results/manifest.json`. Latency is Class R, so it is repeatable but not byte-equal, and it is not compared.
 *Evidence:* super-plan §2.
 
 **Q25. What does the new feed cost?**
-About the same for all three feeds. E7 ran k6 on `syn-W2M-M` with the page cache off on one machine: 5 runs, the first dropped, median with a CI, and a run counts only with zero failed requests. Page 1 takes a median of 38.1 ms for `social`, 36.9 ms for `chrono` and 36.3 ms for `engagement`, and a request sends about 19.6 to 19.7 Prisma queries for all three. The intervals overlap, so the formula adds little. The numbers compare the feeds on one machine; they are not absolute speed.
+About the same for all three feeds. E7 ran k6 on `syn-W2M-M` with the page cache off on one machine: 5 runs, the first dropped, median with a CI, and a run counts only with zero failed requests. Page 1 takes a median of 35.8 ms for `social`, 35.9 ms for `chrono` and 35.9 ms for `engagement` (run with the tuned α and β), and a request sends about 19.6 to 19.7 Prisma queries for all three. The intervals overlap, so the formula adds little. The numbers compare the feeds on one machine; they are not absolute speed.
 *Evidence:* E7 (task 10): `.docs/results/p7-e7/`, table e7 in `.docs/results/p7-report/`, `docs/System_Architecture.md` §6.5.
 
 **Q26. Why is the score computed per request and not stored in a table?**
-It is a cheap formula over counts the database already has. Computing it per request keeps the feed fresh and needs no batch job. E7 shows the cost: a median of 38.1 ms for page 1 with `social`, against 36.9 ms with `chrono`.
+It is a cheap formula over counts the database already has. Computing it per request keeps the feed fresh and needs no batch job. E7 shows the cost: a median of 35.8 ms for page 1 with `social`, against 35.9 ms with `chrono`.
 
 **Q27. Why put the ranking code in a separate package?**
 So that the evaluation runs exactly the production code without starting the server, the database or the cache. The backend imports the package; nothing imports the evaluation.
