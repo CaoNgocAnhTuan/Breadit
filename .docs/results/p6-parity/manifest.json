@@ -15,11 +15,11 @@
   "files": {
     "expected.csv": {
       "rows": 300,
-      "sha256": "9873d9e9fcccf497d2f755ddd0344fb949fa8fcc059ebd01c7f97f330eb27122"
+      "sha256": "e50a2ed7689bcb8723bd30e08bddf9d5d3c2255db78eec3c4e024225de0398cb"
     },
     "orders.csv": {
       "rows": 300,
-      "sha256": "af118a51968e9d3076d0673505f7f573f810c710c187a9ae40d74d58011a0c4b"
+      "sha256": "a7cf170ea1d9bcc613b68a5394fbb839e0c784186d1eb4257bd725e3c8f19e6f"
     },
     "pairs.csv": {
       "rows": 100,
@@ -35,8 +35,8 @@
   },
   "node": "v22.23.4",
   "params": {
-    "alpha": 1,
-    "beta": 1,
+    "alpha": 1024,
+    "beta": 1024,
     "m": 5
   },
   "runId": "p6-parity",
