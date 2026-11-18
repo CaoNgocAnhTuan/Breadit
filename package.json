@@ -12,6 +12,7 @@
     "typecheck": "npm run typecheck -w @breadit/frontend",
     "dev:reset": "npm run dev:reset -w @breadit/frontend",
     "bench:e7": "node scripts/e7/run-e7.mjs",
+    "thesis:repro": "node scripts/repro/thesis-repro.mjs",
     "test:backend": "npm run test -w @breadit/backend && npm run test:it -w @breadit/backend",
     "dataset:humans": "powershell -ExecutionPolicy Bypass -File scripts/dataset-humans.ps1",
     "prepare":   "husky"
