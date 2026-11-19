@@ -1,0 +1,7 @@
+dataset,split,bucket,n_test_users,n_left_out
+syn-W0-M,test,0,64,5
+syn-W0-M,test,1-4,126,11
+syn-W0-M,test,0-4,190,16
+syn-W0-M,test,5-19,192,15
+syn-W0-M,test,20+,208,17
+syn-W0-M,test,all,590,48

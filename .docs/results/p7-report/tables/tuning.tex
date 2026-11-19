@@ -1,0 +1,21 @@
+% tuning: Values chosen on the validation split (the highest NDCG@10, a tie to the smaller value)
+\begin{tabular}{llllr}
+\toprule
+Dataset & Method & Parameter & Value & Validation NDCG@10 \\
+\midrule
+syn-W0-M & H & alpha/beta & 32/512 & 0.027 \\
+syn-W1-M & H & alpha/beta & 256/1024 & 0.029 \\
+syn-W2L-M & H & alpha/beta & 1024/512 & 0.032 \\
+syn-W2M-M & BL2t & ageWeight & 0.125 & 0.012 \\
+syn-W2M-M & BL4 & divisor & 720000 & 0.012 \\
+syn-W2M-M & BL5 & gravity & 0.6 & 0.010 \\
+syn-W2M-M & BL6 & alpha & 16 & 0.018 \\
+syn-W2M-M & H & alpha/beta & 1024/1024 & 0.048 \\
+syn-W2H-M & H & alpha/beta & 1024/1024 & 0.085 \\
+digg2009 & BL2t & ageWeight & 4 & 0.097 \\
+digg2009 & BL4 & divisor & 45000 & 0.244 \\
+digg2009 & BL5 & gravity & 1.5 & 0.249 \\
+digg2009 & BL6 & alpha & 1024 & 0.094 \\
+digg2009 & H & alpha/beta & 1024/0 & 0.093 \\
+\bottomrule
+\end{tabular}

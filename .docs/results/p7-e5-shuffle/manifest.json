@@ -1,0 +1,34 @@
+{
+  "files": {
+    "compare.csv": {
+      "rows": 18,
+      "sha256": "56b3b886a55670736539a54548a93b4f07a4565ad05597e437e0e25eb1f4f7e2"
+    },
+    "coverage.csv": {
+      "rows": 6,
+      "sha256": "23073643f7d938e270af1f0e80ffeab43422581eaa52dd2eebe280d72ff7bffa"
+    },
+    "leftout.csv": {
+      "rows": 6,
+      "sha256": "ca0a9b5f3710f6a0a2f17f1b6821b23213fadfd435328b892e2ee56bd3b7b43e"
+    },
+    "per_user.csv": {
+      "rows": 1084,
+      "sha256": "73e3e69b5a5b5378c21edc15faa24af6112ec4f39cb08d961b0c23d34b41f7fe"
+    },
+    "summary.csv": {
+      "rows": 36,
+      "sha256": "81e397c7dfbd8fa8219ab337c3b983c91db403afaf7d99225e4fbec1a9588ec6"
+    }
+  },
+  "masterSeed": 20261014,
+  "node": "v22.23.4",
+  "runId": "p7-e5-shuffle",
+  "schemaVersion": 1,
+  "source": {
+    "configSha256": "de8b8bb4f1e699225406ff40d9e220ac854f49afe71d6f2c1dc08c583af7c76b",
+    "datasets": {
+      "syn-W2M-M": "a144074779cbd1187c825a8c872c9d9e196a90da5061067d8488ae63224962ed"
+    }
+  }
+}

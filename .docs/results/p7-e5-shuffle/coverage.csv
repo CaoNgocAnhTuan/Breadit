@@ -1,0 +1,7 @@
+dataset,split,method,k,coverage
+syn-W2M-M-shuffled,test,BL2,5,0.069569
+syn-W2M-M-shuffled,test,BL2,10,0.253724
+syn-W2M-M-shuffled,test,BL2,20,0.512850
+syn-W2M-M-shuffled,test,H,5,0.159928
+syn-W2M-M-shuffled,test,H,10,0.216729
+syn-W2M-M-shuffled,test,H,20,0.303814

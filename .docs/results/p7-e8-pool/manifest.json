@@ -1,0 +1,34 @@
+{
+  "files": {
+    "compare.csv": {
+      "rows": 36,
+      "sha256": "69558d5bf7bd680fa3702da1a61160b4d5755430d66fa6ee8a08638df0cdbfad"
+    },
+    "coverage.csv": {
+      "rows": 9,
+      "sha256": "ec7c155bceb2ab5c07ec4770c90a6946575fb3a53a78fc1e92aa62505899762c"
+    },
+    "leftout.csv": {
+      "rows": 6,
+      "sha256": "245b2f7c1c626adc659005871790a95ca1b70da6085e28d85a29f4d65ebe86ce"
+    },
+    "per_user.csv": {
+      "rows": 1770,
+      "sha256": "781677215707813568718b4b3237f72f5896bf338033a4ff6f462b00979cc630"
+    },
+    "summary.csv": {
+      "rows": 54,
+      "sha256": "28586ed94e3b91b5e3c110ffba85d931c479f44f9adc6a9408be5f7a86bf9ed0"
+    }
+  },
+  "masterSeed": 20261014,
+  "node": "v22.23.4",
+  "runId": "p7-e8-pool",
+  "schemaVersion": 1,
+  "source": {
+    "configSha256": "0f7ceec38acb75134bcd6639748d936e7e6662652cd7abee3a405327afb3098e",
+    "datasets": {
+      "syn-W2M-M": "a144074779cbd1187c825a8c872c9d9e196a90da5061067d8488ae63224962ed"
+    }
+  }
+}

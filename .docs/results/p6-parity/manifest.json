@@ -1,0 +1,44 @@
+{
+  "counts": {
+    "interactions": 22258,
+    "posts": 20000,
+    "users": 1000
+  },
+  "dataset": {
+    "id": "syn-W2M-M",
+    "manifestSha256": "a144074779cbd1187c825a8c872c9d9e196a90da5061067d8488ae63224962ed"
+  },
+  "epochSeconds": 1767225600,
+  "external": [
+    "orders.csv"
+  ],
+  "files": {
+    "expected.csv": {
+      "rows": 300,
+      "sha256": "e50a2ed7689bcb8723bd30e08bddf9d5d3c2255db78eec3c4e024225de0398cb"
+    },
+    "orders.csv": {
+      "rows": 300,
+      "sha256": "a7cf170ea1d9bcc613b68a5394fbb839e0c784186d1eb4257bd725e3c8f19e6f"
+    },
+    "pairs.csv": {
+      "rows": 100,
+      "sha256": "b09002b9c4a6bd8de8d17181f98eac084c8340eb783e615a69f9d2ed9bb49b4a"
+    }
+  },
+  "firstPostUnix": 1782777798,
+  "masterSeed": 20261014,
+  "methods": {
+    "chrono": "BL0",
+    "engagement": "BL2",
+    "social": "H"
+  },
+  "node": "v22.23.4",
+  "params": {
+    "alpha": 1024,
+    "beta": 1024,
+    "m": 5
+  },
+  "runId": "p6-parity",
+  "schemaVersion": 1
+}
