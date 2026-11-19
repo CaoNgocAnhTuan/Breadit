@@ -141,6 +141,8 @@ expect('Write .env.example asks (config, no plan)', run('pre-edit.cjs', write('.
 
 expect('Edit backend code with a draft spec asks', run('pre-edit.cjs', edit('apps/backend/src/posts/x.ts', '1', '2')), 'ask', (x) => /no plan is approved/.test(reason(x)));
 expect('Write .docs/notes.md passes', run('pre-edit.cjs', write('.docs/notes.md', 'notes')), 'pass');
+expect('Write .docs/Thesis-Report/main.tex passes (the thesis LaTeX is not gated)', run('pre-edit.cjs', write('.docs/Thesis-Report/main.tex', 'x')), 'pass');
+expect('Write docs/Pre-thesis/Latex/main_docx.tex is denied', run('pre-edit.cjs', write('docs/Pre-thesis/Latex/main_docx.tex', 'x')), 'deny');
 expect('Edit CLAUDE.md passes', run('pre-edit.cjs', edit('CLAUDE.md', '# CLAUDE.md', '# CLAUDE.md!')), 'pass');
 expect('Write a file outside the project passes', run('pre-edit.cjs', write(path.join(os.tmpdir(), 'outside-harness.txt'), 'x')), 'pass');
 expect('Write .claude/state/x passes', run('pre-edit.cjs', write('.claude/state/x', 'x')), 'pass');

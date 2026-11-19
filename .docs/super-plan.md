@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.30 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.31 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -273,9 +273,9 @@ E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, d
 
 ### P9: Writing ★
 
-**Do.** Chapter 2 starts in P1. The rest follows the chapter map below. A report script turns the CSVs into LaTeX tables and a `results-macros.tex` file with named numbers (for example `\recallGain`). The text uses the macros and never typed numbers. This removes the pre-thesis problem where the abstract and chapter 5 disagreed. When writing starts, copy the `Latex/` template into `.docs/latex/`. Do not edit `Latex/`. The supervisor reads the full draft (★).
+**Do.** Chapter 2 starts in P1. The rest follows the chapter map below. A report script turns the CSVs into LaTeX tables and a `results-macros.tex` file with named numbers (for example `\recallGain`). The text uses the macros and never typed numbers. This removes the pre-thesis problem where the abstract and chapter 5 disagreed. The thesis is written in `.docs/Thesis-Report/`: the school format of the pre-thesis LaTeX (now `docs/Pre-thesis/Latex/`, frozen) with the pre-thesis content removed, the Markdown drafts in `drafts/`, and the macros and tables read from `.docs/results/p7-report/` (set up 2026-11-19). The supervisor reads the full draft (★).
 
-**Chapter map.** The order follows the pre-thesis report (`Latex/main_docx.tex`). Check it against the university rules (open item 2).
+**Chapter map.** The order follows the pre-thesis report (`docs/Pre-thesis/Latex/main_docx.tex`). Check it against the university rules (open item 2).
 
 | # | Chapter | Reused from the pre-thesis | New in the thesis | From |
 |---|---|---|---|---|
@@ -472,10 +472,10 @@ The thesis results do not need the schema migration: generated data has no dupli
 ## 11. Open items
 
 1. **What happens on 2026-11-20.** The written submission or the defense? It decides when P10 must be done.
-2. **The university's thesis rules.** Format, length and required chapters. Check the chapter map in P9 against them.
+2. **The university's thesis rules.** Format, length and required chapters. Check the chapter map in P9 against them. Format answered on 2026-11-19: the pre-thesis LaTeX is the school's standard format, and `.docs/Thesis-Report/` uses it. Length and required chapters are still open.
 3. ✅ **D1.** Can a non-member post into a community (Bugs Report §4)? Decided on 2026-10-28: no, a community post needs membership. The generator follows it (P3); the backend rule is in task `p6-social-feed`.
 4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval. The tag was proposed on 2026-11-19, when task `p8-repro` closed: on its closing commit `docs: p8-repro runs and status`. The clean-clone run passed on `701a1ab`, and the closing commit changes only docs (nothing in code, `.docs/results/` or `eval/config/`).
-5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `Latex/` and `docs/` needs the author's request.
+5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `docs/Pre-thesis/` (with its LaTeX) needs the author's request.
 6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). Status 2026-11-02: (a) ✅ set in P2 and checked in P3 and P4; (b) still open, for P5; (c) ✅ set in P2. The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. Set in P2: `.docs/implementation-plan.md` §3.1 and §3.2, checked on Digg in its §3.7; the P3 check is in its §3.6. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family. Set in P2: `.docs/implementation-plan.md` §3.3 (families F1 and F2 per dataset).
 7. **Default feed rule** (P7). Does the supervisor agree that "For You" switches to `social` only when H1 passes on both co-primary tests and the H0 gate passes? Ask with the P7 results. Asked on 2026-11-12 with the P7 results (`results-note.md` of task `p7-offline-experiments`): H1 failed on both tests, so the default stays as it is today unless the supervisor says otherwise. P8 applied this on 2026-11-18: `FEED_DEFAULT_ALGO` stays empty. If the supervisor wants another default, it is one env variable.
 8. ✅ **Hive side check** (P7). Closed on 2026-11-12: the author opened a BigQuery sandbox project, and the SoChainDB dataset refused access, so the gate failed. Nothing to tell the supervisor beyond the limit already in Chapter 6: the community term has synthetic evidence only, and Hive is future work.
@@ -514,3 +514,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.28 · 2026-11-12 · Task `p7-cost-benchmark` (E7). **§7:** the row "k6 runs / load profile" is set, as the author confirmed at the Design approval: one virtual user, 100 requests per run (page 1 of one `algo` for the 100 parity pairs in file order, no sleep), page cache off, the seed of the parity sample (20261014). P7 status paragraph (E7 result); §4 row P7 ✅ (2 of 2 tasks). No other frozen value changed; §5 and §6 are byte-identical.
 - 0.29 · 2026-11-18 · Task `p8-repro` started (code and data steps done, the two full runs going): P8 status paragraph; §4 row P8 ▶ (late); P6 Config line (α and β written); a P7 bullet on the E7 rerun with the tuned weights (the `eSeven*` numbers changed); §11 items 4 (when the tag is proposed) and 7 (P8 applied the rule). No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.30 · 2026-11-19 · Task `p8-repro` closed: P8 status paragraph (done; the two full runs pass, on this machine and on a clean clone); §4 rows P8 ✅ (tag proposed) and P9 ▶ next; §11 item 4 (the tag proposed on the closing commit). No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.31 · 2026-11-19 · Thesis folder: the pre-thesis LaTeX moves to `docs/Pre-thesis/Latex/` (frozen), and the thesis LaTeX is `.docs/Thesis-Report/` in the same school format, not `.docs/latex/` (P9 "Do", the chapter map source, §11 items 2 and 5). No frozen value changed; §5, §6 and §7 are byte-identical.

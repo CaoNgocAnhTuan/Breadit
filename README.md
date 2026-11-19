@@ -130,9 +130,8 @@ datasets/          humans_v1.sql; raw/ holds hand-downloaded datasets (git-ignor
 docs/
   System_Architecture.md   the proposed system and the directory tree
   Guidance-Manual/         bilingual study guide for the thesis
-  Pre-thesis/              the pre-thesis report material (frozen)
-.docs/             Thesis working docs: plans, task folders, results
-Latex/             Pre-thesis report template (frozen)
+  Pre-thesis/              the pre-thesis report material and its LaTeX (frozen)
+.docs/             Thesis working docs: plans, task folders, results, and the thesis LaTeX (Thesis-Report/)
 ```
 
 The full annotated tree is in [docs/System_Architecture.md §10](docs/System_Architecture.md).

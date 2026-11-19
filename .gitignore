@@ -53,7 +53,21 @@ next-env.d.ts
 apps/frontend/public/uploads/*
 !apps/frontend/public/uploads/.gitkeep
 
-/Latex/docx/
+/docs/Pre-thesis/Latex/docx/
+
+# thesis LaTeX build files (.docs/Thesis-Report/, rebuilt with latexmk)
+/.docs/Thesis-Report/*.aux
+/.docs/Thesis-Report/*.log
+/.docs/Thesis-Report/*.out
+/.docs/Thesis-Report/*.toc
+/.docs/Thesis-Report/*.lof
+/.docs/Thesis-Report/*.lot
+/.docs/Thesis-Report/*.fls
+/.docs/Thesis-Report/*.fdb_latexmk
+/.docs/Thesis-Report/*.synctex.gz
+/.docs/Thesis-Report/*.bbl
+/.docs/Thesis-Report/*.blg
+/.docs/Thesis-Report/main.pdf
 
 # raw public datasets (downloaded by hand, recorded by SHA-256 in .docs/datasets.md)
 datasets/raw/

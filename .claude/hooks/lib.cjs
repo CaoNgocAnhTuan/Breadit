@@ -58,11 +58,12 @@ function relPath(file, base) {
 
 /** Why a path must never be edited, or null. Checked for Edit/Write and for shell writes. */
 function protectedReason(rel) {
-  // docs/Pre-thesis/ and Latex/ are the frozen pre-thesis package. The rest of docs/ holds thesis docs
+  // docs/Pre-thesis/ is the frozen pre-thesis package; its LaTeX moved there from Latex/ on 2026-11-19
+  // (author's decision). Latex/ stays refused in case it comes back. The rest of docs/ holds thesis docs
   // for the supervisor (author's decision, 2026-11-02). The docs folder itself still cannot be removed.
   if (/^(docs\/Pre-thesis|Latex)(\/|$)/.test(rel) || rel === 'docs') {
     const dir = rel.startsWith('Latex') ? 'Latex/' : rel === 'docs' ? 'docs/' : 'docs/Pre-thesis/';
-    return `${dir} is frozen pre-thesis material. Thesis docs go in .docs/ or the root of docs/, thesis LaTeX in .docs/latex/ (CLAUDE.md)`;
+    return `${dir} is frozen pre-thesis material. Thesis docs go in .docs/ or the root of docs/, the thesis LaTeX in .docs/Thesis-Report/ (CLAUDE.md)`;
   }
   if (/(^|\/)\.env(\.[^/]+)?$/.test(rel) && !/\.example$/.test(rel)) {
     return '.env files hold live secrets (SMTP, Cloudinary). Change the .env.example file instead and tell the author';
@@ -80,12 +81,13 @@ function protectedReason(rel) {
 }
 
 /**
- * Code and config: everything in the project except thesis docs (.docs/ and docs/, but not .docs/latex/
- * and .docs/results/), root Markdown files and the harness state folder.
+ * Code and config: everything in the project except thesis docs (.docs/ and docs/, but not .docs/results/),
+ * root Markdown files and the harness state folder. The thesis LaTeX in .docs/Thesis-Report/ is a thesis doc
+ * (author's decision, 2026-11-19), so it is not gated.
  * Editing these needs an approved plan for the active task.
  */
 function isGated(rel) {
-  if (rel.startsWith('.docs/')) return /^\.docs\/(latex|results)\//.test(rel);
+  if (rel.startsWith('.docs/')) return /^\.docs\/results\//.test(rel);
   if (rel.startsWith('docs/')) return false;
   if (rel === '.claude/state' || rel.startsWith('.claude/state/')) return false;
   if (!rel.includes('/') && /\.md$/i.test(rel)) return false;

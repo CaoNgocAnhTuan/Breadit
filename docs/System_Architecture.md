@@ -347,7 +347,7 @@ flowchart LR
     CSV --> Harness["npm run harness"]
     Harness --> Res[("results CSVs")]
     Res --> Report["report: macros<br/>task 9"]
-    Report --> Thesis["thesis LaTeX<br/>.docs/latex"]
+    Report --> Thesis["thesis LaTeX<br/>.docs/Thesis-Report"]
     CSV --> Loader["loader<br/>task 7"]
     Loader --> PG[("Postgres")]
     PG --> App["live app<br/>parity test · demo"]
@@ -535,13 +535,12 @@ Breadit/
 │   ├── Bugs Report.md                # known bugs and the task that fixes each
 │   ├── results/                      # committed results, one folder per run (p5-baseline/, p6-parity/, p7-*/, p7-report/) · manifest.json is the merged manifest
 │   ├── works/                        # one folder per task: design.md + plan.md
-│   └── latex/ 🔜                     # P9 · the thesis LaTeX, copied from Latex/
+│   └── Thesis-Report/                # P9 · the thesis LaTeX in the school format (main.tex, chapters/, images/), Markdown drafts in drafts/
 │
 ├── docs/                             # documents for the supervisor and the defense
 │   ├── System_Architecture.md        # this file
 │   ├── Guidance-Manual/              # guidance manual
-│   └── Pre-thesis/                   # the pre-thesis package: report chapters, diagrams, ADRs, k6 scripts · frozen
-├── Latex/                            # pre-thesis report template · not edited
+│   └── Pre-thesis/                   # the pre-thesis package: report chapters, diagrams, ADRs, k6 scripts, its LaTeX in Latex/ · frozen
 ├── .claude/                          # workflow harness: /task, /bugfix, /approve, hooks, rules, templates
 ├── scripts/                          # verify-bug-sweep.sh, verify-socket.cjs, dataset-humans.ps1, e7/ (E7 k6 script and runner), repro/ (thesis-repro.mjs, `npm run thesis:repro`)
 ├── docker-compose.yml                # db (Postgres 16), redis (Redis 7), backend, frontend
