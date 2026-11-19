@@ -1,0 +1,9 @@
+dataset,variant,n,mean_diff,ci_low,ci_high
+syn-W0-M,own-tuning,542,0.011973,-0.000146,0.024458
+syn-W1-M,own-tuning,540,0.028665,0.016977,0.041302
+syn-W2L-M,own-tuning,542,0.035394,0.020691,0.050675
+syn-W2M-M,own-tuning,541,0.044944,0.028036,0.062322
+syn-W2H-M,own-tuning,538,0.075590,0.057479,0.094563
+syn-W0-M,h0-gate,542,0.000770,-0.004285,0.006223
+syn-W0-M,topic-signal,542,0.011150,-0.000822,0.023427
+syn-W2M-M-shuffled,shuffled,542,0.042360,0.026228,0.059305

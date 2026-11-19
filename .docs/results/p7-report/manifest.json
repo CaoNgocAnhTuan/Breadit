@@ -1,8 +1,16 @@
 {
   "files": {
+    "fig-e2-history.csv": {
+      "rows": 11,
+      "sha256": "3a731efd7c6054c47052c0272a0279d19f52f576b51eaaca72d83d775444512d"
+    },
     "fig-e3-density.csv": {
       "rows": 17,
       "sha256": "5315b3ce910bda260d1359dcbe88b1f62dcb68e0c10d42d2aacacf8573a0f864"
+    },
+    "fig-e5-worlds.csv": {
+      "rows": 9,
+      "sha256": "fa5baaa695b82164a4e6a779859d80b1f2898129eb28a5819776848421c0942c"
     },
     "macros.csv": {
       "rows": 154,
