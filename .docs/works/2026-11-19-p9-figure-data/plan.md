@@ -1,6 +1,6 @@
 # Plan: Figure data for Chapter 6 (E2, E5)
 
-Status: approved · 2026-11-19
+Status: done · 2026-11-19
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-19-p9-figure-data/`
 
 All commits go on `test-app` and are never pushed. No step needs Docker. Run `nvm use` first: the `eval/` files run directly on the pinned Node; build `@breadit/ranking` if the eval tests need it. Before Step 1, Claude commits `design.md` and this plan: `docs: p9-figure-data spec, design and plan`.
@@ -34,15 +34,34 @@ All commits go on `test-app` and are never pushed. No step needs Docker. Run `nv
 
 Claude does these after Step 4.
 
-- [ ] DW2: `git show --stat` of the Step 3 commit → in `p7-report/` only the two new files and `manifest.json`, plus `.docs/results/manifest.json`.
-- [ ] DW3: on the real files, `fig-e2-history.csv` has 10 rows; its `syn-W2M-M` 0-4 row is n 174, 0.023061, −0.002358, 0.051290 and its `digg2009` 0-4 row is n 20644, 0.000117, 0.000015, 0.000225; `fig-e5-worlds.csv` has 8 rows; at 3 decimals the `syn-W2M-M` `own-tuning` row is 0.045 and the `h0-gate` row is 0.001 (−0.004 to 0.006).
-- [ ] DW4: the report written into an empty temp folder → every file byte-identical to the committed `p7-report/`.
-- [ ] DW5: `results:manifest` in check mode → exit 0, 162 files.
-- [ ] DW6: a pgfplots test build of each new file in a temp folder (as the E3 test build of 2026-11-19) → `pdflatex` exit 0, no error.
-- [ ] DW1: the eval verify and `verify.sh` pass.
+- [x] DW2: `git show --stat` of the Step 3 commit → in `p7-report/` only the two new files and `manifest.json`, plus `.docs/results/manifest.json`.
+- [x] DW3: on the real files, `fig-e2-history.csv` has 10 rows; its `syn-W2M-M` 0-4 row is n 174, 0.023061, −0.002358, 0.051290 and its `digg2009` 0-4 row is n 20644, 0.000117, 0.000015, 0.000225; `fig-e5-worlds.csv` has 8 rows; at 3 decimals the `syn-W2M-M` `own-tuning` row is 0.045 and the `h0-gate` row is 0.001 (−0.004 to 0.006).
+- [x] DW4: the report written into an empty temp folder → every file byte-identical to the committed `p7-report/`.
+- [x] DW5: `results:manifest` in check mode → exit 0, 162 files.
+- [x] DW6: a pgfplots test build of each new file in a temp folder (as the E3 test build of 2026-11-19) → `pdflatex` exit 0, no error.
+- [x] DW1: the eval verify and `verify.sh` pass.
 
 When these pass, Claude commits the super-plan update (P9 status line, change log; no frozen value changes), the blueprint §5 row 14 ✅ (and row 15 ▶) and the Result below. Commit: `docs: p9-figure-data status`.
 
 ## Result
 
-<!-- Claude fills this in at the end: what was done, test counts, commits, and anything that differed from the plan (and why). -->
+Done on 2026-11-19. Steps 1–4 were implemented by Sonnet and checked by Claude against the design; all 6 acceptance items pass.
+
+**What was built.** In `eval/src/report/tables.ts`: `figE2Rows` (the F1 rows of `p7-main/compare.csv` at K = 10, reusing `FigRow`), the `FigE5Row` interface, the `E5_ROWS` list with a small `e5Source` helper, and `figE5Rows`; `e5Table` now reads `E5_ROWS` (same labels and order, `tables/e5.tex` byte-identical). `report.ts` writes `fig-e2-history.csv` and `fig-e5-worlds.csv` (`FIG_E5_HEADER`).
+
+**Tests.** Eval verify: 434 tests, 434 pass (432 before; TC1 and TC2 are new, and `FILES` names the two files, so TC3 covers them). `verify.sh`: ranking 85, backend unit 204, IT 146, eval verify, all pass.
+
+**Acceptance.**
+- DW2: `ca27e0e` changes only the two new files and `p7-report/manifest.json`, plus `.docs/results/manifest.json` (`p7-report` hash a15a4319… → a52f4c66…).
+- DW3: `fig-e2-history.csv` has 10 rows; `syn-W2M-M,0-4,174,0.023061,-0.002358,0.051290` and `digg2009,0-4,20644,0.000117,0.000015,0.000225`. `fig-e5-worlds.csv` has 8 rows; `syn-W2M-M,own-tuning` gain 0.044944 (0.045), `syn-W0-M,h0-gate` 0.000770 (−0.004285 to 0.006223), as table e5.
+- DW4: the report written into an empty temp folder is byte-identical to the committed `p7-report/`.
+- DW5: `results:manifest` check: equal, 162 files in 16 folders and 9 datasets.
+- DW6: a pgfplots build of both files (one standalone page, an E2 bar chart with both datasets and an E5 bar chart of the eight variants, error bars from the intervals) compiles with `pdflatex`, exit 0, no error. As expected (Design F7), the Digg bars are flat next to the synthetic ones; Chapter 6 needs its own axis or a note for Digg.
+- DW1: see Tests.
+
+**Commits.** `19c2823` (spec, design and plan), `5d2dc1d` (code and tests), `ca27e0e` (report and merged manifest), `f54e5e7` (docs), and the closing commit `docs: p9-figure-data status`.
+
+**Differences from the plan.**
+- The closing commit also fixes an older error found by Sonnet: `.docs/implementation-plan.md` §2.8 and `docs/System_Architecture.md` said "nine LaTeX tables"; the report writes ten.
+- Not changed, noted for later: the report's printed summary still says "16 figure rows" (it counts only E3).
+- The Chapter 3 draft (`682756d`) was committed by Claude between Sonnet's commits; Sonnet's commits used explicit paths, so each holds only its own files.

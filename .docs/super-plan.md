@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.34 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.35 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The supervisor checks progress on **2026-11-30** (2026-11-20 was only the author's own target); the submission and defense dates are not known yet. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -92,7 +92,7 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 11-10 | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` ✅ |
 | ✅ 11-12 (★ note ready to send) | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments` ✅, `p7-cost-benchmark` ✅, `p7-hive-check` ✅ (gate failed) |
 | ✅ 11-19 (tag proposed) | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` ✅ |
-| ▶ next | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | `p9-report-macros` ✅, `p9-figure-data`, `p9-diagrams`, `p9-bug-quick-wins`; the chapters are drafted outside tasks (`.docs/implementation-plan.md` §5, rows 12–27) |
+| ▶ next | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | `p9-report-macros` ✅, `p9-figure-data` ✅, `p9-diagrams`, `p9-bug-quick-wins`; the chapters are drafted outside tasks (`.docs/implementation-plan.md` §5, rows 12–27) |
 | ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-demo-sweep`, `p10-demo-script`, `p10-final-checks`, `p10-security-fixes` (shared server only), `p10-defense-package` (rows 21–31) |
 
 The Tasks column comes from the P2 blueprint. Its task list (`.docs/implementation-plan.md` §5) gives the order, the dependencies, a day budget per task and a trigger date for each cut of §8.
@@ -293,7 +293,7 @@ Nine chapters, decided by the author on 2026-11-19: the system analysis and desi
 
 **Done when.** Every number in the thesis comes from a CSV.
 
-**Status (2026-11-19).** Task `p9-report-macros` (`.docs/works/2026-11-19-p9-report-macros/`) closed: the report writes 153 macros (85 before), among them the full E1 and E2 rows, the tuning choices, the E5 topic row and three `Full` macros with 6 decimals for the Digg H1 row (gain 0.000117, interval 0.000015 to 0.000225). No result number changed. A full `npm run thesis:repro` run passed again (exit 0, every hash equal, 9,057 s). During that run, commit `17e784f` deleted 81 committed result files by mistake; `eb45165` restores them byte for byte. The tag `v2-thesis-experiments` is proposed on the task's closing commit (§11 item 4). The chapters are drafted in `.docs/Thesis-Report/` (Chapters 1, 6 and 7 have first drafts, Chapter 4 an outline).
+**Status (2026-11-19).** Task `p9-report-macros` (`.docs/works/2026-11-19-p9-report-macros/`) closed: the report writes 153 macros (85 before), among them the full E1 and E2 rows, the tuning choices, the E5 topic row and three `Full` macros with 6 decimals for the Digg H1 row (gain 0.000117, interval 0.000015 to 0.000225). No result number changed. A full `npm run thesis:repro` run passed again (exit 0, every hash equal, 9,057 s). During that run, commit `17e784f` deleted 81 committed result files by mistake; `eb45165` restores them byte for byte. The tag `v2-thesis-experiments` is proposed on the task's closing commit (§11 item 4). The chapters are drafted in `.docs/Thesis-Report/` (Chapters 1, 3, 6 and 7 have first drafts, Chapter 4 an outline). Task `p9-figure-data` closed the same day: the report also writes `fig-e2-history.csv` and `fig-e5-worlds.csv` (162 files in the merged manifest), so Chapter 6 can draw E2, E3 and E5 from tested files; no result changed.
 
 ### P10: Defense package
 
@@ -523,3 +523,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.32 · 2026-11-19 · Nine chapters: P9 chapter map gets Chapter 4 System Analysis and Design (use case, activity, sequence, architecture, ERD), and the later chapters move up by one (Discussion is now Chapter 7; the Experiments row now says E1–E8); "Chapter 6" references become "Chapter 7" (P7 default feed rule, P8 status, §8, §11 item 8); §11 item 2 gets the page limit (120, target 80–100). No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.33 · 2026-11-19 · The order of the remaining work (approved by the author, no dates): §4 rows P9 and P10 name their tasks; P10 "Do" gets the checks as scripts of `p10-final-checks` (not new agents), the bug fixes and the sweep before the demo, and a pointer to `.docs/implementation-plan.md` §5 rows 12–31. The header and §8 no longer call 2026-11-20 the deadline: the supervisor checks progress on 2026-11-30. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.34 · 2026-11-19 · Task `p9-report-macros` closed: a P9 status paragraph; §4 row P9 (`p9-report-macros` ✅); §11 item 4 (the tag proposal moves to the task's closing commit). No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.35 · 2026-11-19 · Task `p9-figure-data` closed: the P9 status paragraph and the §4 row P9. No frozen value changed; §5, §6 and §7 are byte-identical.

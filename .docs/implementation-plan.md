@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.18 · 2026-11-19 · Status: approved 2026-10-28
+Version 1.19 · 2026-11-19 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -143,7 +143,7 @@ E7 timing goes to `latency.csv` with the same row rules. It is Class R: its hash
 
 ### 2.8 Macros (H-d)
 
-The report reads only the CSVs above. It writes `macros.csv` (`name, value, file, row_key, column`) and `results-macros.tex`. The `column` column was added in task 9, because a row key alone does not name the cell. A macro name has letters only, because LaTeX does not allow digits. It is built from: experiment, dataset, metric, K in words, what. Example: `\eTwoDiggNdcgTenGain`. Every macro traces to one CSV cell through `macros.csv`. **Task 9 (2026-11-12).** A macro value is its cell rounded to 3 decimals on the decimal string; a p-value under 0.001 is written `<0.001`. The report also writes nine LaTeX tables and `results.md` (the same tables in Markdown) to `.docs/results/p7-report/`. **Task `p9-figure-data` (2026-11-19).** It also writes the figure data of E2, E3 and E5: `fig-e2-history.csv`, `fig-e3-density.csv` and `fig-e5-worlds.csv`. The columns are `dataset`, a label column (`bin` for the history group or the followee bin, `variant` for E5), `n`, `mean_diff`, `ci_low` and `ci_high`, with the cells as written in the source CSV.
+The report reads only the CSVs above. It writes `macros.csv` (`name, value, file, row_key, column`) and `results-macros.tex`. The `column` column was added in task 9, because a row key alone does not name the cell. A macro name has letters only, because LaTeX does not allow digits. It is built from: experiment, dataset, metric, K in words, what. Example: `\eTwoDiggNdcgTenGain`. Every macro traces to one CSV cell through `macros.csv`. **Task 9 (2026-11-12).** A macro value is its cell rounded to 3 decimals on the decimal string; a p-value under 0.001 is written `<0.001`. The report also writes ten LaTeX tables and `results.md` (the same tables in Markdown) to `.docs/results/p7-report/`. **Task `p9-figure-data` (2026-11-19).** It also writes the figure data of E2, E3 and E5: `fig-e2-history.csv`, `fig-e3-density.csv` and `fig-e5-worlds.csv`. The columns are `dataset`, a label column (`bin` for the history group or the followee bin, `variant` for E5), `n`, `mean_diff`, `ci_low` and `ci_high`, with the cells as written in the source CSV.
 
 **Task `p9-report-macros` (2026-11-19).** A name that ends in `Full` holds its cell with all 6 decimals, not 3. It is for numbers that 3 decimals hide: the Digg H1 row in group 0–4 (gain and interval) and two tuning points of H. A tuning grid value (the column `value` of `tuning.csv`) is printed as written, for example `1024/1024` or `0.0625`, and is never rounded. The new words in a name are: `tune` (the tuning run), `Chosen` (the row with `chosen` = 1), `ValNdcgTen` (validation NDCG@10) with `FiveTwelve` and `TenTwentyFour` (the grid values `512/512` and `1024/1024`), `TopicNdcg` (the E5 topic row, H on W0 from `p7-h0`, for example `\eFiveWZeroTopicNdcgTenAllGain`), and `BLZero` to `BLSix` for BL0 to BL6 (`BLTwoT` is BL2t). E1 now has all nine methods and E2 all five groups.
 
@@ -286,8 +286,8 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-19. ✅ mea
 | ✅ 11-19 | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
 | ✅ 11-19 | 12 | `p9-report-macros` | P9 | 11 | the macros Chapters 6 and 7 need, the `Full` rule; closing: the full repro run, the results that commit `17e784f` deleted by mistake | 0.5 | — | — |
 | ✅ 11-19 | 13 | Writing: Guidance Manual 11 §12 (one number from start to end) | P9 | 12 | one real user of `syn-W2M-M` from the test post to the macro, en and vi | 0.25 | — | — |
-| ▶ | 14 | `p9-figure-data` | P9 | 12 | the report also writes `fig-e2` (gain by history group) and `fig-e5` (gain by world), with intervals | 0.5 | — | — |
-| ⬜ | 15 | Writing: Chapter 3 Methodology | P9 | — | draft, review, LaTeX | 1 | — | — |
+| ✅ 11-19 | 14 | `p9-figure-data` | P9 | 12 | the report also writes `fig-e2` (gain by history group) and `fig-e5` (gain by world), with intervals | 0.5 | — | — |
+| ▶ draft written | 15 | Writing: Chapter 3 Methodology | P9 | — | draft, review, LaTeX | 1 | — | — |
 | ⬜ | 16 | `p9-diagrams` | P9 | — | export the Mermaid diagrams to PDF; an ERD from `schema.prisma`; one style | 0.5–1 | — | — |
 | ⬜ | 17 | Writing: Chapters 6 and 7 in LaTeX | P9 ★ | 14 | macros only, the ten tables, three figures (E2, E3, E5) in pgfplots | 1 | — | — |
 | ⬜ | 18 | Writing: Chapter 4 System Analysis and Design | P9 | 16 | requirements, use cases, activity, sequence, architecture, ERD | 1 | — | — |
@@ -355,3 +355,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.16 · 2026-11-19 · §5: the order of the remaining work, rows 12 to 31 (approved by the author), with no end dates: the writing rows, the tasks `p9-figure-data`, `p9-diagrams`, `p9-bug-quick-wins`, `p10-demo-sweep`, `p10-demo-script`, `p10-final-checks`, `p10-security-fixes`, `p10-defense-package`, the checks and the freeze; the bugs placed in each; what stays future work. No contract, rule or frozen value changed.
 - 1.17 · 2026-11-19 · §5 rows 12 and 13 ✅ (task `p9-report-macros` closed; Guidance Manual 11 §12 written), row 14 ▶. No contract, rule or frozen value changed.
 - 1.18 · 2026-11-19 · Task `p9-figure-data`: §2.8 the report also writes the figure data of E2 and E5 (`fig-e2-history.csv`, `fig-e5-worlds.csv`) next to E3; §4 rows E2 and E5 are "table, figure". No contract, rule or frozen value changed.
+- 1.19 · 2026-11-19 · §5 row 14 ✅ (task `p9-figure-data` closed), row 15 ▶ (the Chapter 3 draft is written; review and LaTeX remain); §2.8 says ten LaTeX tables, not nine. No contract, rule or frozen value changed.
