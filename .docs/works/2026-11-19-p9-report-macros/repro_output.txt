@@ -1,0 +1,15 @@
+start 2026-11-19T07:56:39Z node v22.23.4 commit 787b579
+
+> breadit@0.1.0 thesis:repro
+> node scripts/repro/thesis-repro.mjs
+
+ok    checks (Node v22.23.4, merged manifest, clean tree, Digg zips, db and redis)  0.2 s
+note  p7-e7 (Class R, latency) is kept as a report input and is not compared
+ok    01 build-ranking              0.8 s
+ok    02 prisma-generate            1.1 s
+ok    03 clean                      0.0 s
+ok    04 gen                        7.3 s
+ok    05 adapt-digg                 8.1 s
+ok    06 check                      8.8 s
+ok    07 harness-p5-baseline        0.4 s
+ok    08 harness-p7-tune-worlds     159.0 s
