@@ -8,10 +8,11 @@ import { buildMacros, macrosCsv, macrosTex, verifyMacros } from "./macros.ts";
 import type { MacroRow } from "./macros.ts";
 import { parseCsv, readRun } from "./read.ts";
 import type { RunFiles, RunFilesMap } from "./read.ts";
-import { buildTables, figE3Rows, toLatex, toMarkdown } from "./tables.ts";
+import { buildTables, figE2Rows, figE3Rows, figE5Rows, toLatex, toMarkdown } from "./tables.ts";
 
 // The report (design "Report"): reads the thirteen P7 runs, checks every file against its run manifest, and writes macros.csv,
-// results-macros.tex, one table file per table, results.md, fig-e3-density.csv and manifest.json into .docs/results/p7-report/.
+// results-macros.tex, one table file per table, results.md, the three figure files (fig-e2-history.csv, fig-e3-density.csv and
+// fig-e5-worlds.csv) and manifest.json into .docs/results/p7-report/.
 // Nothing here reads the clock or the folder name, so two runs write the same bytes.
 
 const REPO_ROOT = new URL("../../../", import.meta.url).pathname;
@@ -33,7 +34,9 @@ export const REPORT_RUNS: readonly string[] = [
   "p7-e7",
 ];
 
+// The three figure files have the same columns; the second one names the bin (E3), the history group (E2) or the variant (E5).
 const FIG_HEADER = ["dataset", "bin", "n", "mean_diff", "ci_low", "ci_high"] as const;
+const FIG_E5_HEADER = ["dataset", "variant", "n", "mean_diff", "ci_low", "ci_high"] as const;
 
 function resultsMd(tables: { caption: string; id: string; md: string }[], macros: readonly MacroRow[]): string {
   const lines = ["# P7 results", "", "Written by `npm run report -w @breadit/eval` from the results of the thirteen P7 runs. Do not edit: change the results and run it again.", ""];
@@ -56,6 +59,8 @@ export function reportCommand(argv: string[]): string[] {
   const macros = buildMacros(runs);
   const tables = buildTables(runs);
   const fig = figE3Rows(runs);
+  const figE2 = figE2Rows(runs);
+  const figE5 = figE5Rows(runs);
 
   const files: Record<string, string> = {};
   files["macros.csv"] = macrosCsv(macros);
@@ -65,9 +70,17 @@ export function reportCommand(argv: string[]): string[] {
     tables.map((t) => ({ id: t.id, caption: t.caption, md: toMarkdown(t) })),
     macros,
   );
+  files["fig-e2-history.csv"] = csvText(
+    FIG_HEADER,
+    figE2.map((r) => [r.dataset, r.bin, r.n, r.mean_diff, r.ci_low, r.ci_high]),
+  );
   files["fig-e3-density.csv"] = csvText(
     FIG_HEADER,
     fig.map((r) => [r.dataset, r.bin, r.n, r.mean_diff, r.ci_low, r.ci_high]),
+  );
+  files["fig-e5-worlds.csv"] = csvText(
+    FIG_E5_HEADER,
+    figE5.map((r) => [r.dataset, r.variant, r.n, r.mean_diff, r.ci_low, r.ci_high]),
   );
 
   const entries: Record<string, { rows: number; sha256: string }> = {};

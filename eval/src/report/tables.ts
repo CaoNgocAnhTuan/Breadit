@@ -127,6 +127,59 @@ export function figE3Rows(runs: RunFilesMap): FigRow[] {
   return out;
 }
 
+// ---- the E2 and E5 figure data ----
+
+/**
+ * The E2 figure data (the H1 figure): the F1 row of H against BL2 at K = 10 for each history group, for each dataset of MAIN.
+ * `bin` holds the history group. The cells are the text of p7-main/compare.csv, not rounded, and the order comes from MAIN and
+ * F1_GROUPS, never from the file.
+ */
+export function figE2Rows(runs: RunFilesMap): FigRow[] {
+  const compare = rowsOf(runs, "p7-main", "compare.csv");
+  const out: FigRow[] = [];
+  for (const dataset of MAIN) {
+    for (const group of F1_GROUPS) {
+      const r = pick(compare, { dataset, family: "F1", method: "H", ref: "BL2", k: "10", bucket: group }, "p7-main/compare.csv");
+      out.push({ dataset, bin: group, n: cellOf(r, "n", "compare"), mean_diff: cellOf(r, "mean_diff", "compare"), ci_low: cellOf(r, "ci_low", "compare"), ci_high: cellOf(r, "ci_high", "compare") });
+    }
+  }
+  return out;
+}
+
+export interface FigE5Row {
+  dataset: string;
+  /** A short id with no space, for the figure: own-tuning, h0-gate, topic-signal or shuffled. */
+  variant: string;
+  n: string;
+  mean_diff: string;
+  ci_low: string;
+  ci_high: string;
+}
+
+/**
+ * The rows of table e5 and of the E5 figure, once, in their order. `label` is the text of the table, `variant` the id of the figure.
+ * Amendment 1: the H0 gate is the H-follow row. H with the same values shows the topic signal of the community term.
+ */
+const E5_ROWS: ReadonlyArray<{ variant: string; label: string; run: string; dataset: string; method: string }> = [
+  ...["syn-W0-M", "syn-W1-M", "syn-W2L-M", "syn-W2M-M", "syn-W2H-M"].map((dataset) => ({ variant: "own-tuning", label: "own tuning", run: "p7-e5-worlds", dataset, method: "H" })),
+  { variant: "h0-gate", label: "H0 gate: H-follow (alpha of syn-W2M-M)", run: "p7-h0", dataset: "syn-W0-M", method: "H-follow" },
+  { variant: "topic-signal", label: "H on W0, values of syn-W2M-M (topic signal)", run: "p7-h0", dataset: "syn-W0-M", method: "H" },
+  { variant: "shuffled", label: "timestamps shuffled", run: "p7-e5-shuffle", dataset: "syn-W2M-M-shuffled", method: "H" },
+];
+
+/** The compare.csv row of one E5 row: its method against BL2 at K = 10 on all users. */
+function e5Source(runs: RunFilesMap, e: (typeof E5_ROWS)[number]): Rec {
+  return pick(rowsOf(runs, e.run, "compare.csv"), { dataset: e.dataset, method: e.method, ref: "BL2", k: "10", bucket: "all" }, `${e.run}/compare.csv`);
+}
+
+/** The E5 figure data (the gain by world): one row for each row of table e5, with the cells as written. */
+export function figE5Rows(runs: RunFilesMap): FigE5Row[] {
+  return E5_ROWS.map((e) => {
+    const r = e5Source(runs, e);
+    return { dataset: e.dataset, variant: e.variant, n: cellOf(r, "n", "compare"), mean_diff: cellOf(r, "mean_diff", "compare"), ci_low: cellOf(r, "ci_low", "compare"), ci_high: cellOf(r, "ci_high", "compare") };
+  });
+}
+
 // ---- the ten tables ----
 
 function tuningTable(runs: RunFilesMap): Table {
@@ -225,16 +278,10 @@ function e4Table(runs: RunFilesMap): Table {
 }
 
 function e5Table(runs: RunFilesMap): Table {
-  const rows: Cell[][] = [];
-  const add = (label: string, run: string, dataset: string, method = "H"): void => {
-    const r = pick(rowsOf(runs, run, "compare.csv"), { dataset, method, ref: "BL2", k: "10", bucket: "all" }, `${run}/compare.csv`);
-    rows.push([text(label), text(dataset), int(cellOf(r, "n", "compare")), dec(cellOf(r, "mean_diff", "compare")), dec(cellOf(r, "ci_low", "compare")), dec(cellOf(r, "ci_high", "compare"))]);
-  };
-  for (const dataset of ["syn-W0-M", "syn-W1-M", "syn-W2L-M", "syn-W2M-M", "syn-W2H-M"]) add("own tuning", "p7-e5-worlds", dataset);
-  // Amendment 1: the H0 gate is the H-follow row. H with the same values shows the topic signal of the community term.
-  add("H0 gate: H-follow (alpha of syn-W2M-M)", "p7-h0", "syn-W0-M", "H-follow");
-  add("H on W0, values of syn-W2M-M (topic signal)", "p7-h0", "syn-W0-M", "H");
-  add("timestamps shuffled", "p7-e5-shuffle", "syn-W2M-M-shuffled");
+  const rows = E5_ROWS.map((e): Cell[] => {
+    const r = e5Source(runs, e);
+    return [text(e.label), text(e.dataset), int(cellOf(r, "n", "compare")), dec(cellOf(r, "mean_diff", "compare")), dec(cellOf(r, "ci_low", "compare")), dec(cellOf(r, "ci_high", "compare"))];
+  });
   return { id: "e5", caption: "Gain over BL2 in each world, NDCG@10 (K = 10, all users, no p-value). The H0 gate is the H-follow row", columns: ["Run", "Dataset", "Users", "Gain", "CI low", "CI high"], rows };
 }
 

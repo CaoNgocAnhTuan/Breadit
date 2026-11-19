@@ -14,7 +14,7 @@ import { tempDir } from "../checks/fixture.ts";
 
 // TC11 (design DW6, DW9, DW10) and TC5 of task p7-cost-benchmark (DW6): the report on a hand-made results folder for the thirteen run ids.
 const TABLE_IDS = ["tuning", "leftout", "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"];
-const FILES = ["fig-e3-density.csv", "macros.csv", "manifest.json", "results-macros.tex", "results.md", ...TABLE_IDS.map((t) => `tables/${t}.tex`)];
+const FILES = ["fig-e2-history.csv", "fig-e3-density.csv", "fig-e5-worlds.csv", "macros.csv", "manifest.json", "results-macros.tex", "results.md", ...TABLE_IDS.map((t) => `tables/${t}.tex`)];
 
 function report(dir: string, out: string): string[] {
   return reportCommand(["--results-dir", dir, "--out", out]);
@@ -127,6 +127,68 @@ test("fig-e3-density.csv has exactly the four datasets of DW6, four bins each, a
     const cell = readRun(dir, run).files.get("density.csv")!.rows.find((r) => r.dataset === d && r.density_bin === "20+")!;
     assert.equal((mine[3] as Record<string, string>).mean_diff, cell.mean_diff);
   }
+});
+
+test("TC1: fig-e2-history.csv has the ten F1 K = 10 rows of p7-main, in a fixed order, with the cells as written, and equals table e2 at 3 decimals", () => {
+  const dir = tempDir();
+  writeResultsFixture(dir);
+  const out = tempDir();
+  report(dir, out);
+  const fig = parseCsv(readFileSync(join(out, "fig-e2-history.csv"), "utf8"), "fig-e2-history.csv");
+  assert.deepEqual(fig.header, ["dataset", "bin", "n", "mean_diff", "ci_low", "ci_high"]);
+  const datasets = ["syn-W2M-M", "digg2009"];
+  const groups = ["0", "1-4", "0-4", "5-19", "20+"];
+  assert.equal(fig.rows.length, 10);
+  assert.deepEqual(fig.rows.map((r) => `${r.dataset}|${r.bin}`), datasets.flatMap((d) => groups.map((g) => `${d}|${g}`)));
+  const compare = readRun(dir, "p7-main").files.get("compare.csv")!.rows;
+  const md = readFileSync(join(out, "results.md"), "utf8");
+  const e2 = mdCells(md.split("\n## ").slice(1).find((s) => s.startsWith("e2: ")) as string);
+  for (const r of fig.rows) {
+    const hits = compare.filter((c) => c.dataset === r.dataset && c.family === "F1" && c.method === "H" && c.ref === "BL2" && c.k === "10" && c.bucket === r.bin);
+    assert.equal(hits.length, 1, `${r.dataset} ${r.bin}`);
+    const src = hits[0] as Record<string, string>;
+    // the cells are the text of compare.csv, not rounded
+    assert.deepEqual([r.n, r.mean_diff, r.ci_low, r.ci_high], [src.n, src.mean_diff, src.ci_low, src.ci_high], `${r.dataset} ${r.bin}`);
+    // and at 3 decimals they are the cells of table e2
+    const row = e2.find((t) => t[0] === r.dataset && t[1] === r.bin) as string[];
+    assert.ok(row, `table e2 has ${r.dataset} ${r.bin}`);
+    assert.deepEqual([row[2], row[5], row[6], row[7]], [r.n, roundDecimal(r.mean_diff as string, 3), roundDecimal(r.ci_low as string, 3), roundDecimal(r.ci_high as string, 3)], `${r.dataset} ${r.bin}`);
+  }
+});
+
+test("TC2: fig-e5-worlds.csv has the eight rows of table e5 in the order of E5_ROWS, with the cells as written, and equals table e5 at 3 decimals", () => {
+  const dir = tempDir();
+  writeResultsFixture(dir);
+  const out = tempDir();
+  report(dir, out);
+  const text = readFileSync(join(out, "fig-e5-worlds.csv"), "utf8");
+  const fig = parseCsv(text, "fig-e5-worlds.csv");
+  assert.deepEqual(fig.header, ["dataset", "variant", "n", "mean_diff", "ci_low", "ci_high"]);
+  const want: Array<{ variant: string; dataset: string; run: string; method: string }> = [
+    ...["syn-W0-M", "syn-W1-M", "syn-W2L-M", "syn-W2M-M", "syn-W2H-M"].map((dataset) => ({ variant: "own-tuning", dataset, run: "p7-e5-worlds", method: "H" })),
+    { variant: "h0-gate", dataset: "syn-W0-M", run: "p7-h0", method: "H-follow" },
+    { variant: "topic-signal", dataset: "syn-W0-M", run: "p7-h0", method: "H" },
+    { variant: "shuffled", dataset: "syn-W2M-M-shuffled", run: "p7-e5-shuffle", method: "H" },
+  ];
+  assert.equal(fig.rows.length, 8);
+  assert.deepEqual(fig.rows.map((r) => `${r.variant}|${r.dataset}`), want.map((w) => `${w.variant}|${w.dataset}`));
+  const md = readFileSync(join(out, "results.md"), "utf8");
+  const e5 = mdCells(md.split("\n## ").slice(1).find((s) => s.startsWith("e5: ")) as string);
+  assert.equal(e5.length, 8);
+  fig.rows.forEach((r, i) => {
+    const w = want[i] as (typeof want)[number];
+    const hits = readRun(dir, w.run).files.get("compare.csv")!.rows.filter((c) => c.dataset === w.dataset && c.method === w.method && c.ref === "BL2" && c.k === "10" && c.bucket === "all");
+    assert.equal(hits.length, 1, `${w.variant} ${w.dataset}`);
+    const src = hits[0] as Record<string, string>;
+    assert.deepEqual([r.n, r.mean_diff, r.ci_low, r.ci_high], [src.n, src.mean_diff, src.ci_low, src.ci_high], `${w.variant} ${w.dataset}`);
+    // table e5 shows the same row in the same place: Run, Dataset, Users, Gain, CI low, CI high
+    const row = e5[i] as string[];
+    assert.deepEqual(row.slice(1), [r.dataset, r.n, roundDecimal(r.mean_diff as string, 3), roundDecimal(r.ci_low as string, 3), roundDecimal(r.ci_high as string, 3)], `${w.variant} ${w.dataset}`);
+  });
+  // the two rows of p7-h0 differ in the fixture, so a figure that read the wrong method would fail the check above
+  assert.notEqual((fig.rows[5] as Record<string, string>).mean_diff, (fig.rows[6] as Record<string, string>).mean_diff);
+  // a label with a space would be a problem in pgfplots: the variant ids are kebab-case and no cell has a space
+  assert.ok(!/ /.test(text), "no cell has a space");
 });
 
 /** The cells of a table file, as the reader sees them: the numbers after rounding, with the LaTeX and Markdown marks taken off. */
