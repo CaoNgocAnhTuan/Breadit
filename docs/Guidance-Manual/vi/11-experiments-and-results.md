@@ -189,7 +189,43 @@ E7 đo backend live, nên nó là **Class R**: lặp lại được, không gi�
 
 ## 12. Một con số từ đầu đến cuối
 
-🔜 Sẽ viết khi lần chạy `thesis:repro` đầy đủ ngày 2026-11-19 dựng lại xong `p7-main` (cần file `eval/results/p7-main/per_user.csv`, bị git-ignore). Mục này sẽ theo một user thật của `syn-W2M-M` từ bài test, qua thứ hạng của bài đó dưới BL2 và H và hai giá trị NDCG, tới trung bình trên 174 user, khoảng tin cậy, p-value, Holm, và macro `\eTwoWTwoMNdcgTenZeroFourGain`.
+Ta theo con số H1 của `syn-W2M-M`, gain 0.023, từ một user thật tới văn bản thesis. Mọi giá trị dưới đây được đọc từ file hoặc tính lại ngày 2026-11-19, sau khi lần chạy `thesis:repro` đã dựng lại `p7-main`.
+
+**Bước 1. Một user và bài test.** User **414** của `syn-W2M-M` không có positive nào trước thời điểm test (lịch sử 0, nên thuộc nhóm 0, nằm trong 0–4), follow 16 user, và là thành viên của bốn community. Item test là sự kiện 19076: một like trên bài **15846** tại t = 21751197 (số giây tính từ base epoch), sau cut time T = 21412417. Nguồn: `eval/data/syn-W2M-M/interactions.csv` và dòng của user 414 trong `eval/results/p7-main/per_user.csv` (bị git-ignore, SHA-256 của nó nằm trong `.docs/results/p7-main/manifest.json`).
+
+**Bước 2. Các phương pháp thấy gì tại t.** Bài 15846 do user 830 viết (không phải followee) trong community 1, khoảng 89.8 giờ trước t, và có 4 like trước t. Hai trong số đó đến từ followee của user 414 (user 17 và 799). User 414 đã tham gia community 1 trước t. Pool là 2,000 bài mới nhất trong 7 ngày trước t (có 2,142 bài được viết trong khoảng đó).
+
+**Bước 3. Hai thứ hạng.**
+- **BL2** cho điểm 4 like − 0.25 × 89.8 giờ ≈ −18.5: một bài cũ, ít like. Nó xếp bài này **thứ 1,054**.
+- **H** cộng thêm hai phần social. User 414 chưa có lịch sử, nên smoothing cho mỗi followee trong 16 người trust là 1/16, và mỗi community trong 4 cái trọng số 1/4 (tài liệu 03). Social term: hai like của followee, 2 × 1/16 = 0.125, nhân α = 1024 → +128. Community term: 1/4, nhân β = 1024 → +256. Vậy H ≈ −18.5 + 128 + 256 ≈ 365.5, và nó xếp bài này **thứ 1**.
+
+Code cho đúng các thứ hạng này: `npm run rank -w @breadit/eval -- --dataset syn-W2M-M --method H --user 414 --asof 21751197 --before-event 19076 --top 1100 --config p7-main` in ra 15846 đầu tiên; với `--method BL2` nó nằm ở dòng 1,054. (Giá trị của hai term là công thức của tài liệu 03 tính bằng tay; code kiểm tra các thứ hạng.)
+
+**Bước 4. NDCG@10 của một user và hiệu số theo cặp.** NDCG@10 = 1/log2(r + 1) nếu r ≤ 10, ngược lại bằng 0. Với H: 1/log2(2) = **1**. Với BL2: hạng 1,054 > 10, nên **0**. Hiệu số theo cặp của user 414 là **+1**.
+
+**Bước 5. Trung bình trên nhóm.** Nhóm 0–4 của `syn-W2M-M` giữ 174 user. NDCG@10 trung bình là 0.034826 với H và 0.011765 với BL2, nên gain là **0.023061**. Tính lại từ `per_user.csv`, nó bằng `mean_diff` trong `compare.csv` tới từng chữ số. Trong 174 user, H tốt hơn ở 11 người, BL2 tốt hơn ở 4 người, và 159 người bằng nhau: với phần lớn user, không phương pháp nào đưa bài test vào top 10, nên cả hai đều được 0. Chỉ vài user như 414 tạo ra toàn bộ giá trị trung bình, vì vậy khoảng tin cậy rộng.
+
+**Bước 6. Khoảng tin cậy.** Lấy mẫu lại 174 hiệu số có hoàn lại 10,000 lần (stream `bootstrap`) và lấy 95% ở giữa của các trung bình: **−0.002358 đến 0.051290** (tài liệu 06 §3). Khoảng này chứa 0.
+
+**Bước 7. p-value.** Đổi dấu ngẫu nhiên từng hiệu số 10,000 lần (stream `permutation`) và đếm số lần xáo mà |trung bình| ít nhất bằng 0.023061: có 971 lần, nên p = (1 + 971) / 10,001 = **0.097190** (tài liệu 06 §4).
+
+**Bước 8. Holm.** p này đứng thứ 9 từ nhỏ lên trong 15 p-value của family F1 của `syn-W2M-M`, nên Holm nhân nó với 15 − 9 + 1 = 7: **0.680332** (tài liệu 06 §6). Dòng kết quả giờ đã đủ:
+
+```
+syn-W2M-M,F1,H,BL2,10,0-4,174,0.023061,-0.002358,0.051290,0.097190,0.680332
+```
+
+**Bước 9. Từ ô dữ liệu tới thesis.** Report biến ô này thành một macro và ghi lại nó đến từ đâu (`.docs/results/p7-report/macros.csv`):
+
+```
+eTwoWTwoMNdcgTenZeroFourGain,0.023,p7-main/compare.csv,syn-W2M-M|F1|H|BL2|10|0-4,mean_diff
+```
+
+`results-macros.tex` định nghĩa `\newcommand{\eTwoWTwoMNdcgTenZeroFourGain}{0.023}`, và thesis viết `\eTwoWTwoMNdcgTenZeroFourGain`, không bao giờ viết "0.023".
+
+**Bước 10. Vì sao tin được chuỗi này.** `compare.csv` và `per_user.csv` có SHA-256 trong `p7-main/manifest.json`; manifest đó có hash riêng trong `.docs/results/manifest.json`; `npm run thesis:repro` dựng lại mọi file từ dữ liệu thô và kiểm tra mọi hash (tài liệu 07). Lần chạy ngày 2026-11-19 đã dựng lại `compare.csv`, `summary.csv` và manifest của `p7-main` giống từng byte.
+
+**Ví dụ này dạy điều gì.** Với một user chưa có lịch sử, H vẫn có thể thắng, nhưng chỉ nhờ prior: "một bài trong community bạn đã tham gia, được hai người bạn follow like". Với phần lớn user mới, như vậy chưa đủ để đưa bài test vào top 10, nên gain nhỏ và không chắc chắn (H1 fail, Mục 6).
 
 ## 13. Thesis được phép kết luận gì, và không được kết luận gì
 

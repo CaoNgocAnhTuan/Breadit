@@ -189,7 +189,43 @@ E7 measures the live backend, so it is **Class R**: repeatable, not identical (d
 
 ## 12. One number from start to end
 
-🔜 Written when the full `thesis:repro` run of 2026-11-19 has rebuilt `p7-main` (it needs the git-ignored `eval/results/p7-main/per_user.csv`). It will follow one real user of `syn-W2M-M` from the test post, through its rank under BL2 and H and the two NDCG values, to the mean over 174 users, the interval, the p-value, Holm, and the macro `\eTwoWTwoMNdcgTenZeroFourGain`.
+We follow the H1 number of `syn-W2M-M`, the gain 0.023, from one real user to the thesis text. Every value below was read from the files or computed again on 2026-11-19, after the `thesis:repro` run had rebuilt `p7-main`.
+
+**Step 1. One user and the test post.** User **414** of `syn-W2M-M` has no positive before the test time (history 0, so group 0, part of 0–4), follows 16 users, and is a member of four communities. The test item is event 19076: a like on post **15846** at t = 21751197 (seconds from the base epoch), after the cut time T = 21412417. Source: `eval/data/syn-W2M-M/interactions.csv` and the row of user 414 in `eval/results/p7-main/per_user.csv` (git-ignored, its SHA-256 is in `.docs/results/p7-main/manifest.json`).
+
+**Step 2. What the methods see at t.** Post 15846 was written by user 830 (not a followee) in community 1, about 89.8 hours before t, and has 4 likes before t. Two of the likes come from followees of user 414 (users 17 and 799). User 414 joined community 1 before t. The pool is the newest 2,000 posts of the 7 days before t (2,142 were written in that window).
+
+**Step 3. The two ranks.**
+- **BL2** scores 4 likes − 0.25 × 89.8 hours ≈ −18.5: an old post with few likes. It ranks the post **1,054th**.
+- **H** adds the two social parts. User 414 has no history, so the smoothing gives each of the 16 followees the trust 1/16, and each of the 4 communities the weight 1/4 (document 03). Social term: two followee likes, 2 × 1/16 = 0.125, times α = 1024 → +128. Community term: 1/4, times β = 1024 → +256. So H ≈ −18.5 + 128 + 256 ≈ 365.5, and it ranks the post **1st**.
+
+The code gives the same ranks: `npm run rank -w @breadit/eval -- --dataset syn-W2M-M --method H --user 414 --asof 21751197 --before-event 19076 --top 1100 --config p7-main` prints 15846 first; with `--method BL2` it is at line 1,054. (The two term values are the formula of document 03 applied by hand; the code checks the ranks.)
+
+**Step 4. One user's NDCG@10 and the paired difference.** NDCG@10 = 1/log2(r + 1) if r ≤ 10, else 0. For H: 1/log2(2) = **1**. For BL2: rank 1,054 > 10, so **0**. The paired difference of user 414 is **+1**.
+
+**Step 5. The mean over the group.** Group 0–4 of `syn-W2M-M` keeps 174 users. The mean NDCG@10 is 0.034826 for H and 0.011765 for BL2, so the gain is **0.023061**. Computed again from `per_user.csv`, it equals `mean_diff` in `compare.csv` to every digit. Of the 174 users, H is better for 11, BL2 is better for 4, and 159 are equal: for most users neither method puts the test post in the top 10, so both get 0. A few users like 414 carry the whole mean, which is why the interval is wide.
+
+**Step 6. The interval.** Resample the 174 paired differences with replacement 10,000 times (stream `bootstrap`) and take the middle 95% of the means: **−0.002358 to 0.051290** (document 06 §3). It contains 0.
+
+**Step 7. The p-value.** Flip the sign of each difference at random 10,000 times (stream `permutation`) and count the shuffles whose |mean| is at least 0.023061: 971 of them, so p = (1 + 971) / 10,001 = **0.097190** (document 06 §4).
+
+**Step 8. Holm.** This p is the 9th smallest of the 15 p-values in family F1 of `syn-W2M-M`, so Holm multiplies it by 15 − 9 + 1 = 7: **0.680332** (document 06 §6). The row is now complete:
+
+```
+syn-W2M-M,F1,H,BL2,10,0-4,174,0.023061,-0.002358,0.051290,0.097190,0.680332
+```
+
+**Step 9. From the cell to the thesis.** The report turns the cell into a macro and records where it came from (`.docs/results/p7-report/macros.csv`):
+
+```
+eTwoWTwoMNdcgTenZeroFourGain,0.023,p7-main/compare.csv,syn-W2M-M|F1|H|BL2|10|0-4,mean_diff
+```
+
+`results-macros.tex` defines `\newcommand{\eTwoWTwoMNdcgTenZeroFourGain}{0.023}`, and the thesis writes `\eTwoWTwoMNdcgTenZeroFourGain`, never "0.023".
+
+**Step 10. Why you can trust the chain.** `compare.csv` and `per_user.csv` have their SHA-256 in `p7-main/manifest.json`; that manifest has its own hash in `.docs/results/manifest.json`; `npm run thesis:repro` rebuilds every file from the raw data and checks every hash (document 07). The 2026-11-19 run rebuilt `compare.csv`, `summary.csv` and the manifest of `p7-main` byte for byte.
+
+**What this example teaches.** For a user with no history, H can still win, but only through the prior: "a post in a community you joined, liked by two people you follow". For most new users that is not enough to lift the test post into the top 10, so the gain is small and uncertain (H1 fails, Section 6).
 
 ## 13. What the thesis can claim, and what it cannot
 
