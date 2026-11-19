@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.31 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.32 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -238,7 +238,7 @@ Run each experiment once on the frozen config. Do not look at test results while
 
 E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, drop the first run as warm-up, and report the median with a bootstrap confidence interval. The throttle limit in `app.module.ts:28` must become an env variable so the benchmark can raise it (N6). A run counts only if `http_req_failed` is 0. This gate would have caught the 71% failures in the pre-thesis data. Also count the Prisma queries per request. That number is deterministic.
 
-**Default feed rule.** The thesis starts from the Orientation's Gap 1: "For You" is not personalized. After P7, the default "For You" becomes `social` if H1 passes on both co-primary tests and the H0 gate passes. Otherwise the default stays as today, and Chapter 6 says why. P8 applies the result. The supervisor confirms this rule with the P7 results (§11, item 7).
+**Default feed rule.** The thesis starts from the Orientation's Gap 1: "For You" is not personalized. After P7, the default "For You" becomes `social` if H1 passes on both co-primary tests and the H0 gate passes. Otherwise the default stays as today, and Chapter 7 says why. P8 applies the result. The supervisor confirms this rule with the P7 results (§11, item 7).
 
 **Hive side check (optional, gated, added 2026-11-10).** Digg has no communities, so the community term and its prior for cold users are tested only on synthetic data. Hive is the only real candidate found that has the three things this needs: posts tagged with a community, votes with a time, and memberships with a join date (checked on the public API). SoChainDB publishes Hive data from 2020-03-27 to 2022-07-04 on BigQuery under CC BY-SA 4.0 (https://github.com/SOCHAINDB/hive-db). The other candidates fail: the Flickr photo file has no group column, and we found no membership list for Reddit votes or Farcaster. Meetup was not checked, because Kaggle returned 403.
 
@@ -263,7 +263,7 @@ E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, d
 
 **Status (2026-11-19, done).** Task `p8-repro` (`.docs/works/2026-11-18-p8-repro/`), closed on 2026-11-19. Every step and acceptance item passes; `verify.sh` passes.
 - **Default feed.** H1 failed (P7 status), so by the default feed rule "For You" stays as it is today. `FEED_DEFAULT_ALGO` stays empty; no code changed.
-- **α and β in the app.** `SOCIAL_PARAMS` is now α = 1024, β = 1024, the `syn-W2M-M` values of the approved config `eval/config/runs/p7-main.json` (Digg got β = 0 only because β has no effect there). A unit test ties the app to that file. 1024 is the top of the §7 grid, so the tuning hit its edge: a point for Chapter 6. The parity sample was drawn again with these values (`pairs.csv` unchanged), and the parity test gives 300 of 300 at the feed module and 300 of 300 over HTTP. E7 was run again (P7 status).
+- **α and β in the app.** `SOCIAL_PARAMS` is now α = 1024, β = 1024, the `syn-W2M-M` values of the approved config `eval/config/runs/p7-main.json` (Digg got β = 0 only because β has no effect there). A unit test ties the app to that file. 1024 is the top of the §7 grid, so the tuning hit its edge: a point for Chapter 7. The parity sample was drawn again with these values (`pairs.csv` unchanged), and the parity test gives 300 of 300 at the feed module and 300 of 300 over HTTP. E7 was run again (P7 status).
 - **`npm run thesis:repro`** (`scripts/repro/thesis-repro.mjs`). It checks first (Node, the Digg zips with their SHA-256, Docker, no uncommitted results) and stops within a second when one is missing. Then it deletes every Class D result and `eval/data/`, rebuilds them (datasets, the 13 harness runs, the parity sample, the live parity test, the report) and compares every hash with the merged manifest. E7 is not rebuilt (Class R). About 3 hours.
 - **Merged manifest.** `.docs/results/manifest.json` holds the SHA-256 of the 16 results manifests (`p7-e7` marked Class R, not compared) and of the 9 dataset manifests. `npm run results:manifest -w @breadit/eval` compares the tree with it: today 160 files are equal.
 - **The two full runs.** On this machine, `npm run thesis:repro` gave exit 0 in 8,988 s (about 2 h 30 min): 26 of 26 steps ok, and every hash equal (160 files in 16 folders and 9 datasets). After it, `.docs/results/` and `eval/config/runs/` had no change. On a clean clone of `test-app` at `701a1ab` (`npm ci`, then the command), it gave the same result in 8,779 s, and `git status --short` in the clone was empty. The outputs are `repro_output.txt` and `clean_clone_output.txt` in the task folder.
@@ -282,11 +282,14 @@ E7 uses k6 with a fixed seed and a fixed load profile, on size M. Run 5 times, d
 | 1 | Introduction | Background, problem statement | RQ1, RQ2, contributions C1–C3 | §1, Orientation |
 | 2 | Literature Review | Platform architecture (shorter) | Social recommendation, feed ranking heuristics, offline evaluation | P1, §10 |
 | 3 | Methodology | Development process (shorter) | The hybrid score, the cold-start curve, the evaluation design (data, protocol, metrics, statistics) | §5, §6, P3 |
-| 4 | Implementation | Backend, frontend, real-time layer (C1, C3) | `packages/ranking`, the `algo` option, `eval/`, the repro command | P5, P6, P8 |
-| 5 | Experiments and Results | — | E1–E7 tables and figures, macros only | P7 |
-| 6 | Discussion | — | What the results mean, limitations | P7, §8 |
-| 7 | Test Cases; Demonstration | Both chapters | The social feed in the demo | P6, P10 |
-| 8 | Conclusion and Future Works | Structure | The corrected LightFM sentence, future work from §9 | Bugs Report §7 |
+| 4 | System Analysis and Design | Use case, activity, sequence and class diagrams, the ERD (checked against the current code and schema) | The sequence of the `algo=social` feed, the ranking package boundary | P6, `docs/System_Architecture.md` |
+| 5 | Implementation | Backend, frontend, real-time layer (C1, C3) | `packages/ranking`, the `algo` option, `eval/`, the repro command | P5, P6, P8 |
+| 6 | Experiments and Results | — | E1–E8 tables and figures, macros only | P7 |
+| 7 | Discussion | — | What the results mean, limitations | P7, §8 |
+| 8 | Test Cases and Demonstration | Both chapters, cut to a summary table | The social feed in the demo | P6, P10 |
+| 9 | Conclusion and Future Works | Structure | The corrected LightFM sentence, future work from §9 | Bugs Report §7 |
+
+Nine chapters, decided by the author on 2026-11-19: the system analysis and design gets its own chapter. The page budget per chapter (about 95 pages, the limit is 120) is in `.docs/Thesis-Report/drafts/Report Architecture.md`.
 
 **Done when.** Every number in the thesis comes from a CSV.
 
@@ -382,7 +385,7 @@ One source of truth. A change needs a new config version and a line in the chang
 ## 8. Risks and cut order
 
 - **The result is built into the data.** If interactions are made from follows, the social signal wins by construction. Defense: the W0 null world, W1, the timestamp shuffle in E5 (our own test; [23] is cited for the question of influence and correlation), three W2 cells instead of one setting, and the real Digg data (P4). Present synthetic results as a check that the mechanism works, and Digg as outside evidence, where nobody set the influence.
-- **No public dataset.** This is now a fallback risk. It applies only if the Digg conversion fails (the gate in P4). Then all results are synthetic. Say so plainly in chapters 3 and 6, and lean on W0 and W1 to show the result is not built in.
+- **No public dataset.** This is now a fallback risk. It applies only if the Digg conversion fails (the gate in P4). Then all results are synthetic. Say so plainly in chapters 3 and 7, and lean on W0 and W1 to show the result is not built in.
 - **Digg is small and special.** It has 3,553 stories in one month, and only stories that reached the front page, so every story is already popular and a popularity baseline may look strong. Only about 59% of the voters are in the friend table. The zips come from the Internet Archive copy of 2013-08-26 and have a password that the page gives. The terms say "research purposes only" and ask to cite Hogg and Lerman (2012) [50]. The license question goes to the supervisor note. State all of these as limits.
 - **Leakage.** Defense: as-of features and the mutation test in P5.
 - **Weak community evidence.** No public dataset I found has a follow graph, item interactions and explicit community membership together. State it as a limitation. Hive has dated votes and memberships, and is only an optional side check (P7).
@@ -472,13 +475,13 @@ The thesis results do not need the schema migration: generated data has no dupli
 ## 11. Open items
 
 1. **What happens on 2026-11-20.** The written submission or the defense? It decides when P10 must be done.
-2. **The university's thesis rules.** Format, length and required chapters. Check the chapter map in P9 against them. Format answered on 2026-11-19: the pre-thesis LaTeX is the school's standard format, and `.docs/Thesis-Report/` uses it. Length and required chapters are still open.
+2. **The university's thesis rules.** Format, length and required chapters. Check the chapter map in P9 against them. Format answered on 2026-11-19: the pre-thesis LaTeX is the school's standard format, and `.docs/Thesis-Report/` uses it. Length: at most 120 pages, target 80–100 (author, 2026-11-19). Whether the appendix counts, and the required chapters, are still open.
 3. ✅ **D1.** Can a non-member post into a community (Bugs Report §4)? Decided on 2026-10-28: no, a community post needs membership. The generator follows it (P3); the backend rule is in task `p6-social-feed`.
 4. **Git actions.** The tag `v2-thesis-experiments`, fast-forwarding `main`, and each push need the author's approval. The tag was proposed on 2026-11-19, when task `p8-repro` closed: on its closing commit `docs: p8-repro runs and status`. The clean-clone run passed on `701a1ab`, and the closing commit changes only docs (nothing in code, `.docs/results/` or `eval/config/`).
 5. **Pre-thesis corrections.** The proposal is to fix them only in the new thesis text. Editing `docs/Pre-thesis/` (with its LaTeX) needs the author's request.
 6. **P1 decisions, 2026-10-24** (`.docs/literature.md` §9). Status 2026-11-02: (a) ✅ set in P2 and checked in P3 and P4; (b) still open, for P5; (c) ✅ set in P2. The author decided PC2 to PC10, and version 0.7 applies them. Open points: (a) the rule that sets the cut time T belongs to the P2 design. It must check that the history bucket 0–4 keeps enough test users, and P3 must make enough users with a positive after T. Set in P2: `.docs/implementation-plan.md` §3.1 and §3.2, checked on Digg in its §3.7; the P3 check is in its §3.6. (b) P5 sets the baseline grids and the larger pool (W_L, N_L), and freezes them before the first test-split run. (c) The Holm family is method × K × bucket, and BL6, BL2t, BL4 and BL5 make it larger. P2 fixes which comparisons are in the family. Set in P2: `.docs/implementation-plan.md` §3.3 (families F1 and F2 per dataset).
 7. **Default feed rule** (P7). Does the supervisor agree that "For You" switches to `social` only when H1 passes on both co-primary tests and the H0 gate passes? Ask with the P7 results. Asked on 2026-11-12 with the P7 results (`results-note.md` of task `p7-offline-experiments`): H1 failed on both tests, so the default stays as it is today unless the supervisor says otherwise. P8 applied this on 2026-11-18: `FEED_DEFAULT_ALGO` stays empty. If the supervisor wants another default, it is one env variable.
-8. ✅ **Hive side check** (P7). Closed on 2026-11-12: the author opened a BigQuery sandbox project, and the SoChainDB dataset refused access, so the gate failed. Nothing to tell the supervisor beyond the limit already in Chapter 6: the community term has synthetic evidence only, and Hive is future work.
+8. ✅ **Hive side check** (P7). Closed on 2026-11-12: the author opened a BigQuery sandbox project, and the SoChainDB dataset refused access, so the gate failed. Nothing to tell the supervisor beyond the limit already in Chapter 7: the community term has synthetic evidence only, and Hive is future work.
 
 ---
 
@@ -515,3 +518,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.29 · 2026-11-18 · Task `p8-repro` started (code and data steps done, the two full runs going): P8 status paragraph; §4 row P8 ▶ (late); P6 Config line (α and β written); a P7 bullet on the E7 rerun with the tuned weights (the `eSeven*` numbers changed); §11 items 4 (when the tag is proposed) and 7 (P8 applied the rule). No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.30 · 2026-11-19 · Task `p8-repro` closed: P8 status paragraph (done; the two full runs pass, on this machine and on a clean clone); §4 rows P8 ✅ (tag proposed) and P9 ▶ next; §11 item 4 (the tag proposed on the closing commit). No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.31 · 2026-11-19 · Thesis folder: the pre-thesis LaTeX moves to `docs/Pre-thesis/Latex/` (frozen), and the thesis LaTeX is `.docs/Thesis-Report/` in the same school format, not `.docs/latex/` (P9 "Do", the chapter map source, §11 items 2 and 5). No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.32 · 2026-11-19 · Nine chapters: P9 chapter map gets Chapter 4 System Analysis and Design (use case, activity, sequence, architecture, ERD), and the later chapters move up by one (Discussion is now Chapter 7; the Experiments row now says E1–E8); "Chapter 6" references become "Chapter 7" (P7 default feed rule, P8 status, §8, §11 item 8); §11 item 2 gets the page limit (120, target 80–100). No frozen value changed; §5, §6 and §7 are byte-identical.

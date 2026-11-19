@@ -2,7 +2,7 @@
 
 [Guidance Manual](../Guidance-Manual.md) · English · [Tiếng Việt](../vi/11-experiments-and-results.md)
 
-**After reading this you can:** say what question each experiment asks and which run answers it; read every column of a results file and of a report table; give the main numbers and say what they mean; follow one number from one user's ranking to the macro in the thesis; and say what the thesis can claim and what it cannot. This is the background of thesis Chapters 5 and 6.
+**After reading this you can:** say what question each experiment asks and which run answers it; read every column of a results file and of a report table; give the main numbers and say what they mean; follow one number from one user's ranking to the macro in the thesis; and say what the thesis can claim and what it cannot. This is the background of thesis Chapters 6 and 7.
 
 Sources: super-plan P7 (the experiment table and the status), `.docs/results/p7-report/results.md` (all tables), the run folders in `.docs/results/`, implementation-plan §2.7 (the results files) and §3.3–§3.5 (Holm families, the reading of H1, the H0 gate), and the P7 note for the supervisor (`.docs/works/2026-11-11-p7-offline-experiments/results-note.md`). How a number is made: [05](05-evaluation-protocol.md). When a gain is real: [06](06-statistics.md). Terms: [09 Glossary](09-glossary.md).
 
@@ -121,7 +121,7 @@ H1 passes on a dataset only if, in the F1 row for NDCG@10 and group 0–4, **bot
 - **Holm can turn a small p into a large one.** The raw p is 0.030. Holm sorts the 15 p-values of the family; this one is the 5th smallest, so it is multiplied by 15 − 5 + 1 = 11: 0.030497 × 11 = 0.335. On `syn-W2M-M` the raw p 0.097190 is the 9th smallest and is multiplied by 7: 0.680. (Document 06 explains Holm.)
 - **Significance is not size.** Even if the Digg gain were "real", it is about 0.0001 NDCG: nothing a user would notice (document 06, effect size).
 
-**The surprise:** on `syn-W2M-M` the gain **grows with history**: 0.023 for 0–4, 0.031 for 5–19, 0.078 for 20+. The 20+ row is the only F1 row at K = 10 where both conditions hold. With little history the smoothing gives every followee and community the same weight, so the score cannot be personal yet; with more history the counts take over (Chapter 6).
+**The surprise:** on `syn-W2M-M` the gain **grows with history**: 0.023 for 0–4, 0.031 for 5–19, 0.078 for 20+. The 20+ row is the only F1 row at K = 10 where both conditions hold. With little history the smoothing gives every followee and community the same weight, so the score cannot be personal yet; with more history the counts take over (Chapter 7).
 
 ## 7. E3: social density (H2)
 

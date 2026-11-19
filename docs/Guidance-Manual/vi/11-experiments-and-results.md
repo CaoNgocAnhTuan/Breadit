@@ -2,7 +2,7 @@
 
 [Sổ tay hướng dẫn](../Guidance-Manual.md) · [English](../en/11-experiments-and-results.md) · Tiếng Việt
 
-**Đọc xong bạn sẽ:** nói được mỗi thí nghiệm hỏi câu gì và run nào trả lời nó; đọc được mọi cột của một file kết quả và của một bảng trong report; nêu được các con số chính và ý nghĩa của chúng; theo được một con số từ thứ hạng của một user tới macro trong thesis; và nói được thesis được phép kết luận gì, không được kết luận gì. Đây là kiến thức nền của Chương 5 và Chương 6 của thesis.
+**Đọc xong bạn sẽ:** nói được mỗi thí nghiệm hỏi câu gì và run nào trả lời nó; đọc được mọi cột của một file kết quả và của một bảng trong report; nêu được các con số chính và ý nghĩa của chúng; theo được một con số từ thứ hạng của một user tới macro trong thesis; và nói được thesis được phép kết luận gì, không được kết luận gì. Đây là kiến thức nền của Chương 6 và Chương 7 của thesis.
 
 Nguồn: super-plan P7 (bảng thí nghiệm và trạng thái), `.docs/results/p7-report/results.md` (mọi bảng), các thư mục run trong `.docs/results/`, implementation-plan §2.7 (các file kết quả) và §3.3–§3.5 (Holm family, cách đọc H1, H0 gate), và ghi chú P7 gửi thầy (`.docs/works/2026-11-11-p7-offline-experiments/results-note.md`). Một con số được tạo ra thế nào: [05](05-evaluation-protocol.md). Khi nào một mức cải thiện là thật: [06](06-statistics.md). Thuật ngữ: [09 Bảng thuật ngữ](09-glossary.md).
 
@@ -121,7 +121,7 @@ H1 chỉ pass trên một dataset nếu, ở dòng F1 cho NDCG@10 và nhóm 0–
 - **Holm có thể biến một p nhỏ thành p lớn.** p thô là 0.030. Holm sắp xếp 15 p-value của family; p này đứng thứ 5 từ nhỏ lên, nên bị nhân với 15 − 5 + 1 = 11: 0.030497 × 11 = 0.335. Trên `syn-W2M-M`, p thô 0.097190 đứng thứ 9 và bị nhân với 7: 0.680. (Tài liệu 06 giải thích Holm.)
 - **Có ý nghĩa thống kê không có nghĩa là lớn.** Kể cả nếu gain trên Digg là "thật", nó chỉ khoảng 0.0001 NDCG: không user nào nhận ra (tài liệu 06, effect size).
 
-**Điều bất ngờ:** trên `syn-W2M-M`, gain **tăng theo lịch sử**: 0.023 cho 0–4, 0.031 cho 5–19, 0.078 cho 20+. Dòng 20+ là dòng F1 duy nhất ở K = 10 mà cả hai điều kiện đều đúng. Khi lịch sử ít, smoothing cho mọi followee và community cùng một trọng số, nên điểm chưa thể cá nhân hoá; khi lịch sử nhiều hơn, các con số đếm thay thế prior (Chương 6).
+**Điều bất ngờ:** trên `syn-W2M-M`, gain **tăng theo lịch sử**: 0.023 cho 0–4, 0.031 cho 5–19, 0.078 cho 20+. Dòng 20+ là dòng F1 duy nhất ở K = 10 mà cả hai điều kiện đều đúng. Khi lịch sử ít, smoothing cho mọi followee và community cùng một trọng số, nên điểm chưa thể cá nhân hoá; khi lịch sử nhiều hơn, các con số đếm thay thế prior (Chương 7).
 
 ## 7. E3: mật độ social (H2)
 

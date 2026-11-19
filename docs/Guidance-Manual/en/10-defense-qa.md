@@ -91,7 +91,7 @@ The bootstrap gives the size of the gain with a confidence interval. The randomi
 There are 15 confirmatory comparisons per dataset (3 values of K × 5 user groups). Without correction, some would look significant by luck. Holm controls this and stays valid when tests overlap (group 0–4 contains groups 0 and 1–4).
 
 **Q21. What if H1 fails?**
-The thesis reports it. A negative result with a clean protocol is a valid result. The "For You" default then stays as it is, and Chapter 6 discusses why.
+The thesis reports it. A negative result with a clean protocol is a valid result. The "For You" default then stays as it is, and Chapter 7 discusses why.
 *Evidence:* super-plan §1, P7 "Default feed rule".
 
 **Q22. Did H1 pass?**
@@ -147,7 +147,7 @@ The rule, fixed before the test split, needs both a Holm p below 0.05 and an int
 
 **Q34. Why does the hybrid help users with a long history more than new users?**
 For a user with no history, the smoothing gives every followee the same trust and every joined community the same weight, so the score only says "by someone you follow" or "in a community you joined". As history grows, the user's own counts replace the prior and the score becomes personal. On `syn-W2M-M` the gain is 0.023 for 0–4 interactions and 0.078 for 20 or more.
-*Evidence:* table e2; the formula in document 03; Chapter 6.
+*Evidence:* table e2; the formula in document 03; Chapter 7.
 
 **Q35. If H1 failed, what does the thesis contribute?**
 Three things. A hybrid score that the app runs and that was measured with a leak-free, reproducible protocol against tuned baselines. A clear negative answer: on these data the follow graph adds little for new users, and the gain comes from community history acting as a topic signal. And an app where offline numbers describe the live feed (the parity test) and one command rebuilds every number.

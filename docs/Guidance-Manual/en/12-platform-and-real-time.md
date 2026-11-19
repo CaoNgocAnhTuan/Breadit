@@ -2,7 +2,7 @@
 
 [Guidance Manual](../Guidance-Manual.md) · English · [Tiếng Việt](../vi/12-platform-and-real-time.md)
 
-**After reading this you can:** draw the whole Breadit system, not only the feed path; follow one request through the guards; explain how a socket is tied to a user and how a direct message reaches the other person at once; say why the cache uses version numbers instead of deleting keys; and say what each kind of test proves. This is the background of thesis Chapters 4 and 7 and of the words "real-time hybrid social networking platform" in the title.
+**After reading this you can:** draw the whole Breadit system, not only the feed path; follow one request through the guards; explain how a socket is tied to a user and how a direct message reaches the other person at once; say why the cache uses version numbers instead of deleting keys; and say what each kind of test proves. This is the background of thesis Chapters 4, 5 and 8 and of the words "real-time hybrid social networking platform" in the title.
 
 Sources: the code (`apps/backend/src/auth/`, `notifications/`, `messages/`, `admin/`, `cache/`, `block/`, `apps/backend/test/it/`), `CLAUDE.md` ("Architecture"), `.docs/Bugs Report.md` (findings S1, S5 and the system inventory). Diagrams: [System_Architecture.md](../../System_Architecture.md). Terms: [09 Glossary](09-glossary.md). The feed path itself is in [08](08-system-and-feed.md).
 
@@ -156,8 +156,9 @@ The feed pages live 10 s, and their key includes `algo`, the `v:user` version an
 
 ## 7. Where this goes in the thesis
 
-- **Chapter 4 (Implementation):** Sections 1 to 5 of this document, with the feed path of document 08 and the new code of C2 (`packages/ranking`, the `algo` option, `eval/`, the repro command).
-- **Chapter 7 (Test Cases and Demonstration):** the test table of Section 6 and the socket tests as the evidence that the platform and its real-time layer work.
+- **Chapter 4 (System Analysis and Design):** the component picture (Section 1), the request and message sequences (Sections 2 and 3.3), the events (Section 3.2) and the listing rules (Section 5) as design.
+- **Chapter 5 (Implementation):** how Sections 1 to 5 are built, with the feed path of document 08 and the new code of C2 (`packages/ranking`, the `algo` option, `eval/`, the repro command).
+- **Chapter 8 (Test Cases and Demonstration):** the test table of Section 6 and the socket tests as the evidence that the platform and its real-time layer work.
 - **Chapter 1:** the meaning of "real-time" (Section 3) and of "hybrid" (Section 1).
 
 ## 8. Check yourself

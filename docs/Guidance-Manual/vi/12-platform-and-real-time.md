@@ -2,7 +2,7 @@
 
 [Sổ tay hướng dẫn](../Guidance-Manual.md) · [English](../en/12-platform-and-real-time.md) · Tiếng Việt
 
-**Đọc xong bạn sẽ:** vẽ được toàn bộ hệ thống Breadit, không chỉ đường đi của feed; theo được một request qua các guard; giải thích một socket được gắn với một user ra sao và một tin nhắn đến người nhận ngay lập tức thế nào; nói được vì sao cache dùng số version thay vì xoá key; và nói được mỗi loại test chứng minh điều gì. Đây là kiến thức nền của Chương 4 và Chương 7 của thesis, và của cụm "real-time hybrid social networking platform" trong tên đề tài.
+**Đọc xong bạn sẽ:** vẽ được toàn bộ hệ thống Breadit, không chỉ đường đi của feed; theo được một request qua các guard; giải thích một socket được gắn với một user ra sao và một tin nhắn đến người nhận ngay lập tức thế nào; nói được vì sao cache dùng số version thay vì xoá key; và nói được mỗi loại test chứng minh điều gì. Đây là kiến thức nền của Chương 4, 5 và 8 của thesis, và của cụm "real-time hybrid social networking platform" trong tên đề tài.
 
 Nguồn: code (`apps/backend/src/auth/`, `notifications/`, `messages/`, `admin/`, `cache/`, `block/`, `apps/backend/test/it/`), `CLAUDE.md` (mục "Architecture"), `.docs/Bugs Report.md` (finding S1, S5 và bảng kiểm kê hệ thống). Sơ đồ: [System_Architecture.md](../../System_Architecture.md). Thuật ngữ: [09 Bảng thuật ngữ](09-glossary.md). Riêng đường đi của feed nằm ở [08](08-system-and-feed.md).
 
@@ -156,8 +156,9 @@ Các trang feed sống 10 giây, và key của chúng gồm `algo`, version `v:u
 
 ## 7. Phần này nằm ở đâu trong thesis
 
-- **Chương 4 (Implementation):** Mục 1 đến 5 của tài liệu này, cùng đường đi của feed ở tài liệu 08 và code mới của C2 (`packages/ranking`, tham số `algo`, `eval/`, lệnh repro).
-- **Chương 7 (Test Cases and Demonstration):** bảng test ở Mục 6 và các test socket, làm bằng chứng rằng nền tảng và lớp real-time hoạt động.
+- **Chương 4 (System Analysis and Design):** hình các component (Mục 1), các sequence của request và tin nhắn (Mục 2 và 3.3), các sự kiện (Mục 3.2) và các quy tắc của danh sách (Mục 5), ở mức thiết kế.
+- **Chương 5 (Implementation):** Mục 1 đến 5 được xây dựng ra sao, cùng đường đi của feed ở tài liệu 08 và code mới của C2 (`packages/ranking`, tham số `algo`, `eval/`, lệnh repro).
+- **Chương 8 (Test Cases and Demonstration):** bảng test ở Mục 6 và các test socket, làm bằng chứng rằng nền tảng và lớp real-time hoạt động.
 - **Chương 1:** nghĩa của "real-time" (Mục 3) và của "hybrid" (Mục 1).
 
 ## 8. Tự kiểm tra

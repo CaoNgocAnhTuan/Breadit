@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.14 · 2026-11-19 · Status: approved 2026-10-28
+Version 1.15 · 2026-11-19 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -284,10 +284,10 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-19. ✅ mea
 | ✅ 11-12 (gate failed) | 9b | `p7-hive-check` | P7 | 9, closed on 11-13 | gate: BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (section 3.2); then a Hive adapter and H-comm against BL2 (super-plan P7) | 0.5 for the gate | 11-14 | — |
 | ✅ 11-12 | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
 | ✅ 11-19 | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
-| ▶ | 12 | Writing, Chapters 5 and 6 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
+| ▶ | 12 | Writing, Chapters 6 and 7 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
 | ⬜ | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
 
-Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Task 7 closed on 11-10, one day after its planned end. Task 8 closed on 11-10, one day before its planned end, so the plan is on time again. Chapters 1 to 4 and 7 to 8 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
+Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Task 7 closed on 11-10, one day after its planned end. Task 8 closed on 11-10, one day before its planned end, so the plan is on time again. Chapters 1 to 5 and 8 to 9 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
 
 On 2026-11-18, task 11 started three days after its planned end. Its code and data steps were done the same day. The two full repro runs (one on this machine, one on a clean clone) both passed in the night, and the task closed on 11-19, four days after its planned end. Task 12 (writing) and task 13 now only have the spare days 11-19 and 11-20.
 
@@ -331,3 +331,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.12 · 2026-11-18 · Task `p8-repro` started: §1 `eval/` row (`report/`, `bench/`, `repro/`); §2.3 the merged manifest exists; §2.9 the parity sample drawn again with the tuned α and β; §5 task 11 started, one paragraph on the schedule. No contract, rule or frozen value changed.
 - 1.13 · 2026-11-19 · Task `p8-repro` closed: §1 `eval/` row (`repro/` ✅); §5 task 11 ✅ and task 12 ▶, the schedule paragraph. No contract, rule or frozen value changed.
 - 1.14 · 2026-11-19 · Task `p9-report-macros`: §2.8 the `Full` rule (6 decimals), grid values as written, the new name words. No other contract, rule or frozen value changed.
+- 1.15 · 2026-11-19 · Nine thesis chapters (super-plan 0.32): §5 task 12 writes Chapters 6 and 7 (Experiments and Results, Discussion), and the schedule paragraph names Chapters 1 to 5 and 8 to 9. No contract, rule or frozen value changed.

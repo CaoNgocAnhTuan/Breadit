@@ -93,7 +93,7 @@ Bootstrap cho độ lớn của mức cải thiện kèm khoảng tin cậy. Ran
 Có 15 phép so sánh xác nhận mỗi dataset (3 giá trị K × 5 nhóm user). Không điều chỉnh thì vài cái sẽ trông có ý nghĩa chỉ do may. Holm kiểm soát chuyện này và vẫn đúng khi các kiểm định chồng lên nhau (nhóm 0–4 chứa nhóm 0 và 1–4).
 
 **Q21. Nếu H1 không pass thì sao?**
-Thesis báo cáo đúng như vậy. Một kết quả âm với giao thức sạch vẫn là kết quả hợp lệ. Khi đó "For You" mặc định giữ nguyên, và Chương 6 bàn vì sao.
+Thesis báo cáo đúng như vậy. Một kết quả âm với giao thức sạch vẫn là kết quả hợp lệ. Khi đó "For You" mặc định giữ nguyên, và Chương 7 bàn vì sao.
 *Bằng chứng:* super-plan §1, P7 "Default feed rule".
 
 **Q22. H1 có pass không?**
@@ -149,7 +149,7 @@ Luật được cố định trước test split cần cả p Holm dưới 0.05 
 
 **Q34. Vì sao hybrid giúp user có nhiều lịch sử hơn là user mới?**
 Với user chưa có lịch sử, smoothing cho mọi followee cùng một trust và mọi community đã tham gia cùng một trọng số, nên điểm chỉ nói được "bài của người bạn follow" hoặc "bài trong community bạn tham gia". Khi lịch sử tăng, các con số đếm của chính user thay thế prior và điểm trở nên cá nhân. Trên `syn-W2M-M`, gain là 0.023 với 0–4 interaction và 0.078 với từ 20 trở lên.
-*Bằng chứng:* bảng e2; công thức ở tài liệu 03; Chương 6.
+*Bằng chứng:* bảng e2; công thức ở tài liệu 03; Chương 7.
 
 **Q35. Nếu H1 fail, thesis đóng góp được gì?**
 Ba điều. Một hybrid score mà app đang chạy, được đo bằng một protocol không leak và tái lập được, so với các baseline đã tune. Một câu trả lời âm rõ ràng: trên các dữ liệu này follow graph đóng góp ít cho user mới, và gain đến từ lịch sử trong community đóng vai một tín hiệu topic. Và một app mà con số offline mô tả đúng feed live (parity test), với một lệnh dựng lại mọi con số.
