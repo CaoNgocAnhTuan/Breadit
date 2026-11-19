@@ -13,3 +13,27 @@ ok    05 adapt-digg                 8.1 s
 ok    06 check                      8.8 s
 ok    07 harness-p5-baseline        0.4 s
 ok    08 harness-p7-tune-worlds     159.0 s
+ok    09 harness-p7-tune-main       4079.6 s
+ok    10 freeze-check               0.4 s
+ok    11 harness-p7-h0              6.9 s
+ok    12 harness-p7-main            2133.8 s
+ok    13 harness-p7-e5-worlds       20.0 s
+ok    14 harness-p7-e4-terms        1502.6 s
+ok    15 harness-p7-e4-m0           325.8 s
+ok    16 harness-p7-e4-m2           328.2 s
+ok    17 harness-p7-e4-m10          322.1 s
+ok    18 harness-p7-e6-ties         98.5 s
+ok    19 harness-p7-e8-pool         8.2 s
+ok    20 harness-p7-e5-shuffle      3.8 s
+ok    21 parity                     0.4 s
+ok    22 load                       4.1 s
+ok    23 load-check                 0.6 s
+ok    24 test-parity                35.5 s
+ok    25 report                     0.2 s
+ok    26 compare                    0.5 s
+every hash is equal: 160 files in 16 folders and 9 datasets (total 9057.2 s)
+real 9057.36
+user 8953.05
+sys 77.65
+exit 0
+end 2026-11-19T10:27:37Z

@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.16 · 2026-11-19 · Status: approved 2026-10-28
+Version 1.17 · 2026-11-19 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -284,9 +284,9 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-19. ✅ mea
 | ✅ 11-12 (gate failed) | 9b | `p7-hive-check` | P7 | 9, closed on 11-13 | gate: BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (section 3.2); then a Hive adapter and H-comm against BL2 (super-plan P7) | 0.5 for the gate | 11-14 | — |
 | ✅ 11-12 | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
 | ✅ 11-19 | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
-| ▶ | 12 | `p9-report-macros` | P9 | 11 | the macros Chapters 6 and 7 need, the `Full` rule; closing: the full repro run, the results that commit `17e784f` deleted by mistake | 0.5 | — | — |
-| ⬜ | 13 | Writing: Guidance Manual 11 §12 (one number from start to end) | P9 | 12 | one real user of `syn-W2M-M` from the test post to the macro, en and vi | 0.25 | — | — |
-| ⬜ | 14 | `p9-figure-data` | P9 | 12 | the report also writes `fig-e2` (gain by history group) and `fig-e5` (gain by world), with intervals | 0.5 | — | — |
+| ✅ 11-19 | 12 | `p9-report-macros` | P9 | 11 | the macros Chapters 6 and 7 need, the `Full` rule; closing: the full repro run, the results that commit `17e784f` deleted by mistake | 0.5 | — | — |
+| ✅ 11-19 | 13 | Writing: Guidance Manual 11 §12 (one number from start to end) | P9 | 12 | one real user of `syn-W2M-M` from the test post to the macro, en and vi | 0.25 | — | — |
+| ▶ | 14 | `p9-figure-data` | P9 | 12 | the report also writes `fig-e2` (gain by history group) and `fig-e5` (gain by world), with intervals | 0.5 | — | — |
 | ⬜ | 15 | Writing: Chapter 3 Methodology | P9 | — | draft, review, LaTeX | 1 | — | — |
 | ⬜ | 16 | `p9-diagrams` | P9 | — | export the Mermaid diagrams to PDF; an ERD from `schema.prisma`; one style | 0.5–1 | — | — |
 | ⬜ | 17 | Writing: Chapters 6 and 7 in LaTeX | P9 ★ | 14 | macros only, the ten tables, three figures (E2, E3, E5) in pgfplots | 1 | — | — |
@@ -353,3 +353,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.14 · 2026-11-19 · Task `p9-report-macros`: §2.8 the `Full` rule (6 decimals), grid values as written, the new name words. No other contract, rule or frozen value changed.
 - 1.15 · 2026-11-19 · Nine thesis chapters (super-plan 0.32): §5 task 12 writes Chapters 6 and 7 (Experiments and Results, Discussion), and the schedule paragraph names Chapters 1 to 5 and 8 to 9. No contract, rule or frozen value changed.
 - 1.16 · 2026-11-19 · §5: the order of the remaining work, rows 12 to 31 (approved by the author), with no end dates: the writing rows, the tasks `p9-figure-data`, `p9-diagrams`, `p9-bug-quick-wins`, `p10-demo-sweep`, `p10-demo-script`, `p10-final-checks`, `p10-security-fixes`, `p10-defense-package`, the checks and the freeze; the bugs placed in each; what stays future work. No contract, rule or frozen value changed.
+- 1.17 · 2026-11-19 · §5 rows 12 and 13 ✅ (task `p9-report-macros` closed; Guidance Manual 11 §12 written), row 14 ▶. No contract, rule or frozen value changed.

@@ -1,6 +1,6 @@
 # Plan: Report macros for Chapters 5 and 6
 
-Status: approved · 2026-11-19
+Status: done · 2026-11-19
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-19-p9-report-macros/`
 
 All commits go on `test-app` and are never pushed. Steps 1–4 need no Docker. Run `nvm use` first: the `eval/` files run directly on the pinned Node. The full `thesis:repro` run at the end needs `docker compose up db redis -d` and the two Digg zips; Claude runs it after Step 4. Before Step 1, Claude commits `design.md` and this plan: `docs: p9-report-macros spec, design and plan`.
@@ -35,17 +35,40 @@ All commits go on `test-app` and are never pushed. Steps 1–4 need no Docker. R
 
 Claude does these after Step 4.
 
-- [ ] DW2: `git show --stat` of the Step 3 commit → in `p7-report/` only `macros.csv`, `results-macros.tex`, `results.md` and `manifest.json`, plus `.docs/results/manifest.json`.
-- [ ] DW3: every line of `macros.csv` at `5df85f9` is in the new file → no line missing; the new file has 153 rows.
-- [ ] DW4: the new names of the Design table are in `macros.csv` with the cells of the Spec table → the three Digg `Full` values are 0.000117, 0.000015 and 0.000225; `\tuneWTwoMHChosen` is `1024/1024`; `\tuneDiggBLTwoTChosen` is `4`.
-- [ ] DW5: the report written into an empty temp folder → every file byte-identical to the committed `p7-report/`.
-- [ ] DW6: `results:manifest` in check mode → exit 0.
-- [ ] DW7: the chapter macro check over Chapters 5 and 6 → every `\name` is in `macros.csv`, and each `[MACRO?]` mark except the E6 one has a macro to use (the mapping goes in the Result).
-- [ ] Full `npm run thesis:repro` (under `caffeinate -i`, about 2.5 hours) → exit 0, every hash equal, and `git status --short .docs/results/ eval/config/runs/` empty after it. The step lines and the run time go to `repro_output.txt` in this folder.
-- [ ] DW1: the eval verify and `verify.sh` pass.
+- [x] DW2: `git show --stat` of the Step 3 commit → in `p7-report/` only `macros.csv`, `results-macros.tex`, `results.md` and `manifest.json`, plus `.docs/results/manifest.json`.
+- [x] DW3: every line of `macros.csv` at `5df85f9` is in the new file → no line missing; the new file has 153 rows.
+- [x] DW4: the new names of the Design table are in `macros.csv` with the cells of the Spec table → the three Digg `Full` values are 0.000117, 0.000015 and 0.000225; `\tuneWTwoMHChosen` is `1024/1024`; `\tuneDiggBLTwoTChosen` is `4`.
+- [x] DW5: the report written into an empty temp folder → every file byte-identical to the committed `p7-report/`.
+- [x] DW6: `results:manifest` in check mode → exit 0.
+- [x] DW7: the chapter macro check over Chapters 5 and 6 → every `\name` is in `macros.csv`, and each `[MACRO?]` mark except the E6 one has a macro to use (the mapping goes in the Result).
+- [x] Full `npm run thesis:repro` (under `caffeinate -i`, about 2.5 hours) → exit 0, every hash equal, and `git status --short .docs/results/ eval/config/runs/` empty after it. The step lines and the run time go to `repro_output.txt` in this folder.
+- [x] DW1: the eval verify and `verify.sh` pass.
 
 When these pass, Claude commits `repro_output.txt` with the super-plan update (§4 P9 row with the task, the status date, change log 0.31; no frozen value changes) and the Result below. Commit: `docs: p9-report-macros runs and status`. The Result proposes the tag `v2-thesis-experiments` on that commit. The author makes the tag.
 
 ## Result
 
-<!-- Claude fills this in at the end: what was done, test counts, commits, and anything that differed from the plan (and why). -->
+Done on 2026-11-19. Steps 1–4 were implemented by Sonnet and checked by Claude against the design; all 8 acceptance items pass.
+
+**What was built.** `gridValue` in `eval/src/report/round.ts`; in `eval/src/report/macros.ts` the seven baseline words, `GRID_WORD`, 68 new specs (85 → 153 macros) and `formatCell(column, cell, name)`, used by `buildMacros` and `verifyMacros`. The E5 topic names use the metric word `TopicNdcg` (the names are those of the Design, for example `eFiveWZeroTopicNdcgTenAllGain`); the blueprint §2.8 paragraph names that word.
+
+**Tests.** Eval verify: 432 tests, 432 pass (TC1–TC5; `macros.test.ts` has two tests more than the plan: the new names and the Digg `Full` values). `verify.sh` after the repro: ranking 85, backend unit 204, IT 146, eval verify, all pass. Hook tests 96 of 96.
+
+**Acceptance.**
+- DW2: the Step 3 commit `4290c22` changes only `macros.csv`, `results-macros.tex`, `results.md` and `manifest.json` in `p7-report/`, plus `.docs/results/manifest.json` (only the `p7-report` hash, 5830faf9… → a15a4319…).
+- DW3: no line of `macros.csv` at `5df85f9` is missing; 153 rows.
+- DW4: `eTwoDiggNdcgTenZeroFourGainFull` 0.000117, `…CiLowFull` 0.000015, `…CiHighFull` 0.000225; `tuneWTwoMHChosen` 1024/1024; `tuneDiggBLTwoTChosen` 4; each with the file, row key and column of the Spec table.
+- DW5: the report written into an empty temp folder is byte-identical to the committed `p7-report/`.
+- DW6: `results:manifest` check: equal, 160 files in 16 folders and 9 datasets, exit 0.
+- DW7: the drafts of Chapters 6 and 7 (renumbered from 5 and 6 on 2026-11-19) use 70 macros, all in `macros.csv`. The marks now map to: tuned α and β `tuneWTwoMHChosen`; the 512 and 1024 tuning points `tuneWTwoMHValNdcgTenFiveTwelveFull` and `tuneWTwoMHValNdcgTenTenTwentyFourFull`; BL2t and BL6 `eOneWTwoMNdcgBLTwoTTenAllValue`, `eOneWTwoMNdcgBLSixTenAllValue`; BL4 and BL5 `eOneDiggNdcgBLFourTenAllValue`, `eOneDiggNdcgBLFiveTenAllValue`; the Digg row `eTwoDiggNdcgTenZeroFour{Gain,CiLow,CiHigh}Full`; group 20+ `eTwoWTwoMNdcgTenTwentyPlus{Gain,CiLow,CiHigh,PHolm}`; group 5–19 `eTwoWTwoMNdcgTenFiveNineteenPHolm`; the E5 topic row `eFiveWZeroTopicNdcgTenAll{Gain,CiLow,CiHigh}`; BL2t on Digg `tuneDiggBLTwoTChosen`. The E6 mark stays out of scope.
+- Full repro: `npm run thesis:repro` on `787b579` under `caffeinate -i`: exit 0, 26 of 26 steps ok, every hash equal (160 files in 16 folders and 9 datasets), 9,057 s. Output: `repro_output.txt`.
+- DW1: see Tests.
+
+**Commits.** `618b455` (spec, design and plan), `f403336` (code and tests), `4290c22` (report and merged manifest), `787b579` (blueprint §2.8), `eb45165` (restore, below), and the closing commit `docs: p9-report-macros runs and status`.
+
+**Differences from the plan.**
+- **A commit during the repro.** While the run had cleaned the Class D folders, the author committed with `git add` (`17e784f`, "sweep for writing report"), which deleted 81 committed result files and committed half of `repro_output.txt`. Nothing was lost: after the run, the rebuilt files were staged and `git diff --cached 17e784f^ -- .docs/results` was empty, so they equal the files before the sweep byte for byte; `eb45165` restores them. After it, `git status --short .docs/results/ eval/config/runs/` is empty, as the acceptance item asks. Lesson: never `git add -A` while `thesis:repro` runs.
+- Sonnet ticked the plan boxes in the Step 1–2 and Step 4 commits, so the Step 3 commit holds only the five generated files.
+- Super-plan versions moved on during the task (0.31–0.33 were other changes), so the closing line is 0.34.
+
+**Tag proposal.** `v2-thesis-experiments` on the closing commit `docs: p9-report-macros runs and status`. Its results are the ones the full repro run rebuilt and compared, and the commits after `787b579` change only docs, hooks and `.gitignore` (no code in `eval/`, `packages/` or `apps/`, no result). The author makes the tag; nothing is pushed.
