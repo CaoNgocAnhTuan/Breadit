@@ -88,6 +88,9 @@ Every term and symbol used in the thesis, in one place. Each entry is one or two
 | **Leakage test** | Change or delete every event after t_u: u's rows must not change. |
 | **Double-run test** | Two full runs must give byte-identical files. |
 | **Parity test** | The live endpoint and the harness must give the same order for 100 sampled (user, asOf) pairs (task 8). |
+| **Gain** | The mean over users of the paired difference in NDCG@10 between two methods, usually H − BL2 (`mean_diff` in `compare.csv`). Document 11. |
+| **Topic signal** | The part of the community term's gain that comes from users liking the same topics as before, not from influence. It is why H gains on W0 and W1 (E5). Document 11 §9. |
+| **Grid edge** | A tuned value at the top or bottom of its grid, so the best value may lie outside it. On `syn-W2M-M`, H chose α = β = 1024, the top. Document 11 §3. |
 
 ## E. Statistics
 
@@ -138,3 +141,19 @@ Every term and symbol used in the thesis, in one place. Each entry is one or two
 | **Frozen value** | A value fixed before the test split runs (super-plan §7). Changing it needs a new config version and a change-log line. |
 | **`thesis:repro`** | The command of task 11 that deletes and rebuilds every Class D dataset and result, then compares all hashes with the merged manifest. About 3 hours. |
 | **Merged manifest** | `.docs/results/manifest.json`: the SHA-256 of the manifest of every results folder and of every dataset. `npm run results:manifest -w @breadit/eval` compares the tree with it. |
+| **`Full` macro** | A macro whose name ends in `Full` keeps the 6 decimals of its cell, for numbers that 3 decimals hide (the Digg H1 row, two tuning points). Task `p9-report-macros`, document 11 §2. |
+
+## H. The platform
+
+| Term | Meaning |
+|---|---|
+| **Guard** | A NestJS check that runs before a route. `JwtAuthGuard` (or `OptionalJwtAuthGuard`) comes first and sets `req.user`; `BannedUserGuard`, `EmailVerifiedGuard` and `RolesGuard` read it. Document 12 §2. |
+| **Logout blacklist** | Redis keys `auth:blacklist:<jti>`. Logout writes the token's `jti` there, and every guard and the socket refuse that token from then on. |
+| **Push (real-time)** | The server sends an event over an open WebSocket and the page updates without a reload. This is what "real-time" means in the title; the feed itself is not pushed. Document 12 §3. |
+| **Room** | A named group of sockets. Each socket is in the room of its username (set by the server); members of a conversation can join `conversation:<id>`. |
+| **Redis adapter** | `@socket.io/redis-adapter`: sends each event through Redis to every backend process, so it reaches the user whichever process holds the socket. |
+| **S1, S5** | Two security findings of the bug sweep, both fixed. S1: a socket could join any room and read another user's messages. S5: a logged-out token still worked (the socket part is fixed). |
+| **Version-based cache** | Cache keys include a version number (`v:user`); a write increases it, so old entries are never read again and expire with their TTL. Document 12 §4. |
+| **Stampede lock** | The short Redis lock of `getOrSetJson`: when an entry expires, one request rebuilds it while the others wait. |
+| **Soft delete** | A deleted post keeps its row with `deletedAt` set; every query filters it. |
+| **Block filter** | Listings leave out users blocked in either direction (`BlockService.getAllBlockedPeerIds`). |

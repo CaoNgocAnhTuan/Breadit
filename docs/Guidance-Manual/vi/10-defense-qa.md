@@ -132,3 +132,25 @@ Có thể, một feed ưu tiên bạn bè có thể thu hẹp những gì ngư�
 **Q30. Có thêm thời gian thì bạn sẽ làm gì?**
 Thêm các mô hình social có học (SoRec, SocialMF, graph neural network) làm baseline, một pilot với user thật hoặc A/B test, phản hồi tiêu cực, và xếp hạng có tính tới độ đa dạng.
 *Bằng chứng:* super-plan §9.
+
+## G. Kết quả và nền tảng (thêm ngày 2026-11-19)
+
+**Q31. Tên đề tài có chữ "real-time". Vậy feed có real-time không?**
+Không. "Real-time" nghĩa là đẩy (push): server gửi thông báo, tin nhắn riêng, trạng thái đã đọc, tín hiệu đang gõ và lệnh buộc đăng xuất qua WebSocket, và trang cập nhật mà không cần tải lại. Feed được xếp hạng khi user mở hoặc tải lại nó, và bài mới không được đẩy vào một feed đang mở. Thesis cho thấy các sự kiện đến nơi; nó không đo chúng đến nhanh tới mức nào.
+*Bằng chứng:* `apps/backend/src/notifications/notifications.gateway.ts`, các IT của socket (`apps/backend/test/it/socket.it-spec.ts`); tài liệu 12 §3.
+
+**Q32. Làm sao bạn ngăn một user đọc tin nhắn của user khác qua socket?**
+Server, không phải client, quyết định một socket là của ai. Trước khi kết nối được tạo, server kiểm tra cookie đăng nhập và blacklist khi logout, rồi đưa socket vào room mang username của user đó. Một socket chỉ vào được room của một cuộc trò chuyện nếu database xác nhận nó là thành viên, và sự kiện gõ mang username lấy từ phiên đăng nhập. Điều này sửa finding S1, khi client có thể chọn bất kỳ room nào.
+*Bằng chứng:* `authenticate` và `handleJoinConversation` của gateway; `socket.it-spec.ts` ("alice claims to be bob … does NOT get bob's DM"); Bugs Report S1.
+
+**Q33. Trên Digg, khoảng tin cậy của gain nằm trên 0. Vì sao bạn nói H1 fail?**
+Luật được cố định trước test split cần cả p Holm dưới 0.05 và khoảng nằm trên 0. Khoảng là 0.000015 đến 0.000225, nhưng p Holm là 0.335: p thô (0.030) đứng thứ 5 từ nhỏ lên trong 15 p của family, nên Holm nhân nó với 11. Và gain chỉ khoảng 0.0001 NDCG, quá nhỏ để có ý nghĩa thực tế.
+*Bằng chứng:* `.docs/results/p7-main/compare.csv`, dòng `digg2009,F1,H,BL2,10,0-4`; implementation-plan §3.4; tài liệu 11 §6.
+
+**Q34. Vì sao hybrid giúp user có nhiều lịch sử hơn là user mới?**
+Với user chưa có lịch sử, smoothing cho mọi followee cùng một trust và mọi community đã tham gia cùng một trọng số, nên điểm chỉ nói được "bài của người bạn follow" hoặc "bài trong community bạn tham gia". Khi lịch sử tăng, các con số đếm của chính user thay thế prior và điểm trở nên cá nhân. Trên `syn-W2M-M`, gain là 0.023 với 0–4 interaction và 0.078 với từ 20 trở lên.
+*Bằng chứng:* bảng e2; công thức ở tài liệu 03; Chương 6.
+
+**Q35. Nếu H1 fail, thesis đóng góp được gì?**
+Ba điều. Một hybrid score mà app đang chạy, được đo bằng một protocol không leak và tái lập được, so với các baseline đã tune. Một câu trả lời âm rõ ràng: trên các dữ liệu này follow graph đóng góp ít cho user mới, và gain đến từ lịch sử trong community đóng vai một tín hiệu topic. Và một app mà con số offline mô tả đúng feed live (parity test), với một lệnh dựng lại mọi con số.
+*Bằng chứng:* super-plan §1 ("a negative result with a clean protocol is still a valid result"); tài liệu 07 và 11.

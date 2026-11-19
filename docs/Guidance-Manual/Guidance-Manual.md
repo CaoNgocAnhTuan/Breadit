@@ -1,6 +1,6 @@
 # Guidance Manual · Sổ tay hướng dẫn
 
-Version 1.0 · 2026-11-02
+Version 1.1 · 2026-11-19
 
 A reading path for the author and for first-time reviewers of the Breadit thesis. It goes from **why** (the problem), to **how** (the score, the data, the protocol), to **how to defend it**. Each file answers one question and has a worked example you can check by hand.
 
@@ -28,10 +28,12 @@ Mỗi file có hai bản cùng nội dung: tiếng Anh (`en/`) và tiếng Việ
 | 08 | The system and the news feed · Hệ thống và news feed | How does the backend get the ranked feed, and how can the feed be optimized? · Backend lấy feed đã xếp hạng thế nào, và tối ưu feed ra sao? | [en](en/08-system-and-feed.md) | [vi](vi/08-system-and-feed.md) | ✅ |
 | 09 | Glossary · Bảng thuật ngữ | What does this word mean? · Từ này nghĩa là gì? | [en](en/09-glossary.md) | [vi](vi/09-glossary.md) | ✅ |
 | 10 | Defense question bank · Ngân hàng câu hỏi bảo vệ | What will the committee ask? · Hội đồng sẽ hỏi gì? | [en](en/10-defense-qa.md) | [vi](vi/10-defense-qa.md) | ✅ |
+| 11 | The experiments and what the results mean · Các thí nghiệm và ý nghĩa kết quả | What did each experiment show, and what can the thesis claim? · Mỗi thí nghiệm cho thấy gì, và thesis được phép kết luận gì? | [en](en/11-experiments-and-results.md) | [vi](vi/11-experiments-and-results.md) | ✅ |
+| 12 | The platform and the real-time layer · Nền tảng và lớp real-time | How does the whole system work, beyond the feed? · Toàn bộ hệ thống hoạt động thế nào, ngoài feed? | [en](en/12-platform-and-real-time.md) | [vi](vi/12-platform-and-real-time.md) | ✅ |
 
-**Full path (about 4 hours) · Lộ trình đầy đủ (khoảng 4 giờ):** 01 → 10 in order · đọc theo thứ tự.
+**Full path (about 5 hours) · Lộ trình đầy đủ (khoảng 5 giờ):** 01 → 12 in order · đọc theo thứ tự.
 
-**Short path (1 hour) · Lộ trình ngắn (1 giờ):** 09 → 03 → 05 → 10. Add 08 for the system and the feed · Thêm 08 để hiểu hệ thống và feed.
+**Short path (1.5 hours) · Lộ trình ngắn (1,5 giờ):** 09 → 03 → 05 → 11 → 10. Add 08 and 12 for the system · Thêm 08 và 12 để hiểu hệ thống.
 
 Also read · Đọc thêm: [System_Architecture.md](../System_Architecture.md) (the system, the diagrams and the annotated directory tree · hệ thống, sơ đồ và cây thư mục có chú thích).
 

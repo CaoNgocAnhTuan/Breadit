@@ -14,7 +14,7 @@ Breadit is an X/Twitter clone built as an npm-workspaces monorepo:
 
 `docs/Pre-thesis/` holds the pre-thesis report and design material (ADRs, use cases, ERDs, k6 perf scripts), and its LaTeX in `docs/Pre-thesis/Latex/` (the school's format). Do not move or edit it. Thesis working docs (plans, task folders, results) go in `.docs/` at the repo root. The thesis itself is the LaTeX project in `.docs/Thesis-Report/` (the same school format; `main.tex`, `chapters/`, the Markdown drafts in `drafts/`; build with `latexmk -pdf main.tex` in that folder). It reads the macros and tables from `.docs/results/p7-report/` and never copies a number. The root of `docs/` holds thesis docs for the supervisor, reviewers and the defense:
 - `docs/System_Architecture.md`: the proposed system, its diagrams and the annotated directory tree.
-- `docs/Guidance-Manual/`: a study guide in 10 topics, each in `en/` and `vi/` with the same content. English is the reference; if the two differ, fix the Vietnamese one.
+- `docs/Guidance-Manual/`: a study guide in 12 topics, each in `en/` and `vi/` with the same content. English is the reference; if the two differ, fix the Vietnamese one.
 
 No application code lives in any of these folders.
 

@@ -90,6 +90,9 @@ Thuật ngữ chuyên ngành được giữ nguyên tiếng Anh, vì thesis và 
 | **Leakage test** | Sửa hoặc xoá mọi sự kiện sau t_u: các dòng kết quả của u không được thay đổi. |
 | **Double-run test** | Hai lần chạy đầy đủ phải cho ra file giống hệt nhau từng byte. |
 | **Parity test** | Endpoint thật và harness phải cho cùng thứ tự với 100 cặp (user, asOf) lấy mẫu (task 8). |
+| **Gain** | Trung bình trên các user của hiệu số theo cặp về NDCG@10 giữa hai phương pháp, thường là H − BL2 (`mean_diff` trong `compare.csv`). Tài liệu 11. |
+| **Tín hiệu topic (topic signal)** | Phần gain của community term đến từ việc user thích lại những topic họ đã thích, không phải từ influence. Đây là lý do H có gain trên W0 và W1 (E5). Tài liệu 11 §9. |
+| **Mép grid (grid edge)** | Một giá trị được tune nằm ở đỉnh hoặc đáy của grid, nên giá trị tốt nhất có thể nằm ngoài grid. Trên `syn-W2M-M`, H chọn α = β = 1024, là đỉnh. Tài liệu 11 §3. |
 
 ## E. Thống kê
 
@@ -140,3 +143,19 @@ Thuật ngữ chuyên ngành được giữ nguyên tiếng Anh, vì thesis và 
 | **Frozen value** | Giá trị được cố định trước khi chạy split test (super-plan §7). Muốn đổi cần config version mới và một dòng change log. |
 | **`thesis:repro`** | Lệnh của task 11: xoá rồi dựng lại mọi dataset và kết quả Class D, rồi so mọi hash với manifest gộp. Khoảng 3 giờ. |
 | **Manifest gộp** | `.docs/results/manifest.json`: SHA-256 của manifest của mọi thư mục kết quả và mọi dataset. `npm run results:manifest -w @breadit/eval` so cây thư mục với nó. |
+| **Macro `Full`** | Macro có tên kết thúc bằng `Full` giữ đủ 6 chữ số thập phân của ô dữ liệu, cho những con số mà 3 chữ số che mất (dòng H1 của Digg, hai điểm tuning). Task `p9-report-macros`, tài liệu 11 §2. |
+
+## H. Nền tảng
+
+| Thuật ngữ | Nghĩa |
+|---|---|
+| **Guard** | Một bước kiểm tra của NestJS chạy trước route. `JwtAuthGuard` (hoặc `OptionalJwtAuthGuard`) đứng đầu và gán `req.user`; `BannedUserGuard`, `EmailVerifiedGuard` và `RolesGuard` đọc nó. Tài liệu 12 §2. |
+| **Blacklist khi logout** | Các key Redis `auth:blacklist:<jti>`. Logout ghi `jti` của token vào đó, và từ đó mọi guard và socket đều từ chối token này. |
+| **Đẩy (push, real-time)** | Server gửi một sự kiện qua WebSocket đang mở và trang cập nhật mà không tải lại. Đây là nghĩa của "real-time" trong tên đề tài; bản thân feed không được đẩy. Tài liệu 12 §3. |
+| **Room** | Một nhóm socket có tên. Mỗi socket nằm trong room mang username của nó (do server đặt); thành viên của một cuộc trò chuyện có thể vào `conversation:<id>`. |
+| **Redis adapter** | `@socket.io/redis-adapter`: gửi mỗi sự kiện qua Redis tới mọi tiến trình backend, nên nó đến được user dù tiến trình nào đang giữ socket. |
+| **S1, S5** | Hai finding bảo mật của đợt rà lỗi, đều đã sửa. S1: một socket có thể vào bất kỳ room nào và đọc tin nhắn của người khác. S5: token đã logout vẫn dùng được (phần socket đã sửa). |
+| **Cache theo version** | Key cache chứa một số version (`v:user`); một lần ghi tăng nó, nên các entry cũ không bao giờ được đọc nữa và tự hết hạn theo TTL. Tài liệu 12 §4. |
+| **Khoá chống stampede** | Khoá Redis ngắn của `getOrSetJson`: khi một entry hết hạn, một request dựng lại nó trong khi các request khác chờ. |
+| **Xoá mềm (soft delete)** | Bài bị xoá vẫn giữ dòng của nó với `deletedAt` được đặt; mọi truy vấn đều lọc nó. |
+| **Bộ lọc chặn** | Các danh sách loại ra những user bị chặn theo cả hai chiều (`BlockService.getAllBlockedPeerIds`). |

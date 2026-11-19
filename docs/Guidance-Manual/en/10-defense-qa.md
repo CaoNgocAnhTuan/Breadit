@@ -130,3 +130,25 @@ Yes, a feed that favors friends can narrow what people see. Coverage@K is report
 **Q30. What would you do with more time?**
 Learned social models (SoRec, SocialMF, a graph neural network) as baselines, a real-user pilot or A/B test, negative feedback, and diversity-aware ranking.
 *Evidence:* super-plan §9.
+
+## G. The results and the platform (added 2026-11-19)
+
+**Q31. Your title says "real-time". Is the feed real-time?**
+No. "Real-time" means push: the server sends notifications, direct messages, read receipts, typing signals and a forced logout over a WebSocket, and the page updates without a reload. The feed is ranked when the user opens or reloads it, and new posts are not pushed into an open feed. The thesis shows that the events arrive; it does not measure how fast.
+*Evidence:* `apps/backend/src/notifications/notifications.gateway.ts`, the socket IT tests (`apps/backend/test/it/socket.it-spec.ts`); document 12 §3.
+
+**Q32. How do you stop one user from reading another user's messages over the socket?**
+The server, not the client, decides who a socket is. Before the connection exists, it checks the login cookie and the logout blacklist, then puts the socket in the room of that user's username. A socket joins a conversation room only if the database says it is a member, and typing events carry the username from the login. This fixed finding S1, where a client could pick any room.
+*Evidence:* the gateway's `authenticate` and `handleJoinConversation`; `socket.it-spec.ts` ("alice claims to be bob … does NOT get bob's DM"); Bugs Report S1.
+
+**Q33. On Digg the confidence interval of the gain is above zero. Why do you say H1 failed?**
+The rule, fixed before the test split, needs both a Holm p below 0.05 and an interval above 0. The interval is 0.000015 to 0.000225, but the Holm p is 0.335: the raw p (0.030) is the 5th smallest of the 15 in the family, so Holm multiplies it by 11. And the gain is about 0.0001 NDCG, far too small to matter.
+*Evidence:* `.docs/results/p7-main/compare.csv`, row `digg2009,F1,H,BL2,10,0-4`; implementation-plan §3.4; document 11 §6.
+
+**Q34. Why does the hybrid help users with a long history more than new users?**
+For a user with no history, the smoothing gives every followee the same trust and every joined community the same weight, so the score only says "by someone you follow" or "in a community you joined". As history grows, the user's own counts replace the prior and the score becomes personal. On `syn-W2M-M` the gain is 0.023 for 0–4 interactions and 0.078 for 20 or more.
+*Evidence:* table e2; the formula in document 03; Chapter 6.
+
+**Q35. If H1 failed, what does the thesis contribute?**
+Three things. A hybrid score that the app runs and that was measured with a leak-free, reproducible protocol against tuned baselines. A clear negative answer: on these data the follow graph adds little for new users, and the gain comes from community history acting as a topic signal. And an app where offline numbers describe the live feed (the parity test) and one command rebuilds every number.
+*Evidence:* super-plan §1 ("a negative result with a clean protocol is still a valid result"); documents 07 and 11.
