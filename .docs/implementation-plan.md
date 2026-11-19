@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.15 · 2026-11-19 · Status: approved 2026-10-28
+Version 1.16 · 2026-11-19 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -284,12 +284,32 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-19. ✅ mea
 | ✅ 11-12 (gate failed) | 9b | `p7-hive-check` | P7 | 9, closed on 11-13 | gate: BigQuery runs and bucket 0–4 keeps at least 100 test users with a membership (section 3.2); then a Hive adapter and H-comm against BL2 (super-plan P7) | 0.5 for the gate | 11-14 | — |
 | ✅ 11-12 | 10 | `p7-cost-benchmark` | P7 | 8 | E7, throttle limit as an env variable | 1 | 11-14 | N6, T3 (cache state) |
 | ✅ 11-19 | 11 | `p8-repro` | P8 | 9, 10 | `npm run thesis:repro`, default `algo` by the P7 rule, tag proposal | 1 | 11-15 | — |
-| ▶ | 12 | Writing, Chapters 6 and 7 | P9 ★ | 9 | from macros only | 2 | 11-17 | — |
-| ⬜ | 13 | `p10-defense-package` | P10 | 12 | slides, demo script, final checks | 1 | 11-18 | — |
+| ▶ | 12 | `p9-report-macros` | P9 | 11 | the macros Chapters 6 and 7 need, the `Full` rule; closing: the full repro run, the results that commit `17e784f` deleted by mistake | 0.5 | — | — |
+| ⬜ | 13 | Writing: Guidance Manual 11 §12 (one number from start to end) | P9 | 12 | one real user of `syn-W2M-M` from the test post to the macro, en and vi | 0.25 | — | — |
+| ⬜ | 14 | `p9-figure-data` | P9 | 12 | the report also writes `fig-e2` (gain by history group) and `fig-e5` (gain by world), with intervals | 0.5 | — | — |
+| ⬜ | 15 | Writing: Chapter 3 Methodology | P9 | — | draft, review, LaTeX | 1 | — | — |
+| ⬜ | 16 | `p9-diagrams` | P9 | — | export the Mermaid diagrams to PDF; an ERD from `schema.prisma`; one style | 0.5–1 | — | — |
+| ⬜ | 17 | Writing: Chapters 6 and 7 in LaTeX | P9 ★ | 14 | macros only, the ten tables, three figures (E2, E3, E5) in pgfplots | 1 | — | — |
+| ⬜ | 18 | Writing: Chapter 4 System Analysis and Design | P9 | 16 | requirements, use cases, activity, sequence, architecture, ERD | 1 | — | — |
+| ⬜ | 19 | Writing: Chapter 5 Implementation | P9 | — | the system as built (Guidance Manual 08 and 12) | 1 | — | — |
+| ⬜ | 20 | `p9-bug-quick-wins` | P9 | — | the open bugs a demo shows; README corrections of Bugs Report §7; the parity test stays green | 1 | — | R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7 |
+| ⬜ | 21 | `p10-demo-sweep` | P10 | 20 | run `verify-bug-sweep.sh` and `verify-socket.cjs` again, walk the demo path in Chrome, add new bugs to the Bugs Report | 0.5 | — | — |
+| ⬜ | 22 | `p10-demo-script` | P10 | 21 | `scripts/demo/`: load `syn-W2M-M` with `--rebase-to` now, start the app, two demo users (little and long history), a checklist (the three `algo` side by side, a live direct message, a notification, a ban that logs out), cleanup | 1 | — | — |
+| ⬜ | 23 | Writing: Chapter 8 Test Cases and Demonstration | P9 | 22 | the test summary table, a demo rehearsal, about eight screenshots | 0.5 | — | — |
+| ⬜ | 24 | Writing: Chapters 1 and 2 | P9 | — | introduction; literature review from `.docs/related-work.md` | 1 | — | — |
+| ⬜ | 25 | Checks for the supervisor progress check | P9 ★ | 17–24 | `verify.sh`, `test:parity`, `results:manifest`, PDF build and page count, no typed numbers | 0.5 | — | — |
+| ⬜ | 26 | Progress slides for the supervisor | P10 | 25 | status, results, demo | 0.5 | — | — |
+| ⬜ | 27 | Writing: supervisor feedback, Chapter 9, abstract, acknowledgements, appendix | P9 | 26 | after the progress check | 1–2 | — | — |
+| ⬜ | 28 | `p10-final-checks` | P10 | 27 | every number a macro, every citation verified in super-plan §10, the abstract matches Chapter 6, a local overlap check against the pre-thesis text and the paper extracts, at most 100 pages | 1 | — | — |
+| ⬜ | 29 | `p10-security-fixes` (only for a shared server) | P10 | — | the P2 bugs of the Bugs Report | 1 | — | S4, S6, B1, R6, B5, R3 |
+| ⬜ | 30 | `p10-defense-package` | P10 | 28 | defense slides from the same figures and macros, the defense demo script | 1 | — | — |
+| ⬜ | 31 | Freeze | P10 | 30 | clean clone, `thesis:repro` if the ranking or eval code changed, tag `v3-thesis-final`, fast-forward `main`, push (each needs the author) | 0.5 | — | — |
+
+**Order from row 12 on** (decided by the author on 2026-11-19). No dates: the author works through the rows as fast as possible. One task runs at a time; "Writing" rows are not tasks and run next to them. Rows 12 to 26 come before the supervisor progress check on 2026-11-30, which needs Chapters 3 to 7 in PDF and the demo. Not done, and listed as future work in Chapter 9: the schema migration (T6, N3, N10, R4), R5, N7, N9, B8, and Hive.
 
 Spare days: 11-19 and 11-20. P0 (task 2) was done on 10-28, before P3 wrote the first manifest. Task 3 closed one day after its planned end and task 4 one day before its planned end, so on 2026-11-02 the plan is on time. Task 7 closed on 11-10, one day after its planned end. Task 8 closed on 11-10, one day before its planned end, so the plan is on time again. Chapters 1 to 5 and 8 to 9 are written by the author between 10-30 and 11-15, next to the tasks. The bugs of the last column are placed here and fixed in those tasks, not in this one.
 
-On 2026-11-18, task 11 started three days after its planned end. Its code and data steps were done the same day. The two full repro runs (one on this machine, one on a clean clone) both passed in the night, and the task closed on 11-19, four days after its planned end. Task 12 (writing) and task 13 now only have the spare days 11-19 and 11-20.
+On 2026-11-18, task 11 started three days after its planned end. Its code and data steps were done the same day. The two full repro runs (one on this machine, one on a clean clone) both passed in the night, and the task closed on 11-19, four days after its planned end. The date 2026-11-20 was the author's own target; from row 12 on the list has no dates.
 
 **Task 9b is optional** (added 2026-11-10). Its gate runs right after task 9, only if task 9 closes on 11-13, and takes at most half a day. Tasks 10 to 13 then move half a day later, into the spare day 11-19. The whole Hive work was estimated at 2–3 days, more than the spare days left. So if the gate passes, the author decides then whether to run the rest or to put Hive in future work.
 
@@ -332,3 +352,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.13 · 2026-11-19 · Task `p8-repro` closed: §1 `eval/` row (`repro/` ✅); §5 task 11 ✅ and task 12 ▶, the schedule paragraph. No contract, rule or frozen value changed.
 - 1.14 · 2026-11-19 · Task `p9-report-macros`: §2.8 the `Full` rule (6 decimals), grid values as written, the new name words. No other contract, rule or frozen value changed.
 - 1.15 · 2026-11-19 · Nine thesis chapters (super-plan 0.32): §5 task 12 writes Chapters 6 and 7 (Experiments and Results, Discussion), and the schedule paragraph names Chapters 1 to 5 and 8 to 9. No contract, rule or frozen value changed.
+- 1.16 · 2026-11-19 · §5: the order of the remaining work, rows 12 to 31 (approved by the author), with no end dates: the writing rows, the tasks `p9-figure-data`, `p9-diagrams`, `p9-bug-quick-wins`, `p10-demo-sweep`, `p10-demo-script`, `p10-final-checks`, `p10-security-fixes`, `p10-defense-package`, the checks and the freeze; the bugs placed in each; what stays future work. No contract, rule or frozen value changed.

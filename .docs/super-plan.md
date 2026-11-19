@@ -1,8 +1,8 @@
 # Breadit Thesis Super Plan
 
-Version 0.32 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.33 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
-This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The thesis must be finished before **2026-11-20**. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
+This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The supervisor checks progress on **2026-11-30** (2026-11-20 was only the author's own target); the submission and defense dates are not known yet. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
 Four decisions are already made:
 - **Data:** two main sources. One is a seeded synthetic generator. The other is real data: Digg 2009, chosen in P1 against fixed criteria (`.docs/datasets.md`). Both are co-primary for RQ1 and the follow term, because Digg follows and votes are dated on one clock. Synthetic data alone keeps the null world W0, the influence sweep W2 and the community term, because Digg has no groups. Digg is small (3,553 stories, one month, only front-page stories). No real-user pilot.
@@ -92,8 +92,8 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 11-10 | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` ✅ |
 | ✅ 11-12 (★ note ready to send) | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments` ✅, `p7-cost-benchmark` ✅, `p7-hive-check` ✅ (gate failed) |
 | ✅ 11-19 (tag proposed) | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` ✅ |
-| ▶ next | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | Written by the author, outside tasks |
-| ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-defense-package` |
+| ▶ next | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | `p9-report-macros` ▶, `p9-figure-data`, `p9-diagrams`, `p9-bug-quick-wins`; the chapters are drafted outside tasks (`.docs/implementation-plan.md` §5, rows 12–27) |
+| ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-demo-sweep`, `p10-demo-script`, `p10-final-checks`, `p10-security-fixes` (shared server only), `p10-defense-package` (rows 21–31) |
 
 The Tasks column comes from the P2 blueprint. Its task list (`.docs/implementation-plan.md` §5) gives the order, the dependencies, a day budget per task and a trigger date for each cut of §8.
 
@@ -295,7 +295,7 @@ Nine chapters, decided by the author on 2026-11-19: the system analysis and desi
 
 ### P10: Defense package
 
-**Do.** Slides built from the same figures and macros. A demo script on generated data loaded with `--rebase-to`, showing the three `algo` options side by side. Final checks over the thesis and the slides: every number has a macro, every citation is marked "verified" in §10, and the abstract matches chapter 5. Add the `numbers-auditor` and `citation-checker` agents to the harness for these checks.
+**Do.** Slides built from the same figures and macros. A demo script on generated data loaded with `--rebase-to`, showing the three `algo` options side by side. Final checks over the thesis and the slides: every number has a macro, every citation is marked "verified" in §10, the abstract matches Chapter 6, a local overlap check against the pre-thesis text and the saved paper extracts, and at most 100 pages. The checks are scripts of task `p10-final-checks` (no new agents). Before the demo: the open bugs a demo shows are fixed (`p9-bug-quick-wins`), and the demo path is swept again (`p10-demo-sweep`). The order of all remaining work, with no dates, is `.docs/implementation-plan.md` §5 rows 12–31 (approved 2026-11-19); the progress check on 2026-11-30 needs Chapters 3 to 7 in PDF and the demo.
 
 **Done when.** The slides and the demo are ready, and the final checks are clean.
 
@@ -391,7 +391,7 @@ One source of truth. A change needs a new config version and a line in the chang
 - **Weak community evidence.** No public dataset I found has a follow graph, item interactions and explicit community membership together. State it as a limitation. Hive has dated votes and memberships, and is only an optional side check (P7).
 - **Hive side check (P7, gate failed on 2026-11-12).** SoChainDB on BigQuery refused access, and HiveSQL is paid with no join times (P7 status). What we know comes from about 100 minutes of blocks in October 2026, so it says nothing sure about 2020–2022. Data access: crawling the public API is too slow (1,000 blocks are 14–70 MB, 4 of 6 requests timed out after 90 seconds, and a month is about 12–60 GB), so only BigQuery is left. It needs a Google Cloud account with billing and was not tried. Bot votes: Hive pays tokens for votes, and 27.4% of the sampled votes came in the first 5 minutes after the post (15 posts, 2,267 votes); this is a sign, not a proof. Cold users: the sample showed only 2 subscribes, so there may be too few cold users with a membership; the gate checks this. Exposure bias: users see more posts from communities they joined, so they vote on them more, and the gain can look larger than it is.
 
-**Cut order.** The deadline is 2026-11-20. If time runs short, drop in this order:
+**Cut order.** Written when the deadline was 2026-11-20 (the author's target; the experiments are done, so items 1 to 6 no longer apply). If time runs short, drop in this order:
 1. The timestamp shuffle in E5.
 2. E8, the larger-pool run.
 3. The finer parts of E4 (author term, engager term, the `m` sweep). Keep H-follow and H-comm.
@@ -519,3 +519,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.30 · 2026-11-19 · Task `p8-repro` closed: P8 status paragraph (done; the two full runs pass, on this machine and on a clean clone); §4 rows P8 ✅ (tag proposed) and P9 ▶ next; §11 item 4 (the tag proposed on the closing commit). No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.31 · 2026-11-19 · Thesis folder: the pre-thesis LaTeX moves to `docs/Pre-thesis/Latex/` (frozen), and the thesis LaTeX is `.docs/Thesis-Report/` in the same school format, not `.docs/latex/` (P9 "Do", the chapter map source, §11 items 2 and 5). No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.32 · 2026-11-19 · Nine chapters: P9 chapter map gets Chapter 4 System Analysis and Design (use case, activity, sequence, architecture, ERD), and the later chapters move up by one (Discussion is now Chapter 7; the Experiments row now says E1–E8); "Chapter 6" references become "Chapter 7" (P7 default feed rule, P8 status, §8, §11 item 8); §11 item 2 gets the page limit (120, target 80–100). No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.33 · 2026-11-19 · The order of the remaining work (approved by the author, no dates): §4 rows P9 and P10 name their tasks; P10 "Do" gets the checks as scripts of `p10-final-checks` (not new agents), the bug fixes and the sweep before the demo, and a pointer to `.docs/implementation-plan.md` §5 rows 12–31. The header and §8 no longer call 2026-11-20 the deadline: the supervisor checks progress on 2026-11-30. No frozen value changed; §5, §6 and §7 are byte-identical.

@@ -152,10 +152,11 @@ The 18 findings below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B
 | Phase | Bugs |
 |---|---|
 | **Schema migration** (cut from the super plan in v0.2, §9) | T6, and with the same migration: N3, N10, R4 (schema part) |
-| **P6** (hybrid scorer) | done in task `p6-social-feed` (2026-11-10): T4, T3, B6, the pool part of R2, and the D1 product rule. The interaction part of R2 is still open (no phase) |
+| **P6** (hybrid scorer) | done in task `p6-social-feed` (2026-11-10): T4, T3, B6, the pool part of R2, and the D1 product rule. The interaction part of R2 goes to `p9-bug-quick-wins` |
 | **E7** (cost run) | done in task `p7-cost-benchmark` (2026-11-12): N6, and the T3 note (E7 ran with the cache off) |
-| **Before sharing the app** | S5, B1, S4, S6, B5, R3, R6 |
-| **No phase, when time allows** | the rest of P3 and P4 |
+| **P9, before the demo** (task `p9-bug-quick-wins`, implementation-plan §5 row 20) | R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7, and the README corrections of section 7 |
+| **P10, before sharing the app** (task `p10-security-fixes`, row 29, only for a shared server) | B1, S4, S6, B5, R3, R6 |
+| **Future work** (thesis Chapter 9) | the schema migration above, R5, N7, N9, B8 |
 
 ---
 
