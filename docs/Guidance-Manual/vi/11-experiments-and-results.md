@@ -115,6 +115,8 @@ H1 chỉ pass trên một dataset nếu, ở dòng F1 cho NDCG@10 và nhóm 0–
 | `syn-W2M-M` | 20+ | 190 | 0.003 | 0.082 | 0.078 | 0.048 đến 0.112 | 0.002 |
 | `digg2009` | 0–4 | 20,644 | 0.029 | 0.029 | 0.000117 | 0.000015 đến 0.000225 | 0.335 |
 
+Dữ liệu cho hình là `fig-e2-history.csv`: các dòng F1 của H so với BL2 ở K = 10 cho cả năm nhóm (0, 1–4, 0–4, 5–19, 20+) của hai dataset, với các ô giữ nguyên như trong `compare.csv`.
+
 **Synthetic:** khoảng chứa 0 và p cao, nên **H1 fail**. Gain dương, nhưng với 174 user thì không phân biệt được nó với 0.
 
 **Digg:** khoảng nằm trên 0, nhưng p Holm là 0.335, nên **H1 fail** ở điều kiện p. Hai bài học:
@@ -164,6 +166,8 @@ Trên `digg2009` mọi biến thể đều có gain 0.000 (không có dòng H-co
 | H0 gate: H-follow trên W0 | 0.001 | −0.004 đến 0.006 |
 | H trên W0 với các giá trị của `syn-W2M-M` (tín hiệu topic) | 0.011 | −0.001 đến 0.023 |
 | `syn-W2M-M` với thời điểm tương tác bị xáo trong mỗi bài | 0.042 | 0.026 đến 0.059 |
+
+Dữ liệu cho hình là `fig-e5-worlds.csv`: mỗi dòng của bảng e5 là một dòng của file (tám dòng, năm world được tách riêng), với một mã `variant` ngắn (`own-tuning`, `h0-gate`, `topic-signal`, `shuffled`) thay cho nhãn dài.
 
 **Ý nghĩa:**
 - **Gain tăng theo influence**, nên khi dữ liệu có influence thì H bắt được nó.

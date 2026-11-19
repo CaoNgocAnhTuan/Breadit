@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.17 · 2026-11-19 · Status: approved 2026-10-28
+Version 1.18 · 2026-11-19 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -143,7 +143,7 @@ E7 timing goes to `latency.csv` with the same row rules. It is Class R: its hash
 
 ### 2.8 Macros (H-d)
 
-The report reads only the CSVs above. It writes `macros.csv` (`name, value, file, row_key, column`) and `results-macros.tex`. The `column` column was added in task 9, because a row key alone does not name the cell. A macro name has letters only, because LaTeX does not allow digits. It is built from: experiment, dataset, metric, K in words, what. Example: `\eTwoDiggNdcgTenGain`. Every macro traces to one CSV cell through `macros.csv`. **Task 9 (2026-11-12).** A macro value is its cell rounded to 3 decimals on the decimal string; a p-value under 0.001 is written `<0.001`. The report also writes nine LaTeX tables and `results.md` (the same tables in Markdown) to `.docs/results/p7-report/`.
+The report reads only the CSVs above. It writes `macros.csv` (`name, value, file, row_key, column`) and `results-macros.tex`. The `column` column was added in task 9, because a row key alone does not name the cell. A macro name has letters only, because LaTeX does not allow digits. It is built from: experiment, dataset, metric, K in words, what. Example: `\eTwoDiggNdcgTenGain`. Every macro traces to one CSV cell through `macros.csv`. **Task 9 (2026-11-12).** A macro value is its cell rounded to 3 decimals on the decimal string; a p-value under 0.001 is written `<0.001`. The report also writes nine LaTeX tables and `results.md` (the same tables in Markdown) to `.docs/results/p7-report/`. **Task `p9-figure-data` (2026-11-19).** It also writes the figure data of E2, E3 and E5: `fig-e2-history.csv`, `fig-e3-density.csv` and `fig-e5-worlds.csv`. The columns are `dataset`, a label column (`bin` for the history group or the followee bin, `variant` for E5), `n`, `mean_diff`, `ci_low` and `ci_high`, with the cells as written in the source CSV.
 
 **Task `p9-report-macros` (2026-11-19).** A name that ends in `Full` holds its cell with all 6 decimals, not 3. It is for numbers that 3 decimals hide: the Digg H1 row in group 0–4 (gain and interval) and two tuning points of H. A tuning grid value (the column `value` of `tuning.csv`) is printed as written, for example `1024/1024` or `0.0625`, and is never rounded. The new words in a name are: `tune` (the tuning run), `Chosen` (the row with `chosen` = 1), `ValNdcgTen` (validation NDCG@10) with `FiveTwelve` and `TenTwentyFour` (the grid values `512/512` and `1024/1024`), `TopicNdcg` (the E5 topic row, H on W0 from `p7-h0`, for example `\eFiveWZeroTopicNdcgTenAllGain`), and `BLZero` to `BLSix` for BL0 to BL6 (`BLTwoT` is BL2t). E1 now has all nine methods and E2 all five groups.
 
@@ -253,12 +253,12 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 |---|---|---|---|---|---|---|---|
 | Baseline table ★ | — | baseline table for the supervisor | `syn-W0-S`, `syn-W1-S`, `syn-W2M-S`, validation | BL0–BL5 | `summary.csv` | — | — |
 | H0 / E5 | H0 | does the hybrid win where it must not? | `syn-W0-M` | H, BL2 | `compare.csv` (no family) | gate | 5 |
-| H1 test 1 / E2 | RQ1, H1 | cold-start gain, synthetic | `syn-W2M-M` | H, BL2 | `compare.csv`, family F1 | table | 5 |
-| H1 test 2 / E2 † | RQ1, H1 | cold-start gain, real | `digg2009` | H, BL2 | `compare.csv`, family F1 | table | 5 |
+| H1 test 1 / E2 | RQ1, H1 | cold-start gain, synthetic | `syn-W2M-M` | H, BL2 | `compare.csv`, family F1 | table, figure | 5 |
+| H1 test 2 / E2 † | RQ1, H1 | cold-start gain, real | `digg2009` | H, BL2 | `compare.csv`, family F1 | table, figure | 5 |
 | H2 / E3 † | RQ2, H2 | gain against social density | `syn-W2L-M`, `syn-W2M-M`, `syn-W2H-M`, `digg2009` | H, BL2 | `density.csv` | figure | 5, 6 |
 | E1 † | RQ1 | how do all methods compare? | `syn-W2M-M`, `digg2009` (W0 and W1 are in E5) | all, tuned | `summary.csv`, `coverage.csv`, `compare.csv` family F2 | table | 5 |
 | E4 † | RQ1 | which term matters? | `syn-W2M-M`; `digg2009` without H-comm | H, H-follow, H-comm, H-noauthor, H-noengager, H with each `m` of §7 | `summary.csv` | table | 5 |
-| E5 † | H0 | is the result built into the data? | `syn-W0-M`, `syn-W1-M`, the three W2 cells; shuffle on `syn-W2M-M` | H, BL2 | `summary.csv`, `compare.csv` (no family) | table | 5, 6 |
+| E5 † | H0 | is the result built into the data? | `syn-W0-M`, `syn-W1-M`, the three W2 cells; shuffle on `syn-W2M-M` | H, BL2 | `summary.csv`, `compare.csv` (no family) | table, figure | 5, 6 |
 | E6 † | RQ1 | do ties matter? | `syn-W2M-M`, `digg2009` | all | `summary.csv` with reversed tie-break | table | 5 |
 | E7 | — | what does the new feed cost? (Class R) | live app with `syn-W2M-M` loaded | `chrono`, `engagement`, `social` | `latency.csv`, query count | table | 5 |
 | E8 | RQ1 | does pool size matter? | `syn-W2M-M` | H, BL2, the baseline with the best validation NDCG@10; K as in the E8 row of super-plan P7 | `summary.csv` with the larger pool of §7 | table | 5 |
@@ -354,3 +354,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.15 · 2026-11-19 · Nine thesis chapters (super-plan 0.32): §5 task 12 writes Chapters 6 and 7 (Experiments and Results, Discussion), and the schedule paragraph names Chapters 1 to 5 and 8 to 9. No contract, rule or frozen value changed.
 - 1.16 · 2026-11-19 · §5: the order of the remaining work, rows 12 to 31 (approved by the author), with no end dates: the writing rows, the tasks `p9-figure-data`, `p9-diagrams`, `p9-bug-quick-wins`, `p10-demo-sweep`, `p10-demo-script`, `p10-final-checks`, `p10-security-fixes`, `p10-defense-package`, the checks and the freeze; the bugs placed in each; what stays future work. No contract, rule or frozen value changed.
 - 1.17 · 2026-11-19 · §5 rows 12 and 13 ✅ (task `p9-report-macros` closed; Guidance Manual 11 §12 written), row 14 ▶. No contract, rule or frozen value changed.
+- 1.18 · 2026-11-19 · Task `p9-figure-data`: §2.8 the report also writes the figure data of E2 and E5 (`fig-e2-history.csv`, `fig-e5-worlds.csv`) next to E3; §4 rows E2 and E5 are "table, figure". No contract, rule or frozen value changed.

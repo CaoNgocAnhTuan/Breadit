@@ -115,6 +115,8 @@ H1 passes on a dataset only if, in the F1 row for NDCG@10 and group 0–4, **bot
 | `syn-W2M-M` | 20+ | 190 | 0.003 | 0.082 | 0.078 | 0.048 to 0.112 | 0.002 |
 | `digg2009` | 0–4 | 20,644 | 0.029 | 0.029 | 0.000117 | 0.000015 to 0.000225 | 0.335 |
 
+The figure data is `fig-e2-history.csv`: the F1 rows of H against BL2 at K = 10 for all five groups (0, 1–4, 0–4, 5–19, 20+) of both datasets, with the cells as written in `compare.csv`.
+
 **Synthetic:** the interval contains 0 and the p is high, so **H1 fails**. The gain is positive, but with 174 users it cannot be told apart from 0.
 
 **Digg:** the interval is above 0, but the Holm p is 0.335, so **H1 fails** on the p condition. Two lessons:
@@ -164,6 +166,8 @@ On `digg2009` every variant gains 0.000 (no H-comm row: no communities).
 | H0 gate: H-follow on W0 | 0.001 | −0.004 to 0.006 |
 | H on W0 with the `syn-W2M-M` values (topic signal) | 0.011 | −0.001 to 0.023 |
 | `syn-W2M-M` with the engagement times shuffled inside each post | 0.042 | 0.026 to 0.059 |
+
+The figure data is `fig-e5-worlds.csv`: one row for each row of table e5 (eight rows, the five worlds one by one), with a short `variant` id (`own-tuning`, `h0-gate`, `topic-signal`, `shuffled`) in place of the long label.
 
 **What it means:**
 - **The gain grows with influence**, so when influence is in the data, H picks it up.
