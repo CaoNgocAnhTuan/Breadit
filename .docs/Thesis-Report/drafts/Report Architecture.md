@@ -26,7 +26,7 @@ Open: does the appendix count toward the 120 pages? Ask the school.
 
 - **Numbers:** macros only (`\resultsdir/results-macros.tex`), never typed. Tables: `\input{\resultsdir/tables/<id>.tex}`. Figures: pgfplots reading the CSVs of `\resultsdir`.
 - **No repetition:** Chapter 3 defines; Chapter 6 cites. Chapter 4 designs; Chapter 5 describes what was built. Chapter 8 summarizes the tests; the full list goes in the appendix.
-- **Diagrams:** only the main flows, one tool and one style, each one used by a sentence in the text.
+- **Diagrams:** only the main flows, each one used by a sentence in the text, and checked against the code and `schema.prisma` as they are now. The author draws them by hand: draw.io for use case, activity, architecture and the ERD, and the Mermaid web editor for sequence diagrams (decided 2026-11-19; no build pipeline). Export as PDF when the tool allows (draw.io does), otherwise as PNG at 300 dpi or more. Put the image in `images/` and keep its editable source next to it (`.drawio`, or the Mermaid text in a `.mmd` file), so it can be fixed later. Use the same font and the same few colours in every diagram.
 - **Pre-thesis material** (`docs/Pre-thesis/`) is reused only after a check against the current code; the pre-thesis report was 172 pages, so it is cut hard.
 
 ## Workflow per chapter

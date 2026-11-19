@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.35 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.36 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The supervisor checks progress on **2026-11-30** (2026-11-20 was only the author's own target); the submission and defense dates are not known yet. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -92,7 +92,7 @@ The phases are in dependency order. Each phase becomes one or more tasks (column
 | ✅ 11-10 | P6 Social feed in the app | `algo` param, `asOf` flag, feed toggle | Live order equals harness order | `p6-social-feed` ✅ |
 | ✅ 11-12 (★ note ready to send) | P7 Experiments ★ | E1–E8 tables and figure data | Hash check against the manifest | `p7-offline-experiments` ✅, `p7-cost-benchmark` ✅, `p7-hive-check` ✅ (gate failed) |
 | ✅ 11-19 (tag proposed) | P8 Repro package and freeze | `npm run thesis:repro`, tag | One command rebuilds everything | `p8-repro` ✅ |
-| ▶ next | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | `p9-report-macros` ✅, `p9-figure-data` ✅, `p9-diagrams`, `p9-bug-quick-wins`; the chapters are drafted outside tasks (`.docs/implementation-plan.md` §5, rows 12–27) |
+| ▶ next | P9 Writing ★ | Thesis chapters | Every number comes from a CSV | `p9-report-macros` ✅, `p9-figure-data` ✅, `p9-bug-quick-wins`; the diagrams are drawn by hand (no task); the chapters are drafted outside tasks (`.docs/implementation-plan.md` §5, rows 12–27) |
 | ⬜ | P10 Defense package | Slides, demo script, final checks | Slides and demo are ready, checks are clean | `p10-demo-sweep`, `p10-demo-script`, `p10-final-checks`, `p10-security-fixes` (shared server only), `p10-defense-package` (rows 21–31) |
 
 The Tasks column comes from the P2 blueprint. Its task list (`.docs/implementation-plan.md` §5) gives the order, the dependencies, a day budget per task and a trigger date for each cut of §8.
@@ -524,3 +524,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.33 · 2026-11-19 · The order of the remaining work (approved by the author, no dates): §4 rows P9 and P10 name their tasks; P10 "Do" gets the checks as scripts of `p10-final-checks` (not new agents), the bug fixes and the sweep before the demo, and a pointer to `.docs/implementation-plan.md` §5 rows 12–31. The header and §8 no longer call 2026-11-20 the deadline: the supervisor checks progress on 2026-11-30. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.34 · 2026-11-19 · Task `p9-report-macros` closed: a P9 status paragraph; §4 row P9 (`p9-report-macros` ✅); §11 item 4 (the tag proposal moves to the task's closing commit). No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.35 · 2026-11-19 · Task `p9-figure-data` closed: the P9 status paragraph and the §4 row P9. No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.36 · 2026-11-19 · §4 row P9: task `p9-diagrams` dropped by the author; the diagrams are drawn by hand (draw.io, and the Mermaid web editor for sequence diagrams). No frozen value changed; §5, §6 and §7 are byte-identical.

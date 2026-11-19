@@ -42,5 +42,11 @@ This chapter designs the platform (contributions C1 and C3) and shows where the 
 
 ## Notes for the author
 
-1. Diagram tools: Mermaid diagrams (already in `docs/System_Architecture.md` and the Guidance Manual) can be exported to PDF with mermaid-cli (not installed yet); the ERD can come from the schema. Decide one tool and one style for all diagrams.
+1. Diagram tools (decided 2026-11-19): the author draws the diagrams by hand, in draw.io, and the sequence diagrams in the Mermaid web editor. They go in `images/` as PDF (or PNG at 300 dpi or more), each with its editable source next to it (see `Report Architecture.md`, "Diagrams").
 2. Keep each diagram to the main flows. A diagram that does not support a sentence in the text is cut.
+3. Facts checked against the code on 2026-11-19 (check again after `p9-bug-quick-wins`, which may change routes and guards):
+   - Mermaid starting points for the sequence diagrams: Guidance Manual 08 §4 ("For You" with `algo=social`; the same as `docs/System_Architecture.md`) and Guidance Manual 12 §3.3 (direct message). The pre-thesis `docs/Pre-thesis/uc*_sequence.mmd` files are not checked against today's code.
+   - Direct message route: `POST /api/conversations/:id/messages`. The guards are `JwtAuthGuard` and `BannedUserGuard` on the controller, then `EmailVerifiedGuard` on the route (`messages.controller.ts` lines 27–28 and 83–91). `MessagesService.sendMessage` pushes `newMessage` to the other member's username room (`messages.service.ts` lines 315–316).
+   - ERD: the schema has 25 models and 32 relations with `@relation(fields: …)`. The pre-thesis ERD (`docs/Pre-thesis/output/ERD_Breadit.dbml`) has drifted: it has 23 tables, without `Account` and `Session`, and its `CommunityRule` has a `createdAt` the schema does not have and lacks `description`. `Account` and `Session` are unused (Bugs Report R4); leave them out and say so in the caption. Draw the ERD from `schema.prisma`, not from the pre-thesis files.
+   - ERD labels: name each relation by its foreign key (`followerId`, `followingId`), not by the list names. In this schema `User.followers` means "the accounts this user follows" (CLAUDE.md).
+   - The pre-thesis use case diagram (`docs/Pre-thesis/UseCaseDiagram1.png`) shows use cases that may not exist ("Config system", "Analytic and monitor system"). Check each use case against the routes before reusing it.
