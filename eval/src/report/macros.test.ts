@@ -16,7 +16,7 @@ function load(dir: string): RunFilesMap {
 /** The cell of a macro, found by hand: file is <run>/<csv>, row_key the key cells joined with "|". */
 function cellOf(runs: RunFilesMap, m: MacroRow): string {
   const [run, csv] = m.file.split("/") as [string, string];
-  const keys: Record<string, number> = { "compare.csv": 6, "summary.csv": 5, "coverage.csv": 4, "leftout.csv": 3, "density.csv": 4, "latency.csv": 1, "queries.csv": 1 };
+  const keys: Record<string, number> = { "compare.csv": 6, "summary.csv": 5, "coverage.csv": 4, "leftout.csv": 3, "density.csv": 4, "tuning.csv": 4, "latency.csv": 1, "queries.csv": 1 };
   const table = runs.get(run)?.files.get(csv);
   assert.ok(table, `${m.file} is not in the fixture`);
   const cols = table.header.slice(0, keys[csv] as number);
@@ -37,10 +37,11 @@ test("macroName: letters only, and it throws on a digit, on an empty name and on
   assert.throws(() => macroName(["e", "One"], used), /twice|already|repeat/);
 });
 
-test("MACRO_SPECS: 70 specs of the P7 runs and 15 of E7, every name is letters only and none repeats", () => {
+test("MACRO_SPECS: 138 specs of the P7 runs and 15 of E7, every name is letters only and none repeats", () => {
   const e7 = MACRO_SPECS.filter((s) => s.run === "p7-e7");
   assert.equal(e7.length, 15);
-  assert.equal(MACRO_SPECS.length - e7.length, 70, "the macros of the other runs are the same as before E7");
+  assert.equal(MACRO_SPECS.length - e7.length, 138, "the 70 macros of the P7 runs, 68 new ones (task p9-report-macros)");
+  assert.equal(MACRO_SPECS.length, 153);
   const used = new Set<string>();
   for (const s of MACRO_SPECS) {
     const name = macroName(s.parts, used);
@@ -61,8 +62,17 @@ test("buildMacros: each value is its cell after roundDecimal / formatP (counts p
   for (const m of macros) {
     assert.match(m.name, /^[A-Za-z]+$/);
     const cell = cellOf(runs, m);
-    const want = m.column === "p_holm" || m.column === "p_raw" ? formatP(cell) : /^n(_|$)/.test(m.column) ? cell : roundDecimal(cell, 3);
+    // a name that ends in Full holds its 6-decimal cell, the column value (a grid value) is the cell as written (task p9-report-macros)
+    const want =
+      m.name.endsWith("Full") || m.column === "value"
+        ? cell
+        : m.column === "p_holm" || m.column === "p_raw"
+          ? formatP(cell)
+          : /^n(_|$)/.test(m.column)
+            ? cell
+            : roundDecimal(cell, 3);
     assert.equal(m.value, want, m.name);
+    if (m.name.endsWith("Full")) assert.match(m.value, /^-?[0-9]+\.[0-9]{6}$/, m.name);
     assert.match(m.file, /^p7-[a-z0-9-]+\/[a-z_]+\.csv$/);
   }
   // five macros picked by hand
@@ -78,8 +88,10 @@ test("buildMacros: each value is its cell after roundDecimal / formatP (counts p
   assert.equal(pick("hZeroWZeroNdcgHFollowTenAllCiLow").column, "ci_low");
   assert.equal(pick("hZeroWZeroNdcgHFollowTenAllCiHigh").column, "ci_high");
   assert.ok(!byName.has("hZeroWZeroNdcgTenAllGain"), "no H0 macro on the H row");
-  const h0 = macros.filter((m) => m.file === "p7-h0/compare.csv");
+  // the gate macros are the ones named hZero (the E5 topic macros read p7-h0 too)
+  const h0 = macros.filter((m) => m.name.startsWith("hZero"));
   assert.equal(h0.length, 3);
+  for (const m of h0) assert.equal(m.file, "p7-h0/compare.csv", m.name);
   for (const m of h0) assert.ok(m.rowKey.startsWith("syn-W0-M|none|H-follow|BL2|"), m.name);
   assert.equal(pick("eOneDiggNdcgHTenAllValue").file, "p7-main/summary.csv");
   assert.equal(pick("eOneDiggNdcgHTenAllValue").rowKey, "digg2009|test|H|10|all");
@@ -107,6 +119,127 @@ test("buildMacros: each value is its cell after roundDecimal / formatP (counts p
   assert.ok(byName.has("eFourWTwoMNdcgHCommTenAllGain"));
   // the macros are the same on a second build
   assert.deepEqual(buildMacros(runs), macros);
+});
+
+test("new macros (task p9-report-macros): tuning, E1 for nine methods, E2 for five groups, E5 topic row", () => {
+  const dir = tempDir();
+  writeResultsFixture(dir);
+  const runs = load(dir);
+  const macros = buildMacros(runs);
+  const byName = new Map(macros.map((m) => [m.name, m]));
+  const pick = (name: string): MacroRow => {
+    const m = byName.get(name);
+    assert.ok(m, `no macro ${name}`);
+    return m;
+  };
+  const rowOf = (m: MacroRow): Record<string, string> => {
+    const [run, csv] = m.file.split("/") as [string, string];
+    const table = runs.get(run)?.files.get(csv);
+    assert.ok(table);
+    const cols = table.header.slice(0, 4);
+    const hits = table.rows.filter((r) => cols.map((c) => r[c]).join("|") === m.rowKey);
+    assert.equal(hits.length, 1, m.name);
+    return hits[0] as Record<string, string>;
+  };
+  const datasets: [string, string][] = [["WTwoM", "syn-W2M-M"], ["Digg", "digg2009"]];
+
+  // tuning: the chosen value of five methods on both datasets, read from the row with chosen = 1
+  const tuned: [string, string][] = [["H", "H"], ["BLTwoT", "BL2t"], ["BLFour", "BL4"], ["BLFive", "BL5"], ["BLSix", "BL6"]];
+  for (const [dWord, d] of datasets) {
+    for (const [mWord, m] of tuned) {
+      const macro = pick(`tune${dWord}${mWord}Chosen`);
+      assert.equal(macro.file, "p7-tune-main/tuning.csv");
+      assert.equal(macro.column, "value");
+      assert.ok(macro.rowKey.startsWith(`${d}|${m}|`), macro.name);
+      assert.equal(rowOf(macro).chosen, "1", `${macro.name} reads the chosen row`);
+    }
+  }
+  assert.equal(macros.filter((m) => /^tune[A-Za-z]+Chosen$/.test(m.name)).length, 10);
+  // tuning points, full precision, found by their grid value
+  for (const [name, value] of [["tuneWTwoMHValNdcgTenFiveTwelveFull", "512/512"], ["tuneWTwoMHValNdcgTenTenTwentyFourFull", "1024/1024"]] as const) {
+    const m = pick(name);
+    assert.equal(m.file, "p7-tune-main/tuning.csv");
+    assert.equal(m.column, "val_ndcg10");
+    assert.equal(m.rowKey, `syn-W2M-M|H|alpha/beta|${value}`);
+    assert.equal(m.value, rowOf(m).val_ndcg10);
+  }
+  assert.equal(macros.filter((m) => m.file === "p7-tune-main/tuning.csv").length, 12);
+
+  // E1: NDCG@10 of all nine methods on both datasets
+  const nine: [string, string][] = [["BLZero", "BL0"], ["BLOne", "BL1"], ["BLTwo", "BL2"], ["BLTwoT", "BL2t"], ["BLThree", "BL3"], ["BLFour", "BL4"], ["BLFive", "BL5"], ["BLSix", "BL6"], ["H", "H"]];
+  for (const [dWord, d] of datasets) {
+    for (const [mWord, m] of nine) {
+      const macro = pick(`eOne${dWord}Ndcg${mWord}TenAllValue`);
+      assert.equal(macro.file, "p7-main/summary.csv");
+      assert.equal(macro.rowKey, `${d}|test|${m}|10|all`);
+      assert.equal(macro.column, "ndcg");
+    }
+  }
+  assert.equal(pick("eOneDiggNdcgBLFourTenAllValue").rowKey, "digg2009|test|BL4|10|all");
+
+  // E2: five groups, five columns, both datasets
+  const groups: [string, string][] = [["Zero", "0"], ["OneFour", "1-4"], ["ZeroFour", "0-4"], ["FiveNineteen", "5-19"], ["TwentyPlus", "20+"]];
+  const columns: [string, string][] = [["Gain", "mean_diff"], ["CiLow", "ci_low"], ["CiHigh", "ci_high"], ["PHolm", "p_holm"], ["N", "n"]];
+  for (const [dWord, d] of datasets) {
+    for (const [gWord, g] of groups) {
+      for (const [cWord, c] of columns) {
+        const macro = pick(`eTwo${dWord}NdcgTen${gWord}${cWord}`);
+        assert.equal(macro.file, "p7-main/compare.csv");
+        assert.equal(macro.rowKey, `${d}|F1|H|BL2|10|${g}`);
+        assert.equal(macro.column, c);
+      }
+    }
+  }
+  assert.equal(pick("eTwoWTwoMNdcgTenTwentyPlusPHolm").column, "p_holm");
+
+  // E5 topic row: the H row of p7-h0 (not H-follow)
+  for (const [cWord, c] of [["Gain", "mean_diff"], ["CiLow", "ci_low"], ["CiHigh", "ci_high"]] as const) {
+    const m = pick(`eFiveWZeroTopicNdcgTenAll${cWord}`);
+    assert.equal(m.file, "p7-h0/compare.csv");
+    assert.equal(m.rowKey, "syn-W0-M|none|H|BL2|10|all");
+    assert.equal(m.column, c);
+  }
+  // the E5 world macro of W0 keeps its own name and file
+  assert.equal(pick("eFiveWZeroNdcgTenAllGain").file, "p7-e5-worlds/compare.csv");
+});
+
+test("Full macros: the Digg H1 row keeps its 6 decimals, and the 3-decimal macros keep their rounding", () => {
+  const dir = tempDir();
+  const compare = "p7-main/compare.csv|digg2009|F1|H|BL2|10|0-4|";
+  writeResultsFixture(dir, { cells: { [`${compare}mean_diff`]: "0.000117", [`${compare}ci_low`]: "0.000015", [`${compare}ci_high`]: "0.000225", [`${compare}p_holm`]: "0.335466" } });
+  const runs = load(dir);
+  const macros = buildMacros(runs);
+  const byName = new Map(macros.map((m) => [m.name, m]));
+  for (const [what, cell, column] of [["Gain", "0.000117", "mean_diff"], ["CiLow", "0.000015", "ci_low"], ["CiHigh", "0.000225", "ci_high"]] as const) {
+    const full = byName.get(`eTwoDiggNdcgTenZeroFour${what}Full`) as MacroRow;
+    assert.ok(full, `no Full macro for ${what}`);
+    assert.equal(full.value, cell);
+    assert.equal(full.file, "p7-main/compare.csv");
+    assert.equal(full.rowKey, "digg2009|F1|H|BL2|10|0-4");
+    assert.equal(full.column, column);
+    assert.equal(byName.get(`eTwoDiggNdcgTenZeroFour${what}`)?.value, "0.000", "the 3-decimal macro keeps its rounding");
+  }
+  assert.equal(byName.get("eTwoDiggNdcgTenZeroFourPHolm")?.value, "0.335");
+  assert.equal(macros.filter((m) => m.name.endsWith("Full")).length, 5, "three Digg macros and two tuning points");
+  // a Full macro with a tuning cell: the 6 decimals of val_ndcg10
+  const tuneRow = (byName.get("tuneWTwoMHValNdcgTenTenTwentyFourFull") as MacroRow).value;
+  assert.match(tuneRow, /^0\.[0-9]{6}$/);
+});
+
+test("verifyMacros throws when a Full macro holds the 3-decimal value of its cell, and passes on a fresh build", () => {
+  const dir = tempDir();
+  const compare = "p7-main/compare.csv|digg2009|F1|H|BL2|10|0-4|";
+  writeResultsFixture(dir, { cells: { [`${compare}mean_diff`]: "0.000117" } });
+  const runs = load(dir);
+  const macros = buildMacros(runs);
+  verifyMacros(macros, runs);
+  const name = "eTwoDiggNdcgTenZeroFourGainFull";
+  const rounded = macros.map((m) => (m.name === name ? { ...m, value: "0.000" } : m));
+  assert.throws(() => verifyMacros(rounded, runs), (e: Error) => e.message.includes(name) && e.message.includes("0.000117"));
+  // a grid value changed to a rounded text is caught too
+  const chosen = macros.find((m) => m.name === "tuneWTwoMHChosen") as MacroRow;
+  const wrong = macros.map((m) => (m === chosen ? { ...m, value: "1024" } : m));
+  assert.throws(() => verifyMacros(wrong, runs), (e: Error) => e.message.includes("tuneWTwoMHChosen"));
 });
 
 test("rounding on the string: -0.012500 gives -0.013, 0.000999 gives <0.001, 0.999500 gives 1.000, -0.000400 gives 0.000", () => {

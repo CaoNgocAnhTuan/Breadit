@@ -1,5 +1,5 @@
 import { csvText } from "../results-csv.ts";
-import { formatP, roundDecimal } from "./round.ts";
+import { formatP, gridValue, roundDecimal } from "./round.ts";
 import type { RunFilesMap } from "./read.ts";
 
 // Macros (design "Macros and tables", blueprint 2.8). One macro is one cell of a results CSV, rounded by the rule of round.ts. Every
@@ -7,7 +7,7 @@ import type { RunFilesMap } from "./read.ts";
 
 export interface MacroRow {
   name: string;
-  /** The cell after `roundDecimal` or `formatP`; counts stay plain integers. */
+  /** The cell after `roundDecimal` or `formatP`; counts stay plain integers; a name that ends in `Full` keeps 6 decimals; a grid value is as written. */
   value: string;
   /** Relative to .docs/results/: `<runId>/<file>`. */
   file: string;
@@ -56,8 +56,14 @@ export function macroName(parts: readonly string[], used?: Set<string>): string 
   return name;
 }
 
-/** How a column is written: p-values by `formatP`, counts as they are, every other number to 3 decimals. */
-function formatCell(column: string, cell: string): string {
+/**
+ * How a macro is written. A name that ends in `Full` keeps the 6 decimals of its cell (for numbers that 3 decimals hide). The column
+ * `value` of tuning.csv is a grid value, printed as written. Then p-values by `formatP`, counts as they are, every other number to 3
+ * decimals. `buildMacros` and `verifyMacros` both call it, so they use one rule.
+ */
+function formatCell(column: string, cell: string, name: string): string {
+  if (name.endsWith("Full")) return roundDecimal(cell, 6);
+  if (column === "value") return gridValue(cell);
   if (column === "p_holm" || column === "p_raw") return formatP(cell);
   if (column === "n" || column === "n_users" || column === "n_test_users" || column === "n_left_out") return cell;
   return roundDecimal(cell, 3);
@@ -75,13 +81,22 @@ const DATASET_WORD: Readonly<Record<string, string>> = {
   digg2009: "Digg",
 };
 const METHOD_WORD: Readonly<Record<string, string>> = {
+  BL0: "BLZero",
+  BL1: "BLOne",
   BL2: "BLTwo",
+  BL2t: "BLTwoT",
+  BL3: "BLThree",
+  BL4: "BLFour",
+  BL5: "BLFive",
+  BL6: "BLSix",
   H: "H",
   "H-follow": "HFollow",
   "H-comm": "HComm",
   "H-noauthor": "HNoauthor",
   "H-noengager": "HNoengager",
 };
+/** The two tuning points of H on syn-W2M-M that the text compares (the value of the `alpha/beta` grid). */
+const GRID_WORD: Readonly<Record<string, string>> = { "512/512": "FiveTwelve", "1024/1024": "TenTwentyFour" };
 const ALGO_WORD: Readonly<Record<string, string>> = { chrono: "Chrono", engagement: "Engagement", social: "Social" };
 const K_WORD: Readonly<Record<number, string>> = { 5: "Five", 10: "Ten", 20: "Twenty" };
 const GROUP_WORD: Readonly<Record<string, string>> = { "0": "Zero", "1-4": "OneFour", "0-4": "ZeroFour", "5-19": "FiveNineteen", "20+": "TwentyPlus", all: "All" };
@@ -104,8 +119,12 @@ function word<T>(table: Readonly<Record<string | number, T>>, key: string | numb
 }
 
 const MAIN_DATASETS = ["syn-W2M-M", "digg2009"];
+const NINE_METHODS = ["BL0", "BL1", "BL2", "BL2t", "BL3", "BL4", "BL5", "BL6", "H"];
+const TUNED_METHODS = ["H", "BL2t", "BL4", "BL5", "BL6"];
+const F1_GROUPS = ["0", "1-4", "0-4", "5-19", "20+"];
+const F1_COLUMNS = ["mean_diff", "ci_low", "ci_high", "p_holm", "n"];
 
-/** A row of compare.csv: the gain of `method` over BL2. `metric` is "Ndcg" or "Ndcg" plus the method word. */
+/** A row of compare.csv: the gain of `method` over BL2. `metric` is "Ndcg", "Ndcg" plus the method word, or "TopicNdcg" (E5 topic row). */
 function cmp(exp: string, run: string, dataset: string, family: string, method: string, bucket: string, column: string, metric = "Ndcg"): MacroSpec {
   return {
     parts: [exp, word(DATASET_WORD, dataset, "dataset"), metric, K_WORD[10] as string, word(GROUP_WORD, bucket, "group"), word(WHAT_WORD, column, "column")],
@@ -129,16 +148,36 @@ function sum(exp: string, run: string, dataset: string, method: string): MacroSp
 
 function build(): MacroSpec[] {
   const out: MacroSpec[] = [];
-  // H1 (E2): the F1 row H - BL2, K 10, group 0-4 (gain, interval, p_holm, n), and the groups 0 and 1-4 (gain), both datasets.
+  // Tuning (p7-tune-main): the chosen value of each tuned method on both main datasets, and two validation NDCG@10 of H at full precision.
   for (const d of MAIN_DATASETS) {
-    for (const column of ["mean_diff", "ci_low", "ci_high", "p_holm", "n"]) out.push(cmp("eTwo", "p7-main", d, "F1", "H", "0-4", column));
-    for (const g of ["0", "1-4"]) out.push(cmp("eTwo", "p7-main", d, "F1", "H", g, "mean_diff"));
+    for (const m of TUNED_METHODS) {
+      out.push({ parts: ["tune", word(DATASET_WORD, d, "dataset"), word(METHOD_WORD, m, "method"), "Chosen"], run: "p7-tune-main", file: "tuning.csv", key: { dataset: d, method: m, chosen: "1" }, column: "value" });
+    }
+  }
+  for (const point of ["512/512", "1024/1024"]) {
+    out.push({
+      parts: ["tune", word(DATASET_WORD, "syn-W2M-M", "dataset"), word(METHOD_WORD, "H", "method"), "ValNdcgTen", word(GRID_WORD, point, "tuning point"), "Full"],
+      run: "p7-tune-main",
+      file: "tuning.csv",
+      key: { dataset: "syn-W2M-M", method: "H", value: point },
+      column: "val_ndcg10",
+    });
+  }
+  // H1 (E2): the F1 row H - BL2, K 10, every group (gain, interval, p_holm, n), both datasets. The Digg group 0-4 gain and interval also at full precision.
+  for (const d of MAIN_DATASETS) {
+    for (const g of F1_GROUPS) for (const column of F1_COLUMNS) out.push(cmp("eTwo", "p7-main", d, "F1", "H", g, column));
+  }
+  for (const column of ["mean_diff", "ci_low", "ci_high"]) {
+    const s3 = cmp("eTwo", "p7-main", "digg2009", "F1", "H", "0-4", column);
+    out.push({ ...s3, parts: [...s3.parts, "Full"] });
   }
   // H0 gate (amendment 1: on H-follow): K 10, all users: gain and interval.
   for (const column of ["mean_diff", "ci_low", "ci_high"]) out.push(cmp("hZero", "p7-h0", "syn-W0-M", "none", "H-follow", "all", column, `Ndcg${word(METHOD_WORD, "H-follow", "method")}`));
-  // E1: NDCG@10 and Coverage@10 of H and BL2.
+  // E5 topic row: H on W0 (the values of syn-W2M-M), K 10, all users: gain and interval. The name has "Topic" so it does not repeat the E5 world macro.
+  for (const column of ["mean_diff", "ci_low", "ci_high"]) out.push(cmp("eFive", "p7-h0", "syn-W0-M", "none", "H", "all", column, "TopicNdcg"));
+  // E1: NDCG@10 of all nine methods, and Coverage@10 of H and BL2.
   for (const d of MAIN_DATASETS) {
-    for (const m of ["H", "BL2"]) out.push(sum("eOne", "p7-main", d, m));
+    for (const m of NINE_METHODS) out.push(sum("eOne", "p7-main", d, m));
     for (const m of ["H", "BL2"]) {
       out.push({
         parts: ["eOne", word(DATASET_WORD, d, "dataset"), `Cov${word(METHOD_WORD, m, "method")}`, "Ten", "All", "Value"],
@@ -192,7 +231,7 @@ function build(): MacroSpec[] {
   return out;
 }
 
-/** The macros of the report (about 85): the numbers the text is likely to cite. */
+/** The macros of the report (153): the numbers the text is likely to cite. */
 export const MACRO_SPECS: readonly MacroSpec[] = build();
 
 function rowKeyOf(file: string, row: Readonly<Record<string, string>>): string {
@@ -219,7 +258,7 @@ export function buildMacros(runs: RunFilesMap): MacroRow[] {
     const cell = row[s.column];
     if (cell === undefined) throw new Error(`macro ${name}: ${s.run}/${s.file} has no column ${s.column}`);
     if (cell === "") throw new Error(`macro ${name}: the cell ${s.column} of ${s.run}/${s.file} (${rowKeyOf(s.file, row)}) is empty`);
-    return { name, value: formatCell(s.column, cell), file: `${s.run}/${s.file}`, rowKey: rowKeyOf(s.file, row), column: s.column };
+    return { name, value: formatCell(s.column, cell, name), file: `${s.run}/${s.file}`, rowKey: rowKeyOf(s.file, row), column: s.column };
   });
   return rows.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 }
@@ -236,7 +275,7 @@ export function verifyMacros(rows: readonly MacroRow[], runs: RunFilesMap): void
     const row = findRow(runs, run, file, (r) => rowKeyOf(file, r) === m.rowKey, `macro ${m.name}`);
     const cell = row[m.column];
     if (cell === undefined || cell === "") throw new Error(`macro ${m.name}: no value in column ${m.column} of ${m.file} (${m.rowKey})`);
-    const want = formatCell(m.column, cell);
+    const want = formatCell(m.column, cell, m.name);
     if (want !== m.value) throw new Error(`macro ${m.name} is ${m.value}, but its cell ${m.column} of ${m.file} (${m.rowKey}) gives ${want}`);
   }
 }

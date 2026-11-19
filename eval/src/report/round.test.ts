@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { formatP, roundDecimal } from "./round.ts";
+import { formatP, gridValue, roundDecimal } from "./round.ts";
 
 // TC9 (design DW10, F12): rounding on the decimal string, half away from zero, so a table and a macro never disagree.
 test("roundDecimal to 3 places: half away from zero, and a negative zero has no sign", () => {
@@ -50,4 +50,13 @@ test("formatP: three places, and <0.001 under 0.001", () => {
   assert.throws(() => formatP("-0.1"), /p-value/);
   assert.throws(() => formatP("2"), /p-value/);
   assert.throws(() => formatP(""), /decimal|p-value/);
+});
+
+// TC1 (task p9-report-macros, F5): a tuning grid value is printed as written, never rounded.
+test("gridValue returns one decimal number, or two joined by a slash, as written", () => {
+  for (const ok of ["0.0625", "720000", "1024/1024", "32/512", "0", "1.5", "0/16"]) assert.equal(gridValue(ok), ok);
+});
+
+test("gridValue refuses an empty cell, letters, three parts, a sign and a half pair", () => {
+  for (const bad of ["", "abc", "1/2/3", "-1", "+1", "1/", "/1", "1e3", " 1", "1 /2", "1,5"]) assert.throws(() => gridValue(bad), /grid value/, bad);
 });

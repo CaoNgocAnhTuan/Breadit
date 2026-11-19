@@ -37,3 +37,11 @@ export function formatP(cell: string): string {
   if (m[2] === "0" && frac.startsWith("000")) return "<0.001";
   return roundDecimal(cell, 3);
 }
+
+/** A tuning grid value as written: one decimal number or two joined by "/" (0.0625, 720000, 1024/1024). It is not rounded. */
+export function gridValue(cell: string): string {
+  const parts = cell.split("/");
+  const ok = parts.length <= 2 && parts.every((p) => DECIMAL.exec(p)?.[1] === "");
+  if (!ok) throw new Error(`"${cell}" is not a grid value (one decimal number, or two joined by "/", with no sign)`);
+  return cell;
+}

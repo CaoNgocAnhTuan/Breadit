@@ -7,9 +7,9 @@ All commits go on `test-app` and are never pushed. Steps 1–4 need no Docker. R
 
 ## Steps
 
-- [ ] 1. **Grid values.** Write the `gridValue` cases of TC1 in `eval/src/report/round.test.ts` first and see them fail (no function yet). Then add `gridValue(cell: string): string` to `eval/src/report/round.ts`: it returns the cell as written when it is one decimal number, or two joined by `/`, and throws otherwise (empty cell, letters, `1/2/3`, a sign). Reuse the `DECIMAL` pattern of that file, without the minus sign. (Design: Approach 3; Code files, `round.ts`, `round.test.ts`; F5.) No commit yet.
+- [x] 1. **Grid values.** Write the `gridValue` cases of TC1 in `eval/src/report/round.test.ts` first and see them fail (no function yet). Then add `gridValue(cell: string): string` to `eval/src/report/round.ts`: it returns the cell as written when it is one decimal number, or two joined by `/`, and throws otherwise (empty cell, letters, `1/2/3`, a sign). Reuse the `DECIMAL` pattern of that file, without the minus sign. (Design: Approach 3; Code files, `round.ts`, `round.test.ts`; F5.) No commit yet.
 
-- [ ] 2. **The new macros.** Change `eval/src/report/macros.test.ts` first (TC2, TC3, TC4) and see the new checks fail for the right reason (the counts, the missing names, the `Full` value). Then change `eval/src/report/macros.ts` (Design: Approach 1–3; Code files, `macros.ts`):
+- [x] 2. **The new macros.** Change `eval/src/report/macros.test.ts` first (TC2, TC3, TC4) and see the new checks fail for the right reason (the counts, the missing names, the `Full` value). Then change `eval/src/report/macros.ts` (Design: Approach 1–3; Code files, `macros.ts`):
   - `METHOD_WORD` gets the seven baselines, and `GRID_WORD` names `512/512` and `1024/1024`;
   - `build()` gets the specs of the Design table: tuning chosen values (10), the two tuning points with `Full` (2), E1 for all nine methods (H and BL2 keep their names), E2 for every F1 group and the five columns, built once per (dataset, group, column), the three Digg `Full` macros, and the three E5 topic macros from the H row of `p7-h0/compare.csv`;
   - `formatCell(column, cell, name)`: a name ending in `Full` gives `roundDecimal(cell, 6)`, the column `value` gives `gridValue(cell)`, every other column as today. `buildMacros` and `verifyMacros` pass the name;
