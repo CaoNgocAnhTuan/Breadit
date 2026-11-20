@@ -152,7 +152,7 @@ Every term and symbol used in the thesis, in one place. Each entry is one or two
 | **Push (real-time)** | The server sends an event over an open WebSocket and the page updates without a reload. This is what "real-time" means in the title; the feed itself is not pushed. Document 12 §3. |
 | **Room** | A named group of sockets. Each socket is in the room of its username (set by the server); members of a conversation can join `conversation:<id>`. |
 | **Redis adapter** | `@socket.io/redis-adapter`: sends each event through Redis to every backend process, so it reaches the user whichever process holds the socket. |
-| **S1, S5** | Two security findings of the bug sweep, both fixed. S1: a socket could join any room and read another user's messages. S5: a logged-out token still worked (the socket part is fixed). |
+| **S1, S5** | Two security findings of the bug sweep, both fixed. S1: a socket could join any room and read another user's messages. S5: a logged-out token still worked, on sockets and on public HTTP routes (the socket part was fixed in the sweep, the HTTP part in task `p9-bug-quick-wins`). |
 | **Version-based cache** | Cache keys include a version number (`v:user`); a write increases it, so old entries are never read again and expire with their TTL. Document 12 §4. |
 | **Stampede lock** | The short Redis lock of `getOrSetJson`: when an entry expires, one request rebuilds it while the others wait. |
 | **Soft delete** | A deleted post keeps its row with `deletedAt` set; every query filters it. |

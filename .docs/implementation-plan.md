@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.21 · 2026-11-20 · Status: approved 2026-10-28
+Version 1.22 · 2026-11-20 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -268,7 +268,7 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 
 ## 5. Task list
 
-Written on 2026-10-28; the Status column was last updated on 2026-11-19. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
+Written on 2026-10-28; the Status column was last updated on 2026-11-20. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
 
 | Status | # | Task | Phase | Depends on | Scope (short) | Days | Ends | Bugs placed here |
 |---|---|---|---|---|---|---|---|---|
@@ -292,7 +292,7 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-19. ✅ mea
 | ✅ 11-20 | 17 | Writing: Chapters 6 and 7 in LaTeX | P9 ★ | 14 | macros only, the ten tables, three figures (E2, E3, E5) in pgfplots | 1 | — | — |
 | ✅ 11-20 (figures to draw) | 18 | Writing: Chapter 4 System Analysis and Design | P9 | — | requirements, use cases, activity, sequence, architecture, ERD | 1 | — | — |
 | ✅ 11-20 | 19 | Writing: Chapter 5 Implementation | P9 | — | the system as built (Guidance Manual 08 and 12) | 1 | — | — |
-| ⬜ | 20 | `p9-bug-quick-wins` | P9 | — | the open bugs a demo shows; README corrections of Bugs Report §7; the parity test stays green | 1 | — | R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7 |
+| ✅ 11-20 | 20 | `p9-bug-quick-wins` | P9 | — | the open bugs a demo shows; README corrections of Bugs Report §7; the parity test stays green | 1 | — | R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7 |
 | ⬜ | 21 | `p10-demo-sweep` | P10 | 20 | run `verify-bug-sweep.sh` and `verify-socket.cjs` again, walk the demo path in Chrome, add new bugs to the Bugs Report | 0.5 | — | — |
 | ⬜ | 22 | `p10-demo-script` | P10 | 21 | `scripts/demo/`: load `syn-W2M-M` with `--rebase-to` now, start the app, two demo users (little and long history), a checklist (the three `algo` side by side, a live direct message, a notification, a ban that logs out), cleanup | 1 | — | — |
 | ⬜ | 23 | Writing: Chapter 8 Test Cases and Demonstration | P9 | 22 | the test summary table, a demo rehearsal, about eight screenshots | 0.5 | — | — |
@@ -358,3 +358,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.19 · 2026-11-19 · §5 row 14 ✅ (task `p9-figure-data` closed), row 15 ▶ (the Chapter 3 draft is written; review and LaTeX remain); §2.8 says ten LaTeX tables, not nine. No contract, rule or frozen value changed.
 - 1.20 · 2026-11-19 · §5 row 16 dropped by the author: no diagram task; the diagrams are drawn by hand (draw.io, and the Mermaid web editor for sequence diagrams) and added as images while Chapter 4 is written; row 18 no longer depends on row 16. No contract, rule or frozen value changed.
 - 1.21 · 2026-11-20 · §5 rows 15, 17, 18 and 19 ✅: Chapters 3 to 7 are in LaTeX (writing tasks on the light path, CLAUDE.md Workflow; folders `2026-11-20-p9-ch3-latex`, `-p9-ch6-7-latex`, `-p9-ch4-text`, `-p9-ch5-implementation`). The Chapter 4 figures are placeholders until the author draws them. No contract, rule or frozen value changed.
+- 1.22 · 2026-11-20 · §5 row 20 ✅: task `p9-bug-quick-wins` closed. R2 (interaction part), S5 (HTTP part), N2, R1, B7, B10, B2, B9, N5, N8 and R7 are fixed, and `dev:reset` is removed. No contract, rule or frozen value changed.

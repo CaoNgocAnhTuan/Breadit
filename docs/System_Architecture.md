@@ -453,7 +453,8 @@ Breadit/
 │   │   ├── src/app/
 │   │   │   ├── (board)/              # main three-column app (session and ban check in layout.tsx)
 │   │   │   │   ├── page.tsx          # home: For You, Explore, Following, Communities tabs · the `algo` toggle on For You
-│   │   │   │   ├── @modal/           # parallel route for the compose dialog
+│   │   │   │   ├── @modal/           # parallel route for the compose dialog: `(.)compose/post` intercepts the in-app click
+│   │   │   │   ├── compose/post/     # the same compose box as a full page, for a direct load or a reload (N8)
 │   │   │   │   └── [username]/ c/ communities/ messages/ notifications/ search/ settings/ ...
 │   │   │   ├── admin-console/        # admin pages, separate layout
 │   │   │   └── sign-in/ sign-up/ verify/ forgot-password/ reset/

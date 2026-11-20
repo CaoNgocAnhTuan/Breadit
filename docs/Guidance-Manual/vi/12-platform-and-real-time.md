@@ -57,9 +57,9 @@ Lấy ví dụ "like một bài": `POST /api/posts/:id/like`.
    - `RolesGuard` với `@Roles('ADMIN')`: chỉ có trên route quản trị.
 3. **Service** làm việc với Postgres, tăng các version cache mà nó làm thay đổi (Mục 4), và có thể tạo một thông báo (Mục 3).
 
-Các route cho phép khách (chưa đăng nhập) dùng `OptionalJwtAuthGuard`: không có cookie cũng được, và `req.user` để trống.
+Các route cho phép khách (chưa đăng nhập) dùng `OptionalJwtAuthGuard`: không có cookie cũng được, và `req.user` để trống. Token sai, hết hạn hoặc đã logout cũng bị xử lý như vậy, tức là như khách (finding S5, phần HTTP). Cả hai guard gọi cùng một hàm, `readSession` (`auth/session.ts`), hàm này kiểm tra token và blacklist.
 
-**Đăng nhập và đăng xuất.** Đăng nhập đặt cookie `breadit_session` (httpOnly, 30 ngày). Đăng xuất ghi `jti` của token vào Redis (`auth:blacklist:<jti>`), nên từ đó token này bị từ chối, kể cả ở socket. Mã gửi qua email (xác minh, đặt lại mật khẩu) là các dòng của bảng `VerificationToken`, gửi bằng SMTP.
+**Đăng nhập và đăng xuất.** Đăng nhập đặt cookie `breadit_session` (httpOnly, 30 ngày). Đăng xuất ghi `jti` của token vào Redis (`auth:blacklist:<jti>`), nên từ đó token này bị từ chối, kể cả ở socket, và bị coi là khách ở các route công khai. Mã gửi qua email (xác minh, đặt lại mật khẩu) là các dòng của bảng `VerificationToken`, gửi bằng SMTP.
 
 ## 3. Lớp real-time
 

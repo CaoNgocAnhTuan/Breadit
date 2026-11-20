@@ -57,9 +57,9 @@ Take "like a post": `POST /api/posts/:id/like`.
    - `RolesGuard` with `@Roles('ADMIN')`: only on admin routes.
 3. **The service** does the work in Postgres, bumps the cache versions it changes (Section 4), and may create a notification (Section 3).
 
-Routes that work for guests use `OptionalJwtAuthGuard` instead: no cookie is fine, and `req.user` stays empty.
+Routes that work for guests use `OptionalJwtAuthGuard` instead: no cookie is fine, and `req.user` stays empty. A bad, expired or logged-out token is treated the same way, as a guest (finding S5, HTTP part). Both guards call one function, `readSession` (`auth/session.ts`), which checks the token and the blacklist.
 
-**Login and logout.** Login sets the `breadit_session` cookie (httpOnly, 30 days). Logout writes the token's `jti` into Redis (`auth:blacklist:<jti>`), so the same token is refused from then on, also by the socket. Email codes (verify, password reset) are rows of the `VerificationToken` table, sent by SMTP.
+**Login and logout.** Login sets the `breadit_session` cookie (httpOnly, 30 days). Logout writes the token's `jti` into Redis (`auth:blacklist:<jti>`), so the same token is refused from then on, also by the socket, and treated as a guest on the public routes. Email codes (verify, password reset) are rows of the `VerificationToken` table, sent by SMTP.
 
 ## 3. The real-time layer
 

@@ -21,7 +21,7 @@ Every step writes its tests first and sees them fail for the right reason, then 
 
 - [x] 7. **Script (R7).** Remove `dev:reset` from the root and frontend `package.json`, and rewrite README line 88 so it names only the right commands. Search the repo (outside `docs/Pre-thesis/`) for other mentions. (Design: Approach "R7"; F17.) Commit: `chore: remove the script that ran db push (R7)`
 
-- [ ] 8. **Docs.** Update `.docs/Bugs Report.md` (the eleven rows move to §5 with their commits, §1 counts, §2 suggested order, §6 row "P9, before the demo" done, §7 README items done); Chapter 4 NFR2 in `chapters/system-analysis-and-design.tex` and the draft (the S5 HTTP part is fixed); the S1/S5 row of `docs/Guidance-Manual/en/09-glossary.md` and `vi/09-glossary.md` (both parts of S5 fixed); `.docs/implementation-plan.md` §5 row 20 ✅ with a change-log line. Check that `docs/System_Architecture.md` names none of these bugs. Commit: `docs: p9-bug-quick-wins in the Bugs Report, Chapter 4 and the glossary`
+- [x] 8. **Docs.** Update `.docs/Bugs Report.md` (the eleven rows move to §5 with their commits, §1 counts, §2 suggested order, §6 row "P9, before the demo" done, §7 README items done); Chapter 4 NFR2 in `chapters/system-analysis-and-design.tex` and the draft (the S5 HTTP part is fixed); the S1/S5 row of `docs/Guidance-Manual/en/09-glossary.md` and `vi/09-glossary.md` (both parts of S5 fixed); `.docs/implementation-plan.md` §5 row 20 ✅ with a change-log line. Check that `docs/System_Architecture.md` names none of these bugs. Commit: `docs: p9-bug-quick-wins in the Bugs Report, Chapter 4 and the glossary`
 
 ## Tests
 

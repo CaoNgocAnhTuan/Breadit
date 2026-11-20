@@ -154,7 +154,7 @@ Thuật ngữ chuyên ngành được giữ nguyên tiếng Anh, vì thesis và 
 | **Đẩy (push, real-time)** | Server gửi một sự kiện qua WebSocket đang mở và trang cập nhật mà không tải lại. Đây là nghĩa của "real-time" trong tên đề tài; bản thân feed không được đẩy. Tài liệu 12 §3. |
 | **Room** | Một nhóm socket có tên. Mỗi socket nằm trong room mang username của nó (do server đặt); thành viên của một cuộc trò chuyện có thể vào `conversation:<id>`. |
 | **Redis adapter** | `@socket.io/redis-adapter`: gửi mỗi sự kiện qua Redis tới mọi tiến trình backend, nên nó đến được user dù tiến trình nào đang giữ socket. |
-| **S1, S5** | Hai finding bảo mật của đợt rà lỗi, đều đã sửa. S1: một socket có thể vào bất kỳ room nào và đọc tin nhắn của người khác. S5: token đã logout vẫn dùng được (phần socket đã sửa). |
+| **S1, S5** | Hai finding bảo mật của đợt rà lỗi, đều đã sửa. S1: một socket có thể vào bất kỳ room nào và đọc tin nhắn của người khác. S5: token đã logout vẫn dùng được, ở socket và ở các route HTTP công khai (phần socket sửa trong đợt rà lỗi, phần HTTP sửa trong task `p9-bug-quick-wins`). |
 | **Cache theo version** | Key cache chứa một số version (`v:user`); một lần ghi tăng nó, nên các entry cũ không bao giờ được đọc nữa và tự hết hạn theo TTL. Tài liệu 12 §4. |
 | **Khoá chống stampede** | Khoá Redis ngắn của `getOrSetJson`: khi một entry hết hạn, một request dựng lại nó trong khi các request khác chờ. |
 | **Xoá mềm (soft delete)** | Bài bị xoá vẫn giữ dòng của nó với `deletedAt` được đặt; mọi truy vấn đều lọc nó. |

@@ -13,15 +13,16 @@ How the report was made: first I read the code and listed 26 suspected problems.
 | | Count |
 |---|---|
 | Findings in the review | 36 (T1–T10, S1–S6, B1–B10, N1–N10) |
-| **Resolved** | **18** (14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed`, N6 in task `p7-cost-benchmark`) |
-| **Still open** | **18 of the 36, plus 7 found later (R1–R7) = 25** |
+| **Resolved** | **29** (14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed`, N6 in task `p7-cost-benchmark`, and 11 in task `p9-bug-quick-wins`: R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7) |
+| **Still open** | **10 of the 36, plus 4 found later (R3–R6) = 14** |
 | Open decision | 0 (D1 decided on 2026-10-28 and built on 2026-11-10, section 4) |
 
-Open items by priority: **P1 = 2, P2 = 6, P3 = 8, P4 = 9.** What the levels mean is in section 2.
+Open items by priority: **P1 = 1, P2 = 5, P3 = 2, P4 = 6.** What the levels mean is in section 2.
 
 The fixes were checked like this:
 - The same curl script ran on the unfixed code (**42 passed, 53 failed**) and on the final code on a freshly seeded database (**95 passed, 0 failed**). Output: [works/2026-10-21-bugs-sweep/sweep-before.txt](works/2026-10-21-bugs-sweep/sweep-before.txt) and [works/2026-10-21-bugs-sweep/sweep-after.txt](works/2026-10-21-bugs-sweep/sweep-after.txt).
 - 99 unit tests and 108 integration tests pass. Each fix started with a test that failed.
+- Task `p9-bug-quick-wins` (2026-11-20) added 7 unit tests and 22 integration tests (`quick-wins.it-spec.ts`). The backend now has 211 unit tests and 168 integration tests.
 - In Chrome: B4, T1 and T8 were confirmed in the UI. A sweep of 26 page checks gave the expected status codes.
 
 ---
@@ -38,9 +39,9 @@ The fixes were checked like this:
 Effort guess: **XS** under 30 min, **S** under 2 hours, **M** half a day, **L** over a day.
 
 **Suggested order**
-1. **By thesis phase:** T4, T3, B6, the pool part of R2 and the D1 product rule are done in **P6** (task `p6-social-feed`, 2026-11-10). N6 is done in **E7** (task `p7-cost-benchmark`, 2026-11-12). T6 waits for the schema migration, which the super plan cut (v0.2, §9); the social feed counts distinct followees instead.
-2. **Before sharing the app:** S5 (HTTP part), B1, S4, S6, B5, R3.
-3. **Quick wins** (each XS or S, about half a day together): B9, B10, B2, R1, N8, B1, S5, N7.
+1. **By thesis phase:** T4, T3, B6, the pool part of R2 and the D1 product rule are done in **P6** (task `p6-social-feed`, 2026-11-10). N6 is done in **E7** (task `p7-cost-benchmark`, 2026-11-12). The interaction part of R2 is done in **P9** (task `p9-bug-quick-wins`, 2026-11-20). T6 waits for the schema migration, which the super plan cut (v0.2, §9); the social feed counts distinct followees instead.
+2. **Before sharing the app:** B1, S4, S6, B5, R3. (The S5 HTTP part is done in P9.)
+3. **Quick wins** (each XS or S, about half a day together). Done in **P9** (task `p9-bug-quick-wins`, 2026-11-20): R2 (interaction part), S5 (HTTP part), N2, R1, B7, B10, B2, B9, N5, N8, R7. Still open from this list: B1, N7.
 4. The rest of P3 and P4.
 
 ---
@@ -54,13 +55,11 @@ Code locations use function and file names, because line numbers moved during th
 | ID | Problem and effect | Evidence from the run | How to fix | Effort |
 |---|---|---|---|---|
 | **T6** | `interactions.service.ts` (like, save) and `users.service.ts` (follow) do "check, then write" and the tables have no unique key. Two fast requests make duplicate rows and wrong counts. Until fixed, `\|F_u\|` in the trust formula counts duplicates twice. | 6 parallel likes made 6 rows. 6 parallel follows made 6 rows, and one unfollow left 5. **The clean seed already has duplicates:** 53 like pairs (54 extra rows), 45 follow pairs (48 extra), 3 saved pairs (3 extra). | **The schema migration** (cut from the super plan in v0.2, kept in its §9): delete duplicates (keep the lowest `id`), add unique keys, add a CHECK against self-follow. The toggles must catch the unique-key error. The seed is a ready test for the migration. | M |
-| **R2** | Pending community posts (not yet approved) can still be liked, saved, reposted and commented on by ID, and their comments can be read. The post itself is hidden since the fix for T10. | The like was accepted: a pending post showed in the Likes tab before the T10 fix. The comment parts are from code. | `assertPostLive` also hides unapproved posts from non-staff. **The pool part is done** (task `p6-social-feed`, 2026-11-10): the feed module passes `isApproved` to `buildPool`, which drops pending posts (IT test in `feed-algo.it-spec.ts`). The interaction part is still open; the task left it out because it is not on the feed path. | S |
 
 ### 3.2 P2: before anyone else uses the app
 
 | ID | Problem and effect | Evidence from the run | How to fix | Effort |
 |---|---|---|---|---|
-| **S5** (HTTP part) | `optional-jwt.guard.ts` does not check the logout blacklist. A logged-out cookie still gets personal data on public routes. (The socket part is fixed.) | After logout, `/me` and like gave 401, but `GET /api/posts/1` still returned `likes:[{id:2001}]`. A guest gets nothing. | Use the same blacklist check as `JwtAuthGuard`. Put it in one shared function. | S |
 | **B1** | `moderatePost` removes the post for any `action` other than `'APPROVE'`. The `promote` role is not checked. A typo in a request deletes a post. | `{"action":"APROVE"}` returned 201 and the post was soft-deleted. `{}` did too. Promote with `role:"ADMIN"` gave 500. | DTOs with `@IsIn(['APPROVE','REMOVE'])` and `@IsEnum(CommunityRole)`. | XS |
 | **S4** | On local disk, non-image uploads keep the user's file extension and are served from the API origin (`uploads.service.ts`). A verified user can host an `.html` file there. Not a problem with Cloudinary. | `evil.html` uploaded as `video/mp4` was saved as `<uuid>.html` and served as `text/html` (HTTP 200). | Allow only known image and video types, take the extension from the type, and send `X-Content-Type-Options: nosniff` on `/uploads/`. | S |
 | **S6** | Fallback secret `dev-secret-change-in-prod`. The email code uses `Math.random`. Code tries are limited only per IP (10 per minute). A password reset does not end old sessions. | After a password reset, the older session cookie still worked (`/me` 200). The other parts are from code only. | Refuse to start without `JWT_SECRET` in production. Use `crypto.randomInt`. Count tries per email. Keep `passwordChangedAt` and reject older tokens. | M |
@@ -71,13 +70,7 @@ Code locations use function and file names, because line numbers moved during th
 
 | ID | Problem and effect | Evidence from the run | How to fix | Effort |
 |---|---|---|---|---|
-| **N2** | `findByPost` in `comments.service.ts` has no block filter. A blocked user's comment is still shown to the person who blocked them. | carol blocked dave. On bob's post, carol still saw dave's comment. | Filter by `blockService.getAllBlockedPeerIds`, replies included. | S |
 | **N3** | `findOrCreateConversation` checks, then creates, with no unique pair. Parallel requests make duplicate threads. | 5 parallel creates made 5 conversations. DM search returned the same person 4 times. | A unique pair key with an upsert (fits the schema migration), or a lock. | M |
-| **N5** | `Post.tsx` wraps the post text in a link to the status page, and `RichText.tsx` puts a link for each `@mention` inside it: `<a>` inside `<a>`. React logs a hydration error and rebuilds the tree on the client. | Chrome console: "In HTML, `<a>` cannot be a descendant of `<a>`" and "Hydration failed…", on a post with mentions. | Do not wrap the text in a link. Make the card clickable another way. | S |
-| **B2** | The community slug has no format rule. Spaces, `/` or capitals break `/c/<slug>` links. | Slug `Has Space/And Slash` was created (201). | `@Matches(/^[a-z0-9-]{3,30}$/)` in the DTO. | XS |
-| **B7** | `getTrending` counts tags of community posts (and, from code, deleted posts) and is not cached. Trending numbers are wrong. | Reported vs real: music 38 vs 16, photography 36 vs 12, books 36 vs 13, productivity 133 vs 113, coffee 82 vs 62. | Count only live root posts outside communities (a join or a raw query). Cache it for a minute. | S–M |
-| **N8** | Opening or refreshing `/compose/post` directly gives 404. It only works as an in-app modal. | `GET /compose/post` with a session cookie gave 404. | Add a page or a `default` for the children slot. | XS–S |
-| **R1** | `_count.replies` on comments also counts deleted replies, the same bug as T1. The UI only uses it at the nesting limit. | Found while fixing T1 (code). | Use a filtered count in `commentInclude`. | XS |
 | **R6** | An admin can ban themselves or other admins (`setBanStatus`). A ban does not end the token, but `BannedUserGuard` now blocks writes. | The admin banned their own account (200), kept working, and unbanned it. Banning another admin was not run. | Refuse self and admin targets with 400. | S |
 
 ### 3.4 P4: minor
@@ -85,14 +78,11 @@ Code locations use function and file names, because line numbers moved during th
 | ID | Problem and effect | Evidence from the run | How to fix | Effort |
 |---|---|---|---|---|
 | **B8** | A comment like is sent as `LIKE` with the post ID, so the text says "liked your post". `Notification.commentId` is never filled. | New `LIKE` rows had `postId` set and no `commentId`. | Fill `commentId` and use text "liked your comment". | S |
-| **B9** | The "Explore" menu item links to `/`, not `/?feed=explore` (`LeftBar.tsx`). | In the page HTML, Explore, Homepage and More all link to `/`. | Change the `href`. | XS |
-| **B10** | `GET messages` sets `lastReadAt` but does not clear the `dm:unreadCount` cache (60 s). | After `GET messages` the list showed `unread:2` while `unread-count` said 1. | Delete the cache key in `getMessages`. | XS |
 | **N7** | Small API mistakes: an unknown profile name returns 200 with an empty list, `%` in search works as a wildcard, and an empty search returns no `communities` key. | `GET /api/users/user1_nope/posts` gave 200. `q=%` returned 5 posts. `q=` returned only `hashtags`, `posts`, `users`. | Return 404, escape `%` and `_`, keep one response shape. | S |
 | **N9** | Every new follow row sends a notification, so follow, unfollow, follow again repeats it. | bob had 8 FOLLOW notifications from 3 people (6 from alice's parallel requests). | Skip the notification if one from the same actor already exists. Easier after the schema migration. | S |
 | **N10** | One user can report the same post many times, and each report notifies every admin. | carol's two reports on one post made 2 rows and 2 notifications. | Unique key on (reporter, post) with an upsert (fits the schema migration). | S |
 | **R4** | Dead code and unused config: the `Account` and `Session` models, `Post.parentPostId` and its relation (queries still filter `parentPostId: null`), the `resend` npm package, the env names `STORAGE_DRIVER`, `RESEND_API_KEY` and `EMAIL_FROM`, and frontend lint warnings (unused variables in six components). | From code and `npm run lint` (warnings only, 0 errors). | Remove them. The schema parts belong in the schema migration. | S–M |
 | **R5** | `getConnectUsers` builds the whole user list in memory and slices it. Fine now, slow at 5,000 users. | Code only. The connect list had 9 pages for 107 users. | Page in the database. | M |
-| **R7** | `npm run dev:reset` (root script, defined in `apps/frontend/package.json`) runs `prisma db push --force-reset` and then the seed. `db push` builds the schema without the migrations, so the `*_data_humans_v1*` data migrations never run and the database can drift from what Docker deploys with `migrate deploy`. The old README told new developers to use it, and the harness hook refuses `db push`. | Code only (found 2026-11-02 while updating the README). The README now uses `prisma migrate deploy` and `prisma db seed`. | Change the script to `prisma migrate reset --force` (drops the database, applies every migration, runs the seed) with `--schema`, or remove it. | XS |
 
 ---
 
@@ -104,7 +94,7 @@ Code locations use function and file names, because line numbers moved during th
 
 ## 5. Resolved bugs
 
-The 18 findings below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed` (2026-11-10), and N6 in task `p7-cost-benchmark` (2026-11-12). They are the last four rows of §5.1. "Where" is the code at the tag `v1-prethesis`. Details of each sweep test are in [Pre-thesis verify.md](Pre-thesis%20verify.md).
+The 29 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed` (2026-11-10), N6 in task `p7-cost-benchmark` (2026-11-12), and 11 in task `p9-bug-quick-wins` (2026-11-20): R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7. "Where" is the code at the tag `v1-prethesis`. Details of each sweep test are in [Pre-thesis verify.md](Pre-thesis%20verify.md).
 
 ### 5.1 Thesis path
 
@@ -121,6 +111,7 @@ The 18 findings below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B
 | **T3** | The feed cache lives 10 s and is keyed by `v:user`. Creating or deleting a post did not change that counter, so a new post could be missing from the author's feed for up to 10 s. | bob posted and his feed still returned 0 posts for 11 s. With the cache off it showed at once. | `PostsService.create` and `remove` bump the author's `v:user` (unit test `posts.service.spec.ts`). Likes, reposts and comments still do not bump anyone's version: other users' feeds can be up to 10 s old. The parity test runs with `REDIS_HTTP_CACHE_ENABLED=false`, and E7 ran with the cache off too (`.docs/results/p7-e7/manifest.json`, `cacheEnabled: false`). | `cb1db27` |
 | **B6** | A community ban did not clear the banned member's cached community list (5 min). | In `club-two`, dave's Communities feed showed post 905 for 11 s after the mod banned him. | `banUser` deletes `graph:communities` for the target and bumps their `v:user`. `deleteCommunity` does the same for every former member, read inside its transaction (unit test `communities.service.spec.ts`). | `cb1db27` |
 | **N6** | The rate limit (1,000 per minute, `app.module.ts`) was counted **per route** per IP and was hard-coded. The Next server calls from one IP, so all its users share each counter. It is the likely cause of the 71% failures in the old k6 file (not proven: that file stores no status codes). | After 1,300 calls to `/api/posts`, that route gave 429, while `/api/search`, `/api/hashtags/trending` and `/api/communities` gave 200. | `readThrottleLimit` (`throttle/throttle.config.ts`) reads `THROTTLE_LIMIT`: a positive whole number, default 1,000, and any other value stops the app at start. The E7 runner sets it to 1,000,000, and a run counts only if `http_req_failed` is 0 (the first failed request stops E7). | `c5cdec4` |
+| **R2** | Pending community posts (not yet approved) could still be liked, saved, reposted and commented on by ID, and their comments could be read (`assertPostLive`, `CommentsService`). The post itself was hidden since the fix for T10. | The like was accepted: a pending post showed in the Likes tab before the T10 fix. The comment parts are from code. | **Pool part**, task `p6-social-feed` (2026-11-10): the feed module passes `isApproved` to `buildPool`, which drops pending posts (IT test in `feed-algo.it-spec.ts`). **Interaction part**, task `p9-bug-quick-wins` (2026-11-20): one function `canSeePost` (`posts/visibility.ts`) is used by `findOne`, like, save, repost, comment create, comment list and comment like. Only the author, the community owner and the mods get through; everyone else gets 404. IT test TC3 in `quick-wins.it-spec.ts`. Not covered: a repost sent as `POST /api/posts` with `rePostId` (`PostsService.create` checks only `deletedAt`); the web app uses `POST /api/posts/:id/repost`. | `9e72a56` (interaction part) |
 
 ### 5.2 Security
 
@@ -129,6 +120,7 @@ The 18 findings below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B
 | **S1** | `newUser` joined any room by a username the client sent. `sendNotification` faked notifications. `joinConversation` had no member check (`notifications.gateway.ts`). | alice sent `newUser: "t_bob"` and received bob's private DM. Her fake notification reached carol. A non-member got typing events. | The server checks the login cookie before the socket connects, joins it to its own room, and ignores the username the client sends. `joinConversation` is for members only. Typing events use the real username. `sendNotification` is removed. | `3b62928` |
 | **S2** | `GET /api/users/:username` returned the whole user row except the password, to anyone (`findByUsername`). | With no cookie it returned email, `emailVerified`, `role` and `banned` of bob. | `email`, `emailVerified` and `banned` are removed for everyone except the owner. | `53fb757` |
 | **S3** | No `BannedUserGuard` on several writes. | Banned `t_eve` with her old cookie: post, comment, upload, new DM and create community all gave 201. Like, follow, report, delete gave 403. | The guard is added to post create, comment create, uploads, community create and all DM routes. A unit test keeps it there. (Admins banning themselves is still open: R6.) | `53fb757` |
+| **S5** | A logged-out token still worked. The socket part was fixed in the sweep (`3b62928`). The HTTP part: `optional-jwt.guard.ts` did not check the logout blacklist, so a logged-out cookie still got personal data on public routes. | After logout, `/me` and like gave 401, but `GET /api/posts/1` still returned `likes:[{id:2001}]`. A guest gets nothing. | One shared function `readSession(token, redis)` (`auth/session.ts`) does the check: verify the token, read `auth:blacklist:<jti>`, build the user. `JwtAuthGuard` answers 401 on `null`. `OptionalJwtAuthGuard` goes on as a guest on `null` and on a Redis error. Unit test `session.spec.ts` (TC1) and IT test TC2. | `1d6247f` (HTTP part) |
 
 ### 5.3 Other bugs
 
@@ -138,11 +130,21 @@ The 18 findings below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B
 | **N4** | Any text was accepted as an avatar or cover (`update-user.dto.ts`). `next/image` throws for unknown hosts, so pages returned 500. | With `img = https://evil.example/x.png`, every page was 500 for that user. For another user, her profile and **their notifications page** were 500. | `@IsImageRef()`: an uploaded file name, or `https` on `res.cloudinary.com` or `picsum.photos`. Used for users and communities. A unit test checks the hosts match `next.config.ts`. | `91f0aea` |
 | **B3** | Text over the column size gave 500 (post 255, comment 1,000). | A 300-char post, 400-char quote repost and 1,200-char comment gave 500. A report with no reason gave 500. | Limits checked (counted in characters, so an emoji is 1) and answered with 400. The report needs a reason. | `c4d5d46` |
 | **B4** | The feed fetch never checked `res.ok` (`InfiniteFeed.tsx`). | After 1,300 requests, `/api/posts` gave 429 and the home page showed the crash screen "Something went wrong. Try again". | `jsonOrThrow()` in the home feed, the hashtag page and the followers lists. A failed refetch keeps the posts already shown. Chrome now keeps the page and shows "Something went wrong!" in the feed area. | `5db92b8` |
+| **N2** | `findByPost` in `comments.service.ts` had no block filter. A blocked user's comment was still shown to the person who blocked them. | carol blocked dave. On bob's post, carol still saw dave's comment. | `findByPost` reads `blockService.getAllBlockedPeerIds` once and leaves out the blocked users' comments at all five levels. The replies under a hidden comment go with it. A block counts in both directions. IT test TC4. | `2c0535a` |
+| **N5** | `Post.tsx` wrapped the post text in a link to the status page, and `RichText.tsx` put a link for each `@mention` and `#tag` inside it: `<a>` inside `<a>`. React logged a hydration error and rebuilt the tree on the client. | Chrome console: "In HTML, `<a>` cannot be a descendant of `<a>`" and "Hydration failed…", on a post with mentions. | The text is a `div` with `role="link"` and `tabIndex` 0, not a `Link`. A click opens the post; Ctrl or Cmd click and middle click open a new tab; Enter does what a click does; a click that ends a text selection does nothing. The mention and tag links keep their own click. | `8241cef` |
+| **N8** | Opening or refreshing `/compose/post` directly gave 404. It only worked as an in-app modal. | `GET /compose/post` with a session cookie gave 404. | The modal is now the intercepting route `@modal/(.)compose/post`, and the new page `(board)/compose/post/page.tsx` serves a direct load or a reload. Its close button goes to `/`. | `8241cef` |
+| **B2** | The community slug had no format rule. Spaces, `/` or capitals broke `/c/<slug>` links. | Slug `Has Space/And Slash` was created (201). | `@Matches(/^[a-z0-9_-]{3,30}$/)` on `CreateCommunityDto.slug`, so the form and the API agree. Old rows are not changed. IT test TC8. | `9d8cd90` |
+| **B7** | `getTrending` counted tags of community posts and deleted posts, and was not cached. Trending numbers were wrong. | Reported vs real: music 38 vs 16, photography 36 vs 12, books 36 vs 13, productivity 133 vs 113, coffee 82 vs 62. | `getTrending` counts only posts that are not deleted, not in a community and approved, and caches the top 5 for 60 s (`hashtags:trending:top5`, no version key). IT tests TC6 and a cache check. | `9d8cd90` |
+| **R1** | `_count.replies` on comments also counted deleted replies, the same bug as T1. The UI only uses it at the nesting limit. | Found while fixing T1 (code). | `commentInclude` counts `replies: { where: { deletedAt: null } }`. IT test TC5. | `2c0535a` |
+| **B9** | The "Explore" menu item linked to `/`, not `/?feed=explore` (`LeftBar.tsx`). | In the page HTML, Explore, Homepage and More all link to `/`. | The `href` is `/?feed=explore`. | `8241cef` |
+| **B10** | `GET messages` set `lastReadAt` but did not clear the `dm:unreadCount` cache (60 s). | After `GET messages` the list showed `unread:2` while `unread-count` said 1. | `getMessages` deletes `dm:unreadCount` for the reader, as `sendMessage` already does for the other member. The IT test boots a second app with the HTTP cache on, because the shared IT app runs with the cache off (TC7). | `9d8cd90` |
+| **R7** | `npm run dev:reset` (root script, defined in `apps/frontend/package.json`) ran `prisma db push --force-reset` and then the seed. `db push` builds the schema without the migrations, so the `*_data_humans_v1*` data migrations never ran and the database could drift from what Docker deploys with `migrate deploy`. The old README told new developers to use it, and the harness hook refuses `db push`. | Code only (found 2026-11-02 while updating the README). | The script is removed from the root and the frontend `package.json`, and the README names only `prisma migrate deploy` and `prisma db seed`. The hook `pre-bash.cjs` still refuses the name. | `fdaed58` |
 
 ### 5.4 What the fixes mean for the thesis baseline
 
 - The thesis baselines BL0 to BL5 are computed from events by the harness. The fixes change the **live** counts only when deleted rows exist, and the synthetic generator writes none. So the harness results do not change.
 - The Explore numbers in the old pre-thesis report were measured with the buggy counts and the old rate limit. They are not comparable with new runs (see section 7).
+- The P9 fixes (`p9-bug-quick-wins`) do not change the harness results either: the harness reads events, not the API, and the synthetic data have no pending interactions, deleted tags or blocked comments.
 - The setup commit `84e84a7` added the Jest tests, `app.setup.ts` and the two verify scripts (`scripts/verify-bug-sweep.sh`, `scripts/verify-socket.cjs`). No behavior change.
 
 ---
@@ -152,9 +154,9 @@ The 18 findings below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B
 | Phase | Bugs |
 |---|---|
 | **Schema migration** (cut from the super plan in v0.2, §9) | T6, and with the same migration: N3, N10, R4 (schema part) |
-| **P6** (hybrid scorer) | done in task `p6-social-feed` (2026-11-10): T4, T3, B6, the pool part of R2, and the D1 product rule. The interaction part of R2 goes to `p9-bug-quick-wins` |
+| **P6** (hybrid scorer) | done in task `p6-social-feed` (2026-11-10): T4, T3, B6, the pool part of R2, and the D1 product rule. The interaction part of R2 was done in `p9-bug-quick-wins` |
 | **E7** (cost run) | done in task `p7-cost-benchmark` (2026-11-12): N6, and the T3 note (E7 ran with the cache off) |
-| **P9, before the demo** (task `p9-bug-quick-wins`, implementation-plan §5 row 20) | R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7, and the README corrections of section 7 |
+| **P9, before the demo** (task `p9-bug-quick-wins`, implementation-plan §5 row 20) | done on 2026-11-20: R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7, and the README corrections of section 7 |
 | **P10, before sharing the app** (task `p10-security-fixes`, row 29, only for a shared server) | B1, S4, S6, B5, R3, R6 |
 | **Future work** (thesis Chapter 9) | the schema migration above, R5, N7, N9, B8 |
 
@@ -171,10 +173,9 @@ The 18 findings below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B
 4. The NFR doc that still says 120 per minute.
 
 **Also found, for the same list:**
-- `README.md` says `npm run dev:reset` for local work. It runs `db push --force-reset`, which wipes the database and skips the migrations.
-- `README.md` calls Explore "trending by likes". The code uses the weighted score.
-- `docs/testcase.md` says verify returns a session cookie. The code only returns `ok`, and the user must sign in.
-- `docs/feed_implementation_now.md` says page size 3. The code uses 10.
+- **Done** (task `p9-bug-quick-wins`, 2026-11-20): `README.md` said `npm run dev:reset` for local work. The README now names `prisma migrate deploy` and `prisma db seed`, and the script is removed (R7).
+- **Done**: `README.md` called Explore "trending by likes". It now says the engagement score.
+- Not changed: `docs/testcase.md` says verify returns a session cookie (the code only returns `ok`, and the user must sign in), and `docs/feed_implementation_now.md` says page size 3 (the code uses 10). Both files are now in `docs/Pre-thesis/`, which is frozen.
 
 ---
 
