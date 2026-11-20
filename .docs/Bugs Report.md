@@ -14,16 +14,17 @@ How the report was made: first I read the code and listed 26 suspected problems.
 |---|---|
 | Findings in the review | 36 (T1–T10, S1–S6, B1–B10, N1–N10) |
 | **Resolved** | **29** (14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed`, N6 in task `p7-cost-benchmark`, and 11 in task `p9-bug-quick-wins`: R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7) |
-| **Still open** | **10 of the 36, plus 4 found later (R3–R6) = 14** |
+| **Still open** | **10 of the 36, plus 4 found later (R3–R6), plus 5 from the demo sweep (V1–V5) = 19** |
 | Open decision | 0 (D1 decided on 2026-10-28 and built on 2026-11-10, section 4) |
 
-Open items by priority: **P1 = 1, P2 = 5, P3 = 2, P4 = 6.** What the levels mean is in section 2.
+Open items by priority: **P1 = 1, P2 = 5, P3 = 4, P4 = 9.** What the levels mean is in section 2.
 
 The fixes were checked like this:
 - The same curl script ran on the unfixed code (**42 passed, 53 failed**) and on the final code on a freshly seeded database (**95 passed, 0 failed**). Output: [works/2026-10-21-bugs-sweep/sweep-before.txt](works/2026-10-21-bugs-sweep/sweep-before.txt) and [works/2026-10-21-bugs-sweep/sweep-after.txt](works/2026-10-21-bugs-sweep/sweep-after.txt).
 - 99 unit tests and 108 integration tests pass. Each fix started with a test that failed.
 - Task `p9-bug-quick-wins` (2026-11-20) added 7 unit tests and 22 integration tests (`quick-wins.it-spec.ts`). The backend now has 211 unit tests and 168 integration tests.
 - In Chrome: B4, T1 and T8 were confirmed in the UI. A sweep of 26 page checks gave the expected status codes.
+- The demo sweep (task `p10-demo-sweep`, 2026-11-20) walked all 28 pages and 15 flows in Chrome: 5 new findings (V1–V5, §3.5) and a new symptom of T6. Record: [works/2026-11-20-p10-demo-sweep/sweep.md](works/2026-11-20-p10-demo-sweep/sweep.md).
 
 ---
 
@@ -54,7 +55,7 @@ Code locations use function and file names, because line numbers moved during th
 
 | ID | Problem and effect | Evidence from the run | How to fix | Effort |
 |---|---|---|---|---|
-| **T6** | `interactions.service.ts` (like, save) and `users.service.ts` (follow) do "check, then write" and the tables have no unique key. Two fast requests make duplicate rows and wrong counts. Until fixed, `\|F_u\|` in the trust formula counts duplicates twice. | 6 parallel likes made 6 rows. 6 parallel follows made 6 rows, and one unfollow left 5. **The clean seed already has duplicates:** 53 like pairs (54 extra rows), 45 follow pairs (48 extra), 3 saved pairs (3 extra). | **The schema migration** (cut from the super plan in v0.2, kept in its §9): delete duplicates (keep the lowest `id`), add unique keys, add a CHECK against self-follow. The toggles must catch the unique-key error. The seed is a ready test for the migration. | M |
+| **T6** | `interactions.service.ts` (like, save) and `users.service.ts` (follow) do "check, then write" and the tables have no unique key. Two fast requests make duplicate rows and wrong counts. Until fixed, `\|F_u\|` in the trust formula counts duplicates twice. | 6 parallel likes made 6 rows. 6 parallel follows made 6 rows, and one unfollow left 5. **The clean seed already has duplicates:** 53 like pairs (54 extra rows), 45 follow pairs (48 extra), 3 saved pairs (3 extra). Demo sweep (2026-11-20): the followers and following pages show a user twice and React logs "Encountered two children with the same key" (`/user2/followers`: `user15` has 3 follow rows to `user2`). | **The schema migration** (cut from the super plan in v0.2, kept in its §9): delete duplicates (keep the lowest `id`), add unique keys, add a CHECK against self-follow. The toggles must catch the unique-key error. The seed is a ready test for the migration. | M |
 
 ### 3.2 P2: before anyone else uses the app
 
@@ -83,6 +84,18 @@ Code locations use function and file names, because line numbers moved during th
 | **N10** | One user can report the same post many times, and each report notifies every admin. | carol's two reports on one post made 2 rows and 2 notifications. | Unique key on (reporter, post) with an upsert (fits the schema migration). | S |
 | **R4** | Dead code and unused config: the `Account` and `Session` models, `Post.parentPostId` and its relation (queries still filter `parentPostId: null`), the `resend` npm package, the env names `STORAGE_DRIVER`, `RESEND_API_KEY` and `EMAIL_FROM`, and frontend lint warnings (unused variables in six components). | From code and `npm run lint` (warnings only, 0 errors). | Remove them. The schema parts belong in the schema migration. | S–M |
 | **R5** | `getConnectUsers` builds the whole user list in memory and slices it. Fine now, slow at 5,000 users. | Code only. The connect list had 9 pages for 107 users. | Page in the database. | M |
+
+### 3.5 Found in the demo sweep (task `p10-demo-sweep`, 2026-11-20)
+
+Found while walking the demo path in Chrome (dev data in schema `public`, `next dev`). Evidence per row is in [works/2026-11-20-p10-demo-sweep/sweep.md](works/2026-11-20-p10-demo-sweep/sweep.md).
+
+| ID | Problem and effect | Evidence from the run | How to fix | Effort |
+|---|---|---|---|---|
+| **V1** (P3) | `/messages` and `/messages/:id` fail hydration in `ConversationList`: the server HTML says "No conversations yet", the client shows the list, and React throws away the server tree. Users see the right list, but the console shows an exception. Likely cause (not proven): `ChatDrawer`, always in the `(board)` layout through `ChatDrawerManager`, uses the same query key `["conversations"]` with no `initialData`, so `ConversationList`'s `initialData` is not used on the server. | P20 and P21: console EXCEPTION "Hydration failed …", diff `<button>` (client) against `<p>` "No conversations yet" (server). | Give the two queries their own keys, or seed the shared key from the server data once. Check with the console on `/messages`. | S |
+| **V2** (P4) | After a new comment, the comment count on the post stays the same until a reload. | W6: comment 772 shown at once; the header count stayed 1, then 2 after a reload. | Update or invalidate the post's count when the comment is created (not checked which component holds it). | XS–S |
+| **V3** (P4) | An approved community post shows "(edited)". Cause (from code): `moderatePost` (`communities.service.ts`) updates the post row with `isApproved: true`, so Prisma moves `updatedAt`, and `Post.tsx` shows "(edited)" when `updatedAt` is more than 1 s after `createdAt`. | W9: post 929, approved by the owner, shows "(edited)". | Mark edits with their own field or time, or keep `updatedAt` on approve. | XS |
+| **V4** (P4) | After the owner approves a post, the community feed does not show it until the 10 s feed cache runs out and the page is reloaded. Same family as the T3 note (writes that do not bump a cache version). | W9: after Approve the header said "1 Posts" and the feed was empty; after 10 s and a reload the post was there. | Bump the cache version that the community feed reads when a post is approved, and refetch the feed on the client. | S |
+| **V5** (P3) | `app/sign-in/layout.tsx` renders its own `<html>` and `<body>` inside the root layout. On every client navigation to `/sign-in` (logout, a ban), React logs "In HTML, `<html>` cannot be a child of `<body>`" and "You are mounting a new html component …". A direct load of `/sign-in` showed no error. | W13 and W15: three console errors right after the page reached `/sign-in`. | Let the sign-in layout return only its children (keep the metadata). | XS |
 
 ---
 
@@ -158,6 +171,7 @@ The 29 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 i
 | **E7** (cost run) | done in task `p7-cost-benchmark` (2026-11-12): N6, and the T3 note (E7 ran with the cache off) |
 | **P9, before the demo** (task `p9-bug-quick-wins`, implementation-plan §5 row 20) | done on 2026-11-20: R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7, and the README corrections of section 7 |
 | **P10, before sharing the app** (task `p10-security-fixes`, row 29, only for a shared server) | B1, S4, S6, B5, R3, R6 |
+| **P10, before the demo** (proposed task `p10-demo-fixes`, before row 22; the author decides, `p10-demo-sweep` Open question 1) | V1–V5 |
 | **Future work** (thesis Chapter 9) | the schema migration above, R5, N7, N9, B8 |
 
 ---
