@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { POST_DESC_MAX, isTooLong } from '../common/limits';
+import { canSeePost } from '../posts/visibility';
 
 @Injectable()
 export class InteractionsService {
@@ -10,18 +11,23 @@ export class InteractionsService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
-  /** The post must exist and not be soft-deleted. Returns its author id. */
-  private async assertPostLive(postId: number): Promise<{ userId: string }> {
+  /**
+   * The post must exist, not be soft-deleted, and be visible to the viewer: a post that waits for
+   * approval (R2) is open only to its author, the community owner and the mods. Returns its author id.
+   */
+  private async assertPostLive(postId: number, viewerId: string): Promise<{ userId: string }> {
     const post = await this.prisma.post.findFirst({
       where: { id: postId, deletedAt: null },
-      select: { userId: true },
+      select: { userId: true, communityId: true, isApproved: true },
     });
-    if (!post) throw new NotFoundException('Post not found');
+    if (!post || !(await canSeePost(this.prisma, post, viewerId))) {
+      throw new NotFoundException('Post not found');
+    }
     return post;
   }
 
   async toggleLike(userId: string, postId: number) {
-    const post = await this.assertPostLive(postId);
+    const post = await this.assertPostLive(postId, userId);
     const existing = await this.prisma.like.findFirst({ where: { userId, postId } });
 
     if (existing) {
@@ -36,7 +42,7 @@ export class InteractionsService {
   }
 
   async toggleSave(userId: string, postId: number) {
-    await this.assertPostLive(postId);
+    await this.assertPostLive(postId, userId);
     const existing = await this.prisma.savedPosts.findFirst({
       where: { userId, postId },
     });
@@ -56,7 +62,7 @@ export class InteractionsService {
     if (isTooLong(quote, POST_DESC_MAX)) {
       throw new BadRequestException(`Text is too long (max ${POST_DESC_MAX} characters)`);
     }
-    const originalPost = await this.assertPostLive(postId);
+    const originalPost = await this.assertPostLive(postId, userId);
 
     if (quote) {
       await this.prisma.post.create({

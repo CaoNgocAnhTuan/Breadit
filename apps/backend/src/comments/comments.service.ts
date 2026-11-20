@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { COMMENT_BODY_MAX, isTooLong } from '../common/limits';
+import { canSeePost } from '../posts/visibility';
 
 @Injectable()
 export class CommentsService {
@@ -38,6 +39,21 @@ export class CommentsService {
     };
   }
 
+  /**
+   * The post must exist, not be soft-deleted, and be visible to the viewer (R2): a post that waits for
+   * approval is open only to its author, the community owner and the mods. Everybody else gets 404.
+   */
+  private async assertPostVisible(postId: number, viewerId?: string): Promise<{ id: number; userId: string }> {
+    const post = await this.prisma.post.findFirst({
+      where: { id: postId, deletedAt: null },
+      select: { id: true, userId: true, communityId: true, isApproved: true },
+    });
+    if (!post || !(await canSeePost(this.prisma, post, viewerId))) {
+      throw new NotFoundException('Post not found');
+    }
+    return post;
+  }
+
   /** A comment needs text or at least one image (N1), and the text must fit the column (B3). */
   private assertText(text: string, mediaCount: number) {
     if (isTooLong(text, COMMENT_BODY_MAX)) {
@@ -49,8 +65,7 @@ export class CommentsService {
   }
 
   async findByPost(postId: number, userId?: string, sort = 'relevant') {
-    const post = await this.prisma.post.findUnique({ where: { id: postId } });
-    if (!post || post.deletedAt) throw new NotFoundException();
+    await this.assertPostVisible(postId, userId);
 
     const include = this.commentInclude(userId);
 
@@ -111,11 +126,7 @@ export class CommentsService {
   ) {
     this.assertText(body, files.length);
 
-    const post = await this.prisma.post.findFirst({
-      where: { id: postId, deletedAt: null },
-      select: { id: true, userId: true },
-    });
-    if (!post) throw new NotFoundException('Post not found');
+    const post = await this.assertPostVisible(postId, userId);
 
     if (parentCommentId) {
       const parentComment = await this.prisma.comment.findUnique({
@@ -331,6 +342,7 @@ export class CommentsService {
       select: { userId: true, postId: true, deletedAt: true },
     });
     if (!comment || comment.deletedAt) throw new NotFoundException();
+    await this.assertPostVisible(comment.postId, userId);
 
     const existing = await this.prisma.commentLike.findUnique({
       where: { userId_commentId: { userId, commentId } },

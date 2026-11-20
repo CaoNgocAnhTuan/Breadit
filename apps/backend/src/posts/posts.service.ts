@@ -13,6 +13,7 @@ import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { POST_DESC_MAX, isTooLong } from '../common/limits';
 import { engagementSelect } from './engagement';
+import { canSeePost } from './visibility';
 import { computeExploreScoreFixed } from '@breadit/ranking';
 import { FEED_CONFIG, type FeedAlgo, type FeedConfig } from '../feed/feed.config';
 import { makeAlgoCursor, pageAfter, parseAlgoCursor } from '../feed/feed.cursor';
@@ -431,24 +432,6 @@ export class PostsService {
     return result;
   }
 
-  /**
-   * A post that waits for approval (finding T10) is visible only to its author and to the
-   * OWNER or MOD of its community. Everybody else, guests included, gets 404.
-   */
-  private async canSeePending(
-    post: { userId: string; communityId: number | null },
-    viewerId?: string,
-  ): Promise<boolean> {
-    if (!viewerId) return false;
-    if (post.userId === viewerId) return true;
-    if (post.communityId == null) return false;
-    const member = await this.prisma.communityMember.findUnique({
-      where: { userId_communityId: { userId: viewerId, communityId: post.communityId } },
-      select: { role: true },
-    });
-    return member?.role === CommunityRole.OWNER || member?.role === CommunityRole.MOD;
-  }
-
   async findOne(postId: number, userId?: string) {
     const include = this.postInclude(userId);
     const post = await this.prisma.post.findFirst({
@@ -458,7 +441,7 @@ export class PostsService {
         community: { select: { name: true, slug: true } },
       },
     });
-    if (post && !post.isApproved && !(await this.canSeePending(post, userId))) {
+    if (post && !(await canSeePost(this.prisma, post, userId))) {
       return null;
     }
     if (
