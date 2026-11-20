@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.20 · 2026-11-19 · Status: approved 2026-10-28
+Version 1.21 · 2026-11-20 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -287,11 +287,11 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-19. ✅ mea
 | ✅ 11-19 | 12 | `p9-report-macros` | P9 | 11 | the macros Chapters 6 and 7 need, the `Full` rule; closing: the full repro run, the results that commit `17e784f` deleted by mistake | 0.5 | — | — |
 | ✅ 11-19 | 13 | Writing: Guidance Manual 11 §12 (one number from start to end) | P9 | 12 | one real user of `syn-W2M-M` from the test post to the macro, en and vi | 0.25 | — | — |
 | ✅ 11-19 | 14 | `p9-figure-data` | P9 | 12 | the report also writes `fig-e2` (gain by history group) and `fig-e5` (gain by world), with intervals | 0.5 | — | — |
-| ▶ draft written | 15 | Writing: Chapter 3 Methodology | P9 | — | draft, review, LaTeX | 1 | — | — |
+| ✅ 11-20 | 15 | Writing: Chapter 3 Methodology | P9 | — | draft, review, LaTeX | 1 | — | — |
 | ✖ dropped 11-19 | 16 | ~~`p9-diagrams`~~ | P9 | — | no task: the author draws the diagrams by hand (draw.io; sequence diagrams in the Mermaid web editor) and adds them as images in row 18 | — | — | — |
-| ⬜ | 17 | Writing: Chapters 6 and 7 in LaTeX | P9 ★ | 14 | macros only, the ten tables, three figures (E2, E3, E5) in pgfplots | 1 | — | — |
-| ⬜ | 18 | Writing: Chapter 4 System Analysis and Design | P9 | — | requirements, use cases, activity, sequence, architecture, ERD | 1 | — | — |
-| ⬜ | 19 | Writing: Chapter 5 Implementation | P9 | — | the system as built (Guidance Manual 08 and 12) | 1 | — | — |
+| ✅ 11-20 | 17 | Writing: Chapters 6 and 7 in LaTeX | P9 ★ | 14 | macros only, the ten tables, three figures (E2, E3, E5) in pgfplots | 1 | — | — |
+| ✅ 11-20 (figures to draw) | 18 | Writing: Chapter 4 System Analysis and Design | P9 | — | requirements, use cases, activity, sequence, architecture, ERD | 1 | — | — |
+| ✅ 11-20 | 19 | Writing: Chapter 5 Implementation | P9 | — | the system as built (Guidance Manual 08 and 12) | 1 | — | — |
 | ⬜ | 20 | `p9-bug-quick-wins` | P9 | — | the open bugs a demo shows; README corrections of Bugs Report §7; the parity test stays green | 1 | — | R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7 |
 | ⬜ | 21 | `p10-demo-sweep` | P10 | 20 | run `verify-bug-sweep.sh` and `verify-socket.cjs` again, walk the demo path in Chrome, add new bugs to the Bugs Report | 0.5 | — | — |
 | ⬜ | 22 | `p10-demo-script` | P10 | 21 | `scripts/demo/`: load `syn-W2M-M` with `--rebase-to` now, start the app, two demo users (little and long history), a checklist (the three `algo` side by side, a live direct message, a notification, a ban that logs out), cleanup | 1 | — | — |
@@ -357,3 +357,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.18 · 2026-11-19 · Task `p9-figure-data`: §2.8 the report also writes the figure data of E2 and E5 (`fig-e2-history.csv`, `fig-e5-worlds.csv`) next to E3; §4 rows E2 and E5 are "table, figure". No contract, rule or frozen value changed.
 - 1.19 · 2026-11-19 · §5 row 14 ✅ (task `p9-figure-data` closed), row 15 ▶ (the Chapter 3 draft is written; review and LaTeX remain); §2.8 says ten LaTeX tables, not nine. No contract, rule or frozen value changed.
 - 1.20 · 2026-11-19 · §5 row 16 dropped by the author: no diagram task; the diagrams are drawn by hand (draw.io, and the Mermaid web editor for sequence diagrams) and added as images while Chapter 4 is written; row 18 no longer depends on row 16. No contract, rule or frozen value changed.
+- 1.21 · 2026-11-20 · §5 rows 15, 17, 18 and 19 ✅: Chapters 3 to 7 are in LaTeX (writing tasks on the light path, CLAUDE.md Workflow; folders `2026-11-20-p9-ch3-latex`, `-p9-ch6-7-latex`, `-p9-ch4-text`, `-p9-ch5-implementation`). The Chapter 4 figures are placeholders until the author draws them. No contract, rule or frozen value changed.
