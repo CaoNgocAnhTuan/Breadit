@@ -1,0 +1,30 @@
+sequenceDiagram
+    autonumber
+    participant UI as Browser (InfiniteFeed)
+    participant C as PostsController
+    participant S as PostsService
+    participant K as Redis cache
+    participant F as FeedService
+    participant DB as Postgres
+    participant R as ranking package
+    UI->>C: GET /api/posts?algo=social&cursor=1
+    C->>S: findAll(cursor, ..., algo, asOf)
+    S->>S: resolveFeedOptions, t = asOf, the time in the cursor, or the clock
+    S->>K: get the page (the key has algo, cursor, v:user, asOf)
+    alt hit
+        K-->>S: cached page
+    else miss
+        S->>F: rank(user, social, t)
+        F->>DB: 1. root posts in [t − W, t), community posts included
+        F->>DB: 2. the user's follows, memberships, positives before t
+        F->>DB: 3. blocked peers
+        F->>R: userFeaturesAsOf, buildPool
+        F->>DB: 4. likes, comments, reposts on the pool posts before t
+        F->>R: postFeaturesAsOf per pool post, scorer(H), rankPool
+        R-->>F: post ids in order
+        F-->>S: (id, score) in rank order
+        S->>DB: load the 10 posts after the cursor, with counts and media
+        S->>K: store the page, 10 s
+    end
+    S-->>C: posts, hasMore, nextCursor "t:score:id"
+    C-->>UI: JSON

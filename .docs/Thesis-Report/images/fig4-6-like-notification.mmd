@@ -1,0 +1,33 @@
+sequenceDiagram
+    autonumber
+    participant A as Alice's browser
+    participant C as InteractionsController
+    participant S as InteractionsService
+    participant DB as Postgres
+    participant N as NotificationsService
+    participant GW as Gateway and Redis adapter
+    participant B as Bob's browser
+    Note over B,GW: Bob's socket joined the room "bob" when it connected
+    A->>C: POST /api/posts/:id/like with the cookie
+    C->>C: JwtAuthGuard, BannedUserGuard (reads the DB), EmailVerifiedGuard
+    C->>S: toggleLike(alice, postId)
+    S->>DB: find the post, not deleted
+    S->>S: canSeePost: a post that waits for approval is open<br/>only to its author, and to the owner or a moderator of its community
+    alt no such post, or Alice may not see it
+        S-->>A: 404 Post not found
+    else found and visible
+        S->>DB: find Alice's like on the post
+        alt already liked
+            S->>DB: delete the like
+        else not liked
+            S->>DB: create the like
+            S-)N: emit(LIKE, alice, bob, postId), not awaited
+            Note over N: skipped when Alice likes her own post
+            N->>DB: save the Notification
+            N->>DB: find Bob's username
+            N->>GW: server.to("bob").emit("getNotification")
+            GW-->>B: getNotification
+        end
+        S->>DB: count the likes of the post
+        S-->>A: 200 liked, count
+    end

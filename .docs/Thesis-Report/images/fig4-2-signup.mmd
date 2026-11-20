@@ -1,0 +1,21 @@
+flowchart TD
+    S((Start)) --> A1["Fill in the sign-up form:<br/>username, email, password"]
+    A1 --> A2["POST /api/auth/register"]
+    A2 --> D1{"Input valid?"}
+    D1 -->|no| R1["400: show the errors"]
+    R1 --> A1
+    D1 -->|yes| D2{"Email or username<br/>already taken?"}
+    D2 -->|yes| R2["409: show the error"]
+    R2 --> A1
+    D2 -->|no| A3["Hash the password (bcrypt)<br/>and create the user,<br/>emailVerified empty"]
+    A3 --> A4["Make a 6-digit code, valid 15 minutes,<br/>and email it"]
+    A4 --> A5["Open /verify and enter the code"]
+    A5 --> A6["POST /api/auth/verify"]
+    A6 --> D3{"Code right and<br/>not expired?"}
+    D3 -->|no| D4{"Ask for a new code?"}
+    D4 -->|yes| A7["POST /api/auth/verify/resend:<br/>a new code replaces the old one"]
+    A7 --> A5
+    D4 -->|no| A5
+    D3 -->|yes| A8["Set emailVerified,<br/>delete the code"]
+    A8 --> A9["Go to /sign-in?verified=1"]
+    A9 --> E(((End)))

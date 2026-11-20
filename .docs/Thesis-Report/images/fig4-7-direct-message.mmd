@@ -1,0 +1,27 @@
+sequenceDiagram
+    autonumber
+    participant A as Alice's browser
+    participant C as MessagesController
+    participant S as MessagesService
+    participant DB as Postgres
+    participant K as Redis
+    participant GW as Gateway and Redis adapter
+    participant B as Bob's browser
+    B->>GW: connect with the cookie
+    GW->>GW: check the cookie and the logout blacklist
+    GW->>GW: join the room "bob"
+    A->>C: POST /api/conversations/:id/messages with the cookie
+    C->>C: JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard
+    C->>S: sendMessage(id, alice, body or media)
+    S->>DB: Alice is a member, and no block between the two
+    alt not a member, blocked, or no body and no media
+        S-->>A: 403
+    else ok
+        S->>DB: one transaction: create the message, update the conversation time
+        S->>DB: find the other member (Bob)
+        S->>GW: server.to("bob").emit("newMessage")
+        GW-->>B: newMessage
+        B->>B: show the message, update the unread count
+        S->>K: delete Bob's unread-count cache entry
+        S-->>A: 201 the message
+    end

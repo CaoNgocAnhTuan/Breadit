@@ -1,0 +1,184 @@
+erDiagram
+    User {
+        String id PK
+        String email UK
+        String username UK
+        DateTime emailVerified
+        Role role
+        Boolean banned
+        DateTime createdAt
+    }
+    VerificationToken {
+        String identifier UK "unique pair"
+        String token UK "unique pair"
+        DateTime expires
+    }
+    Post {
+        Int id PK
+        DateTime createdAt
+        DateTime deletedAt
+        Boolean isSensitive
+        Boolean isApproved
+        String userId FK
+        Int rePostId FK
+        Int parentPostId FK
+        Int communityId FK
+    }
+    Hashtag {
+        Int id PK
+        String tag UK
+        DateTime createdAt
+    }
+    PostTag {
+        Int postId PK, FK
+        Int hashtagId PK, FK
+    }
+    Like {
+        Int id PK
+        DateTime createdAt
+        String userId FK
+        Int postId FK
+    }
+    SavedPosts {
+        Int id PK
+        DateTime createdAt
+        String userId FK
+        Int postId FK
+    }
+    Notification {
+        Int id PK
+        NotificationType type
+        String recipientId FK
+        String actorId FK
+        Int postId FK
+        Int commentId FK
+        DateTime readAt
+        DateTime createdAt
+    }
+    Follow {
+        Int id PK
+        DateTime createdAt
+        Boolean notify
+        String followerId FK
+        String followingId FK
+    }
+    Block {
+        Int id PK
+        DateTime createdAt
+        String blockerId FK, UK "unique pair"
+        String blockedId FK, UK "unique pair"
+    }
+    Report {
+        Int id PK
+        DateTime createdAt
+        ReportStatus status
+        String reporterId FK
+        Int postId FK
+    }
+    Conversation {
+        Int id PK
+        DateTime createdAt
+    }
+    ConversationMember {
+        Int conversationId PK, FK
+        String userId PK, FK
+        DateTime lastReadAt
+    }
+    Message {
+        Int id PK
+        Int conversationId FK
+        String senderId FK
+        DateTime createdAt
+    }
+    PostMedia {
+        Int id PK
+        Int postId FK
+        DateTime createdAt
+    }
+    Community {
+        Int id PK
+        String slug UK
+        DateTime createdAt
+    }
+    CommunityMember {
+        Int id PK
+        CommunityRole role
+        DateTime createdAt
+        String userId FK, UK "unique pair"
+        Int communityId FK, UK "unique pair"
+    }
+    CommunityRule {
+        Int id PK
+        Int communityId FK
+    }
+    CommunityBannedUser {
+        Int id PK
+        DateTime createdAt
+        String userId FK, UK "unique pair"
+        Int communityId FK, UK "unique pair"
+    }
+    Comment {
+        Int id PK
+        DateTime createdAt
+        DateTime deletedAt
+        String userId FK
+        Int postId FK
+        Int parentCommentId FK
+    }
+    CommentMedia {
+        Int id PK
+        Int commentId FK
+        DateTime createdAt
+    }
+    CommentLike {
+        Int id PK
+        DateTime createdAt
+        String userId FK, UK "unique pair"
+        Int commentId FK, UK "unique pair"
+    }
+    Mention {
+        Int id PK
+        DateTime createdAt
+        Int postId FK
+        Int commentId FK
+        String userId FK
+    }
+    User ||--o{ Post : "userId"
+    Post |o--o{ Post : "rePostId"
+    Post |o--o{ Post : "parentPostId"
+    Community |o--o{ Post : "communityId"
+    Post ||--o{ PostTag : "postId"
+    Hashtag ||--o{ PostTag : "hashtagId"
+    User ||--o{ Like : "userId"
+    Post ||--o{ Like : "postId"
+    User ||--o{ SavedPosts : "userId"
+    Post ||--o{ SavedPosts : "postId"
+    User ||--o{ Notification : "recipientId"
+    User ||--o{ Notification : "actorId"
+    Post |o--o{ Notification : "postId"
+    Comment |o--o{ Notification : "commentId"
+    User ||--o{ Follow : "followerId"
+    User ||--o{ Follow : "followingId"
+    User ||--o{ Block : "blockerId"
+    User ||--o{ Block : "blockedId"
+    User ||--o{ Report : "reporterId"
+    Post ||--o{ Report : "postId"
+    Conversation ||--o{ ConversationMember : "conversationId"
+    User ||--o{ ConversationMember : "userId"
+    Conversation ||--o{ Message : "conversationId"
+    User ||--o{ Message : "senderId"
+    Post ||--o{ PostMedia : "postId"
+    User ||--o{ CommunityMember : "userId"
+    Community ||--o{ CommunityMember : "communityId"
+    Community ||--o{ CommunityRule : "communityId"
+    User ||--o{ CommunityBannedUser : "userId"
+    Community ||--o{ CommunityBannedUser : "communityId"
+    User ||--o{ Comment : "userId"
+    Post ||--o{ Comment : "postId"
+    Comment |o--o{ Comment : "parentCommentId"
+    Comment ||--o{ CommentMedia : "commentId"
+    User ||--o{ CommentLike : "userId"
+    Comment ||--o{ CommentLike : "commentId"
+    Post |o--o{ Mention : "postId"
+    Comment |o--o{ Mention : "commentId"
+    User ||--o{ Mention : "userId"

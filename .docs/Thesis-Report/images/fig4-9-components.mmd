@@ -1,0 +1,32 @@
+flowchart LR
+    B["Web browser"]
+    subgraph FE["Frontend: Next.js 15, React 19"]
+        MW["middleware.ts<br/>session cookie check"]
+        SC["Server components<br/>serverFetch()"]
+        CC["Client components<br/>TanStack Query, api()"]
+    end
+    subgraph BE["Backend: NestJS 10 on Fastify"]
+        REST["REST controllers /api/...<br/>guards, ValidationPipe, throttler"]
+        SVC["Services: auth, posts, feed, users,<br/>communities, messages, notifications, admin"]
+        GW["Socket.IO gateway<br/>NotificationsGateway"]
+    end
+    RANK["@breadit/ranking<br/>pure ranking package"]
+    PG[("PostgreSQL 16<br/>via Prisma 6")]
+    RD[("Redis 7<br/>cache, logout blacklist,<br/>throttler, socket adapter")]
+    UP[("Uploads<br/>Cloudinary or local disk")]
+    SMTP["SMTP server<br/>verification and reset email"]
+
+    B --> MW
+    MW --> SC
+    B --> CC
+    SC -->|"HTTP, forwards the cookie"| REST
+    CC -->|"HTTP with the cookie"| REST
+    B <-->|"WebSocket with the cookie"| GW
+    REST --> SVC
+    SVC -->|"plain arrays in, post ids out"| RANK
+    SVC --> PG
+    SVC <--> RD
+    GW <--> RD
+    SVC --> UP
+    SVC -->|"emit to a user room"| GW
+    SVC --> SMTP

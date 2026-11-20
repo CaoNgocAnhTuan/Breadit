@@ -2,8 +2,9 @@
 % Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. This chapter has no result numbers;
 % the numbers typed here are design values of the code (page size, text limits, cache time).
 % The \chapter command is in main.tex, so this file starts with the introduction and then the sections.
-% Figures: each one is a placeholder. The author draws the diagrams by hand (draw.io, Mermaid web editor) from the scripts
-% in the draft, saves them in images/ and replaces the \fbox line by the \includegraphics line above it.
+% Figures: each one is \thesisdiagram{<name>}{<width>} (macro in main.tex). It shows images/<name>.pdf, or images/<name>.png,
+% and until one of them exists it shows a framed placeholder. The author draws the diagrams by hand (draw.io, Mermaid web editor)
+% from the scripts in diagrams.md, and saves the image in images/ under that name: no edit of this file is needed.
 % Pointers to Chapter 3: sec:method-hybrid (3.2), sec:method-protocol (3.5), sec:method-repro (3.8), sec:method-cost (3.9).
 
 This chapter designs the platform of contribution C1 (the architecture) and contribution C3 (the real-time layer), and shows where the ranking of C2 plugs in. Section~\ref{sec:design-requirements} lists the requirements. Section~\ref{sec:design-usecases} gives the use cases. Sections~\ref{sec:design-activity} and~\ref{sec:design-sequence} show the main flows as activity diagrams and sequence diagrams. Section~\ref{sec:design-architecture} shows the architecture, and Section~\ref{sec:design-database} the database. Chapter 3 defines the ranking method, so this chapter only shows where the method is called. Chapter 5 describes how the design is built. Every route, guard and field named here was checked against the code.
@@ -86,8 +87,7 @@ The platform has four actors. A \textbf{Guest} is not signed in. A \textbf{User}
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-1-usecase}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-1-usecase.pdf}}}
+  \thesisdiagram{fig4-1-usecase}{\textwidth}
   \caption{Use case overview.}
   \label{fig:design-usecase}
 \end{figure}
@@ -240,8 +240,7 @@ After the right code, the backend sets \texttt{emailVerified}, deletes the code,
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-2-signup}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-2-signup.pdf}}}
+  \thesisdiagram{fig4-2-signup}{\textwidth}
   \caption{Sign up with email verification.}
   \label{fig:design-signup}
 \end{figure}
@@ -254,8 +253,7 @@ When the post has text, the service saves its hashtags in lower case and its men
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-3-publish-post}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-3-publish-post.pdf}}}
+  \thesisdiagram{fig4-3-publish-post}{\textwidth}
   \caption{Publish a post.}
   \label{fig:design-publish}
 \end{figure}
@@ -268,8 +266,7 @@ These queries leave out deleted posts and blocked users, and community posts app
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-4-feed-page}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-4-feed-page.pdf}}}
+  \thesisdiagram{fig4-4-feed-page}{\textwidth}
   \caption{Get one page of a feed.}
   \label{fig:design-feedpage}
 \end{figure}
@@ -286,18 +283,16 @@ On every later request, \texttt{JwtAuthGuard} verifies the token, asks Redis whe
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-5-auth-session}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-5-auth-session.pdf}}}
+  \thesisdiagram{fig4-5-auth-session}{\textwidth}
   \caption{Sign in, a signed-in request and sign out.}
   \label{fig:design-session}
 \end{figure}
 
-Figure~\ref{fig:design-like} shows the pattern of every notification: a guard chain, a service call, the change in the database, and then \texttt{NotificationsService.emit}. Alice likes Bob's post. The post must exist and must not be deleted, or the answer is 404. A like is a toggle: a second call deletes the like and sends nothing. A new like calls \texttt{emit} without waiting for it, so the answer to Alice does not depend on the push. \texttt{emit} skips a like of your own post, saves a \texttt{Notification} row, finds the username of Bob, and sends \texttt{getNotification} to the room of that username. The room is the address of the user, and the Redis adapter makes it work with more than one backend process. The service reads the like count after the change and returns it.
+Figure~\ref{fig:design-like} shows the pattern of every notification: a guard chain, a service call, the change in the database, and then \texttt{NotificationsService.emit}. Alice likes Bob's post. The post must exist, must not be deleted, and Alice must be allowed to see it (a post that waits for approval is open only to its author and the community owner and mods), or the answer is 404. A like is a toggle: a second call deletes the like and sends nothing. A new like calls \texttt{emit} without waiting for it, so the answer to Alice does not depend on the push. \texttt{emit} skips a like of your own post, saves a \texttt{Notification} row, finds the username of Bob, and sends \texttt{getNotification} to the room of that username. The room is the address of the user, and the Redis adapter makes it work with more than one backend process. The service reads the like count after the change and returns it.
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-6-like-notification}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-6-like-notification.pdf}}}
+  \thesisdiagram{fig4-6-like-notification}{\textwidth}
   \caption{Like a post, with the notification saved and pushed.}
   \label{fig:design-like}
 \end{figure}
@@ -306,8 +301,7 @@ Figure~\ref{fig:design-dm} shows a direct message. When Bob's page loads, his so
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-7-direct-message}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-7-direct-message.pdf}}}
+  \thesisdiagram{fig4-7-direct-message}{\textwidth}
   \caption{A direct message in real time.}
   \label{fig:design-dm}
 \end{figure}
@@ -318,8 +312,7 @@ Figure~\ref{fig:design-social} shows the new part of the thesis inside the platf
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-8-foryou-social}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-8-foryou-social.pdf}}}
+  \thesisdiagram{fig4-8-foryou-social}{\textwidth}
   \caption{The For You feed with \texttt{algo=social}.}
   \label{fig:design-social}
 \end{figure}
@@ -332,8 +325,7 @@ Figure~\ref{fig:design-components} shows the components of the platform.
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-9-components}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-9-components.pdf}}}
+  \thesisdiagram{fig4-9-components}{\textwidth}
   \caption{The components of the platform.}
   \label{fig:design-components}
 \end{figure}
@@ -372,8 +364,7 @@ Figure~\ref{fig:design-boundary} shows the one boundary that C2 adds. The backen
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-10-ranking-boundary}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-10-ranking-boundary.pdf}}}
+  \thesisdiagram{fig4-10-ranking-boundary}{\textwidth}
   \caption{The boundary of the ranking package.}
   \label{fig:design-boundary}
 \end{figure}
@@ -388,8 +379,7 @@ The database is PostgreSQL 16, used through Prisma 6. The schema has 25 models. 
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{fig4-11-erd}
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-11-erd.pdf}}}
+  \thesisdiagram{fig4-11-erd}{\textwidth}
   \caption{The ERD of the database: 23 of the 25 models (\texttt{Account} and \texttt{Session} are left out, because no code reads them). Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its dates (without \texttt{updatedAt}); the other fields are in \texttt{schema.prisma}.}
   \label{fig:design-erd}
 \end{figure}

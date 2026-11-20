@@ -1,0 +1,35 @@
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant B as Browser
+    participant AC as AuthController
+    participant AS as AuthService
+    participant G as JwtAuthGuard
+    participant DB as Postgres
+    participant R as Redis
+    U->>B: email and password
+    B->>AC: POST /api/auth/login
+    AC->>AS: login(dto)
+    AS->>DB: find the user by email
+    AS->>AS: bcrypt.compare(password, hash)
+    alt wrong email or password
+        AS-->>B: 401 Invalid email or password
+    else right
+        AS->>AS: signJwt: HS256, a new jti, 30 days
+        AS-->>B: 200 user, Set-Cookie breadit_session (httpOnly)
+    end
+    Note over B,R: Every later request sends the cookie
+    B->>G: GET /api/... with the cookie
+    G->>G: readSession: verifyJwt
+    G->>R: GET auth:blacklist:jti
+    R-->>G: not found
+    G->>G: req.user = id, username, emailVerified, role, banned
+    U->>B: sign out
+    B->>AC: POST /api/auth/logout with the cookie
+    AC->>AS: logout(token)
+    AS->>R: SET auth:blacklist:jti until the token expires
+    AS-->>B: 200, clear the cookie
+    B->>G: a request with the old token
+    G->>R: GET auth:blacklist:jti
+    R-->>G: found
+    G-->>B: 401

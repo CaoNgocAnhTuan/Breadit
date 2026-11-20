@@ -1,0 +1,24 @@
+flowchart TD
+    S((Start)) --> A1["GET /api/posts with the cursor and<br/>feed, user, communityId, algo, asOf"]
+    A1 --> D1{"Options valid? asOf only when enabled,<br/>algo only on For You and signed in"}
+    D1 -->|no| R1["400 or 401"]
+    R1 --> E1(((End)))
+    D1 -->|yes| D2{"For You, signed in,<br/>no algo given?"}
+    D2 -->|yes| A2["algo = FEED_DEFAULT_ALGO<br/>(empty when not set)"]
+    D2 -->|no| A3
+    A2 --> A3["Read the clock once"]
+    A3 --> A4["Cache key: viewer, mode, cursor,<br/>v:user version, asOf"]
+    A4 --> D3{"Page in the cache?"}
+    D3 -->|yes| R2["Return the cached page"]
+    R2 --> E1
+    D3 -->|no| D4{"algo set?"}
+    D4 -->|yes| A5["FeedService.rank at time t:<br/>pool, as-of features, scorer, rankPool"]
+    A5 --> A6["Take the 10 posts after the cursor.<br/>Next cursor: t:score:id"]
+    D4 -->|no| A7["Pick the mode: community, Explore,<br/>Following, Communities, profile,<br/>For You (newest first) or guest"]
+    A7 --> A8["Query: no deleted posts, no blocked peers.<br/>Community posts only in the community feeds,<br/>and only approved ones"]
+    A8 --> A9["Order newest first<br/>(Explore: the BL2 score)"]
+    A9 --> A10["Take one page"]
+    A6 --> A11["Store the page for 10 s"]
+    A10 --> A11
+    A11 --> R3["Return posts, hasMore, nextCursor"]
+    R3 --> E1

@@ -1,6 +1,6 @@
 # Chapter 4. System Analysis and Design
 
-> **Text written on 2026-11-20; the diagrams are still to be drawn.** The text of Sections 4.1–4.6 is below, checked against the code and `apps/backend/prisma/schema.prisma` on 2026-11-20. The same text is in `chapters/system-analysis-and-design.tex`, with a placeholder for each figure. Each figure below is a Mermaid script, checked on 2026-11-19. The author turns each one into an image: paste it into the Mermaid web editor (mermaid.live) and export it, or into draw.io (Arrange → Insert → Advanced → Mermaid) and redraw it there. Save the image in `images/` as `fig4-<n>-<name>.pdf` (the names are in the LaTeX placeholders), with the script next to it as a `.mmd` file. Remove this box before the final version. Budget: about 14 pages (see `Report Architecture.md`).
+> **Text written on 2026-11-20; the diagrams are still to be drawn.** The text of Sections 4.1–4.6 is below, checked against the code and `apps/backend/prisma/schema.prisma` on 2026-11-20. The same text is in `chapters/system-analysis-and-design.tex`, with a placeholder for each figure. Each figure below is a Mermaid script, checked on 2026-11-19 (Figures 4.3 to 4.8 again on 2026-11-20, see note 3). The author turns each one into an image: paste it into the Mermaid web editor (mermaid.live) and export it, or into draw.io (Arrange → Insert → Advanced → Mermaid) and redraw it there. Save the image in `images/` as `fig4-<n>-<name>.pdf` (the names are in the LaTeX placeholders), with the script next to it as a `.mmd` file (the `.mmd` files are already there). The file `diagrams.md` has the how-to and the list of all 11 figures. Remove this box before the final version. Budget: about 14 pages (see `Report Architecture.md`).
 
 This chapter designs the platform of contribution C1 (the architecture) and contribution C3 (the real-time layer), and shows where the ranking of C2 plugs in. Section 4.1 lists the requirements. Section 4.2 gives the use cases. Sections 4.3 and 4.4 show the main flows as activity diagrams and sequence diagrams. Section 4.5 shows the architecture, and Section 4.6 the database. Chapter 3 defines the ranking method, so this chapter only shows where the method is called. Chapter 5 describes how the design is built. Every route, guard and field named here was checked against the code.
 
@@ -232,7 +232,7 @@ flowchart TD
     A9 --> E2
 ```
 
-Checked against: `posts.controller.ts` (`@Post()` with `JwtAuthGuard`, `BannedUserGuard`, `EmailVerifiedGuard`), `posts.service.ts` `create` (`assertPostText`, the community, ban and membership checks, `isApproved`, `incrNumber('v:user')`, hashtags, mentions, the community notifications), `common/limits.ts` (`POST_DESC_MAX = 255`). A mention is saved only for a user the author follows. Hashtags and mentions are read only when the post has text.
+Checked against (again on 2026-11-20, no change): `posts.controller.ts` (`@Post()` with `JwtAuthGuard`, `BannedUserGuard`, `EmailVerifiedGuard`), `posts.service.ts` `create` (`assertPostText`, the community, ban and membership checks, `isApproved`, `incrNumber('v:user')`, hashtags, mentions, the community notifications), `common/limits.ts` (`POST_DESC_MAX = 255`). A mention is saved only for a user the author follows. Hashtags and mentions are read only when the post has text. The approval of a pending post (`CommunitiesService.moderatePost`) is not in this figure.
 
 Figure 4.4 shows how one page of a feed is made. It is the place where the ranking plugs in. The request has a cursor and the options `feed`, `user`, `communityId`, `algo` and the test-only `asOf`. The backend first checks the options. `algo` is allowed only on For You and only for a signed-in user, and `asOf` only when a test flag is on. A wrong option gives 400 or 401. A signed-in user on For You with no `algo` gets the default of the configuration.
 
@@ -269,7 +269,7 @@ flowchart TD
     R3 --> E1
 ```
 
-Checked against: `feed/feed.options.ts` (`resolveFeedOptions`), `posts.service.ts` `findAll` (lines 186–300: the clock read once, the cache key, the `algo` branch, the mode branches) and `algoPage` (lines 150–184).
+Checked against (line numbers of 2026-11-20): `feed/feed.options.ts` (`resolveFeedOptions`), `posts.service.ts` `findAll` (lines 187–433: the clock read once, the cache key, the `algo` branch, the mode branches) and `algoPage` (lines 152–185).
 
 ## 4.4 Sequence diagrams (about 3 pages)
 
@@ -304,7 +304,7 @@ sequenceDiagram
     end
     Note over B,R: Every later request sends the cookie
     B->>G: GET /api/... with the cookie
-    G->>G: verifyJwt
+    G->>G: readSession: verifyJwt
     G->>R: GET auth:blacklist:jti
     R-->>G: not found
     G->>G: req.user = id, username, emailVerified, role, banned
@@ -319,9 +319,9 @@ sequenceDiagram
     G-->>B: 401
 ```
 
-Checked against: `auth.controller.ts` (`login`, `logout`), `auth.service.ts` (`signJwt`, `setSessionCookie`, `login`, `logout`, `BLACKLIST_PREFIX`), `jwt.guard.ts`. Sign-in does not refuse a banned or unverified user; `BannedUserGuard` and `EmailVerifiedGuard` stop their writes later.
+Checked against (again on 2026-11-20): `auth.controller.ts` (`login`, `logout`), `auth.service.ts` (`signJwt`, `setSessionCookie`, `login`, `logout`, `BLACKLIST_PREFIX`), `jwt.guard.ts` and `session.ts` (`readSession`: the token check and the blacklist read, shared with `OptionalJwtAuthGuard`; a Redis error gives 401). Sign-in does not refuse a banned or unverified user; `BannedUserGuard` and `EmailVerifiedGuard` stop their writes later.
 
-Figure 4.6 shows the pattern of every notification: a guard chain, a service call, the change in the database, and then `NotificationsService.emit`. Alice likes Bob's post. The post must exist and must not be deleted, or the answer is 404. A like is a toggle: a second call deletes the like and sends nothing. A new like calls `emit` without waiting for it, so the answer to Alice does not depend on the push. `emit` skips a like of your own post, saves a `Notification` row, finds the username of Bob, and sends `getNotification` to the room of that username. The room is the address of the user, and the Redis adapter makes it work with more than one backend process. The service reads the like count after the change and returns it.
+Figure 4.6 shows the pattern of every notification: a guard chain, a service call, the change in the database, and then `NotificationsService.emit`. Alice likes Bob's post. The post must exist, must not be deleted, and Alice must be allowed to see it (a post that waits for approval is open only to its author and the community owner and mods), or the answer is 404. A like is a toggle: a second call deletes the like and sends nothing. A new like calls `emit` without waiting for it, so the answer to Alice does not depend on the push. `emit` skips a like of your own post, saves a `Notification` row, finds the username of Bob, and sends `getNotification` to the room of that username. The room is the address of the user, and the Redis adapter makes it work with more than one backend process. The service reads the like count after the change and returns it.
 
 **Figure 4.6. Like a post, with the notification saved and pushed.**
 
@@ -340,9 +340,10 @@ sequenceDiagram
     C->>C: JwtAuthGuard, BannedUserGuard (reads the DB), EmailVerifiedGuard
     C->>S: toggleLike(alice, postId)
     S->>DB: find the post, not deleted
-    alt no such post
+    S->>S: canSeePost: a post that waits for approval is open<br/>only to its author, and to the owner or a moderator of its community
+    alt no such post, or Alice may not see it
         S-->>A: 404 Post not found
-    else found
+    else found and visible
         S->>DB: find Alice's like on the post
         alt already liked
             S->>DB: delete the like
@@ -360,7 +361,7 @@ sequenceDiagram
     end
 ```
 
-Checked against: `interactions.controller.ts` lines 33–38, `interactions.service.ts` (`assertPostLive`, `toggleLike`), `notifications.service.ts` `emit` (lines 17–43).
+Checked against (again on 2026-11-20): `interactions.controller.ts` lines 33–38, `interactions.service.ts` (`assertPostLive`, `toggleLike`), `posts/visibility.ts` (`canSeePost`: a pending post gives 404 to everybody except its author, the community owner and the moderators), `notifications.service.ts` `emit` (lines 17–43). Saves and reposts use the same `assertPostLive`.
 
 Figure 4.7 shows a direct message. When Bob's page loads, his socket connects with the cookie. The gateway checks the cookie and the blacklist, and joins the socket to the room named after Bob. The server decides this, and the name that the client sends is ignored (finding S1). When Alice sends a message, the guards run, and the service checks that Alice is a member of the conversation and that no block exists between the two. If not, the answer is 403. Otherwise the service writes the message and the conversation time in one transaction. Then it pushes `newMessage` to the room of Bob, deletes the cached unread count of Bob for this conversation, and answers 201 with the message. Typing signals use the rooms `conversation:<id>`, and a socket can join such a room only if it is a member.
 
@@ -396,7 +397,7 @@ sequenceDiagram
     end
 ```
 
-Checked against: `messages.controller.ts` lines 27–28 (`api/conversations`, `JwtAuthGuard`, `BannedUserGuard`) and 83–91 (`EmailVerifiedGuard`, `sendMessage`), `messages.service.ts` `sendMessage` (lines 275–325, `assertMember`, `assertConversationNotBlocked`), `notifications.gateway.ts` (`handleConnection` joins the username room).
+Checked against (again on 2026-11-20, no change): `messages.controller.ts` lines 27–28 (`api/conversations`, `JwtAuthGuard`, `BannedUserGuard`) and 83–91 (`EmailVerifiedGuard`, `sendMessage`), `messages.service.ts` `sendMessage` (lines 277–327, `assertMember`, `assertConversationNotBlocked`), `notifications.gateway.ts` (`authenticate` checks the cookie and the blacklist; `handleConnection` joins the username room).
 
 Figure 4.8 shows the new part of the thesis inside the platform. On a cache miss, `PostsService` asks `FeedService.rank` to rank the pool for the user at time *t*. The time *t* is `asOf`, the time inside the cursor (page 2 and later), or the clock. `FeedService` loads plain data from Postgres in four steps: the root posts of the window [*t* − *W*, *t*), with community posts included; the follows, the memberships and the earlier positives of the user; the blocked peers; and, once the pool is built, the likes, comments and reposts on the pool posts. All events are taken before *t*. Between the loads, it calls the ranking package, which returns the post ids in order.
 
@@ -437,7 +438,7 @@ sequenceDiagram
     C-->>UI: JSON
 ```
 
-Checked against: `posts.service.ts` lines 150–222 (`algoPage`, `findAll`), `feed/feed.service.ts` `rank` (lines 53–158, the four loads and the package calls). The same diagram is in Guidance Manual 08 §4.
+Checked against (line numbers of 2026-11-20): `posts.service.ts` lines 152–225 (`algoPage`, `findAll`), `feed/feed.service.ts` `rank` (lines 53–158, the four loads and the package calls). The same diagram is in Guidance Manual 08 §4.
 
 ## 4.5 Architecture and modules (about 1.5 pages)
 
@@ -758,14 +759,18 @@ The next table lists the main entities and the rules the design keeps. Three rul
 
 1. **Diagram tools** (decided 2026-11-19): the author draws the diagrams by hand: draw.io, or the Mermaid web editor with the scripts above. Each image goes in `images/` as PDF (or PNG at 300 dpi or more), with its editable source next to it (see `Report Architecture.md`, "Diagrams").
 2. **Main flows only.** A diagram that does not support a sentence in the text is cut. The ERD is large; if it does not fit one page, put it on a landscape page or cut the field lists down to the keys.
-3. **Check again after `p9-bug-quick-wins`.** That task may change routes and guards (for example B2, R1). If it does, update Figures 4.3, 4.5, 4.6 and 4.7.
+3. **Checked again on 2026-11-20, after `p9-bug-quick-wins` and `p10-demo-fixes`.** Figures 4.3, 4.5, 4.6 and 4.7 were compared with the code (and 4.4 and 4.8, which use `posts.service.ts`). Two scripts changed:
+   - **Figure 4.5.** The token check and the blacklist read are now in one function, `readSession` (`auth/session.ts`), that `JwtAuthGuard` and `OptionalJwtAuthGuard` both call (fix S5). The step "verifyJwt" is now "readSession: verifyJwt". The flow is the same: a logged-out token gives 401.
+   - **Figure 4.6.** `InteractionsService.assertPostLive` now calls `canSeePost` (`posts/visibility.ts`, fix R2). A post that waits for approval gives 404 to everybody except its author, the community owner and the moderators. The figure has a new step and the 404 branch says so. Saves, reposts and comments use the same rule.
+   - **Figures 4.3 and 4.7** are unchanged. The approval of a pending post (`CommunitiesService.moderatePost`: it keeps `updatedAt` and bumps `v:user` of the approver and the author) is in no figure. The new `cache.del` in `getMessages` (B10) is a read path, and no figure shows it.
+   - The paragraph before Figure 4.6 now also says that Alice must be allowed to see the post (2026-11-20).
 4. **Other facts checked on 2026-11-19:**
    - The pre-thesis ERD (`docs/Pre-thesis/output/ERD_Breadit.dbml`) has drifted from the schema. It has 23 tables, and its `CommunityRule` has a `createdAt` that the schema does not have and lacks `description`. Use Figure 4.11, not the pre-thesis files.
    - Relations are named by the foreign key (`followerId`, `followingId`), not by the list names. In this schema `User.followers` means "the accounts this user follows" (CLAUDE.md).
    - The pre-thesis use case diagram (`docs/Pre-thesis/UseCaseDiagram1.png`) shows use cases that do not exist ("Config system", "Analytic and monitor system"). Figure 4.1 replaces it.
    - The pre-thesis sequence diagrams (`docs/Pre-thesis/uc*_sequence.mmd`) were not checked against today's code. Figures 4.5–4.8 replace the ones Chapter 4 needs.
-5. **Text and LaTeX, 2026-11-20.** The text is in `chapters/system-analysis-and-design.tex`. Figures and tables are numbered through the whole thesis (`main.tex` removes the chapter prefix), so "Figure 4.1" here is only a working name. The text uses `\ref`, so the numbers follow by themselves. The placeholders wait for these files in `images/`: `fig4-1-usecase`, `fig4-2-signup`, `fig4-3-publish-post`, `fig4-4-feed-page`, `fig4-5-auth-session`, `fig4-6-like-notification`, `fig4-7-direct-message`, `fig4-8-foryou-social`, `fig4-9-components`, `fig4-10-ranking-boundary`, `fig4-11-erd`. To use an image, replace the `\fbox` line of its figure by the `\includegraphics` line in the comment above it. With the placeholders, the chapter has about 15 pages (the last one is 60% full). Real images are taller than the 5 cm placeholders, so expect about 17 to 18 pages. If that is too long, cut first: the use case table "ban a user", the last paragraph of 4.3, and the rows FR7, FR9 and FR19 of the requirements table.
-6. **Outline against today's code (2026-11-20).** The scripts are unchanged. Small differences, none of them wrong enough to redraw:
+5. **Text and LaTeX, 2026-11-20.** The text is in `chapters/system-analysis-and-design.tex`. Figures and tables are numbered through the whole thesis (`main.tex` removes the chapter prefix), so "Figure 4.1" here is only a working name. The text uses `\ref`, so the numbers follow by themselves. The placeholders wait for these files in `images/`: `fig4-1-usecase`, `fig4-2-signup`, `fig4-3-publish-post`, `fig4-4-feed-page`, `fig4-5-auth-session`, `fig4-6-like-notification`, `fig4-7-direct-message`, `fig4-8-foryou-social`, `fig4-9-components`, `fig4-10-ranking-boundary`, `fig4-11-erd`. Each figure uses the macro `\thesisdiagram{<name>}{\textwidth}` (in `main.tex`): when `images/<name>.pdf` (or `.png`) exists, LaTeX shows it, and if not it shows the placeholder. So just save the image and rebuild; do not edit the `.tex`. `diagrams.md` lists every figure with its file name, tool and script, and `images/<name>.mmd` holds the same script. With the placeholders, the chapter has about 15 pages (the last one is 60% full). Real images are taller than the 5 cm placeholders, so expect about 17 to 18 pages. If that is too long, cut first: the use case table "ban a user", the last paragraph of 4.3, and the rows FR7, FR9 and FR19 of the requirements table.
+6. **Outline against today's code (2026-11-20).** When this note was written, the scripts were unchanged (Figures 4.5 and 4.6 changed later the same day, see note 3). Small differences, none of them wrong enough to redraw:
    - Figure 4.4 says "no blocked peers" for every mode. The profile mode (`user=`) does not filter blocked users, and the guest feed has no viewer. The text says only "These queries leave out deleted posts and blocked users", so check the figure again if you want it exact.
    - Figure 4.3 does not show the check of `rePostId` (404 when the post to repost is missing) that `PostsService.create` runs before the community checks. The web app reposts through `POST /api/posts/:id/repost`, not through this field.
    - Joining a community (`POST /api/communities/:id/join`) needs only `JwtAuthGuard` and `BannedUserGuard`. Only the post in it needs a verified email (use case "join a community and post in it").

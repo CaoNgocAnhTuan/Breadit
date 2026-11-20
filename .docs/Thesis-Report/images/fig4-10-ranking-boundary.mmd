@@ -1,0 +1,20 @@
+flowchart LR
+    UI["Frontend<br/>Feed, InfiniteFeed"]
+    API["PostsController<br/>GET /api/posts"]
+    SVC["PostsService.findAll<br/>mode, cache, page"]
+    FS["FeedService.rank<br/>loads the data"]
+    RANK["@breadit/ranking<br/>buildPool, as-of features,<br/>scorer, rankPool"]
+    PG[("Postgres")]
+    RD[("Redis<br/>10 s pages")]
+    EVAL["eval/ harness<br/>offline, CSV data"]
+
+    UI -->|"cursor, feed, algo"| API
+    API --> SVC
+    SVC <--> RD
+    SVC -->|"algo set"| FS
+    SVC -->|"Explore score (BL2)"| RANK
+    FS -->|"plain arrays"| RANK
+    RANK -->|"ordered post ids"| FS
+    FS --> PG
+    SVC -->|"load the page's posts"| PG
+    EVAL -.->|"same functions"| RANK

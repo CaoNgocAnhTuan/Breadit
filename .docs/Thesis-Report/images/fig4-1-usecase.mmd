@@ -1,0 +1,51 @@
+flowchart LR
+    Guest["«actor»<br/>Guest"]
+    User["«actor»<br/>User"]
+    Mod["«actor»<br/>Community owner<br/>or moderator"]
+    Admin["«actor»<br/>Admin"]
+    Mail["«system»<br/>Email service (SMTP)"]
+
+    subgraph Breadit["Breadit"]
+        UC1(["Sign up"])
+        UC2(["Verify email with a code"])
+        UC3(["Sign in"])
+        UC4(["Reset password"])
+        UC5(["Sign out"])
+        UC6(["Read the feeds: For You,<br/>Following, Communities, Explore"])
+        UC7(["Create, edit or delete a post"])
+        UC8(["Like, repost or save a post"])
+        UC9(["Comment and reply"])
+        UC10(["Follow or block a user"])
+        UC11(["Join a community and post in it"])
+        UC12(["Send a direct message"])
+        UC13(["Get real-time notifications"])
+        UC14(["Search posts, users and hashtags"])
+        UC15(["Edit the profile"])
+        UC16(["Report a post"])
+        UC17(["Moderate a community:<br/>approve posts, rules, bans"])
+        UC18(["Ban or unban a user"])
+        UC19(["Review reports:<br/>dismiss, or delete the post"])
+    end
+
+    Guest --- UC1
+    Guest --- UC3
+    Guest --- UC4
+    UC1 -.->|"«include»"| UC2
+    User --- UC5
+    User --- UC6
+    User --- UC7
+    User --- UC8
+    User --- UC9
+    User --- UC10
+    User --- UC11
+    User --- UC12
+    User --- UC13
+    User --- UC14
+    User --- UC15
+    User --- UC16
+    Mod -->|"is a"| User
+    Mod --- UC17
+    UC18 --- Admin
+    UC19 --- Admin
+    UC2 --- Mail
+    UC4 --- Mail
