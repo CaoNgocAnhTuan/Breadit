@@ -16,7 +16,7 @@ const menuList = [
   {
     id: 2,
     name: "Explore",
-    link: "/",
+    link: "/?feed=explore",
     icon: "explore.svg",
   },
   {

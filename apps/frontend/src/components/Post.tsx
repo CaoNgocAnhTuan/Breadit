@@ -7,6 +7,7 @@ import RichText from "./RichText";
 import Video from "./Video";
 import MediaViewer from "./MediaViewer";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Post as PostType, MentionEntity } from "@breadit/shared";
 import { format } from "timeago.js";
@@ -49,6 +50,18 @@ const Post = ({
     type: "image" | "video";
   } | null>(null);
   const originalPost = post.rePost || post;
+  const router = useRouter();
+  const statusHref = `/${originalPost.user.username}/status/${originalPost.id}`;
+  const hasText = !!originalPost.desc;
+
+  // N5: the post text opens the post, but it holds links (@mention, #tag), and an <a> inside an <a> is
+  // invalid HTML (hydration error). So the text is a div with role="link", not a Link.
+  const openPost = (inNewTab: boolean) => {
+    if (inNewTab) window.open(statusHref, "_blank", "noopener");
+    else router.push(statusHref);
+  };
+  const fromInnerLink = (e: React.SyntheticEvent) =>
+    (e.target as HTMLElement).closest("a") !== null;
 
   return (
     <div className="p-4 border-y-[1px] border-borderGray">
@@ -151,8 +164,28 @@ const Post = ({
             />
           </div>
           {/* TEXT & MEDIA */}
-          <Link
-            href={`/${originalPost.user.username}/status/${originalPost.id}`}
+          <div
+            role={hasText ? "link" : undefined}
+            tabIndex={hasText ? 0 : undefined}
+            className="cursor-pointer"
+            onClick={(e) => {
+              if (fromInnerLink(e)) return;
+              // A click that ends a text selection is not a click on the post.
+              if (window.getSelection()?.toString()) return;
+              openPost(e.ctrlKey || e.metaKey);
+            }}
+            onAuxClick={(e) => {
+              // Middle click opens the post in a new tab.
+              if (e.button !== 1 || fromInnerLink(e)) return;
+              e.preventDefault();
+              openPost(true);
+            }}
+            onKeyDown={(e) => {
+              // Enter on the text itself (not on a link inside it) does what a click does.
+              if (e.key !== "Enter" || e.target !== e.currentTarget) return;
+              e.preventDefault();
+              openPost(e.ctrlKey || e.metaKey);
+            }}
           >
             <p className={`${type === "status" && "text-lg"}`}>
               {originalPost.desc ? (
@@ -162,7 +195,7 @@ const Post = ({
                 />
               ) : null}
             </p>
-          </Link>
+          </div>
           {originalPost.media && originalPost.media.length > 0 && (
             <div
               className={`grid gap-0.5 rounded-2xl overflow-hidden border border-borderGray ${
