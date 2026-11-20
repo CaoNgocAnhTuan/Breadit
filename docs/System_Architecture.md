@@ -465,7 +465,7 @@ Breadit/
 │   └── backend/                      # @breadit/backend · NestJS 10 on Fastify, Prisma 6 (port 4000)
 │       ├── prisma/
 │       │   ├── schema.prisma         # data model: User, Post, Follow, Like, Comment, Community, ...
-│       │   ├── migrations/           # 19 migrations · a committed one never changes
+│       │   ├── migrations/           # 18 migrations · a committed one never changes
 │       │   └── seed.ts               # dev seed: admin + user1–user50 · not deterministic, not for evaluation
 │       ├── src/
 │       │   ├── posts/                # PostsController, PostsService.findAll (all feeds), Explore via @breadit/ranking

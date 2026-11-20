@@ -1,2 +1,286 @@
 % Chapter 5. Implementation. Draft: drafts/05-implementation.md
-% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand.
+% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. This chapter has no result numbers;
+% the one tuned value it needs (alpha and beta of the live feed) is the macro \tuneWTwoMHChosen.
+% The \chapter command is in main.tex, so this file starts with the introduction and then the sections.
+% This chapter cites no reference, so it adds no key to references.tex.
+% Layout settings for this chapter only (they are put back at the end of this file): long file names in \texttt need
+% some stretch, and the tables may sit at the top of a page with text below them, so no page is left half empty.
+\setlength{\emergencystretch}{3em}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.8}
+
+Chapter 4 designs the platform. This chapter describes what was built. Section~\ref{sec:impl-stack} lists the technology, and Section~\ref{sec:impl-monorepo} the monorepo. Sections~\ref{sec:impl-backend} and~\ref{sec:impl-realtime} describe the backend and the real-time layer. Section~\ref{sec:impl-feed} shows how the feed works in the app, and Section~\ref{sec:impl-ranking} describes the package that holds the ranking code. Section~\ref{sec:impl-eval} describes the evaluation code, Section~\ref{sec:impl-repro} explains how every result can be rebuilt, and Section~\ref{sec:impl-tests} describes the tests. Chapter 3 defines the method, Chapter 6 gives the results, and Chapter 8 summarizes the tests.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Technology stack}
+\label{sec:impl-stack}
+
+The whole system is written in TypeScript and runs on Node.js 22. The exact version, v22.23.4, is in \texttt{.nvmrc}. The root \texttt{package.json} accepts only Node 22 (\texttt{"engines": \{ "node": ">=22 <23" \}}), and \texttt{.npmrc} sets \texttt{engine-strict=true}, so npm refuses another major version. The Docker builds use \texttt{npm ci} with the lockfile \texttt{package-lock.json}, and the Docker images are pinned by digest.
+
+Table~\ref{tab:impl-stack} lists the main parts, with the versions written in the \texttt{package.json} files. A caret (\texttt{\textasciicircum}) means ``this version or a newer one with the same major number''. The lockfile fixes the exact version that \texttt{npm ci} installs.
+
+\begin{table}[htb]
+  \centering
+  \caption{The technology stack.}
+  \label{tab:impl-stack}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}l >{\raggedright\arraybackslash}p{4.3cm} >{\raggedright\arraybackslash}p{3.4cm} >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Layer & Technology & Version & Used for \\
+    \midrule
+    Runtime  & Node.js, TypeScript & 22 (\texttt{.nvmrc}: v22.23.4), \texttt{\textasciicircum 5} & all code \\
+    \midrule
+    Frontend & Next.js (App Router), React & 15.1.0, \texttt{\textasciicircum 19.0.0} & pages, server components, route middleware \\
+             & TanStack Query, Tailwind CSS & \texttt{\textasciicircum 5.64.2}, \texttt{\textasciicircum 3.4.1} & data fetching and infinite scroll, styling \\
+             & Socket.IO client & \texttt{\textasciicircum 4.8.1} & real-time events \\
+    \midrule
+    Backend  & NestJS, Fastify & \texttt{\textasciicircum 10.4.15}, \texttt{\textasciicircum 4.28.1} & modules, guards, pipes; HTTP server \\
+             & Prisma, ioredis & \texttt{\textasciicircum 6.2.1}, \texttt{\textasciicircum 5.4.1} & database client and migrations, Redis client \\
+             & Socket.IO, \texttt{@socket.io/\allowbreak redis-adapter} & \texttt{\textasciicircum 4.8.3}, \texttt{\textasciicircum 8.3.0} & the real-time gateway (through the Nest packages \texttt{@nestjs/\allowbreak websockets} and \texttt{@nestjs/\allowbreak platform-socket.io}, \texttt{\textasciicircum 11.1.19}) \\
+             & jose, bcryptjs, class-validator & \texttt{\textasciicircum 5.10.0}, \texttt{\textasciicircum 3.0.3}, \texttt{\textasciicircum 0.14.1} & JWT tokens, password hashes, validation of request bodies \\
+             & \texttt{@nestjs/\allowbreak throttler}, nodemailer, sharp, cloudinary & \texttt{\textasciicircum 6.5.0}, \texttt{\textasciicircum 8.0.7}, \texttt{\textasciicircum 0.34.5}, \texttt{\textasciicircum 2.10.0} & rate limit (counted in Redis), email, image re-encoding, optional media host \\
+    \midrule
+    Data     & PostgreSQL, Redis & 16, 7 (\texttt{postgres:\allowbreak 16-alpine}, \texttt{redis:\allowbreak 7-alpine}) & main database; cache, logout blacklist, rate limit, socket adapter \\
+    \midrule
+    Tests    & Jest, ts-jest; \texttt{node --test}; k6 & \texttt{\textasciicircum 29.7.0}, \texttt{\textasciicircum 29.4.15}; Node 22; k6 & backend and ranking tests; evaluation tests; the E7 load test \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The Nest core is version 10, but its two WebSocket packages are version 11. npm reports a peer-dependency conflict, so backend dependencies are added with \texttt{npm install --legacy-peer-deps}. PostgreSQL and Redis run in Docker: \texttt{docker-compose.yml} has four services (\texttt{db}, \texttt{redis}, \texttt{backend} and \texttt{app}, the frontend), on the host ports 5433, 6378, 4000 and 3000.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The monorepo}
+\label{sec:impl-monorepo}
+
+The repository is one npm-workspaces monorepo. The root \texttt{package.json} lists the workspaces \texttt{apps/*}, \texttt{packages/*} and \texttt{eval}: five packages (Table~\ref{tab:impl-workspaces}).
+
+\begin{table}[htb]
+  \centering
+  \caption{The five workspaces.}
+  \label{tab:impl-workspaces}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.4cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{3.0cm} >{\raggedright\arraybackslash}p{3.1cm}@{}}
+    \toprule
+    Package & What it is (folder) & How it is built & What it imports \\
+    \midrule
+    \texttt{@breadit/frontend} & the Next.js app (\texttt{apps/frontend}) & \texttt{next build} & \texttt{@breadit/shared} (types) \\
+    \texttt{@breadit/backend}  & the NestJS app (\texttt{apps/backend}) & \texttt{nest build} to \texttt{dist/} & \texttt{@breadit/ranking} \\
+    \texttt{@breadit/shared}   & API types for the frontend (\texttt{packages/shared}) & \texttt{tsc} to \texttt{dist/} & nothing \\
+    \texttt{@breadit/ranking}  & the pure ranking code (\texttt{packages/ranking}) & \texttt{tsc} to \texttt{dist/} (CommonJS) & nothing outside the package \\
+    \texttt{@breadit/eval}     & the evaluation code, ESM (\texttt{eval}) & not built: Node 22 runs the \texttt{.ts} files & \texttt{@breadit/ranking}; \texttt{@prisma/client} in one file \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Three rules keep the dependencies simple. First, nothing imports \texttt{eval/}, so evaluation code can never reach production. Second, \texttt{@breadit/ranking} imports only its own files and \texttt{node:} modules. Third, \texttt{eval/} imports \texttt{@prisma/client} in one file only, \texttt{src/loader/db.ts}. Tests check the second and the third rule (Section~\ref{sec:impl-tests}). The packages \texttt{@breadit/shared} and \texttt{@breadit/ranking} are built first, because the other packages read their \texttt{dist/} folders; the backend Dockerfile builds \texttt{@breadit/ranking} before the backend.
+
+For development, \texttt{docker compose up db redis -d} starts the data stores, \texttt{npm run dev} starts the frontend (port 3000), and \texttt{npm run dev -w @breadit/backend} starts the backend (port 4000). \texttt{docker compose up --build} starts the full stack. The backend container first runs \texttt{prisma migrate deploy}, so the schema always comes from the 18 committed migrations.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The backend}
+\label{sec:impl-backend}
+
+\textbf{Structure.} The backend is a NestJS 10 application on the Fastify HTTP server, not on Express. It has 18 Nest modules (one for each feature, and three for infrastructure: prisma, redis and cache), 13 controllers and 72 REST routes. Every controller path starts with \texttt{api/}, for example \texttt{@Controller('api/posts')}. The data model is the Prisma schema \texttt{apps/backend/prisma/schema.prisma} with 25 models. Chapter 4 shows it as an ERD.
+
+\textbf{Start-up.} \texttt{main.ts} creates the app, and \texttt{setupApp} in \texttt{app.setup.ts} configures it. It registers the Fastify plugins for cookies, multipart uploads (at most 10 files, and 500 MB for one file) and static files (\texttt{/uploads/}), turns on CORS for \texttt{FRONTEND\_URL} with credentials, and installs the Socket.IO adapter of Nest (\texttt{IoAdapter}). It sets the global \texttt{ValidationPipe(\{ whitelist: true, transform: true \})}, which drops a body field that has no \texttt{class-validator} decorator in its DTO, and the global \texttt{AllExceptionsFilter}, which gives every error one JSON shape. The integration tests call the same \texttt{setupApp}. A global \texttt{ThrottlerGuard} limits the requests per route and per IP in 60 seconds, with its counters in Redis. The limit is \texttt{THROTTLE\_LIMIT} (default 1,000).
+
+\textbf{How the frontend calls the backend.} The frontend has no database access and no API route of its own. Server components call \texttt{serverFetch()} and \texttt{getSession()} (\texttt{src/lib/session.ts}) on \texttt{BACKEND\_INTERNAL\_URL}, and copy the cookies of the request by hand. Client components call \texttt{api()} and \texttt{apiMultipart()} (\texttt{src/lib/api.ts}) on \texttt{NEXT\_PUBLIC\_BACKEND\_URL} with \texttt{credentials: 'include'}. The file \texttt{src/middleware.ts} only checks that the cookie \texttt{breadit\_session} exists and redirects to \texttt{/sign-in} if it does not; the real check is in the backend. The main pages are in the route group \texttt{(board)}, whose \texttt{layout.tsx} calls \texttt{getSession()} and shows a ``suspended'' page to a banned user.
+
+\textbf{Authentication.} Login checks the password with bcrypt and signs a JWT with HS256 (library \texttt{jose}). The token has a random \texttt{jti} and lives 30 days. It is stored in the cookie \texttt{breadit\_session}, which is \texttt{httpOnly}, \texttt{SameSite=Lax}, and \texttt{Secure} in production. Logout writes the \texttt{jti} into Redis under \texttt{auth:blacklist:<jti>} until the token would expire, so a copied cookie stops working. Routes are protected with guards, in the order written in \texttt{@UseGuards(...)}. \texttt{JwtAuthGuard} comes first: it reads the cookie, checks the blacklist and sets \texttt{req.user}. (\texttt{OptionalJwtAuthGuard} is used for the routes that also serve guests.) Then \texttt{BannedUserGuard} reads \texttt{banned} from the database again, because the token can be 30 days old; \texttt{EmailVerifiedGuard} refuses write actions until the email is verified; and \texttt{RolesGuard} with \texttt{@Roles('ADMIN')} protects the admin routes. The codes for email verification and password reset are rows of the table \texttt{VerificationToken} (identifier \texttt{email-verify:<email>} or \texttt{password-reset:<email>}), and \texttt{AuthService} sends them with nodemailer over SMTP.
+
+\textbf{The cache.} \texttt{CacheService} (\texttt{cache/cache.service.ts}) keeps JSON answers in Redis, under keys of the form \texttt{prefix:part:part}. It does not delete keys when data changes. A read path puts a version number in its key, for example \texttt{getNumber('v:user', [userId])}, and a write path increases it with \texttt{incrNumber('v:user', [userId])}. The next read builds a new key and misses the cache, and the old entries expire with their time to live. This works because one write can change many cached pages, whose keys are not known in advance, and one version number covers them all. Feed pages, notification lists and search results use \texttt{v:user}. A new or deleted post, a follow, a block, a community join, leave or ban, and reading a notification increase it. The small lists \texttt{graph:follows} and \texttt{graph:communities} (kept 300 seconds) are deleted by key instead, because their keys are known. \texttt{getOrSetJson} adds a short lock, so only one request rebuilds an expired entry. Setting \texttt{REDIS\_HTTP\_CACHE\_ENABLED=false} turns the cache off; the tests and the E7 benchmark run with it off.
+
+\textbf{Rules for every listing.} \texttt{BlockService.getAllBlockedPeerIds} returns the users blocked in either direction, and the queries for posts, users, search, notifications and messages leave them out. Posts are soft-deleted (\texttt{deletedAt}), and every query filters them. A community post needs membership, and it is shown only when \texttt{isApproved} is true. Chapter 4 gives the reasons. Uploaded images are re-encoded with \texttt{sharp} and stored on Cloudinary (when \texttt{CLOUDINARY\_CLOUD\_NAME} is set) or in the folder \texttt{UPLOAD\_DIR}.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The real-time layer}
+\label{sec:impl-realtime}
+
+``Real-time'' in this thesis means push: the server sends an event over an open WebSocket, and the page changes without a reload. One gateway does all of it, \texttt{NotificationsGateway} in \texttt{notifications/notifications.gateway.ts}. It runs in the same process as the REST routes, so a service that changes data can push an event at once.
+
+\textbf{Who a socket is.} The server decides this, never the client. The singleton in \texttt{src/socket.ts} opens one socket with \texttt{withCredentials: true}, so the cookies travel with the handshake. In \texttt{afterInit}, the gateway registers a middleware that runs before the connection exists. It reads \texttt{breadit\_session} from the handshake, checks the token with \texttt{verifyJwt} and the Redis blacklist, and stores \texttt{\{ id, username \}} on \texttt{socket.data}. A missing, bad, expired or logged-out token is refused. After the connection, the gateway puts the socket into the room named after its username. The client still sends \texttt{newUser} (in \texttt{components/Socket.tsx}), but the gateway ignores the name in it.
+
+\textbf{Rooms and events.} The user room, named after the username, receives the events for one user. The conversation room \texttt{conversation:<id>} carries the typing signals. A socket joins it with \texttt{joinConversation} only if \texttt{ConversationMember} has a row for the user and the conversation, and it can send \texttt{startTyping} and \texttt{stopTyping} only into a room it has joined. The typing event carries the username from the login, not one written by the client. Table~\ref{tab:impl-events} lists the events from the server to the client.
+
+\begin{table}[htb]
+  \centering
+  \caption{The events from the server to the client.}
+  \label{tab:impl-events}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.1cm} >{\raggedright\arraybackslash}p{4.1cm} >{\raggedright\arraybackslash}p{3.4cm} >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Event & Sent by & To which room & When \\
+    \midrule
+    \texttt{getNotification} & \texttt{Notifications\allowbreak Service.emit} & the user room of the recipient & a like, comment, follow, mention and so on \\
+    \texttt{newMessage} & \texttt{Messages\allowbreak Service.sendMessage} & the user room of the other member & a direct message is saved \\
+    \texttt{messageRead} & \texttt{Messages\allowbreak Service.markRead} & the user room of the other member & the reader marks the conversation as read \\
+    \texttt{userTyping}, \texttt{userStopTyping} & the gateway & \texttt{conversation:<id>}, without the sender & a member starts or stops typing \\
+    \texttt{accountBanned} & \texttt{Admin\allowbreak Service.setBanStatus} & the user room of the banned user & an admin bans the account \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+A notification is saved first and pushed second: \texttt{NotificationsService.emit} writes a \texttt{Notification} row, then sends \texttt{getNotification} to the room of the recipient. A user who is offline finds the row in the list later, and a user who is online sees it at once. A notification to oneself is skipped. When an admin bans a user, \texttt{Socket.tsx} handles \texttt{accountBanned}: it calls \texttt{POST /api/auth/logout} and goes to \texttt{/sign-in?banned=true}, so the banned user cannot go on acting.
+
+\textbf{The Redis adapter.} With two or more backend processes, the receiver may be connected to another process than the one that saved the message. The gateway therefore installs \texttt{createAdapter} of \texttt{@socket.io/\allowbreak redis-adapter} with two Redis connections (one to publish, one to subscribe). The adapter sends each event through Redis to every process, so it reaches the receiver wherever he is connected. Chapter 4 draws the flows of a like and of a direct message. The feed is not pushed: it is ranked when the user opens or reloads it. This thesis shows that the events arrive (Chapter 8), and it does not measure how fast.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The feed in the app}
+\label{sec:impl-feed}
+
+\textbf{The request path.} \texttt{GET /api/posts} is \texttt{PostsController.findAll} with \texttt{OptionalJwtAuthGuard}, so guests can read too. Its query parameters are \texttt{cursor}, \texttt{user}, \texttt{feed}, \texttt{communityId}, \texttt{algo} and \texttt{asOf}. \texttt{PostsService.findAll} first calls \texttt{resolveFeedOptions} (\texttt{feed/feed.options.ts}), which checks \texttt{algo} and \texttt{asOf} and applies the default \texttt{algo}. Then it reads the clock once, for the whole request, builds the cache key, and returns the cached page if there is one. When \texttt{algo} is set, it calls \texttt{algoPage}, which uses the feed module. Otherwise it runs the older modes: a community, Explore, Following, Communities, a profile, For You (newest first) or the guest feed.
+
+\textbf{The \texttt{algo} option.} \texttt{algo} has three values, and each one runs a method of Chapter 3 (the map \texttt{ALGO\_METHOD} in \texttt{feed/feed.constants.ts}): \texttt{chrono} is BL0, \texttt{engagement} is BL2 and \texttt{social} is the hybrid $H$. The option works only on the For You feed of a logged-in user. An unknown value, or \texttt{algo} together with \texttt{feed}, \texttt{user} or \texttt{communityId}, gives 400, and a guest gets 401. Two environment variables belong to it, and \texttt{readFeedConfig} reads both when the app starts:
+\begin{itemize}
+  \item \texttt{FEED\_DEFAULT\_ALGO} is the \texttt{algo} of For You when the request has none. When it is not set, For You is the feed of before the thesis: the posts of the user and the followees, newest first. Docker Compose passes the variable with an empty default. Chapter 3 gives the rule that sets the default, and Chapter 6 its outcome.
+  \item \texttt{FEED\_ASOF\_ENABLED=true} makes the backend accept the test parameter \texttt{asOf} (Unix seconds), to rank the feed as it was at a past time. The parity test needs it. The backend refuses to start when the flag is on and \texttt{NODE\_ENV=production}, and Docker Compose never passes it.
+\end{itemize}
+A wrong value of either variable stops the backend at start. It never falls back to a silent default.
+
+\textbf{The feed module.} \texttt{FeedService.rank(userId, algo, asOfSec)} in \texttt{feed/feed.service.ts} returns the whole ranked pool as \texttt{(id, score)} pairs. It never reads the clock; the time is its argument. It has no ranking logic: it loads plain arrays from Prisma, calls the package, and gives back the result. It loads, in this order: (1) the candidates, which are the root posts created in the window $[t - W, t)$, community posts included and repost rows left out, with no row limit, because only \texttt{buildPool} applies the cap; (2) in parallel, the follows and memberships of the user with their times, and the likes, comments and reposts of the user before $t$, with the author and community of each post touched; (3) the blocked peers, from \texttt{BlockService.getAllBlockedPeerIds}. It calls \texttt{userFeaturesAsOf} and \texttt{buildPool}. Then, for the posts left in the pool only, it loads the likes, comments and reposts before $t$ and calls \texttt{postFeaturesAsOf} for each post. At the end it calls the scorer of the \texttt{algo} and \texttt{rankPool}. The follows and memberships are read with their times, and not through the cached lists \texttt{graph:follows} and \texttt{graph:communities}, because the as-of rule needs the times. The file \texttt{feed/feed.mapping.ts} turns the Prisma rows into the plain types of the package, with every time in whole Unix seconds, rounded down. Listing~\ref{lst:impl-rank-call} shows the call, shortened.
+
+\begin{lstlisting}[language=JavaScript, caption={The call of the ranking package in \texttt{FeedService.rank} (shortened).}, label=lst:impl-rank-call]
+const asOf = { t: asOfSec };   // whole Unix seconds, no event id
+const uf = userFeaturesAsOf(userId, asOf, { follows, memberships, positives, postInfo });
+const pool = buildPool({ user: userId, asOf, candidates, blocked, earlierPositives },
+                       POOL_PARAMS);
+const score = scorer(ALGO_METHOD[algo]);        // 'BL0', 'BL2' or 'H'
+const ctx = { user: userId, asOf, uf, params: methodParams(algo) };
+const order = rankPool(pool, (p) => score(ctx, p, feats.get(p.id)));   // post ids
+\end{lstlisting}
+
+The numbers of the method come from one file, \texttt{feed/feed.constants.ts}. \texttt{POOL\_PARAMS} is the window of 7 days and the cap of 2,000 posts, and \texttt{PRIOR\_M} is the prior strength $m = 5$. They are the frozen values of Chapter 3, and a unit test checks that they equal \texttt{eval/config/frozen-v1.json}. \texttt{SOCIAL\_PARAMS} holds $\alpha$ and $\beta$ of \texttt{social}. They are the values tuned for \texttt{syn-W2M-M} (\tuneWTwoMHChosen, written as $\alpha/\beta$), and a unit test checks that they equal the approved run config \texttt{eval/config/runs/p7-main.json}.
+
+\textbf{Paging and cache.} A page has 10 posts. For the \texttt{algo} feeds, the cursor of the first page is \texttt{1}, and a later cursor is \texttt{t:score:id} (Listing~\ref{lst:impl-cursor}): the time $t$ at which the pool was ranked, and the score and id of the last post of the page. The next request ranks the pool again at the same $t$ and returns the posts after that \texttt{(score, id)}. Events after $t$ are not visible at $t$, so a post is never repeated or skipped between pages. Without \texttt{asOf}, a cursor older than 24 hours gives 400, and the client starts again from the first page. After the ranking, \texttt{algoPage} loads the 10 posts of the page with their counts and media in one query, and keeps the rank order. \texttt{findAll} stores each page for 10 seconds. The cache key has the viewer, the mode (for example \texttt{algo-social}), the cursor, the version \texttt{v:user} and \texttt{asOf}, so each option has its own entry, and a follow, a block or a new post makes the next request miss the cache.
+
+\begin{lstlisting}[caption={The cursor of an \texttt{algo} feed and the cache key of a feed page.}, label=lst:impl-cursor]
+cursor     = "1"                          the first page
+           | "<t>:<score>:<id>"           later pages of an algo feed: three integers
+cache key  = feed:<viewer>:<mode>:<profile user>:<communityId>:<cursor>:<v:user>:<asOf>
+\end{lstlisting}
+
+\textbf{Explore and the frontend.} The Explore feed uses the package, too. It takes the 400 newest posts of the last 7 days, scores each one with \texttt{compute\allowbreak Explore\allowbreak ScoreFixed} of \texttt{@breadit/ranking}, sorts by \texttt{(score desc, id desc)}, and keeps at most 3 posts per author, with one time for the whole request (the clock read once, or \texttt{asOf}). So BL2 in the evaluation is exactly the production code. In the frontend, the home page \texttt{app/(board)/page.tsx} shows the four tabs (For you, Explore, Following, Communities) and, on For you, three links (``Chronological'', ``Engagement'' and ``Social'') that set \texttt{?algo=}. \texttt{Feed.tsx} is a server component that fetches the first page. \texttt{InfiniteFeed.tsx} is a client component: TanStack Query fetches the next pages with \texttt{nextCursor}, and its query key contains \texttt{algo}.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The ranking package}
+\label{sec:impl-ranking}
+
+\texttt{@breadit/ranking} (folder \texttt{packages/ranking}) holds every ranking rule of the thesis: the candidate pool, the as-of features, the 13 scoring methods and the final sort. It is compiled by \texttt{tsc} to CommonJS in \texttt{dist/}, and it has no runtime dependency. Both the backend and \texttt{eval/} import it, so the live feed and the evaluation run the same functions. The only difference is how they load the data: Prisma rows in the backend, CSV files in \texttt{eval/}.
+
+The package is pure. The same input always gives the same output, and the code never reads a clock, a database or a random source. A test, \texttt{determinism.spec.ts}, enforces this on every source file. It fails on \texttt{Date.now}, \texttt{new Date()} without an argument, \texttt{performance.now}, \texttt{Math.random}, \texttt{randomUUID}, \texttt{localeCompare}, \texttt{toLocale...String}, \texttt{Intl} and \texttt{.sort()} without a compare function. It also fails on any import except \texttt{node:} modules and files of the package itself.
+
+The package has eight source files: \texttt{types.ts} (the plain types), \texttt{asof.ts} (\texttt{visibleAt}, the rule ``only the past'', and \texttt{ageHours}), \texttt{features.ts} (\texttt{userFeatures\allowbreak AsOf} and \texttt{postFeatures\allowbreak AsOf}), \texttt{pool.ts} (\texttt{buildPool}, the pool of Section~\ref{sec:method-protocol}), \texttt{scorers.ts} (\texttt{scorer(method)}), \texttt{rank.ts} (\texttt{rankPool}), \texttt{explore.ts} (\texttt{compute\allowbreak Explore\allowbreak ScoreFixed}, the production Explore score, moved here unchanged) and \texttt{index.ts} (the public exports).
+
+\textbf{The contract.} The caller gives plain arrays and gets back an ordered list of post ids. The interface is five functions (Listing~\ref{lst:impl-rank-call} shows them in use). \texttt{userFeaturesAsOf} and \texttt{postFeaturesAsOf} build the as-of features, \texttt{buildPool} builds the pool, \texttt{scorer} returns the function of one method, and \texttt{rankPool} sorts. The time is always the argument \texttt{asOf}. An event is visible at \texttt{asOf} if its time is before \texttt{asOf.t}, or equal to it and with a smaller event id. The harness passes the id of the test event; the live app passes no id, so only events strictly before $t$ count.
+
+\textbf{The scorers.} \texttt{scorer(method)} returns the function of one of the 13 method ids: BL0 to BL6, BL2t, H, and the four ablations H-follow, H-comm, H-noauthor and H-noengager. H and its four ablations come from one function, \texttt{hybrid}, which switches the terms on and off. Three rules protect the results. Every score is an integer (a score in points is stored as $\lfloor \text{score} \times 100 \rfloor$), and a score that is not finite throws an error. A missing parameter (for example $\alpha$) throws an error and never falls back to a default. A NaN score in \texttt{rankPool} throws, because it has no place in a total order. The package has 85 unit tests (Jest).
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The evaluation code}
+\label{sec:impl-eval}
+
+\texttt{eval/} (\texttt{@breadit/eval}) is the code of the offline evaluation of Chapter 3. It is ESM, and Node 22 runs its \texttt{.ts} files directly, so there is no build step. Its only runtime dependencies are \texttt{@breadit/ranking} and, in one file, \texttt{@prisma/client}. It never touches Redis or HTTP, and it writes to Postgres only through the loader. Table~\ref{tab:impl-eval-commands} lists its commands, which are npm scripts of the workspace (\texttt{npm run <script> -w @breadit/eval}).
+
+\begin{table}[htb]
+  \centering
+  \caption{The commands of \texttt{eval/}.}
+  \label{tab:impl-eval-commands}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.2cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{4.8cm}@{}}
+    \toprule
+    Script & What it does & Where it writes \\
+    \midrule
+    \texttt{gen} & generates the eight synthetic datasets & \texttt{eval/data/<id>/} \\
+    \texttt{adapt:digg} & converts the two Digg 2009 zips & \texttt{eval/data/digg2009/} \\
+    \texttt{check} & checks every dataset: format, calibration to Digg, social lift, cut time $T$, history groups & the terminal \\
+    \texttt{harness <runId>} & runs \texttt{eval/config/runs/<runId>.json} & \texttt{.docs/results/<runId>/} \\
+    \texttt{freeze} & writes the ten P7 test configs from the committed tuning (\texttt{--check} only compares) & \texttt{eval/config/runs/} \\
+    \texttt{report} & turns the results into macros, tables and figure data & \texttt{.docs/results/p7-report/} \\
+    \texttt{load}, \texttt{load:check} & write a synthetic dataset into Postgres, and read it back & the schema \texttt{eval\_load} \\
+    \texttt{rank} & prints one ranking for one user at one time & the terminal \\
+    \texttt{parity} & draws the 100 parity pairs and writes the harness orders & \texttt{.docs/results/p6-parity/} \\
+    \texttt{results:manifest} & compares every manifest with the merged manifest & the terminal \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\textbf{Datasets and random numbers.} Every dataset, synthetic or real, has the same six CSV tables: \texttt{users}, \texttt{follows}, \texttt{communities}, \texttt{memberships}, \texttt{posts} and \texttt{interactions}. The files are UTF-8 with LF line ends, the rows are sorted, and ids and times are integers. The folder also has a \texttt{manifest.json} with the SHA-256 of every file (\texttt{canonical/} holds the schema, the writer and a strict reader). \texttt{rng.ts} gives one seeded stream for each stage of the work. The generator is sfc32, seeded from the SHA-256 of the text \texttt{<master seed>:<stage>}, and the stages are \texttt{users}, \texttt{follows}, \texttt{communities}, \texttt{posts}, \texttt{interactions}, \texttt{bootstrap}, \texttt{permutation}, \texttt{parity}, \texttt{shuffle} and \texttt{bootstrap-median}. A new stage never changes the numbers of another stage.
+
+\textbf{The generators of data.} The synthetic generator (\texttt{src/generator/}) runs the five stages of Chapter 3 and writes eight datasets: the five worlds at size M, and three of them at size S. Its parameters are in \texttt{eval/config/synthetic-v1.json}, and the SHA-256 of that file goes into every dataset manifest. The two Digg zips are protected with a password that the Digg page publishes. Node has no reader for this old protection (ZipCrypto), so \texttt{src/adapters/zip.ts} is a small reader of our own. It decrypts and unpacks in memory and writes nothing to disk. The raw files are in \texttt{datasets/raw/digg2009/}, which git ignores. \texttt{eval/config/digg2009.json} holds their SHA-256, and the adapter refuses a file with another hash.
+
+\textbf{The harness} (\texttt{src/harness/}). One run is one JSON file in \texttt{eval/\allowbreak config/\allowbreak runs/} (there are 13). The config names the datasets, the methods, the parameters, the split and the pool. The split comes only from the file, never from a flag, and the test split runs only when the file has \texttt{"testApprovedBy": "author"}. For each user item, the harness builds the as-of features and the pool with the functions of the package, ranks the pool with each method, and records the rank of the item. A fast mode builds the post features from an index, and a reference mode calls \texttt{postFeaturesAsOf} over every event; a test checks that both give byte-identical rows. \texttt{metrics.ts} computes Recall@$K$, NDCG@$K$ and coverage, and \texttt{stats.ts} the paired bootstrap, the randomization test and the Holm correction. Tuning picks each parameter on the validation split by NDCG@10, and a tie goes to the smaller value. Then \texttt{freeze} writes the test configs from the tuning files, so no tuned number is copied by hand. A run writes its CSV files and a manifest to \texttt{.docs/results/<runId>/}. A file of per-user rows above 5 MB goes to the git-ignored \texttt{eval/results/}, and the manifest lists it as external.
+
+\textbf{The loader} (\texttt{src/loader/}). The loader puts a synthetic dataset into the real database, so that the live app can run on it (the parity test, the E7 benchmark and the demo). It writes only to a schema whose name matches \texttt{eval\_[a-z0-9\_]+}, by default \texttt{eval\_load}; the schema \texttt{public} is never touched. It runs \texttt{prisma migrate deploy} on the schema, empties it, and writes every row with its explicit id in one transaction, so a failure rolls everything back. A repost becomes a \texttt{Post} row with \texttt{rePostId}. \texttt{load:check} reads the rows back and compares the six CSV files with the dataset manifest. The option \texttt{--rebase-to} shifts all times by one constant and is for the demo only.
+
+\textbf{The report} (\texttt{src/report/}). \texttt{report} reads the results of the 13 P7 runs, checks every file against its run manifest, and writes to \texttt{.docs/results/p7-report/} the file \texttt{macros.csv}, the LaTeX macros \texttt{results-macros.tex}, ten LaTeX tables, \texttt{results.md} and the data of three figures. Each macro in \texttt{macros.csv} records the file, the row and the column it came from. The thesis reads the macros and the tables through the path \texttt{\textbackslash resultsdir} set in \texttt{main.tex}, so no result number is typed in the text. The E7 benchmark is run by \texttt{npm run bench:e7} from the repository root (\texttt{scripts/e7/run-e7.mjs}, with k6). Chapter 3 describes its method, and Chapter 6 gives its results.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Reproducibility}
+\label{sec:impl-repro}
+
+\textbf{What is pinned.} Chapter 3 divides the results into Class D (byte-identical) and Class R (repeatable). The code keeps Class D with five rules: no clock and no unseeded randomness in \texttt{packages/ranking} and \texttt{eval/} (grep tests in \texttt{determinism.spec.ts} and in \texttt{eval/src/forbidden.test.ts}); one master seed with one stream for each stage; integer scores with a total tie-break; canonical CSV files; and a pinned environment. The Node version is pinned by \texttt{.nvmrc} and \texttt{engine-strict}, the Docker images by digest, and the packages by the lockfile.
+
+\textbf{Manifests.} Every folder of data or results has a \texttt{manifest.json} (Listing~\ref{lst:impl-manifest}). It lists each file with its number of rows and its SHA-256 (\texttt{files}), names the files kept in the git-ignored \texttt{eval/results/} (\texttt{external}), and records the Node version, because math functions can differ between engines. The keys are sorted, so the manifest itself is byte-stable. The manifest of a dataset has \texttt{datasetId} and \texttt{epoch} in place of \texttt{runId}.
+
+\begin{lstlisting}[language=JavaScript, caption={The shape of the manifest of a run (the values in angle brackets are placeholders).}, label=lst:impl-manifest]
+{ "schemaVersion": 1, "runId": "p7-main",
+  "masterSeed": 20261014, "node": "v22.23.4",
+  "source": { "configSha256": "<hash>",
+              "datasets": { "syn-W2M-M": "<hash of its manifest>" } },
+  "files": { "summary.csv": { "rows": "<n>", "sha256": "<hash>" } },
+  "external": [ "per_user.csv" ] }
+\end{lstlisting}
+
+The merged manifest \texttt{.docs/results/manifest.json} holds the SHA-256 of the manifest of each of the 16 results folders and of the 9 dataset manifests, so one compare checks every file, including the git-ignored ones. The folder \texttt{p7-e7} is marked Class R: it is listed but never compared, because timings are never byte-equal. \texttt{npm run results:manifest -w @breadit/eval} compares the tree with the merged manifest, and \texttt{--write} writes it.
+
+\textbf{One command.} \texttt{npm run thesis:repro} (the script \texttt{scripts/\allowbreak repro/\allowbreak thesis-repro.mjs}) rebuilds every Class D result and compares every hash. It needs the pinned Node, \texttt{docker compose up db redis -d}, and the two Digg zips with the right SHA-256. It has 26 steps. First it checks, before anything is changed, the Node version, the merged manifest, that \texttt{.docs/results/} and \texttt{eval/config/} have no uncommitted change, the Digg zips, and Docker; all problems are listed together and the command stops. Then it builds \texttt{@breadit/ranking} and the Prisma client, and deletes every Class D results folder and \texttt{eval/data/}, so every file is rebuilt from nothing. Then it runs \texttt{gen}, \texttt{adapt:digg} and \texttt{check}; the runs \texttt{p5-baseline}, the two tuning runs, \texttt{freeze --check} and the ten test runs, with the H0 gate first (it never tunes and never writes a config); the parity steps; and at the end \texttt{report} and the compare with the merged manifest. Each step writes a log to \texttt{eval/results/repro/}. The first step that fails stops the command and prints the end of its log, and the command exits with 0 only when every hash is equal. It uses the schema \texttt{eval\_load} and Redis database 2, so nothing else should use them while it runs. Chapter 6 reports that it passes.
+
+\textbf{The parity test.} The parity test checks that the live feed gives the same order as the harness. It has three steps (Listing~\ref{lst:impl-parity}). First, \texttt{npm run parity} draws 100 pairs of a user and a time from \texttt{syn-W2M-M}, 25 in each history group, and writes the harness order for each pair and each \texttt{algo} to \texttt{.docs/results/p6-parity/}. Second, \texttt{load} puts the same dataset into \texttt{eval\_load}. Third, \texttt{npm run test:parity -w @breadit/backend} starts the real app on \texttt{eval\_load}, with the page cache off and \texttt{asOf} on. It first checks that the data and the parameters equal the sample. Then, for each of the 100 pairs and each of the three \texttt{algo} values, it makes two checks: \texttt{FeedService.rank} must give the same whole order (the same size and SHA-256), and the first two pages of \texttt{GET /api/posts?algo=...\&asOf=...} must equal the first 20 posts of the harness order.
+
+\begin{lstlisting}[caption={The three commands of the parity check.}, label=lst:impl-parity]
+npm run parity -w @breadit/eval -- --param alpha=<a> --param beta=<b>
+npm run load -w @breadit/eval -- syn-W2M-M
+npm run test:parity -w @breadit/backend
+\end{lstlisting}
+
+The test only reads the schema \texttt{eval\_load}, and it uses Redis database 2. The values $\alpha$ and $\beta$ of the first command must equal \texttt{SOCIAL\_PARAMS}, and the output is committed. Any change of the feed, of its pool or features, or of the package must keep this test passing. That is what ties the numbers of Chapter 6 to the feed that users get. Chapter 8 gives the outcome of the test.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Tests}
+\label{sec:impl-tests}
+
+There are six levels of tests (Table~\ref{tab:impl-tests}). Chapter 8 summarizes them with their counts, and the appendix lists them all, so this section only says how they run.
+
+\begin{table}[htb]
+  \centering
+  \caption{The levels of tests and how they run.}
+  \label{tab:impl-tests}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.1cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{3.6cm}@{}}
+    \toprule
+    Level & Tool and place & Needs \\
+    \midrule
+    Ranking unit tests & Jest, \texttt{packages/ranking/src/*.spec.ts}; \texttt{npm run test -w @breadit/ranking} & nothing \\
+    Backend unit tests & Jest project \texttt{unit}, \texttt{apps/backend/src/**/*.spec.ts}; \texttt{npm run test -w @breadit/backend} & nothing \\
+    Integration tests & Jest project \texttt{it}, \texttt{apps/backend/test/it/*.it-spec.ts}; \texttt{npm run test:it -w @breadit/backend} & \texttt{docker compose up db redis -d} \\
+    Parity test & Jest project \texttt{parity}, \texttt{apps/backend/test/parity/}; \texttt{npm run test:parity -w @breadit/backend} & the same, and \texttt{syn-W2M-M} loaded into \texttt{eval\_load} \\
+    Evaluation tests & \texttt{node --test}, \texttt{eval/src/**/*.test.ts}; \texttt{npm run verify -w @breadit/eval} (type check and tests) & Node from \texttt{.nvmrc} \\
+    Frontend & no tests; the type check \texttt{tsc --noEmit} and ESLint & nothing \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The integration tests start the real app with \texttt{setupApp}, on their own Postgres schema \texttt{it\_test} and Redis database 1, so the data of the schema \texttt{public} is never touched. They also connect real Socket.IO clients to the app, to test the gateway (\texttt{socket.it-spec.ts}). \texttt{npm run test:backend} runs the unit and the integration tests together. A fourth Jest project, \texttt{bench}, only prepares the E7 benchmark. The script \texttt{.claude/hooks/verify.sh} runs all of these checks except the parity test. The Husky pre-commit hook runs \texttt{lint-staged} (ESLint on the frontend files) and \texttt{npm run typecheck}; it does not run the backend tests.
+\setlength{\emergencystretch}{0pt}
+\renewcommand{\topfraction}{0.7}
+\renewcommand{\bottomfraction}{0.3}
+\renewcommand{\textfraction}{0.2}
+\renewcommand{\floatpagefraction}{0.5}
