@@ -1,2 +1,96 @@
 % Chapter 7. Discussion. Draft: drafts/07-discussion.md
-% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand.
+% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. This chapter uses the macros of Chapter 6
+% and the same \macromissing mark (defined in chapters/experiments-and-results.tex); no mark is left in this chapter.
+% The \chapter command is in main.tex, so this file starts with the introduction and then the sections.
+% Citations: \refcite{<key>}, with the keys of chapters/references.tex.
+% A macro followed by a space needs {} after it (TeX drops the space after a control word).
+
+\label{ch:discussion}
+
+This chapter explains what the results of Chapter 6 mean. Section~\ref{sec:disc-rq1} answers RQ1 and Section~\ref{sec:disc-rq2} answers RQ2. Section~\ref{sec:disc-hybrid} looks at what the hybrid score really uses, and Section~\ref{sec:disc-breadit} says what the results mean for Breadit. Section~\ref{sec:disc-limits} lists the limits of the study.
+
+The main finding is a negative one: on these data, the follow graph adds little to the ranking, and the hybrid does not help users with little history more than the current heuristic. This is still a valid result. The hypotheses, the tuning and the test configs were frozen before the test split was run, the H0 gate passed, and every offline number can be rebuilt byte for byte with one command. So the result is not an accident of the setup.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{RQ1: does the social signal help users with little history?}
+\label{sec:disc-rq1}
+
+\textbf{Answer: not on these data.} H1 fails on both co-primary tests (Section~\ref{sec:results-e2}).
+
+\textbf{Synthetic data.} On \texttt{syn-W2M-M}, the hybrid is better than BL2 over all users (\eOneWTwoMNdcgHTenAllValue{} against \eOneWTwoMNdcgBLTwoTenAllValue{}), and its gain is positive in every history group. But the gain is largest for users with a long history and smallest for new users, which is the opposite of what RQ1 hoped for. In group 0--4 the interval contains 0.
+
+We see two reasons, and both may play a part:
+\begin{itemize}
+  \item \textbf{Few users.} Group 0--4 holds only \eTwoWTwoMNdcgTenZeroFourN{} users, so the interval is wide (\eTwoWTwoMNdcgTenZeroFourCiLow{} to \eTwoWTwoMNdcgTenZeroFourCiHigh{}). A real but small gain for new users cannot be told apart from 0 with this many users.
+  \item \textbf{The score has little to say about a new user.} For a user with no history, the smoothing (Chapter 3) gives every followee the same trust and every joined community the same weight. The score then only says ``this post is by someone you follow'' or ``this post is in a community you joined''. It cannot say which of them the user likes. As history grows, the counts replace the prior, and the score becomes personal. This fits the result that the gain grows with history (Section~\ref{sec:results-e2}). The smoothing makes the score safe for new users, but it does not make it strong for them.
+\end{itemize}
+
+\textbf{Digg.} On \texttt{digg2009}, the social terms change almost nothing (Section~\ref{sec:results-e2} and E4 in Section~\ref{sec:results-e4}). Our reading is a matter of scale. The engagement part of the score grows with the number of votes, and Digg stories have many votes, because every story in the data reached the front page (Chapter 3). The social part has a fixed upper bound: by the formula in Chapter 3, each sum of trust values is at most 1, so the social term is at most 2, and $\alpha$ times it is small next to hundreds of votes. The tuning chose the largest $\alpha$ in the grid, which also suggests that the grid did not reach the scale Digg needs. This reading was not tested.
+
+\textbf{What does work on Digg is time.} BL4 and BL5 divide the score by a power of the post's age, while BL2 only subtracts a small linear age term. On Digg, BL2 is close to plain popularity (BL3, Table~\ref{tab:results-e1}), and the ``hot'' formulas are far better than both (Section~\ref{sec:results-e1}). Even BL2t, with the largest age weight of its grid, stays far below them (its tuned age weight is \tuneDiggBLTwoTChosen{}). So on these data, how fast a post gets old matters much more than who the user follows.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{RQ2: when does the social signal start to help?}
+\label{sec:disc-rq2}
+
+\textbf{Answer: on these data, there is no level of follows where it starts to help.} H2 is not supported (Section~\ref{sec:results-e3}). On the W2 cells, the gain is already there for users who follow nobody, and it does not rise with the number of followees. On Digg it is 0 in every bin.
+
+The gain at 0 followees comes from the community term, which does not need any follows. So the question of RQ2, ``how much social interaction is needed'', gets a different answer than expected: the signal that helps is the user's own history inside communities, not the size of the follow graph.
+
+E5 adds one more view (Section~\ref{sec:results-e5}). The gain grows with the strength of influence that the generator puts into the data, from W0 through W1 to the three W2 cells. So when influence is in the data, the hybrid does pick it up. But W0 and W1 have no influence and still show a gain, and shuffling the engagement times inside each post keeps most of the gain. Both point the same way: most of the gain comes from correlation (users like the same topics as before), not from influence (users like what their followees liked first). Telling influence and correlation apart is a known hard problem~\refcite{anagnostopoulos2008}. Our tests do not settle it, but they show that the gain does not depend much on the order of engagements.
+
+This study measures social density by the number of followees only. H2 also names the amount of friend engagement in the pool, which was not measured (Section~\ref{sec:disc-limits}).
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{What the hybrid score really uses}
+\label{sec:disc-hybrid}
+
+E4 shows that on \texttt{syn-W2M-M}, almost all of the gain comes from the community term (H-comm gains \eFourWTwoMNdcgHCommTenAllGain{} of the \eFourWTwoMNdcgHTenAllGain{} of the full score), while the follow terms alone add \eFourWTwoMNdcgHFollowTenAllGain{} (Section~\ref{sec:results-e4}).
+
+In the generator, a community is a topic. The community term counts the user's earlier likes in the post's community, so it counts the user's earlier likes on that topic. In practice, the hybrid works on synthetic data as a \textbf{topic-interest signal}: ``you liked posts in this community before, so here is another one''. This is real personalization, and it explains why the full hybrid beat BL2 even on W0 (Section~\ref{sec:results-setup}). But it is not the social signal that RQ1 was about. On real data, a community is not always one topic, so this result may not carry over. Digg has no communities, and the Hive check failed (Section~\ref{sec:disc-limits}), so we could not test it on real data.
+
+Two smaller points from E4:
+\begin{itemize}
+  \item \textbf{The author term.} Removing it does not lower the gain (\eFourWTwoMNdcgHNoauthorTenAllGain{} against \eFourWTwoMNdcgHTenAllGain{}). We added it so that a new post by a followee is not ignored (Chapter 3). On these data it is not needed, but it does no harm.
+  \item \textbf{The prior strength $m$.} $m = 2$ gives a higher gain than the frozen $m = 5$ (\eFourWTwoMNdcgHMTwoTenAllGain{} against \eFourWTwoMNdcgHTenAllGain{}). The difference is small, it is on one dataset, and $m$ was frozen before the test split, so we keep $m = 5$. Tuning $m$ with $\alpha$ and $\beta$ is future work.
+\end{itemize}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{What this means for Breadit}
+\label{sec:disc-breadit}
+
+\textbf{The default feed stays as it is.} The default feed rule (Chapter 3) was set before the test split: ``For You'' switches to the \texttt{social} feed only if H1 passes on both co-primary tests and the H0 gate passes. H1 failed, so ``For You'' keeps its current order. The \texttt{social} feed stays in the app as an option (\texttt{algo=social}). Changing the default is one environment variable (\texttt{FEED\_DEFAULT\_ALGO}), so a later study can switch it without new code.
+
+\textbf{Cost is not the reason.} E7 shows that the \texttt{social} feed takes the same time as the other two feeds on our setup (Section~\ref{sec:results-e7}). The decision rests on the quality results only.
+
+\textbf{The offline numbers describe the live feed.} The live feed and the evaluation call the same ranking package, and the parity test checks that the live order equals the harness order (Chapter 5). So the results of Chapter 6 are about the code that runs in the app, not about a separate model.
+
+\textbf{A stronger time decay may help Explore, but only on some data.} On Digg, BL4 and BL5 are far better than the production Explore score (BL2). On \texttt{syn-W2M-M}, they are not better than BL2 (Table~\ref{tab:results-e1}). So the gain depends on the data, and a change to Explore needs its own test on Breadit data. We list it as future work and do not change Explore.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Limits of the study}
+\label{sec:disc-limits}
+
+\textbf{Synthetic data.} We designed the generator, so the synthetic results show that the method works under our assumptions, not that it works for real users. The W0 null world, W1, the three W2 cells and the timestamp shuffle (E5) guard against a result that is built into the data. The fact that a community is a topic in the generator is the main assumption behind the community result.
+
+\textbf{Digg.} The data is small and special (Chapter 3): one month of stories, only stories that reached the front page, so every story is already popular. Many voters are not in the friend table and have no follows. The follow graph is one crawl, so a follow that was removed before the crawl is missing. The files come from an Internet Archive copy, because the original host is gone. Digg also has no communities.
+
+\textbf{No real data for the community term.} We found no public dataset with a follow graph, dated interactions and dated community membership together. Hive was the only candidate, and the check failed: the public copy of the data refused access, and the paid service keeps memberships without a join time (super-plan \S 8). So the community term, which carries most of the synthetic gain, has synthetic evidence only.
+
+\textbf{Statistical power.} Group 0--4 of \texttt{syn-W2M-M} is small (Section~\ref{sec:disc-rq1}), so a small gain for new users may exist and not be detected. A larger synthetic world would help, but size L was cut from the plan.
+
+\textbf{Tuning at the edge of the grid.} The chosen $\alpha$ and $\beta$ are the largest values of the widened grid (Section~\ref{sec:results-tuning}), so the best values may be larger. The live feed uses these edge values.
+
+\textbf{Choices made after looking at validation results.} Two changes were made before the test split: the H0 gate moved to H-follow, and the grids were widened (Section~\ref{sec:results-setup}). Both were decided from validation results only and recorded with their date, but they are still choices made by us after seeing data.
+
+\textbf{What the offline test measures.} Each user has one test item: the last post they liked, commented on or reposted. The test asks whether a method ranks that post high. It does not measure whether users are happier with the feed. The logged likes also depend on what the users were shown at the time, for example the Digg front page. Recommendation systems trained or tested on such logs can be biased towards what was already shown~\refcite{chaney2018}.
+
+\textbf{Social density.} E3 uses only the number of followees, not the amount of friend engagement in the pool, which H2 also names.
+
+\textbf{Cost.} E7 ran on one machine with one virtual user and the page cache off, and the machine was not quiet at the start (its load is in the E7 manifest). It shows that the three feeds cost about the same for one user. It says nothing about many users at once.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Summary}
+\label{sec:disc-summary}
+
+The social-graph-aware hybrid did not help users with little history more than the current heuristic, on synthetic data or on Digg. On synthetic data it is better than BL2 over all users, but the gain comes from the user's history in communities, which acts as a topic signal, and it grows with history. On Digg, the follow signal is too small next to the vote counts, and a stronger time decay is what matters. The \texttt{social} feed costs the same as the other feeds, and its live order equals the evaluated order. So the app keeps its current ``For You'' and offers the \texttt{social} feed as an option. Chapter 9 lists the future work that follows from these limits.

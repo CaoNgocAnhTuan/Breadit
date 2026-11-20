@@ -1,2 +1,421 @@
 % Chapter 6. Experiments and Results. Draft: drafts/06-experiments-and-results.md
-% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand.
+% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. The few settings typed here are names or
+% frozen values of Chapter 3 (K = 10, the history groups, the grid values, the dataset names, version 0.25 of the super-plan).
+% A number the text needs that has no macro is \macromissing{...}: a red mark, listed for the report-script task.
+% The \chapter command is in main.tex, so this file starts with the introduction and then the sections.
+% Tables: \input{\resultsdir/tables/<id>.tex} (tuning, leftout, e1 to e8). Figures: pgfplots reading the CSVs of \resultsdir
+% (fig-e2-history.csv, fig-e3-density.csv, fig-e5-worlds.csv).
+% Citations: \refcite{<key>}, with the keys of chapters/references.tex. This chapter cites no reference.
+% A macro followed by a space needs {} after it (TeX drops the space after a control word).
+
+\label{ch:results}
+
+%% A number that has no macro yet: a visible red mark, never a typed number.
+\providecommand{\macromissing}[1]{\textcolor{red}{[MACRO?: #1]}}
+
+%% Filters for the figures below: keep (discard if not) or drop (discard if) the rows whose column #1 has the value #2.
+\pgfplotsset{
+  discard if not/.style 2 args={
+    x filter/.code={
+      \edef\resfigtempa{\thisrow{#1}}%
+      \edef\resfigtempb{#2}%
+      \ifx\resfigtempa\resfigtempb\else\def\pgfmathresult{inf}\fi
+    }
+  },
+  discard if/.style 2 args={
+    x filter/.code={
+      \edef\resfigtempa{\thisrow{#1}}%
+      \edef\resfigtempb{#2}%
+      \ifx\resfigtempa\resfigtempb\def\pgfmathresult{inf}\fi
+    }
+  },
+  %% Both tests in one filter (a second x filter would replace the first): keep the rows whose column #1 is #2 and whose column #3 is not #4.
+  keep rows/.style n args={4}{
+    x filter/.code={
+      \edef\resfigtempa{\thisrow{#1}}%
+      \edef\resfigtempb{#2}%
+      \edef\resfigtempc{\thisrow{#3}}%
+      \edef\resfigtempd{#4}%
+      \ifx\resfigtempa\resfigtempb\else\def\pgfmathresult{inf}\fi
+      \ifx\resfigtempc\resfigtempd\def\pgfmathresult{inf}\fi
+    }
+  },
+  %% Common look of the three figures: marks with 95% intervals as error bars, a dashed line at 0, black and white.
+  gainplot/.style={
+    height=6cm,
+    width=0.37\textwidth,
+    tick label style={font=\footnotesize},
+    label style={font=\footnotesize},
+    title style={font=\footnotesize},
+    ylabel={Gain in NDCG@10 ($H - \mathrm{BL2}$)},
+    scaled y ticks=false,
+    yticklabel style={/pgf/number format/fixed, /pgf/number format/fixed zerofill, /pgf/number format/precision=2},
+    extra y ticks={0},
+    extra y tick labels={},
+    extra y tick style={grid=major, grid style={dashed, black!70}},
+    error bars/y dir=both,
+    error bars/y explicit,
+    error bars/error bar style={thick},
+    error bars/error mark options={rotate=90, mark size=2pt},
+    every axis plot/.append style={black, only marks, mark size=2pt},
+  },
+}
+
+This chapter gives the results of the offline experiments E1 to E6 and E8, and of the cost benchmark E7. Chapter 3 describes the data, the protocol, the methods and the statistics, so this chapter only reports what was measured. Chapter 7 discusses what the results mean.
+
+All quality numbers use NDCG@10 unless a table says otherwise. ``Gain'' always means the paired difference $H - \text{BL2}$ per user, averaged over users. BL2 is the production Explore score, the reference of H1.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{How the experiments were run}
+\label{sec:results-setup}
+
+\textbf{Datasets.} Five synthetic worlds of size M (\texttt{syn-W0-M}, \texttt{syn-W1-M}, and the three W2 cells \texttt{syn-W2L-M}, \texttt{syn-W2M-M}, \texttt{syn-W2H-M}) and the real dataset Digg 2009 (\texttt{digg2009}). H1 has two co-primary tests: \texttt{syn-W2M-M} (the middle W2 cell) and \texttt{digg2009}.
+
+\textbf{Order of work.} First, every tuned parameter was chosen on the validation items only, all before the cut time $T$. Second, the choices were frozen into the test configs, and the author approved them. Third, the test split was run once. No test result was seen before the tuning was frozen.
+
+\textbf{Two changes before the test split.} Both were decided from validation results only, and both are recorded in the super-plan change log (version 0.25):
+\begin{itemize}
+  \item \textbf{The H0 gate now tests H-follow, not the full $H$.} On W0, the full hybrid beat BL2 on validation, almost only through the community term. In the generator a community is a topic, so this term carries topic interest even when there is no social influence. H-follow ($\beta = 0$) has only the follow terms, and follows are random in W0, so it is the right null test.
+  \item \textbf{The grids were widened.} The best $\alpha$ and $\beta$ were at the top of the first grid. The $\alpha$ and $\beta$ grid was extended, and the baseline grids were widened past their edges (Chapter 3 gives the final grids).
+\end{itemize}
+
+\textbf{Statistics.} For \texttt{syn-W2M-M} and \texttt{digg2009}, family F1 holds the H1 comparisons ($H - \text{BL2}$ for each $K$ and history group) and family F2 holds $H$ against every other baseline. Each family is corrected with Holm on its own. All other comparisons get a bootstrap confidence interval and no $p$-value. H1 passes on a dataset only if, for NDCG@10 in group 0--4, the Holm-adjusted $p$ is below the Holm level \textbf{and} the lower end of the 95\% confidence interval is above 0.
+
+\textbf{Reproducibility.} Every offline run of this chapter (all but E7) was made a second time from empty folders, and every result file was byte-identical. The command \texttt{npm run thesis:repro} rebuilds all of them from the raw data and compares each file with the merged manifest \texttt{.docs/results/manifest.json}. It passed on the development machine and on a clean clone of the repository. The E7 timings are repeatable, not identical (Section~\ref{sec:results-e7}).
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Tuning results}
+\label{sec:results-tuning}
+
+Table~\ref{tab:results-tuning} lists the value chosen for each tuned method on each dataset.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Values chosen on the validation split for each tuned method (the highest validation NDCG@10; a tie goes to the smaller value).}
+  \label{tab:results-tuning}
+  \small
+  \input{\resultsdir/tables/tuning.tex}
+\end{table}
+
+On \texttt{syn-W2M-M}, $H$ chose $\alpha / \beta$ = \tuneWTwoMHChosen{}. This is the top of the widened grid, so the tuning still stopped at the edge. On \texttt{syn-W2M-M}, the validation gain from the second-highest grid value to the top one was small (validation NDCG@10 \tuneWTwoMHValNdcgTenFiveTwelveFull{} at $\alpha = \beta = 512$ and \tuneWTwoMHValNdcgTenTenTwentyFourFull{} at $\alpha = \beta = 1{,}024$). On \texttt{digg2009}, $H$ chose the same $\alpha$ and $\beta = 0$. Digg has no communities, so $\beta$ has no effect there, and the tie rule picks the smaller value.
+
+The live \texttt{social} feed uses the \texttt{syn-W2M-M} values (Chapter 5). The parity test checks that the live feed order equals the harness order with these values.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Test users and left-out users}
+\label{sec:results-leftout}
+
+Table~\ref{tab:results-leftout} gives the number of test users and of left-out users by history group. A user is left out when the test post is not in the user's candidate pool.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Test users and left-out users by history group.}
+  \label{tab:results-leftout}
+  \small
+  \input{\resultsdir/tables/leftout.tex}
+\end{table}
+
+\texttt{syn-W2M-M} has \eOneWTwoMTestUsersAllN{} test users, and \eOneWTwoMLeftOutAllN{} of them are left out. \texttt{digg2009} has \eOneDiggTestUsersAllN{} test users, and \eOneDiggLeftOutAllN{} are left out. After this, the H1 group 0--4 holds \eTwoWTwoMNdcgTenZeroFourN{} users on \texttt{syn-W2M-M} and \eTwoDiggNdcgTenZeroFourN{} users on \texttt{digg2009}.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{H0 gate}
+\label{sec:results-h0}
+
+The gate compares H-follow with BL2 on the null world W0, with the $\alpha$ chosen on \texttt{syn-W2M-M}. The gain is \hZeroWZeroNdcgHFollowTenAllGain{}, with a 95\% confidence interval from \hZeroWZeroNdcgHFollowTenAllCiLow{} to \hZeroWZeroNdcgHFollowTenAllCiHigh{}. The interval contains 0, so H-follow does not beat BL2 when follows are random. \textbf{The gate passes}, and the other results can be used.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{E1: all methods}
+\label{sec:results-e1}
+
+Table~\ref{tab:results-e1} compares all methods on the test split, over all users, at $K = 10$.
+
+\begin{table}[htbp]
+  \centering
+  \caption{E1: all methods on the test split, all users, $K = 10$.}
+  \label{tab:results-e1}
+  \small
+  \resizebox{\textwidth}{!}{\setlength{\tabcolsep}{3pt}\input{\resultsdir/tables/e1.tex}}
+\end{table}
+
+On \texttt{syn-W2M-M}, $H$ has an NDCG@10 of \eOneWTwoMNdcgHTenAllValue{}, against \eOneWTwoMNdcgBLTwoTenAllValue{} for BL2. The best other baselines are BL2t and BL6 (\eOneWTwoMNdcgBLTwoTTenAllValue{} and \eOneWTwoMNdcgBLSixTenAllValue{}). $H$ also covers fewer distinct posts than BL2: Coverage@10 is \eOneWTwoMCovHTenAllValue{} for $H$ and \eOneWTwoMCovBLTwoTenAllValue{} for BL2.
+
+On \texttt{digg2009}, $H$ and BL2 have the same NDCG@10 (\eOneDiggNdcgHTenAllValue{} and \eOneDiggNdcgBLTwoTenAllValue{}) and the same Coverage@10 (\eOneDiggCovHTenAllValue{}). The two ``hot'' baselines are far better than both: BL4 (Reddit) and BL5 (Hacker News) reach \eOneDiggNdcgBLFourTenAllValue{} and \eOneDiggNdcgBLFiveTenAllValue{}.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{E2: users with little history (H1)}
+\label{sec:results-e2}
+
+Table~\ref{tab:results-e2} gives the gain of $H$ over BL2 for each history group, with its 95\% confidence interval and the Holm-adjusted $p$ (family F1). Figure~\ref{fig:results-e2} draws the gains with their intervals. This is the main test of the thesis.
+
+\begin{table}[htbp]
+  \centering
+  \caption{E2: gain of $H$ over BL2 by history group, NDCG@10 (family F1, Holm-adjusted $p$).}
+  \label{tab:results-e2}
+  \small
+  \resizebox{\textwidth}{!}{\input{\resultsdir/tables/e2.tex}}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      name=left, gainplot,
+      title={\texttt{syn-W2M-M}},
+      xlabel={History group},
+      symbolic x coords={0,1-4,0-4,5-19,20+},
+      xtick={0,1-4,0-4,5-19,20+},
+      xticklabels={0,1--4,0--4,5--19,20+},
+    ]
+      \addplot[black] table[col sep=comma, x=bin, y=mean_diff,
+        y error plus expr=\thisrow{ci_high}-\thisrow{mean_diff},
+        y error minus expr=\thisrow{mean_diff}-\thisrow{ci_low},
+        discard if not={dataset}{syn-W2M-M}]{\resultsdir/fig-e2-history.csv};
+    \end{axis}
+    \begin{axis}[
+      at={(left.east)}, anchor=west, xshift=1.9cm, gainplot,
+      title={\texttt{digg2009}},
+      xlabel={History group},
+      symbolic x coords={0,1-4,0-4,5-19,20+},
+      xtick={0,1-4,0-4,5-19,20+},
+      xticklabels={0,1--4,0--4,5--19,20+},
+      scaled y ticks=base 10:4,
+      yticklabel style={/pgf/number format/fixed, /pgf/number format/fixed zerofill, /pgf/number format/precision=0},
+    ]
+      \addplot[black] table[col sep=comma, x=bin, y=mean_diff,
+        y error plus expr=\thisrow{ci_high}-\thisrow{mean_diff},
+        y error minus expr=\thisrow{mean_diff}-\thisrow{ci_low},
+        discard if not={dataset}{digg2009}]{\resultsdir/fig-e2-history.csv};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{E2: gain in NDCG@10 of $H$ over BL2 by history group, with the 95\% confidence interval, at $K = 10$. Left: \texttt{syn-W2M-M}. Right: \texttt{digg2009}, on its own and much smaller scale. The dashed line is 0. Group 0--4, the group of H1, holds the users of groups 0 and 1--4.}
+  \label{fig:results-e2}
+\end{figure}
+
+\textbf{\texttt{syn-W2M-M}.} In group 0--4, the gain is \eTwoWTwoMNdcgTenZeroFourGain{}, with a confidence interval from \eTwoWTwoMNdcgTenZeroFourCiLow{} to \eTwoWTwoMNdcgTenZeroFourCiHigh{} and a Holm $p$ of \eTwoWTwoMNdcgTenZeroFourPHolm{}. The interval contains 0 and the $p$ is above the Holm level, so \textbf{H1 fails on \texttt{syn-W2M-M}}. The gain is positive in both parts of the group (\eTwoWTwoMNdcgTenZeroGain{} in group 0 and \eTwoWTwoMNdcgTenOneFourGain{} in group 1--4), but the intervals are wide.
+
+\textbf{\texttt{digg2009}.} In group 0--4, the gain is \eTwoDiggNdcgTenZeroFourGain{} at three decimals (\eTwoDiggNdcgTenZeroFourGainFull{} at six decimals). The lower end of the interval is above 0, but only by a very small amount: the interval runs from \eTwoDiggNdcgTenZeroFourCiLowFull{} to \eTwoDiggNdcgTenZeroFourCiHighFull{}. The Holm $p$ is \eTwoDiggNdcgTenZeroFourPHolm{}, above the Holm level. H1 needs both conditions, so \textbf{H1 fails on \texttt{digg2009}}.
+
+\textbf{Other groups.} On \texttt{syn-W2M-M}, the gain grows with history. It is largest for users with 20 or more earlier interactions (gain \eTwoWTwoMNdcgTenTwentyPlusGain{}, interval from \eTwoWTwoMNdcgTenTwentyPlusCiLow{} to \eTwoWTwoMNdcgTenTwentyPlusCiHigh{}, Holm $p$ \eTwoWTwoMNdcgTenTwentyPlusPHolm{}). This is the only F1 row at $K = 10$ where both conditions hold. In group 5--19, the interval is above 0, but the Holm $p$ is not below the level (\eTwoWTwoMNdcgTenFiveNineteenPHolm{}). On \texttt{digg2009}, the gain is near 0 in every group.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{E3: social density (H2)}
+\label{sec:results-e3}
+
+Table~\ref{tab:results-e3} and Figure~\ref{fig:results-e3} give the gain by the number of followees the user has at the test time.
+
+\begin{table}[htbp]
+  \centering
+  \caption{E3: gain of $H$ over BL2 by social density (the number of followees at the test time), NDCG@10.}
+  \label{tab:results-e3}
+  \small
+  \input{\resultsdir/tables/e3.tex}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      name=left, gainplot,
+      title={W2 cells (synthetic)},
+      xlabel={Followees},
+      symbolic x coords={0,1-4,5-19,20+},
+      xtick={0,1-4,5-19,20+},
+      xticklabels={0,1--4,5--19,20+},
+      legend style={font=\scriptsize, at={(0.5,-0.32)}, anchor=north, legend columns=-1},
+    ]
+      \addplot[black, xshift=-5pt, mark=triangle*, mark options={solid, fill=white}] table[col sep=comma, x=bin, y=mean_diff,
+        y error plus expr=\thisrow{ci_high}-\thisrow{mean_diff},
+        y error minus expr=\thisrow{mean_diff}-\thisrow{ci_low},
+        keep rows={dataset}{syn-W2L-M}{n}{1}]{\resultsdir/fig-e3-density.csv};
+      \addlegendentry{W2L}
+      \addplot[black, xshift=0pt, mark=*] table[col sep=comma, x=bin, y=mean_diff,
+        y error plus expr=\thisrow{ci_high}-\thisrow{mean_diff},
+        y error minus expr=\thisrow{mean_diff}-\thisrow{ci_low},
+        keep rows={dataset}{syn-W2M-M}{n}{1}]{\resultsdir/fig-e3-density.csv};
+      \addlegendentry{W2M}
+      \addplot[black, xshift=5pt, mark=square*, mark options={solid, fill=white}] table[col sep=comma, x=bin, y=mean_diff,
+        y error plus expr=\thisrow{ci_high}-\thisrow{mean_diff},
+        y error minus expr=\thisrow{mean_diff}-\thisrow{ci_low},
+        keep rows={dataset}{syn-W2H-M}{n}{1}]{\resultsdir/fig-e3-density.csv};
+      \addlegendentry{W2H}
+    \end{axis}
+    \begin{axis}[
+      at={(left.east)}, anchor=west, xshift=1.9cm, gainplot,
+      title={\texttt{digg2009}},
+      xlabel={Followees},
+      symbolic x coords={0,1-4,5-19,20+},
+      xtick={0,1-4,5-19,20+},
+      xticklabels={0,1--4,5--19,20+},
+      scaled y ticks=base 10:4,
+      yticklabel style={/pgf/number format/fixed, /pgf/number format/fixed zerofill, /pgf/number format/precision=0},
+    ]
+      \addplot[black] table[col sep=comma, x=bin, y=mean_diff,
+        y error plus expr=\thisrow{ci_high}-\thisrow{mean_diff},
+        y error minus expr=\thisrow{mean_diff}-\thisrow{ci_low},
+        discard if not={dataset}{digg2009}]{\resultsdir/fig-e3-density.csv};
+    \end{axis}
+  \end{tikzpicture}
+  \caption{E3: gain in NDCG@10 of $H$ over BL2 by the number of followees at the test time, with the 95\% confidence interval, at $K = 10$. Left: the three W2 cells (low, middle and high influence); the bin 1--4 holds too few users in these worlds and has no mark (Table~\ref{tab:results-e3}). Right: \texttt{digg2009}, on its own and much smaller scale. The dashed line is 0.}
+  \label{fig:results-e3}
+\end{figure}
+
+On the three W2 cells, the gain is already positive for users who follow nobody: \eThreeWTwoLNdcgTenZeroGain{} (low influence), \eThreeWTwoMNdcgTenZeroGain{} (middle) and \eThreeWTwoHNdcgTenZeroGain{} (high). For users with 20 or more followees, it is \eThreeWTwoLNdcgTenTwentyPlusGain{}, \eThreeWTwoMNdcgTenTwentyPlusGain{} and \eThreeWTwoHNdcgTenTwentyPlusGain{}. So the gain does not rise with the number of followees; on all three cells it is lower at 20 or more than at 0. The bin 1--4 holds only \macromissing{E3: number of users in bin 1--4 (one value per synthetic world)} in each synthetic world, so it is not read.
+
+On \texttt{digg2009}, the gain is 0 in every bin (for example \eThreeDiggNdcgTenZeroGain{} at 0 followees and \eThreeDiggNdcgTenTwentyPlusGain{} at 20 or more).
+
+H2 says that the gain grows with social density and is about 0 for a user who follows nobody and has no community. Neither part holds on these data, so \textbf{H2 is not supported}. This experiment measures density by the number of followees only.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{E4: which term matters}
+\label{sec:results-e4}
+
+Table~\ref{tab:results-e4} removes one term of $H$ at a time and changes the prior strength $m$. Every row is the gain over BL2 on all users.
+
+\begin{table}[htbp]
+  \centering
+  \caption{E4: the terms of $H$ and the prior strength $m$, NDCG@10 (gain over BL2, all users).}
+  \label{tab:results-e4}
+  \small
+  \input{\resultsdir/tables/e4.tex}
+\end{table}
+
+\textbf{Terms (\texttt{syn-W2M-M}).} The full $H$ gains \eFourWTwoMNdcgHTenAllGain{}. H-comm ($\alpha = 0$, community term only) gains \eFourWTwoMNdcgHCommTenAllGain{}, while H-follow ($\beta = 0$, follow terms only) gains \eFourWTwoMNdcgHFollowTenAllGain{}. So almost all of the gain comes from the community term. Removing the author term gives \eFourWTwoMNdcgHNoauthorTenAllGain{}, and removing the engager term gives \eFourWTwoMNdcgHNoengagerTenAllGain{}: each of the two follow parts changes the result very little.
+
+\textbf{Prior strength $m$ (\texttt{syn-W2M-M}).} With $m = 0$, 2, 5 (the frozen value) and 10, the gain is \eFourWTwoMNdcgHMZeroTenAllGain{}, \eFourWTwoMNdcgHMTwoTenAllGain{}, \eFourWTwoMNdcgHTenAllGain{} and \eFourWTwoMNdcgHMTenTenAllGain{}. $m = 2$ gives the highest gain. The frozen value was kept, because it was fixed before the test split.
+
+\textbf{\texttt{digg2009}.} Every variant gains 0 over BL2 (for example \eFourDiggNdcgHTenAllGain{} for $H$ and \eFourDiggNdcgHFollowTenAllGain{} for H-follow). There is no H-comm row, because Digg has no communities.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{E5: is the result built into the data?}
+\label{sec:results-e5}
+
+Table~\ref{tab:results-e5} runs $H$ against BL2 in every synthetic world, each with its own tuning, and adds two control runs. Figure~\ref{fig:results-e5} draws the gain of each run with its interval.
+
+\begin{table}[htbp]
+  \centering
+  \caption{E5: gain over BL2 in each world, NDCG@10 ($K = 10$, all users, no $p$-value). The H0 gate is the H-follow row.}
+  \label{tab:results-e5}
+  \small
+  \resizebox{\textwidth}{!}{\input{\resultsdir/tables/e5.tex}}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      gainplot,
+      width=0.9\textwidth,
+      height=6.5cm,
+      % own-tuning and syn-W2M-M-shuffled are listed only because pgfplots maps a row before the filter drops it
+      symbolic x coords={syn-W0-M,syn-W1-M,syn-W2L-M,syn-W2M-M,syn-W2H-M,h0-gate,topic-signal,shuffled,own-tuning,syn-W2M-M-shuffled},
+      xmin=syn-W0-M, xmax=shuffled,
+      enlarge x limits=0.08,
+      xtick={syn-W0-M,syn-W1-M,syn-W2L-M,syn-W2M-M,syn-W2H-M,h0-gate,topic-signal,shuffled},
+      xticklabels={W0,W1,W2L,W2M,W2H,{W0, H-follow (gate)},{W0, W2M values},{W2M, shuffled}},
+      xticklabel style={rotate=35, anchor=east},
+      legend style={font=\scriptsize, at={(0.02,0.97)}, anchor=north west},
+      legend cell align=left,
+    ]
+      \addplot[black, mark=*] table[col sep=comma, x=dataset, y=mean_diff,
+        y error plus expr=\thisrow{ci_high}-\thisrow{mean_diff},
+        y error minus expr=\thisrow{mean_diff}-\thisrow{ci_low},
+        discard if not={variant}{own-tuning}]{\resultsdir/fig-e5-worlds.csv};
+      \addlegendentry{Each world with its own tuning}
+      \addplot[black, mark=square*, mark options={solid, fill=white}] table[col sep=comma, x=variant, y=mean_diff,
+        y error plus expr=\thisrow{ci_high}-\thisrow{mean_diff},
+        y error minus expr=\thisrow{mean_diff}-\thisrow{ci_low},
+        discard if={variant}{own-tuning}]{\resultsdir/fig-e5-worlds.csv};
+      \addlegendentry{Control runs}
+    \end{axis}
+  \end{tikzpicture}
+  \caption{E5: gain in NDCG@10 of $H$ over BL2 in each synthetic world and in the control runs, with the 95\% confidence interval, at $K = 10$. W0 has no influence and no homophily, W1 has homophily only, and the three W2 cells have low, middle and high influence. ``W0, H-follow (gate)'' is the H0 gate. ``W0, W2M values'' is $H$ on W0 with the values chosen on \texttt{syn-W2M-M}. ``W2M, shuffled'' is \texttt{syn-W2M-M} with the times of the engagements shuffled inside each post. The dashed line is 0.}
+  \label{fig:results-e5}
+\end{figure}
+
+\textbf{Worlds.} The gain grows with the strength of social influence in the generator: \eFiveWZeroNdcgTenAllGain{} in W0 (no influence, no homophily), \eFiveWOneNdcgTenAllGain{} in W1 (homophily only), and \eFiveWTwoLNdcgTenAllGain{}, \eFiveWTwoMNdcgTenAllGain{} and \eFiveWTwoHNdcgTenAllGain{} in the low, middle and high W2 cells. In W0 the interval starts at \eFiveWZeroNdcgTenAllCiLow{}. W0 and W1 have no influence, so their gain comes from the topic signal in the community term (Section~\ref{sec:results-setup}), not from influence.
+
+\textbf{$H$ on W0 with the \texttt{syn-W2M-M} values.} The gain is \eFiveWZeroTopicNdcgTenAllGain{}, with a 95\% interval from \eFiveWZeroTopicNdcgTenAllCiLow{} to \eFiveWZeroTopicNdcgTenAllCiHigh{}, and the interval contains 0.
+
+\textbf{Shuffled timestamps.} In a copy of \texttt{syn-W2M-M} where the times of the engagements are shuffled inside each post, the gain is \eFiveWTwoMShuffledNdcgTenAllGain{} (interval from \eFiveWTwoMShuffledNdcgTenAllCiLow{}), against \eFiveWTwoMNdcgTenAllGain{} without shuffling. Most of the gain stays, so it does not depend much on who engaged first.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{E6: ties}
+\label{sec:results-e6}
+
+Table~\ref{tab:results-e6} repeats E1 with the reversed tie-break. With it, $H$ gives \eSixWTwoMNdcgHTenAllValue{} and BL2 gives \eSixWTwoMNdcgBLTwoTenAllValue{} on \texttt{syn-W2M-M}, and $H$ and BL2 both give \eSixDiggNdcgHTenAllValue{} on \texttt{digg2009}: the same values as in E1. Over all methods and both datasets, NDCG@10 changes by at most \macromissing{largest NDCG@10 change in E6}. Ties do not change any result of this chapter.
+
+\begin{table}[htbp]
+  \centering
+  \caption{E6: NDCG@10, all users, with the normal and the reversed tie-break.}
+  \label{tab:results-e6}
+  \small
+  \resizebox{\textwidth}{!}{\input{\resultsdir/tables/e6.tex}}
+\end{table}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{E8: a larger pool}
+\label{sec:results-e8}
+
+Table~\ref{tab:results-e8} runs the main comparison on \texttt{syn-W2M-M} again with the larger pool ($W_L$ and $N_L$, Chapter 3). It includes BL6, the baseline with the highest validation NDCG@10 on this dataset.
+
+\begin{table}[htbp]
+  \centering
+  \caption{E8: NDCG@10 on \texttt{syn-W2M-M} with the normal and the larger pool.}
+  \label{tab:results-e8}
+  \small
+  \input{\resultsdir/tables/e8.tex}
+\end{table}
+
+With the larger pool, $H$ drops from \eOneWTwoMNdcgHTenAllValue{} to \eEightWTwoMNdcgHTenAllValue{}, and BL2 from \eOneWTwoMNdcgBLTwoTenAllValue{} to \eEightWTwoMNdcgBLTwoTenAllValue{}. The order of the methods does not change, and $H$ stays far above BL2.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{E7: the cost of the three feeds}
+\label{sec:results-e7}
+
+E7 measures the live backend, not the harness, so it is a Class R result: repeatable, not identical. The setup is frozen (Chapter 3): one machine, the page cache off, one virtual user, page 1 of one \texttt{algo} for each pair of the parity sample, five rounds with the first one dropped as warm-up. A run counts only if no request fails, and no request failed. The \texttt{social} feed runs with the tuned $\alpha$ and $\beta$ of Section~\ref{sec:results-tuning}. The machine and its load are recorded in \texttt{.docs/results/p7-e7/manifest.json}.
+
+Table~\ref{tab:results-e7} gives the results.
+
+\begin{table}[htbp]
+  \centering
+  \caption{E7: the cost of the three feeds, page 1 on one machine with the page cache off: median of the kept runs with its 95\% bootstrap interval, p95, and Prisma queries per request.}
+  \label{tab:results-e7}
+  \small
+  \resizebox{\textwidth}{!}{\input{\resultsdir/tables/e7.tex}}
+\end{table}
+
+The median time for page 1 is \eSevenChronoMedian{}~ms for \texttt{chrono} (95\% interval \eSevenChronoCiLow{} to \eSevenChronoCiHigh{}), \eSevenEngagementMedian{}~ms for \texttt{engagement} (\eSevenEngagementCiLow{} to \eSevenEngagementCiHigh{}) and \eSevenSocialMedian{}~ms for \texttt{social} (\eSevenSocialCiLow{} to \eSevenSocialCiHigh{}). The intervals overlap, so this setup shows no difference in time between the three feeds. The p95 times are \eSevenChronoPNinetyFive{}, \eSevenEngagementPNinetyFive{} and \eSevenSocialPNinetyFive{}~ms.
+
+The number of Prisma queries per request is deterministic for a given request. On average it is \eSevenChronoQueriesMean{} (\texttt{chrono}), \eSevenEngagementQueriesMean{} (\texttt{engagement}) and \eSevenSocialQueriesMean{} (\texttt{social}).
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Summary}
+\label{sec:results-summary}
+
+Table~\ref{tab:results-summary} gives the result for each hypothesis.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Result for each hypothesis.}
+  \label{tab:results-summary}
+  \small
+  \begin{tabular}{@{}lp{0.72\textwidth}@{}}
+    \toprule
+    Hypothesis & Result \\
+    \midrule
+    H0 (sanity) & Passes: H-follow does not beat BL2 on W0. \\
+    H1 (RQ1) & Fails on both co-primary tests, \texttt{syn-W2M-M} and \texttt{digg2009}. \\
+    H2 (RQ2) & Not supported: the gain is already there at 0 followees and does not rise with them. \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The other results, in short:
+\begin{itemize}
+  \item On \texttt{syn-W2M-M}, $H$ is far above BL2 over all users. The gain comes mostly from the community term and mostly from users with a long history.
+  \item On \texttt{digg2009}, the social terms change almost nothing, and the ``hot'' baselines BL4 and BL5 are far better than BL2 and $H$.
+  \item Ties and a larger pool do not change these results.
+  \item The \texttt{social} feed costs the same time as the other two feeds on this setup.
+\end{itemize}
+
+By the default feed rule (Chapter 3), ``For You'' switches to the \texttt{social} feed only if H1 passes on both co-primary tests and the H0 gate passes. H1 failed, so ``For You'' stays as it is today. Chapter 7 discusses why.
