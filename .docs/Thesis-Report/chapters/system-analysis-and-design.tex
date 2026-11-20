@@ -1,2 +1,432 @@
 % Chapter 4. System Analysis and Design. Draft: drafts/04-system-analysis-and-design.md
-% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand.
+% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. This chapter has no result numbers;
+% the numbers typed here are design values of the code (page size, text limits, cache time).
+% The \chapter command is in main.tex, so this file starts with the introduction and then the sections.
+% Figures: each one is a placeholder. The author draws the diagrams by hand (draw.io, Mermaid web editor) from the scripts
+% in the draft, saves them in images/ and replaces the \fbox line by the \includegraphics line above it.
+% Pointers to Chapter 3: sec:method-hybrid (3.2), sec:method-protocol (3.5), sec:method-repro (3.8), sec:method-cost (3.9).
+
+This chapter designs the platform of contribution C1 (the architecture) and contribution C3 (the real-time layer), and shows where the ranking of C2 plugs in. Section~\ref{sec:design-requirements} lists the requirements. Section~\ref{sec:design-usecases} gives the use cases. Sections~\ref{sec:design-activity} and~\ref{sec:design-sequence} show the main flows as activity diagrams and sequence diagrams. Section~\ref{sec:design-architecture} shows the architecture, and Section~\ref{sec:design-database} the database. Chapter 3 defines the ranking method, so this chapter only shows where the method is called. Chapter 5 describes how the design is built. Every route, guard and field named here was checked against the code.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Requirements}
+\label{sec:design-requirements}
+
+A requirement says what the platform must do (functional, FR) or how well it must do it (non-functional, NFR). Table~\ref{tab:design-fr} lists the functional requirements by module. The feed requirements FR20 to FR23 are the ones that the ranking of Chapter 3 touches.
+
+{\small\singlespacing
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{1.1cm} >{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{\dimexpr\textwidth-3.6cm-4\tabcolsep\relax}@{}}
+  \caption{Functional requirements by module.}
+  \label{tab:design-fr}\\
+  \toprule
+  ID & Module & Requirement \\
+  \midrule
+  \endfirsthead
+  \toprule
+  ID & Module & Requirement \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  FR1  & Accounts & A guest can sign up with a username (3 to 30 letters, digits or \texttt{\_}), an email and a password (at least 6 characters). Username and email are unique. \\
+  FR2  & Accounts & The system emails a 6-digit code, valid for 15 minutes, to verify the email. The user can ask for a new code. Until the email is verified, the main writes (post, comment, like, save, repost, upload, send a message, create a community) are refused. \\
+  FR3  & Accounts & A user can sign in and sign out. A session lasts 30 days, and signing out ends it at once. A user can reset a forgotten password with an emailed link that is valid for 1 hour. \\
+  FR4  & Posts & A user can publish a post with text of up to 255 characters and up to 10 images or videos. A post needs text or media. \\
+  FR5  & Posts & The author can edit the text and the media of a post, and delete it. A deleted post is hidden, not removed (soft delete). \\
+  FR6  & Posts & Hashtags (\texttt{\#tag}) and mentions (\texttt{@username}) are read from the text when the post is saved. A mention counts only for a user whom the author follows, and it notifies that user. \\
+  FR7  & Posts & A user can report a post with a reason of up to 500 characters. \\
+  FR8  & Interactions & A user can like, save and repost a post (plain or with a quote). Each action is a toggle. \\
+  FR9  & Interactions & A user can comment on a post, reply to a comment, edit or delete own comments, and like a comment. \\
+  FR10 & Social graph & A user can follow and unfollow, and block and unblock, another user. A block removes the follows in both directions and hides each user from the other in feeds, search, notifications and messages. \\
+  FR11 & Social graph & A user has a profile (name, bio, location, job, website, avatar, cover) with the tabs posts, replies, media and likes, the lists of followers and following, saved posts, and recommendations of people to follow. \\
+  FR12 & Communities & A user can create a community (a name and a unique slug) and becomes its owner. A user can join and leave a community. An owner cannot leave. \\
+  FR13 & Communities & A post in a community needs membership. The post of a member waits for approval. The post of an owner or a moderator is approved at once. Only approved posts are shown. \\
+  FR14 & Communities & Owners and moderators approve or remove posts, edit the rules and the settings, and ban users from the community. The owner promotes moderators, transfers the ownership and deletes the community. \\
+  FR15 & Messages & Two users can chat one to one, with text of up to 1,000 characters or a media link. The system keeps the unread counts and the read marks. A blocked pair cannot message each other. \\
+  FR16 & Notifications & The system notifies a user of a like, a reply, a repost, a follow, a mention, a report (admins) and the posts of a community. The user sees the list and marks one or all as read. An action on your own item does not notify. \\
+  FR17 & Search & One search call returns users, posts, hashtags and communities (up to 5 of each). The platform lists the 5 trending hashtags and the posts of a hashtag. \\
+  FR18 & Admin & An admin can list and search users, and ban and unban them. A banned user cannot write. If the user is online, the browser signs out at once. \\
+  FR19 & Admin & An admin sees the open reports and can dismiss a report or delete the reported post. \\
+  FR20 & Feed & The system offers these feeds, in pages of 10 posts with a cursor: For You, Following, Communities, Explore, a profile and a community. \\
+  FR21 & Feed & A signed-in user can choose the ranking of For You with the option \texttt{algo}: \texttt{chrono}, \texttt{engagement} or \texttt{social} (the methods BL0, BL2 and H of Chapter 3). One configuration value sets the default. \\
+  FR22 & Feed & Explore ranks the newest 400 posts of the last 7 days (community posts left out) by the engagement score, and keeps at most 3 posts per author in the candidate list. \\
+  FR23 & Feed & No feed shows a deleted post or a post that waits for approval. The feeds of Home, Following, Communities, Explore and a community also leave out blocked users. \\
+\end{longtable}}
+
+The non-functional requirements are in Table~\ref{tab:design-nfr}. A finding such as S1 or T6 comes from the bug review of the app: the letter is the class (S for security, T for the thesis path) and the number is the item. Three of the requirements matter most for the thesis: the push of real-time events (NFR4), the reproducibility of the ranking (NFR5), and the rule that speed is judged only by the measurements of experiment E7 (NFR6).
+
+{\small\singlespacing
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{1.3cm} >{\raggedright\arraybackslash}p{2.9cm} >{\raggedright\arraybackslash}p{\dimexpr\textwidth-4.2cm-4\tabcolsep\relax}@{}}
+  \caption{Non-functional requirements.}
+  \label{tab:design-nfr}\\
+  \toprule
+  ID & Area & Requirement \\
+  \midrule
+  \endfirsthead
+  \toprule
+  ID & Area & Requirement \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  NFR1 & Security: sessions & The session is a signed token (HS256) in an httpOnly cookie, with \texttt{sameSite=lax} and \texttt{secure} in production. Passwords are stored as bcrypt hashes. Signing out puts the token id in a Redis blacklist. \\
+  NFR2 & Security: access & Each route lists its guards: signed in, not banned (read from the database, because a token can be 30 days old), email verified, and the admin role. A socket gets its user from the cookie and never from the client (before this was fixed, a client could join the room of any user by sending a username: finding S1). A logged-out token cannot open a socket (finding S5, socket part). The public routes do not yet check the blacklist (finding S5, HTTP part, open). \\
+  NFR3 & Security: input and abuse & A global validation pipe drops every field that no rule names. Text sizes are limited (a post 255 characters, a comment and a message 1,000). A Redis rate limiter allows by default 1,000 requests per minute for each route and IP address, and 5 to 10 for the sign-up, sign-in, verify and reset routes. \\
+  NFR4 & Real-time push & Notifications, direct messages, read marks, typing signals and bans reach an online user over a WebSocket, without a page reload. A notification is saved before it is pushed, so an offline user sees it later. With more than one backend process, the event still reaches the user. No delivery time target is set. \\
+  NFR5 & Reproducibility of the ranking & The live feed is a pure function of the stored data and one time $t$: no clock and no randomness inside the ranking. The app and the evaluation call the same code, and a parity test checks that the live order equals the evaluation order. Every result of the evaluation is rebuilt by one command and compared by hash (Section~\ref{sec:method-repro}). \\
+  NFR6 & Performance & No speed target is set. The cost of one feed page is measured only in experiment E7 (Section~\ref{sec:method-cost}). \\
+  NFR7 & Data integrity & Posts and comments are soft-deleted. A write that changes several rows (a message and its conversation time, a block and the removed follows) runs in one database transaction. Unique keys protect memberships, blocks and community bans. Likes, saves and follows have no unique key yet, so two fast requests can make a duplicate row (finding T6, open; future work in Chapter 9). \\
+\end{longtable}}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Use cases}
+\label{sec:design-usecases}
+
+The platform has four actors. A \textbf{Guest} is not signed in. A \textbf{User} is signed in. A \textbf{Community owner or moderator} is a User who has the role OWNER or MOD in one community. An \textbf{Admin} has the role ADMIN. The email service (SMTP) is a system actor that sends the codes. Figure~\ref{fig:design-usecase} shows the use cases of each actor.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-1-usecase}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-1-usecase.pdf}}}
+  \caption{Use case overview.}
+  \label{fig:design-usecase}
+\end{figure}
+
+The web app sends a guest to the sign-in page for every page except sign-up, verify, sign-in, forgot password and reset. So the Guest has only three use cases in the figure. Some API routes also accept a guest (they use \texttt{OptionalJwtAuthGuard}), but the web app does not use them for guests, so we leave them out. The admin routes need the role ADMIN.
+
+We specify four use cases in detail (Tables~\ref{tab:design-uc-feed} to~\ref{tab:design-uc-ban}). They are the ones the thesis relies on: the For You feed with the option \texttt{algo} (C2), a direct message (C3), joining a community and posting in it (a post in a community needs membership, which the community term of the score assumes), and banning a user (the admin control, and a second real-time event). The other use cases follow the same pattern: a chain of guards, one service call, and often a notification.
+
+{\small\singlespacing
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{\dimexpr\textwidth-2.5cm-2\tabcolsep\relax}@{}}
+  \caption{Use case: read the For You feed with the option \texttt{algo}.}
+  \label{tab:design-uc-feed}\\
+  \toprule
+  \textbf{Actor} & User (signed in). \\
+  \textbf{Covers} & FR20, FR21, FR23, NFR5. \\
+  \midrule
+  \textbf{Precondition} & The user is signed in and not banned. The user has opened For You and chosen Chronological, Engagement or Social. \\
+  \midrule
+  \textbf{Main flow} &
+  \begin{enumerate}[nosep,leftmargin=*,label=\arabic*.]
+    \item The user opens \texttt{/?algo=social}.
+    \item The server component \texttt{Feed} calls \texttt{GET /api/posts?cursor=1\&algo=social} and forwards the session cookie.
+    \item The backend checks the options and reads the clock once.
+    \item The backend looks for the page in the Redis cache. The key holds the viewer, the mode, the cursor, the \texttt{v:user} version and \texttt{asOf}.
+    \item On a miss, \texttt{FeedService.rank} loads the data, calls the ranking package and returns the pool as (post id, score) in rank order.
+    \item The backend takes the 10 posts after the cursor, loads them with their counts and media, stores the page for 10 seconds, and returns \texttt{posts}, \texttt{hasMore} and \texttt{nextCursor} (\texttt{t:score:id}).
+    \item \texttt{InfiniteFeed} shows the posts. When the user scrolls, it asks for the next page with \texttt{nextCursor}. The pool is ranked again at the same time $t$.
+  \end{enumerate} \\
+  \midrule
+  \textbf{Alternative flows} &
+  \begin{enumerate}[nosep,leftmargin=*,label=A\arabic*.]
+    \item The page is in the cache: step 4 returns it.
+    \item \texttt{algo} is unknown, or is sent together with \texttt{feed}, \texttt{user} or \texttt{communityId}: 400.
+    \item A guest sends \texttt{algo}: 401.
+    \item No \texttt{algo} is sent: the default of \texttt{FEED\_DEFAULT\_ALGO} applies. It is empty today, so For You is the old feed: you and your followees, no community posts, newest first.
+    \item The cursor is older than 24 hours: 400, and the feed must start again from page 1.
+    \item The pool is empty: an empty page, with \texttt{hasMore} false.
+    \item The request fails (for example 429): the feed keeps the posts already on the screen, and shows an error only when it is empty.
+  \end{enumerate} \\
+  \bottomrule
+\end{longtable}}
+
+{\small\singlespacing
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{\dimexpr\textwidth-2.5cm-2\tabcolsep\relax}@{}}
+  \caption{Use case: send a direct message.}
+  \label{tab:design-uc-dm}\\
+  \toprule
+  \textbf{Actor} & User (Alice, the sender). Bob is the receiver. \\
+  \textbf{Covers} & FR15, NFR4. \\
+  \midrule
+  \textbf{Precondition} & Alice is signed in, not banned and email verified. A conversation with Bob exists. It is made by \texttt{POST /api/conversations} with \texttt{targetUserId}, which refuses yourself and a blocked pair. \\
+  \midrule
+  \textbf{Main flow} &
+  \begin{enumerate}[nosep,leftmargin=*,label=\arabic*.]
+    \item When Bob's page loads, his browser opens the socket with the cookie. The gateway checks the cookie and the logout blacklist, and joins the socket to the room named after Bob's username.
+    \item Alice sends \texttt{POST /api/conversations/:id/messages} with \texttt{body} (up to 1,000 characters) or \texttt{mediaUrl}.
+    \item The guards \texttt{JwtAuthGuard}, \texttt{BannedUserGuard} and \texttt{EmailVerifiedGuard} pass.
+    \item The service checks that Alice is a member and that there is no block between the two members.
+    \item The service saves the message and updates the conversation time in one transaction.
+    \item The service pushes \texttt{newMessage} to Bob's room.
+    \item Bob's browser shows the message and updates his unread count. The service deletes Bob's cached unread count for the conversation and answers 201 with the message.
+    \item When Bob reads the conversation, his browser sends \texttt{PATCH /api/conversations/:id/read}. This sets \texttt{lastReadAt} and pushes \texttt{messageRead} to Alice.
+  \end{enumerate} \\
+  \midrule
+  \textbf{Alternative flows} &
+  \begin{enumerate}[nosep,leftmargin=*,label=A\arabic*.]
+    \item Alice is not a member, a block exists, or the message has neither body nor media: 403. A body over 1,000 characters: 400.
+    \item Bob is offline: no push arrives. The message is in the database, and Bob sees it and his unread count when he opens the app.
+    \item Alice has no valid session, is banned or is not verified: 401 or 403.
+    \item Bob's socket is on another backend process: the Redis adapter carries the event to it.
+  \end{enumerate} \\
+  \bottomrule
+\end{longtable}}
+
+{\small\singlespacing
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{\dimexpr\textwidth-2.5cm-2\tabcolsep\relax}@{}}
+  \caption{Use case: join a community and post in it.}
+  \label{tab:design-uc-community}\\
+  \toprule
+  \textbf{Actor} & User. The owner or moderator who approves the post is the second actor. \\
+  \textbf{Covers} & FR6, FR12, FR13, FR14. \\
+  \midrule
+  \textbf{Precondition} & The user is signed in, not banned and email verified. The community exists, and the user is not banned from it. \\
+  \midrule
+  \textbf{Main flow} &
+  \begin{enumerate}[nosep,leftmargin=*,label=\arabic*.]
+    \item The user opens the community page and presses Join: \texttt{POST /api/communities/:id/join}. The service adds a \texttt{CommunityMember} row with the role MEMBER and updates the caches of the user (\texttt{graph:communities} and \texttt{v:user}).
+    \item The page shows the compose box, because the user is a member.
+    \item The user writes the post and sends \texttt{POST /api/posts} with \texttt{communityId}.
+    \item The service checks the text, that the community exists, that the user is not banned there and that the user is a member.
+    \item The service saves the post with \texttt{isApproved} false, because the user is a member and not an owner or a moderator.
+    \item The service reads the hashtags and the mentions, and notifies the owners and the moderators (COMMUNITY\_POST).
+    \item An owner or a moderator approves the post: \texttt{POST /api/communities/:id/posts/:postId/moderate} with the action APPROVE. The post joins the community feed, and the other members get COMMUNITY\_NEW\_POST.
+  \end{enumerate} \\
+  \midrule
+  \textbf{Alternative flows} &
+  \begin{enumerate}[nosep,leftmargin=*,label=A\arabic*.]
+    \item The user is banned from the community: 403, at join and at post.
+    \item The user is not a member: 403 ``Join the community to post in it''.
+    \item The user is the owner or a moderator: the post is approved at once, and every other member gets COMMUNITY\_NEW\_POST. Steps 6 and 7 do not happen.
+    \item A moderator removes the post (the action REMOVE): the post is soft-deleted.
+    \item The user presses Join again: the same route is a toggle, and the user leaves. An owner cannot leave (403).
+  \end{enumerate} \\
+  \bottomrule
+\end{longtable}}
+
+{\small\singlespacing
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.5cm} >{\raggedright\arraybackslash}p{\dimexpr\textwidth-2.5cm-2\tabcolsep\relax}@{}}
+  \caption{Use case: ban a user.}
+  \label{tab:design-uc-ban}\\
+  \toprule
+  \textbf{Actor} & Admin. The banned user is affected. \\
+  \textbf{Covers} & FR18, NFR2, NFR4. \\
+  \midrule
+  \textbf{Precondition} & The admin is signed in, and the token holds the role ADMIN. \\
+  \midrule
+  \textbf{Main flow} &
+  \begin{enumerate}[nosep,leftmargin=*,label=\arabic*.]
+    \item The admin opens the admin console (\texttt{/admin-console/users}) and finds the user with \texttt{GET /api/admin/users?q=}.
+    \item The admin presses Ban: \texttt{POST /api/admin/users/:id/ban}.
+    \item \texttt{JwtAuthGuard} and \texttt{RolesGuard} (role ADMIN) pass.
+    \item The service checks that the user exists and sets \texttt{banned} to true.
+    \item The service pushes \texttt{accountBanned} to the room of the user.
+    \item The browser of the banned user calls the sign-out route and goes to \texttt{/sign-in?banned=true}.
+    \item From now on, \texttt{BannedUserGuard} refuses the writes of the user, even with an old token, because it reads \texttt{banned} from the database.
+  \end{enumerate} \\
+  \midrule
+  \textbf{Alternative flows} &
+  \begin{enumerate}[nosep,leftmargin=*,label=A\arabic*.]
+    \item The caller is not an admin: 403. There is no cookie: 401. The web app also sends a non-admin away from the console.
+    \item The user does not exist: 404.
+    \item The user is offline: no push is sent. The old token still works for reading, but the writes are refused (step 7), and the pages show ``Your account has been suspended''.
+    \item Unban: \texttt{POST /api/admin/users/:id/unban} sets \texttt{banned} to false. No event is sent.
+    \item Known gap: the route does not refuse a ban of the admin's own account or of another admin (an open finding).
+  \end{enumerate} \\
+  \bottomrule
+\end{longtable}}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Activity diagrams}
+\label{sec:design-activity}
+
+Three activity diagrams show the flows that have decisions: sign up, publish a post, and get one page of a feed. The other flows are simple chains, and the use cases above describe them.
+
+Figure~\ref{fig:design-signup} shows the sign-up. The form needs a username of 3 to 30 letters, digits or underscores, a valid email and a password of at least 6 characters. A wrong input gives 400. A username or an email that is already in use gives 409. Then the backend hashes the password with bcrypt and creates the user with \texttt{emailVerified} empty.
+
+Next, the backend makes a 6-digit code that is valid for 15 minutes, saves it in the \texttt{VerificationToken} table and sends it by email. If the email cannot be sent, the error is only logged: the user exists and can ask for a new code, which replaces the old one. The resend route gives the same answer whether or not the email is known, so it does not tell who has an account.
+
+After the right code, the backend sets \texttt{emailVerified}, deletes the code, and the user goes to the sign-in page. An unverified user can sign in, but \texttt{EmailVerifiedGuard} refuses the main writes. The register and verify routes allow 10 requests per minute, and the resend route allows 5.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-2-signup}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-2-signup.pdf}}}
+  \caption{Sign up with email verification.}
+  \label{fig:design-signup}
+\end{figure}
+
+Figure~\ref{fig:design-publish} shows how a post is published. Three guards run first: signed in, not banned (read from the database) and email verified. Then the service checks the text (at most 255 characters, and text or media). For a community post, it also checks that the community exists, that the user is not banned there and that the user is a member.
+
+Only then are the files uploaded (to Cloudinary or to the local disk) and the post saved. The field \texttt{isApproved} is true outside a community. In a community, it is true only for the owner or a moderator, so the post of a member waits for approval. The service then raises the \texttt{v:user} version of the author, so the new post shows at once in the author's own feeds.
+
+When the post has text, the service saves its hashtags in lower case and its mentions. A mention is saved only for a user whom the author follows, and that user gets a MENTION notification. For a community post, the other members are notified when an owner or a moderator posts (COMMUNITY\_NEW\_POST), and the owners and the moderators are notified when a member posts (COMMUNITY\_POST).
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-3-publish-post}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-3-publish-post.pdf}}}
+  \caption{Publish a post.}
+  \label{fig:design-publish}
+\end{figure}
+
+Figure~\ref{fig:design-feedpage} shows how one page of a feed is made. It is the place where the ranking plugs in. The request has a cursor and the options \texttt{feed}, \texttt{user}, \texttt{communityId}, \texttt{algo} and the test-only \texttt{asOf}. The backend first checks the options. \texttt{algo} is allowed only on For You and only for a signed-in user, and \texttt{asOf} only when a test flag is on. A wrong option gives 400 or 401. A signed-in user on For You with no \texttt{algo} gets the default of the configuration.
+
+Then the clock is read once, and the cache key is built from the viewer, the mode, the cursor, the \texttt{v:user} version and \texttt{asOf}. A cache hit returns the page. On a miss, an \texttt{algo} feed asks \texttt{FeedService.rank} for the ranked pool at time $t$, and takes the 10 posts after the cursor. The other modes run one database query: community, Explore, Following, Communities, profile, For You (newest first) or guest.
+
+These queries leave out deleted posts and blocked users, and community posts appear only in the community feeds and only when approved. Explore scores its 400 newest candidates with the engagement score of the ranking package. Every page is stored for 10 seconds.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-4-feed-page}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-4-feed-page.pdf}}}
+  \caption{Get one page of a feed.}
+  \label{fig:design-feedpage}
+\end{figure}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Sequence diagrams}
+\label{sec:design-sequence}
+
+Four sequence diagrams show the order of the calls between the components: the session, a notification, a direct message and the social feed. The first three are the pattern of the real-time platform. The last one is the new part of the thesis.
+
+Figure~\ref{fig:design-session} shows the session. At sign-in, the backend finds the user by email and compares the password with the bcrypt hash. A wrong email or password gives 401. Otherwise it signs a token with HS256, a new \texttt{jti} (a unique token id) and a life of 30 days, and sets it in the httpOnly cookie \texttt{breadit\_session}. The token holds the id, the username, the email, the \texttt{emailVerified} date, the role and the \texttt{banned} flag. Sign-in does not refuse a banned or an unverified user; the guards stop their writes later.
+
+On every later request, \texttt{JwtAuthGuard} verifies the token, asks Redis whether \texttt{auth:blacklist:<jti>} exists, and fills \texttt{req.user}. At sign-out, the backend stores that key in Redis for the rest of the token's life, so the list cleans itself. A request with the old token then gets 401.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-5-auth-session}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-5-auth-session.pdf}}}
+  \caption{Sign in, a signed-in request and sign out.}
+  \label{fig:design-session}
+\end{figure}
+
+Figure~\ref{fig:design-like} shows the pattern of every notification: a guard chain, a service call, the change in the database, and then \texttt{NotificationsService.emit}. Alice likes Bob's post. The post must exist and must not be deleted, or the answer is 404. A like is a toggle: a second call deletes the like and sends nothing. A new like calls \texttt{emit} without waiting for it, so the answer to Alice does not depend on the push. \texttt{emit} skips a like of your own post, saves a \texttt{Notification} row, finds the username of Bob, and sends \texttt{getNotification} to the room of that username. The room is the address of the user, and the Redis adapter makes it work with more than one backend process. The service reads the like count after the change and returns it.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-6-like-notification}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-6-like-notification.pdf}}}
+  \caption{Like a post, with the notification saved and pushed.}
+  \label{fig:design-like}
+\end{figure}
+
+Figure~\ref{fig:design-dm} shows a direct message. When Bob's page loads, his socket connects with the cookie. The gateway checks the cookie and the blacklist, and joins the socket to the room named after Bob. The server decides this, and the name that the client sends is ignored (finding S1). When Alice sends a message, the guards run, and the service checks that Alice is a member of the conversation and that no block exists between the two. If not, the answer is 403. Otherwise the service writes the message and the conversation time in one transaction. Then it pushes \texttt{newMessage} to the room of Bob, deletes the cached unread count of Bob for this conversation, and answers 201 with the message. Typing signals use the rooms \texttt{conversation:<id>}, and a socket can join such a room only if it is a member.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-7-direct-message}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-7-direct-message.pdf}}}
+  \caption{A direct message in real time.}
+  \label{fig:design-dm}
+\end{figure}
+
+Figure~\ref{fig:design-social} shows the new part of the thesis inside the platform. On a cache miss, \texttt{PostsService} asks \texttt{FeedService.rank} to rank the pool for the user at time $t$. The time $t$ is \texttt{asOf}, the time inside the cursor (page 2 and later), or the clock. \texttt{FeedService} loads plain data from Postgres in four steps: the root posts of the window $[t - W, t)$, with community posts included; the follows, the memberships and the earlier positives of the user; the blocked peers; and, once the pool is built, the likes, comments and reposts on the pool posts. All events are taken before $t$. Between the loads, it calls the ranking package, which returns the post ids in order.
+
+\texttt{PostsService} takes the 10 posts after the cursor, loads them with their counts and media, and stores the page for 10 seconds. The cursor \texttt{t:score:id} holds $t$, so page 2 is ranked at the same time as page 1, and no post repeats or is skipped. Sections~\ref{sec:method-protocol} and~\ref{sec:method-hybrid} define the pool and the score.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-8-foryou-social}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-8-foryou-social.pdf}}}
+  \caption{The For You feed with \texttt{algo=social}.}
+  \label{fig:design-social}
+\end{figure}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Architecture and modules}
+\label{sec:design-architecture}
+
+Figure~\ref{fig:design-components} shows the components of the platform.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-9-components}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-9-components.pdf}}}
+  \caption{The components of the platform.}
+  \label{fig:design-components}
+\end{figure}
+
+\textbf{Frontend.} The frontend is a Next.js 15 app with React 19. It has no database and no API routes of its own: all data comes from the backend over \texttt{/api/...}. A middleware only checks that the session cookie exists, and sends the user to the sign-in page if it does not. The backend does the real check. Server components fetch data with \texttt{serverFetch()}, which calls the backend by its internal address and forwards the cookie. Client components use TanStack Query and \texttt{api()}, which calls the backend from the browser with the cookie. One Socket.IO connection is shared by the whole page.
+
+\textbf{Backend.} The backend is NestJS 10 on Fastify. It has 13 controllers with 72 REST routes, all under \texttt{/api/...}, and one Socket.IO gateway in the same process. A request passes the rate limiter, the validation pipe, the guards written on the route, the controller and the service. One filter turns every error into the same JSON shape. The services work on PostgreSQL through Prisma 6, and push events through the gateway.
+
+\textbf{Data services.} PostgreSQL 16 is the system of record. Redis 7 has four jobs: the JSON cache, the logout blacklist, the store of the rate limiter and the adapter of Socket.IO. Uploaded files go to Cloudinary when it is configured, and to the local disk if not. Emails go out through an SMTP server.
+
+\textbf{Real-time layer.} The gateway gives each socket the user of its cookie, and puts it in a room named after the username. A service sends an event to a user with \texttt{server.to(username).emit(...)}. Table~\ref{tab:design-events} lists the events. A notification is saved before it is pushed, so an offline user finds it later in the list. The feed is not pushed: it is ranked when the user opens or reloads it.
+
+\begin{table}[htbp]
+  \centering
+  \caption{The events from the server to the browser.}
+  \label{tab:design-events}
+  \small
+  \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.1cm} >{\raggedright\arraybackslash}p{3.7cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Event & Sent by & To the room & When \\
+    \midrule
+    \texttt{getNotification} & \texttt{Notifications\allowbreak Service.\allowbreak emit} & the username of the recipient & a like, reply, repost, follow, mention, report or community post \\
+    \texttt{newMessage} & \texttt{MessagesService} & the username of the other member & a direct message is sent \\
+    \texttt{messageRead} & \texttt{Messages\allowbreak Service.\allowbreak markRead} & the username of the other member & the reader opens the conversation \\
+    \texttt{userTyping}, \texttt{userStopTyping} & the gateway & \texttt{conversation:\allowbreak <id>} & a member types or stops \\
+    \texttt{accountBanned} & \texttt{AdminService} & the username of the banned user & an admin bans the account \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\textbf{Cache.} Read-heavy endpoints keep their JSON answer in Redis under a key such as \texttt{feed:<viewer>:<mode>:...}. One part of the key is a version number, for example \texttt{v:user}. A write raises the version, so later reads build a new key and miss the cache. The old entries are never deleted, and they expire. We chose versions because one write can change many cached pages whose keys are not known in advance. Feed pages live 10 seconds. The likes and comments of other users do not raise your version, so your feed can be up to 10 seconds old. This is the price of a simple cache. The cost experiment E7 runs with the cache off, to measure the ranking work.
+
+\textbf{Rules for every listing.} Post, user, search, notification and message listings leave out blocked users in either direction. A soft-deleted post (\texttt{deletedAt}) is never shown. A community post is shown only when it is approved. Hashtags and mentions are read when a post is saved, so reading never parses text.
+
+Figure~\ref{fig:design-boundary} shows the one boundary that C2 adds. The backend loads plain arrays from PostgreSQL, calls five functions of the package (\texttt{user\allowbreak Features\allowbreak AsOf}, \texttt{post\allowbreak Features\allowbreak AsOf}, \texttt{buildPool}, \texttt{scorer} and \texttt{rankPool}) and gets back post ids in order. The package is pure: it has no Nest, Prisma, Redis, clock or randomness, and the time $t$ is an argument. The Explore feed calls \texttt{computeExploreScoreFixed} of the same package; this is the method BL2. The offline evaluation in \texttt{eval/} calls the same functions with data from CSV files.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-10-ranking-boundary}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-10-ranking-boundary.pdf}}}
+  \caption{The boundary of the ranking package.}
+  \label{fig:design-boundary}
+\end{figure}
+
+This is the main design rule of the thesis: all ranking logic lives in the package, and never in the backend. We keep the score out of SQL and out of the services, because two copies of one rule could drift apart. With one copy, a number measured offline describes the live feed, and a parity test checks that the live order equals the order of the evaluation (Section~\ref{sec:method-repro}).
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Database design}
+\label{sec:design-database}
+
+The database is PostgreSQL 16, used through Prisma 6. The schema has 25 models. Figure~\ref{fig:design-erd} shows 23 of them. \texttt{Account} and \texttt{Session} are left out, because no code reads them. Each line of the figure is one foreign key, named by its field. For example, the line from \texttt{User} to \texttt{Post} named \texttt{userId} means that one user has zero or more posts, and each post has exactly one user, through \texttt{Post.userId}. A line that may be empty on one side means that the foreign key can be empty: a post may have no community.
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{fig4-11-erd}
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/fig4-11-erd.pdf}}}
+  \caption{The ERD of the database: 23 of the 25 models (\texttt{Account} and \texttt{Session} are left out, because no code reads them). Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its dates (without \texttt{updatedAt}); the other fields are in \texttt{schema.prisma}.}
+  \label{fig:design-erd}
+\end{figure}
+
+Table~\ref{tab:design-entities} lists the main entities and the rules the design keeps. Three rules matter most for the feed. A deleted post keeps its row with \texttt{deletedAt} set, and every read filters it. A post in a community is shown only when \texttt{isApproved} is true. A post in a community needs a membership row of the author. In this schema, \texttt{User.followers} means the accounts that this user follows, so a count of followers must use \texttt{followingId} of the \texttt{Follow} table.
+
+{\small\singlespacing
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}p{4.6cm} >{\raggedright\arraybackslash}p{\dimexpr\textwidth-8.6cm-4\tabcolsep\relax}@{}}
+  \caption{The main entities and the rules of the design.}
+  \label{tab:design-entities}\\
+  \toprule
+  Entity & What it holds & Rule \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Entity & What it holds & Rule \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+    \texttt{User} & account and profile; \texttt{role} (USER or ADMIN); \texttt{banned}; \texttt{emailVerified} & email and username are unique; the password is a bcrypt hash; \texttt{emailVerified} is empty until the code is entered \\
+  \midrule
+    \texttt{Post} & text (up to 255 characters); \texttt{deletedAt}; \texttt{isApproved}; \texttt{communityId}; \texttt{rePostId} & soft delete; one table for originals and reposts (a plain repost has \texttt{rePostId} and no text, a quote has both); \texttt{parentPostId} is a leftover, so a root post has both fields empty \\
+  \midrule
+    \texttt{Like}, \texttt{SavedPosts} & a user and a post & a toggle: the second call deletes the row; no unique key yet (finding T6) \\
+  \midrule
+    \texttt{Comment} & text (up to 1,000 characters); \texttt{parentCommentId}; \texttt{deletedAt} & replies form a thread through \texttt{parentCommentId}; soft delete; \texttt{CommentLike} has a unique key (user, comment) \\
+  \midrule
+    \texttt{Follow} & \texttt{followerId}, \texttt{followingId}, \texttt{notify} & unfollow deletes the row; the service refuses a follow of yourself; no unique key yet \\
+  \midrule
+    \texttt{Community}, \texttt{CommunityMember}, \texttt{CommunityBannedUser}, \texttt{CommunityRule} & a unique slug; one member row per user and community, with the role MEMBER, MOD or OWNER & the pair (user, community) is unique in members and in bans; a community ban deletes the membership \\
+  \midrule
+    \texttt{Conversation}, \texttt{ConversationMember}, \texttt{Message} & two members with \texttt{lastReadAt}; messages with text (up to 1,000 characters) or \texttt{mediaUrl} & the key of a member is (conversation, user); the unread count comes from \texttt{lastReadAt} \\
+  \midrule
+    \texttt{Notification} & a type (9 values); recipient; actor; optional post and comment; \texttt{readAt} & saved before it is pushed; never made for an action on your own item \\
+  \midrule
+    \texttt{Block} & \texttt{blockerId}, \texttt{blockedId} & the pair is unique; both directions count; blocking deletes the follows between the two in one transaction \\
+  \midrule
+    other models & \texttt{Hashtag}, \texttt{PostTag}, \texttt{Mention}, \texttt{Report}, \texttt{PostMedia}, \texttt{CommentMedia}, \texttt{VerificationToken} & hashtags and mentions are made when the post is saved; a report is OPEN or CLOSED \\
+\end{longtable}}
