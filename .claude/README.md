@@ -26,6 +26,7 @@ Each task is one folder `.docs/works/YYYY-MM-DD-<slug>/` with two files.
 - `plan.md` has at most 600 lines. It holds ordered Steps that point back to the design, Tests, Acceptance checks and Result. It does not list exact commands.
 - Opus is the main model (`"model": "opus"` in `settings.json`). Sonnet is started by Opus only for the implement step.
 - Light checks, reviewers and a separate design agent are gone. The author's review is the gate.
+- **Writing tasks** (no code, no tests; decided 2026-11-20): `design.md` holds the Spec only, with no status lines and no `plan.md`. Opus starts Sonnet at once, then checks the result against "Done when", fills Result and commits. A task with any code, debugging or testing takes the full path.
 
 Task state lives in status lines: `Spec status:` and `Design status:` in `design.md`, `Status:` in `plan.md` (`draft`, `approved`, `done`). Only the author's `/approve` writes "approved". Folders in `.docs/works/` from before this workflow (no `Spec status:` line) are old records and are ignored.
 

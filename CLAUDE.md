@@ -41,6 +41,8 @@ Every feature, super-plan item or bug fix goes through three approvals before an
 3. Claude writes `plan.md`: ordered steps that point back to the design, tests, acceptance checks. The author types `/approve`. Approving the plan also approves the commits it lists.
 4. Claude starts a Sonnet agent to implement the plan (tests first, commits). Then Claude runs `verify.sh` and the acceptance checks, fills Result and closes the task.
 
+**Writing tasks** (no code, no tests: a thesis chapter, a doc) use a light path, decided by the author on 2026-11-20. Claude opens the task folder with a `design.md` that holds the Spec only (no `Spec status:` line, so the hooks do not gate it, and no `plan.md`), then starts a Sonnet agent at once. Claude checks the result against the Spec's "Done when", fills Result and commits.
+
 **Git.** Commit every change on the current branch, `test-app`. Never create a new branch for a change: no feature, task, fix or thesis branches. Tags, pushes and any change to `main` need the author's OK.
 
 Only the author runs `/approve`. The hooks in `.claude/hooks/` enforce the rest: code edits ask the author unless the active task's plan is approved, `docs/Pre-thesis/` (with the pre-thesis LaTeX), `.env` and committed migrations cannot be edited, and commits go on `test-app` only. Thesis reports are written separately, not inside a task. A frozen value (super-plan §7) changes only when the author asks, with a line in the super-plan change log. See `.claude/README.md` for the full map.
