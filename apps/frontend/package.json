@@ -7,8 +7,7 @@
     "build":     "next build",
     "start":     "next start",
     "lint":      "next lint",
-    "typecheck": "tsc --noEmit",
-    "dev:reset": "npx prisma db push --force-reset && npx prisma db seed"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.64.2",

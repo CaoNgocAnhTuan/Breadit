@@ -85,7 +85,7 @@ npm run dev -w @breadit/backend              # backend  — port 4000
 
 The backend reads `.env` from its working directory (`apps/backend`), so put a `.env` there too or export the variables.
 
-Do not use `prisma db push` or `npm run dev:reset`: the schema must come from the committed migrations, which also hold data migrations (Bugs Report R7).
+Build the database only with `prisma migrate deploy` and `prisma db seed` (step 3 above): the schema must come from the committed migrations, which also hold data migrations.
 
 Seed users: `admin` / `123456` (admin) and `user1`–`user50` / `password`.
 
