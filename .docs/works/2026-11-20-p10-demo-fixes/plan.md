@@ -1,6 +1,6 @@
 # Plan: Demo fixes V1 to V5
 
-Status: approved · 2026-11-20
+Status: done · 2026-11-20
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-20-p10-demo-fixes/`
 
 Backend steps write their IT tests first and see them fail for the right reason. The frontend has no tests; its checks are the Acceptance items, done by Opus in Chrome. Docker db and redis must run. All commits go on `test-app` and are never pushed. Approving this plan approves the commits below.
@@ -27,10 +27,27 @@ DW1, DW2, DW5 and DW6 are Acceptance items (Chrome); DW7 and DW8 are A5.
 
 Opus does these after Step 3, with the backend from `run-safe.sh` and the frontend dev server.
 
-- [ ] A1 (DW1, V1). In Chrome, `/messages` and `/messages/<id>` for a user with a conversation → no "Hydration failed" in the console; the list shows the conversations; the chat drawer, opened from the home page, still lists them.
-- [ ] A2 (DW2, V2). In Chrome, add a top-level comment on a post's status page → the header comment count goes up by 1 without a reload; a reply also adds 1.
-- [ ] A3 (DW3, DW4, V3, V4). In Chrome, as a community owner, approve a pending post → it shows in the community feed right away, with no "(edited)".
-- [ ] A4 (DW5, V5). In Chrome, sign out from the home page, then open `/sign-in` directly → no "`<html>` cannot be a child of `<body>`" and no "mounting a new html" error; the title is "Breadit".
-- [ ] A5 (DW6, DW7, DW8). Edit a post's text → the card shows "(edited)". `verify.sh` → all green. `test:parity` → passes.
+- [x] A1 (DW1, V1). In Chrome, `/messages` and `/messages/<id>` for a user with a conversation → no "Hydration failed" in the console; the list shows the conversations; the chat drawer, opened from the home page, still lists them.
+- [x] A2 (DW2, V2). In Chrome, add a top-level comment on a post's status page → the header comment count goes up by 1 without a reload; a reply also adds 1.
+- [x] A3 (DW3, DW4, V3, V4). In Chrome, as a community owner, approve a pending post → it shows in the community feed right away, with no "(edited)".
+- [x] A4 (DW5, V5). In Chrome, sign out from the home page, then open `/sign-in` directly → no "`<html>` cannot be a child of `<body>`" and no "mounting a new html" error; the title is "Breadit".
+- [x] A5 (DW6, DW7, DW8). Edit a post's text → the card shows "(edited)". `verify.sh` → all green. `test:parity` → passes.
 
 ## Result
+
+Delivered on 2026-11-20. V1–V5 are fixed. Nothing is pushed.
+
+**Commits** (on `test-app`): `8a28bbc` V3 and V4 backend (with TC1–TC3), `b0782fe` V1, V2, V4 and V5 frontend, `3c10f63` docs, and the closing commit.
+
+**Tests.** Unit 211 (unchanged). IT 168 → 171 (TC1–TC3 in `demo-fixes.it-spec.ts`); each failed first for the expected reason (TC1: `updatedAt` moved 70 ms; TC2 and TC3: the second read returned the cached empty page). Opus ran `verify.sh`: all 9 checks pass (ranking 85, unit 211, IT 171). `test:parity`: 102 passed.
+
+**Acceptance (Opus, Chrome; clicks sent from JavaScript, as in the sweep).**
+- A1: `/messages` and `/messages/7` as `user1`: the list shows `User 2`, no console error (before: "Hydration failed"). The drawer, opened with the Chat button on the home page, shows "User 2 … Sweep W10 live message".
+- A2: on `/user2/status/320` the header count went 2 → 3 after a comment and 3 → 4 after a reply, with no reload.
+- A3: `user2` posted 930 in `sweep_p10` (pending); `user1` approved it; the post was in the community feed at once (before: up to 10 s and a reload), with no "(edited)"; no console error.
+- A4: logout from the home page → `/sign-in`, title "Breadit", no console error; a direct load of `/sign-in` has one `<html>` and one `<body>` and no console error.
+- A5: post 926 edited through `PATCH /api/posts/926` (200) → its status page shows "(edited)". `verify.sh` and `test:parity` as above.
+
+**Differences from the design.**
+- V2: `PostInteractions` did not keep the comment count in `useState` (it showed `count.comments` from props), so the design's premise and its rejected option "router.refresh()" were not accurate. The fix adds a `commentsAdded` counter and shows `count.comments + commentsAdded`; the behaviour is the one the design asked for. If the props ever change after a local add (no page does this today), the count could be one too high until a reload.
+- Implementation-plan row 21b has no day budget ("—").
