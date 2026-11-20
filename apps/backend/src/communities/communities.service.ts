@@ -389,7 +389,12 @@ export class CommunitiesService {
     if (!post) throw new NotFoundException('Post not found in this community');
 
     if (action === 'APPROVE') {
-      await this.prisma.post.update({ where: { id: postId }, data: { isApproved: true } });
+      // V3: a given `updatedAt` is kept, so an approved post does not look edited ("(edited)" in Post.tsx).
+      await this.prisma.post.update({ where: { id: postId }, data: { isApproved: true, updatedAt: post.updatedAt } });
+
+      // V4: the community feed is cached under the viewer's `v:user`. Bump the two who act (a Set: one bump if the
+      // approver is the author). Other members see the post when their cached page ends (10 s, the T3 rule).
+      await Promise.all([...new Set([userId, post.userId])].map((id) => this.cache.incrNumber('v:user', [id])));
 
       // Notify all community members (except the post author) about the new post
       const communityMembers = await this.prisma.communityMember.findMany({
