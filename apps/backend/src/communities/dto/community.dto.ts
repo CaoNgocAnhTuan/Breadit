@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 import { IsImageRef } from '../../common/validators/image-ref';
 
 export class CreateCommunityDto {
@@ -10,6 +10,7 @@ export class CreateCommunityDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(30)
+  @Matches(/^[a-z0-9_-]{3,30}$/, { message: 'Slug must be 3-30 characters: a-z, 0-9, _ or -' })
   slug: string;
 
   @IsString()

@@ -265,6 +265,8 @@ export class MessagesService {
       where: { conversationId_userId: { conversationId, userId } },
       data: { lastReadAt: new Date() },
     });
+    // B10: the list caches the unread count for 60 s; opening the thread must clear it for the reader.
+    await this.cache.del('dm:unreadCount', [conversationId, userId]);
 
     const items = messages.reverse();
     const nextCursor = messages.length === 30 ? messages[messages.length - 1].id : null;

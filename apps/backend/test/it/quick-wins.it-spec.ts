@@ -226,4 +226,123 @@ describe('p9 quick wins', () => {
       expect(list[0].replies![0]._count.replies).toBe(1);
     });
   });
+
+  describe('B7: trending counts only live posts outside communities (TC6)', () => {
+    it('deleted, community and unapproved posts are not counted', async () => {
+      const tag = uniq('trend');
+      const owner = await createUserWithCookie({ username: uniq('b7owner') });
+      const author = await createUserWithCookie({ username: uniq('b7author') });
+      const text = (n: string) => `post ${n} #${tag}`;
+
+      // 3 live posts outside communities
+      for (const n of ['live1', 'live2', 'live3']) {
+        expect((await as(author).form('POST', '/api/posts', { desc: text(n) })).status).toBe(201);
+      }
+      // 2 deleted posts
+      for (const n of ['gone1', 'gone2']) {
+        const p = await as(author).form('POST', '/api/posts', { desc: text(n) });
+        expect((await as(author).delete(`/api/posts/${p.body.id}`)).status).toBe(200);
+      }
+      // 2 community posts (the owner's posts are approved at once)
+      const c = await as(owner).post('/api/communities', { name: 'B7 Club', slug: uniq('b7club') });
+      for (const n of ['club1', 'club2']) {
+        const p = await as(owner).form('POST', '/api/posts', { desc: text(n), communityId: String(c.body.id) });
+        expect(p.status).toBe(201);
+      }
+      // 1 post outside communities that waits for approval (set in the database)
+      const waiting = await as(author).form('POST', '/api/posts', { desc: text('waiting') });
+      await prisma().post.update({ where: { id: waiting.body.id }, data: { isApproved: false } });
+
+      expect(await prisma().postTag.count({ where: { hashtag: { tag } } })).toBe(8);
+
+      const res = await guest().get('/api/hashtags/trending');
+      expect(res.status).toBe(200);
+      expect(res.body).toContainEqual({ tag, postCount: 3 });
+    });
+  });
+
+  describe('B10, B7 cache: the HTTP cache is on (TC7)', () => {
+    // The IT app runs with REDIS_HTTP_CACHE_ENABLED=false, where the unread count is never cached and B10
+    // cannot show. This describe boots a second app with the cache on (CacheService reads the flag once, when
+    // it is built) and then puts the flag back.
+    let cached: NestFastifyApplication;
+    const asC = (u: U) => client(cached, u.cookie);
+
+    beforeAll(async () => {
+      const old = process.env.REDIS_HTTP_CACHE_ENABLED;
+      process.env.REDIS_HTTP_CACHE_ENABLED = 'true';
+      try {
+        cached = await createTestApp();
+      } finally {
+        if (old === undefined) delete process.env.REDIS_HTTP_CACHE_ENABLED;
+        else process.env.REDIS_HTTP_CACHE_ENABLED = old;
+      }
+    });
+
+    afterAll(async () => {
+      await cached.close();
+    });
+
+    it('B10: opening the thread clears the unread count in the list', async () => {
+      const [alice, bob] = await Promise.all([
+        createUserWithCookie({ username: uniq('b10alice') }),
+        createUserWithCookie({ username: uniq('b10bob') }),
+      ]);
+      const conv = await asC(bob).post('/api/conversations', { targetUserId: alice.user.id });
+      expect(conv.status).toBeLessThan(300);
+      const id = conv.body.id as number;
+      for (const body of ['hello', 'are you there?']) {
+        expect((await asC(bob).post(`/api/conversations/${id}/messages`, { body })).status).toBe(201);
+      }
+      const unread = async () => {
+        const list = await asC(alice).get('/api/conversations');
+        expect(list.status).toBe(200);
+        return list.body.items.find((c: { id: number }) => c.id === id).unreadCount as number;
+      };
+
+      expect(await unread()).toBe(2); // this read puts 2 in the cache
+      expect((await asC(alice).get(`/api/conversations/${id}/messages`)).status).toBe(200);
+      expect(await unread()).toBe(0);
+
+      // A new message after the read counts again (sendMessage already cleared the key for the other member).
+      expect((await asC(bob).post(`/api/conversations/${id}/messages`, { body: 'one more' })).status).toBe(201);
+      expect(await unread()).toBe(1);
+    });
+
+    it('B7: the trending list is cached for 60 s (a new tagged post shows only after the key expires)', async () => {
+      const tag = uniq('cachedtag');
+      const author = await createUserWithCookie({ username: uniq('b7cache') });
+      for (let i = 0; i < 6; i++) {
+        expect((await asC(author).form('POST', '/api/posts', { desc: `cached trend ${i} #${tag}` })).status).toBe(201);
+      }
+      const first = await client(cached).get('/api/hashtags/trending');
+      expect(first.body).toContainEqual({ tag, postCount: 6 });
+
+      expect((await asC(author).form('POST', '/api/posts', { desc: `cached trend 7 #${tag}` })).status).toBe(201);
+      const second = await client(cached).get('/api/hashtags/trending');
+      expect(second.body).toContainEqual({ tag, postCount: 6 }); // still the cached list
+    });
+  });
+
+  describe('B2: the community slug format (TC8)', () => {
+    it.each([
+      ['a space and a slash', 'Has Space/And Slash'],
+      ['capital letters', 'Webdev'],
+      ['a dot', 'web.dev'],
+      ['2 characters', 'ab'],
+      ['31 characters', 'a'.repeat(31)],
+    ])('%s gives 400 and no row', async (_why, slug) => {
+      const u = await createUserWithCookie({ username: uniq('b2user') });
+      const res = await as(u).post('/api/communities', { name: 'Bad slug', slug });
+      expect(res.status).toBe(400);
+      expect(await prisma().community.count({ where: { slug } })).toBe(0);
+    });
+
+    it.each(['good_slug-1', 'webdev', 'abc', 'a'.repeat(30)])('slug %s gives 201', async (slug) => {
+      const u = await createUserWithCookie({ username: uniq('b2user') });
+      const res = await as(u).post('/api/communities', { name: 'Good slug', slug });
+      expect(res.status).toBe(201);
+      expect(res.body.slug).toBe(slug);
+    });
+  });
 });
