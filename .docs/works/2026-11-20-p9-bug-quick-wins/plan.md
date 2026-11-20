@@ -1,6 +1,6 @@
 # Plan: Bug quick wins before the demo
 
-Status: approved · 2026-11-20
+Status: done · 2026-11-20
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-20-p9-bug-quick-wins/`
 
 Every step writes its tests first and sees them fail for the right reason, then writes the code. Backend steps need Docker db and redis for the IT tests. All commits go on `test-app` and are never pushed. Approving this plan approves the commits below.
@@ -44,11 +44,38 @@ The other DW rows are Acceptance items (A1–A6).
 
 Claude does these after Step 8, with db and redis up.
 
-- [ ] A1 (DW8, B9). In Chrome, the Explore item of the left bar → opens `/?feed=explore` with the Explore tab active.
-- [ ] A2 (DW9, N5). In Chrome, the home feed with a post that has a mention and a tag → no "`<a>` cannot be a descendant of `<a>`" and no hydration error in the console; a click on the text opens the post; a click on the mention opens the profile; Cmd-click on the text opens a new tab.
-- [ ] A3 (DW10, N8). In Chrome, the Post button of the left bar → the compose modal over the feed; reload → the compose page (no 404); with curl and a session cookie, `GET /compose/post` → 200.
-- [ ] A4 (DW11, R7). `npm run` at the root and in `apps/frontend` → no `dev:reset` in the list.
-- [ ] A5 (DW12, DW13). `verify.sh` → all green; `test:parity` (needs `syn-W2M-M` in `eval_load`; load it first if the schema is empty) → passes.
-- [ ] A6 (DW14). `scripts/verify-bug-sweep.sh` against a fresh backend from `run-safe.sh` → no check that passed before fails now (compare with `works/2026-10-21-bugs-sweep/sweep-after.txt`).
+- [x] A1 (DW8, B9). In Chrome, the Explore item of the left bar → opens `/?feed=explore` with the Explore tab active.
+- [x] A2 (DW9, N5). In Chrome, the home feed with a post that has a mention and a tag → no "`<a>` cannot be a descendant of `<a>`" and no hydration error in the console; a click on the text opens the post; a click on the mention opens the profile; Cmd-click on the text opens a new tab.
+- [x] A3 (DW10, N8). In Chrome, the Post button of the left bar → the compose modal over the feed; reload → the compose page (no 404); with curl and a session cookie, `GET /compose/post` → 200.
+- [x] A4 (DW11, R7). `npm run` at the root and in `apps/frontend` → no `dev:reset` in the list.
+- [x] A5 (DW12, DW13). `verify.sh` → all green; `test:parity` (needs `syn-W2M-M` in `eval_load`; load it first if the schema is empty) → passes.
+- [x] A6 (DW14). `scripts/verify-bug-sweep.sh` against a fresh backend from `run-safe.sh` → no check that passed before fails now (compare with `works/2026-10-21-bugs-sweep/sweep-after.txt`).
 
 ## Result
+
+Delivered on 2026-11-20. The eleven bugs (R2 interaction part, S5 HTTP part, N2, R1, B7, B10, B2, B9, N5, N8, R7) are fixed. Nothing is pushed.
+
+**Commits** (on `test-app`): `1d6247f` S5, `9e72a56` R2, `2c0535a` N2 and R1, `9d8cd90` B7, B10 and B2, `8241cef` B9, N5 and N8, `fdaed58` R7, `0e51b79` docs. Step 5 needed no change, so it has no commit.
+
+**Tests.** Unit 204 → 211 (TC1, 7 tests). IT 146 → 168 (22 tests in `quick-wins.it-spec.ts`). Each TC failed first for the expected reason, then passed (implementer's report). Opus ran `verify.sh` on Node v22.23.4: all 9 checks pass (ranking 85, unit 211, IT 168). `test:parity`: 102 passed, after `load:check syn-W2M-M` gave 6 of 6 files equal to the manifest.
+
+**Acceptance (Opus).**
+- A1: the Explore item links to `/?feed=explore`; after the click the URL is `/?feed=explore` and the Explore tab is active.
+- A2: no `<a>` inside `<a>` in the DOM (`a a` count 0), no console error on load. A click on the post text opens `/user38/status/679`; Cmd-click and middle click call `window.open` with `_blank`; a click on `#tag0006` opens `/hashtag/tag0006`. The home feed had tags but no mention, so the mention click was not run; mentions and tags use the same `RichText` link.
+- A3: the Post button opens the modal over the feed (the feed stays behind it), the URL is `/compose/post`; a reload shows the full compose page; curl with a session cookie gives 200.
+- A4: `npm run` at the root and in `apps/frontend` lists no `dev:reset`.
+- A5: as above.
+- A6: `verify-bug-sweep.sh` against a fresh backend from `run-safe.sh`: 95 passed, 0 failed, the same as `sweep-after.txt`.
+
+The Chrome checks used clicks sent from JavaScript (`element.click()` and `MouseEvent`), because the Chrome extension's mouse clicks did not reach the page in this session (a capture listener on `document` saw no event, also on links this task did not touch).
+
+**Differences from the plan.**
+- TC7 (B10) needs the cache on, and the shared IT app runs with `REDIS_HTTP_CACHE_ENABLED=false`, so a second app with the cache on runs TC7 and one extra test of the 60 s trending cache.
+- N5: the handlers also ignore events from an `<a>` inside the text; `role="link"` and `tabIndex` are set only when the post has text.
+- Extra doc edits in `0e51b79`: Guidance Manual 12 §2 (en, vi), `docs/System_Architecture.md` (the directory tree names the intercepting route and the compose page), Chapter 4 draft note, Bugs Report §1 and §5.4.
+
+**Open points.**
+- R2 has one path left: `POST /api/posts` with a `rePostId` field still checks only `deletedAt` (`PostsService.create`). The web app uses `POST /api/posts/:id/repost`, which is fixed. It is written as "Not covered" in the Bugs Report R2 row.
+- `_count.replies` still counts a blocked user's reply (it is hidden but counted).
+- `drafts/05-implementation.md` note 6 still says `OptionalJwtAuthGuard` skips the blacklist; Chapter 4 note 3 asks to check Figures 4.3 and 4.5–4.7 again.
+- `.claude/hooks/pre-bash.cjs` still refuses the name `dev:reset`; harmless.
