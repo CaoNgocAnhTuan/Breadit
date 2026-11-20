@@ -17,6 +17,11 @@ const BACKEND_URL =
 
 const MAX_THREAD_DEPTH = 5;
 
+// V2: PostInteractions (the post's header on the status page) listens and adds 1 to its comment count.
+function announceCommentAdded(postId: number) {
+  window.dispatchEvent(new CustomEvent("post:comment-added", { detail: { postId } }));
+}
+
 function CommentNode({
   comment,
   postId,
@@ -68,6 +73,7 @@ function CommentNode({
       setReplyPreviews([]);
       setShowReply(false);
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      announceCommentAdded(postId);
     },
   });
 
@@ -620,6 +626,7 @@ const Comments = ({ postId }: { postId: number }) => {
       setError(null);
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      announceCommentAdded(postId);
     },
     onError: (err: Error) => {
       if (err.message === "empty") setError("Comment cannot be empty.");

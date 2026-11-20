@@ -70,7 +70,8 @@ export default function ChatDrawer({ open, onClose }: Props) {
 
   const { data, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ["conversations"],
+      // V1: not the key of ConversationList (it has server initialData), so the two lists do not share one entry.
+      queryKey: ["conversations", "drawer"],
       queryFn: ({ pageParam }) =>
         fetchConversations(pageParam as number | undefined),
       initialPageParam: undefined as number | undefined,

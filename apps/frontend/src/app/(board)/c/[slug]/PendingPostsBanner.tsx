@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { format } from "timeago.js";
 
@@ -15,6 +16,7 @@ type PendingPost = {
 
 export default function PendingPostsBanner({ communityId }: { communityId: number }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [posts, setPosts] = useState<PendingPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [moderatingId, setModeratingId] = useState<number | null>(null);
@@ -35,7 +37,11 @@ export default function PendingPostsBanner({ communityId }: { communityId: numbe
         body: JSON.stringify({ action }),
       });
       setPosts((prev) => prev.filter((p) => p.id !== postId));
-      if (action === "APPROVE") router.refresh();
+      if (action === "APPROVE") {
+        // V4: router.refresh() updates the server parts; the client feed query needs its own refetch.
+        queryClient.invalidateQueries({ queryKey: ["posts"] });
+        router.refresh();
+      }
     } catch {
       // ignore
     } finally {
