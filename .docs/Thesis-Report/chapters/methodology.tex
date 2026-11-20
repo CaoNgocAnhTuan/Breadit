@@ -1,2 +1,179 @@
 % Chapter 3. Methodology. Draft: drafts/03-methodology.md
-% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand.
+% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. This chapter has no result numbers;
+% the frozen settings (m, grids, T, seed, world parameters, Digg sizes) are typed, as the draft says.
+% The \chapter command is in main.tex, so this file starts with the introduction and then the sections.
+% Citations: \refcite{<key>}, with the keys of chapters/references.tex.
+
+This chapter describes how the research questions are answered. Section~\ref{sec:method-design} gives the research design. Sections~\ref{sec:method-hybrid} and~\ref{sec:method-baselines} define the hybrid score and the methods it is compared with. Section~\ref{sec:method-data} describes the two data sources, Section~\ref{sec:method-protocol} the evaluation protocol, Section~\ref{sec:method-tuning} the tuning, and Section~\ref{sec:method-stats} the statistics. Section~\ref{sec:method-repro} explains how the results are made reproducible, and Section~\ref{sec:method-cost} how the cost of the live feed is measured. Chapter 6 reports the results.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Research design}
+\label{sec:method-design}
+
+The thesis asks two questions. \textbf{RQ1:} does adding social-graph signals (follow trust and community affinity) to the ranking improve the ``For You'' feed over the current heuristic, especially for users with little history? \textbf{RQ2:} how does the amount of social interaction change the ranking quality, and where does the social signal start to help?
+
+Each question has a hypothesis that was written down and frozen before any test result existed:
+\begin{itemize}
+  \item \textbf{H1 (RQ1).} For users with 0--4 earlier interactions, the hybrid score $H$ has a higher NDCG@10 than BL2, the score of the current Explore feed. H1 has two co-primary tests: one on synthetic data (the middle-influence world, Section~\ref{sec:method-data}) and one on real data (Digg 2009). Each test is judged on its own.
+  \item \textbf{H2 (RQ2).} The gain over BL2 grows with social density, and it is about zero for a user who follows nobody and has no community.
+  \item \textbf{H0 (sanity).} In the null world W0, where follows are random, the follow part of the hybrid must not beat BL2. A win there would mean a bug or a leak, so H0 is checked first, as a gate.
+\end{itemize}
+
+The design is an \textbf{offline evaluation}: the methods rank posts for past moments, and we check whether each user's next real action is ranked high. It does not need real users, and every number can be rebuilt. Its limits are discussed in Chapter 7.
+
+Three rules hold throughout. First, everything that could be tuned was tuned on validation data, frozen, and only then run once on the test data. Second, every feature is computed only from events before the ranking time. Third, the same ranking code runs in the evaluation and in the live app (Chapter 5), so the numbers describe the feed that users get.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The hybrid score}
+\label{sec:method-hybrid}
+
+The hybrid score of post $p$ for user $u$ at time $t$ is
+\begin{equation}
+  H(p,u,t) = \text{engagement}(p,t) + \alpha \cdot \text{social}(p,u,t) + \beta \cdot \text{community}(p,u,t).
+  \label{eq:method-hybrid}
+\end{equation}
+
+\textbf{Engagement} is the score of the current Explore feed, computed as of $t$:
+\begin{equation}
+  \text{engagement}(p,t) = \text{likes} + 2 \cdot \text{comments} + 3 \cdot \text{reposts} - 0.25 \cdot \text{ageHours}.
+  \label{eq:method-engagement}
+\end{equation}
+
+\textbf{The social term} adds trust in the people $u$ follows. It has two parts: the author, and the followees who engaged with the post before $t$.
+\begin{align}
+  \text{social}(p,u,t) &= \mathbf{1}[\,u \text{ follows } \text{author}(p)\,] \cdot \text{trust}\bigl(u,\text{author}(p),t\bigr) \nonumber\\
+  &\quad + \sum_{\substack{f \text{ a followee of } u\\ f \text{ engaged with } p \text{ before } t}} \text{trust}(u,f,t), \label{eq:method-social}\\[4pt]
+  \text{trust}(u,f,t) &= \frac{n_{uf} + m/|F_u|}{N_u + m}. \label{eq:method-trust}
+\end{align}
+\noindent Here $n_{uf}$ is the number of $u$'s earlier positives on posts by $f$, $N_u$ is $u$'s total number of earlier positives, and $F_u$ is the set of $u$'s followees at $t$.
+
+\textbf{The community term} adds $u$'s affinity to the post's community:
+\begin{equation}
+  \text{community}(p,u,t) = \frac{c_{u,c(p)} + m \cdot \mathbf{1}[\,u \text{ is a member of } c(p)\,] \,/\, |M_u|}{N_u + m}.
+  \label{eq:method-community}
+\end{equation}
+\noindent Here $c_{u,c}$ is the number of $u$'s earlier positives in community $c$, and $M_u$ is the set of $u$'s communities at $t$. A post outside any community gets 0.
+
+\textbf{Why the prior $m$.} Without it, trust would be $n_{uf}/N_u$, which is $0/0$ for a user with no history, so the score could not help exactly the users RQ1 asks about. The $m$-estimate~\refcite{cestnik1990}\refcite{castellano2020} mixes the user's own counts with a prior: at $N_u = 0$, every followee gets the same trust $1/|F_u|$ and every community the same weight $1/|M_u|$. As history grows, the weight of the prior, $m/(N_u + m)$, falls smoothly. The three cold-start phases of the original proposal become this one curve; the history groups of Section~\ref{sec:method-protocol} are used only to report results. The frozen value is $m = 5$.
+
+\textbf{Why an author term.} A new post by a followee that nobody has engaged with yet would get nothing from the engager sum alone. Large platforms weight in-network posts by the strength of the tie to the author: Twitter's RealGraph predicts the chance of a future interaction for each pair of users~\refcite{kamath2014} and is described as the most important part of ranking in-network posts~\refcite{twitter2023}. The author term is our simple form of that idea. Section~\ref{sec:method-baselines} tests whether each term matters.
+
+\textbf{Integer scores and ties.} Every score is stored as the integer $\lfloor \text{score} \times 100 \rfloor$, sums run in a fixed order, and posts are sorted by \texttt{(score desc, post id desc)}. So two runs always give the same order, and no result depends on the order in which a database returns rows. Section~\ref{sec:method-protocol} checks the effect of the tie-break.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Baselines and ablations}
+\label{sec:method-baselines}
+
+All methods rank the same candidate pool (Section~\ref{sec:method-protocol}). Table~\ref{tab:method-methods} lists them.
+
+\begin{table}[htbp]
+  \centering
+  \caption{The methods compared in the evaluation.}
+  \label{tab:method-methods}
+  \small
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    Id & Method & Why it is here \\
+    \midrule
+    BL0  & the production ``For You'': posts of followees first, newest first, then the rest newest first & the current feed \\
+    BL1  & newest first & the simplest feed \\
+    BL2  & the production Explore score (engagement above), as of $t$ & the reference of H1: $H$ is BL2 plus the social terms \\
+    BL2t & BL2 with its age weight tuned & the reference with the same tuning effort as $H$ \\
+    BL3  & global popularity: likes as of $t$ & a popularity baseline \\
+    BL4  & Reddit ``hot''~\refcite{reddit-hot}, likes as upvotes, with the time divisor tuned & a known strong time-decay formula \\
+    BL5  & Hacker News ranking~\refcite{shirriff2013}, $(P - 1)^{0.8} / (T + 2)^{\text{gravity}}$, with the gravity tuned & a second known time-decay formula \\
+    BL6  & engagement $+\ \alpha \cdot {}$(follows the author $+$ number of followees who engaged), every trust weight 1 & shows what the trust weights add over a plain count \\
+    H    & the hybrid score & the method of the thesis \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+BL4 and BL5 were added so that the baselines are not weak~\refcite{ferraridacrema2019}, and BL2t, BL4, BL5 and BL6 are tuned like $H$, so the hybrid is not the only tuned method. The ablations of $H$ are: \textbf{H-follow} ($\beta = 0$, follow terms only), \textbf{H-comm} ($\alpha = 0$, community term only), \textbf{H-noauthor} and \textbf{H-noengager} (one follow part removed), and $H$ with $m = 0$, 2 and 10.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Data}
+\label{sec:method-data}
+
+Two sources are used, because each one can test something the other cannot.
+
+\textbf{Synthetic data.} A seeded generator (\texttt{eval/}, configuration \texttt{synthetic-v1\allowbreak.json}, frozen with its SHA-256) creates users, follows, communities, posts and interactions in five stages, each with its own random stream. Each user has a hidden main topic; there is one community per topic. An action picks a post from the last 7 days with a weight that combines the user's interest in the post's topic, the post's freshness and popularity, a \textbf{social influence} term (the author is a followee, or followees acted on the post before) and a \textbf{community influence} term. The generator never ranks a feed, so the data do not depend on any tested method.
+
+The worlds, listed in Table~\ref{tab:method-worlds}, differ in homophily $h$ (similar users follow each other) and influence $g$:
+
+\begin{table}[htbp]
+  \centering
+  \caption{The synthetic worlds: homophily $h$, social influence $g_s$ and community influence $g_c$.}
+  \label{tab:method-worlds}
+  \small
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\textwidth}{@{}l c c c >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    World & $h$ & social $g_s$ & community $g_c$ & Role \\
+    \midrule
+    W0 & 0 & 0 & 0 & null world: follows are random and have no effect (the H0 gate) \\
+    W1 & 0.7 & 0 & 0 & homophily only, no influence \\
+    W2L, W2M, W2H & 0.7 & 0.5, 2, 8 & 0.5, 2, 8 & low, middle and high influence; W2M is H1 test 1 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Each world has size M: 1,000 users and 20,000 posts. Values that real data can set were calibrated to Digg 2009 (the activity shares per history group, the mean number of actions per user, the share of users with followees and their number); the rest are our own choices, each with its reason in the configuration file.
+
+\textbf{Real data: Digg 2009}~\refcite{lerman-digg}\refcite{lerman-digg-archive}. It was chosen against rules written before any candidate was judged (\texttt{.docs/datasets.md}): a directed follow graph with dates on the same clock as the actions, and dated positive actions on items whose author is in the same graph. Digg passed both. The two files come from the Internet Archive copy of the original page, because the original host is gone; their SHA-256 is recorded. The conversion keeps Digg's own ids, treats a vote as a like, takes the first voter of a story as its author, keeps the earliest of repeated votes, and drops links without a date and self-links. A follow counts for a test only if it is dated before that test's time. The result has 336,047 users, 3,553 stories, 3,007,345 likes and 1,729,983 dated follows.
+
+\textbf{What each source can test.} Digg tests the follow terms on real behaviour, but it has no communities, so the community term is 0 there and $\beta$ has no effect. The community term is tested on synthetic data only; Hive, the one real candidate with dated memberships, could not be accessed (Chapter 7). Digg is also small and special: one month, only stories that reached the front page.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Evaluation protocol}
+\label{sec:method-protocol}
+
+\textbf{Split.} All positives (likes, comments, reposts) of a dataset are sorted by time, and the cut time $T$ is the time of the event at position $\lceil 0.8 \cdot n \rceil$. Events at or before $T$ are used for tuning; events after $T$ only for the final test. One global cut means that tuning never sees the test period of any user, which a split per user would allow~\refcite{meng2020}. The frozen values of $T$ are 21,412,417 s for the M worlds (seconds from 2026-01-01) and 1,246,068,297 for Digg (Unix time).
+
+\textbf{One test item per user.} A user's test item is the last positive after $T$ on a post the user had not touched before; its time is $t_u$. A user with no such positive has no test item. The validation item is defined in the same way before $T$.
+
+\textbf{The as-of rule.} Every feature for user $u$ is computed only from events before $t_u$ (an event at exactly $t_u$ counts only if its id is smaller than the test event's id): like counts, post age, follows, memberships and trust. Training on events after the test time is a known source of leakage~\refcite{ji2023}. A leakage test checks it: changing or deleting every event after $t_u$ leaves $u$'s results unchanged.
+
+\textbf{The candidate pool.} One function, \texttt{buildPool}, used by both the evaluation and the live feed, builds $u$'s pool at $t_u$: root posts that are not deleted and are approved, created in the 7 days before $t_u$, not by a blocked user, not $u$'s own posts and not posts $u$ touched before; the newest 2,000 are kept. A user whose test post is not in the pool is left out and counted. Each method ranks the whole pool, with no sampled negatives, because sampled metrics can change which method looks best~\refcite{krichene2020}\refcite{canamares2020}. A check with a larger pool (14 days, 4,000 posts) is part of the experiments.
+
+\textbf{Metrics.} With one test item at rank $r$: Recall@$K$ equals HitRate@$K$ (1 if $r \le K$); NDCG@$K$ is $1/\log_2(r + 1)$ if $r \le K$, else 0; Coverage@$K$ is the number of distinct posts in any user's top $K$, divided by the number of distinct posts in any user's pool~\refcite{ge2010}. $K$ is 5, 10 and 20; NDCG@10 is the main metric. The comparison is per user: the \textbf{gain} is the mean over users of the paired difference in NDCG@10.
+
+\textbf{History groups.} History is the number of $u$'s positives before $t_u$. Results are reported for the groups 0, 1--4, 5--19 and 20 or more, and for 0--4, the group of H1.
+
+\textbf{Ties.} The experiments are repeated with the reversed tie-break, because many tied scores (popularity especially) can change metrics~\refcite{mcsherry2008}.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Tuning and freezing}
+\label{sec:method-tuning}
+
+$\alpha$ and $\beta$ of $H$ are tuned on the validation items only, on the grid 0, 1, 2, 4, \ldots, 1,024 for each, by NDCG@10; a tie goes to the smaller pair. The same rule tunes the one parameter of BL2t (age weight 0.0625 to 4 per hour), BL4 (time divisor 11,250 to 720,000 s) and BL5 (gravity 0.6 to 2.4), and the $\alpha$ of BL6. Each grid contains the published or production value. Each dataset is tuned on its own.
+
+After tuning, the choices are written into the test configurations, the author approves them, and the test split runs once. Two changes were made before the test split, both decided from validation results only and recorded with their date: the H0 gate tests H-follow instead of the full $H$, and the grids were widened because the first choices sat at their edge (Chapter 6).
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Statistics}
+\label{sec:method-stats}
+
+For each user, take the paired difference against the reference method. Two tools are used, each with 10,000 draws from a seeded random stream~\refcite{smucker2007}:
+\begin{itemize}
+  \item a \textbf{paired bootstrap 95\% confidence interval} of the mean difference;
+  \item a \textbf{paired randomization test}: flip the sign of each user's difference at random; the two-sided $p$-value is the share of flips whose mean is at least as far from 0 as the real one.
+\end{itemize}
+
+\textbf{Holm correction}~\refcite{holm1979} controls the error over many comparisons. On each of the two main datasets there are two families: F1, the confirmatory one ($H - \text{BL2}$ for each $K$ and each history group, 15 comparisons), and F2 ($H$ against each other baseline). Other comparisons get an interval and no $p$-value.
+
+\textbf{The decision rule for H1} was fixed before the test split: H1 passes on a dataset only if, for NDCG@10 and group 0--4, the Holm-adjusted $p$ is below 0.05 \textbf{and} the lower end of the interval is above 0. Holm adjusts $p$-values, not intervals, so this is the closest standard reading of ``the interval is above 0 after Holm correction''.
+
+\textbf{The default feed rule} was fixed at the same time: ``For You'' switches to the hybrid only if H1 passes on both tests and the H0 gate passes.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Reproducibility}
+\label{sec:method-repro}
+
+Every result of this thesis is one of two classes. \textbf{Class D} (data, rankings, metrics, statistics, tables) must be byte-identical on every run: no wall clock and no unseeded randomness in the ranking or evaluation code, one master seed (20261014) with a separate stream per stage, integer scores, a total tie-break, canonical CSV files, a pinned Node version and pinned Docker images. Each output file has a SHA-256 in a manifest, and one command, \texttt{npm run thesis:repro}, rebuilds every Class D file from the raw data and compares every hash~\refcite{sandve2013}. \textbf{Class R} (time measurements) can only be repeatable, not identical; it is reported as a median with an interval.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Measuring the cost of the live feed}
+\label{sec:method-cost}
+
+The cost experiment (E7) measures the live backend, not the evaluation code. With the synthetic world W2M loaded into the database, a load tool sends 100 requests per run (page 1 of the feed for 100 sampled user and time pairs) from one virtual user, with the page cache off, for each of the three feed rankings (newest first, engagement, social). Five runs are made and the first is dropped as warm-up; a run counts only if no request fails. The result is the median time with a bootstrap interval, and the number of database queries per request, which is exact.

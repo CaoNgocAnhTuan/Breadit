@@ -1,5 +1,26 @@
 % References: the numbered list of the school format (same as the pre-thesis report).
-% Cite only references marked "verified" in the super-plan §10. Uncomment the list with the first item:
-% \begin{enumerate}[leftmargin=*, label=\arabic*., itemsep=0.8em]
-%   \item Holm, S. (1979). A simple sequentially rejective multiple test procedure. \textit{Scandinavian Journal of Statistics}, 6(2).
-% \end{enumerate}
+% Cite only references marked "verified" in the super-plan §10, with the facts of that section (no pages, volumes or authors that are not there).
+% How to cite: write \item\label{ref:<key>} for each reference here, and \refcite{<key>} in the text (macro in main.tex); it prints [n],
+% where n is the number of the item. The list is in the order of first citation in Chapter 3 for now; p10-final-checks puts it
+% in the order of first appearance in the whole thesis.
+{\emergencystretch=5em % lets the long URLs break at a slash
+\begin{enumerate}[leftmargin=*, label=\arabic*., ref=\arabic*, itemsep=0.8em]
+  \item\label{ref:cestnik1990} Cestnik (1990). Estimating probabilities: a crucial task in machine learning. \textit{ECAI 1990}, pp.\ 147--149. \url{https://openalex.org/W203696055}
+  \item\label{ref:castellano2020} Castellano, Moral-Garc{\'\i}a, Mantas, Abell{\'a}n (2020). On the use of m-probability-estimation and imprecise probabilities in the na{\"\i}ve Bayes classifier. \textit{International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems}, 28(4). \url{https://doi.org/10.1142/S0218488520500282}
+  \item\label{ref:kamath2014} Kamath, Sharma, Wang, Yin (2014). RealGraph: User interaction prediction at Twitter. \textit{UEO '14 workshop, New York}. \url{https://www.ueo-workshop.com/wp-content/uploads/2014/04/sig-alternate.pdf}
+  \item\label{ref:twitter2023} Twitter Engineering (2023). Twitter's recommendation algorithm (blog). \url{https://blog.twitter.com/engineering/en_us/topics/open-source/2023/twitter-recommendation-algorithm}
+  \item\label{ref:reddit-hot} Reddit (archived). \texttt{\_sorts.pyx}, the ``hot'' function. \url{https://github.com/reddit-archive/reddit/blob/master/r2/r2/lib/db/_sorts.pyx}
+  \item\label{ref:shirriff2013} Shirriff (2013). How Hacker News ranking really works. \url{https://www.righto.com/2013/11/how-hacker-news-ranking-really-works.html}
+  \item\label{ref:ferraridacrema2019} Ferrari Dacrema, Cremonesi, Jannach (2019). Are we really making much progress? \textit{RecSys}. \url{https://arxiv.org/abs/1907.06902}
+  \item\label{ref:lerman-digg} Lerman. Digg 2009 data. \url{https://www.isi.edu/people-lerman/research/downloads/}
+  \item\label{ref:lerman-digg-archive} Lerman. Digg 2009 data set page (Internet Archive snapshot 20221130205157). \url{http://web.archive.org/web/20221130205157id_/https://www.isi.edu/~lerman/downloads/digg2009.html}. The two data files are Internet Archive captures of 2013-08-26: \url{http://web.archive.org/web/20130826053517id_/http://www.isi.edu/~lerman/downloads/digg_votes.zip} and \url{http://web.archive.org/web/20130826053527id_/http://www.isi.edu/~lerman/downloads/digg_friends.zip}
+  \item\label{ref:meng2020} Meng, McCreadie, Macdonald, Ounis (2020). Exploring data splitting strategies for the evaluation of recommendation models. \textit{RecSys}. \url{https://arxiv.org/abs/2007.13237}
+  \item\label{ref:ji2023} Ji, Sun, Zhang, Li (2023). A critical study on data leakage in recommender system offline evaluation. \textit{ACM TOIS}, 41(3). \url{https://doi.org/10.1145/3569930}
+  \item\label{ref:krichene2020} Krichene, Rendle (2020). On sampled metrics for item recommendation. \textit{KDD}. \url{https://doi.org/10.1145/3394486.3403226}
+  \item\label{ref:canamares2020} Ca{\~n}amares, Castells (2020). On target item sampling in offline recommender system evaluation. \textit{RecSys}. \url{https://doi.org/10.1145/3383313.3412259}
+  \item\label{ref:ge2010} Ge, Delgado-Battenfeld, Jannach (2010). Beyond accuracy: evaluating recommender systems by coverage and serendipity. \textit{RecSys}. \url{https://doi.org/10.1145/1864708.1864761}
+  \item\label{ref:mcsherry2008} McSherry, Najork (2008). Computing information retrieval performance measures efficiently in the presence of tied scores. \textit{ECIR}. \url{https://doi.org/10.1007/978-3-540-78646-7_38}
+  \item\label{ref:smucker2007} Smucker, Allan, Carterette (2007). A comparison of statistical significance tests for information retrieval evaluation. \textit{CIKM}. \url{https://doi.org/10.1145/1321440.1321528}
+  \item\label{ref:holm1979} Holm (1979). A simple sequentially rejective multiple test procedure. \textit{Scandinavian Journal of Statistics}, 6(2). \url{https://www.jstor.org/stable/4615733}
+  \item\label{ref:sandve2013} Sandve et al. (2013). Ten simple rules for reproducible computational research. \textit{PLoS Computational Biology}. \url{https://doi.org/10.1371/journal.pcbi.1003285}
+\end{enumerate}}

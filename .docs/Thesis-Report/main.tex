@@ -146,6 +146,8 @@
 \pgfplotsset{compat=1.18}
 \newcommand{\resultsdir}{../results/p7-report}
 \input{\resultsdir/results-macros.tex}
+%% Citation by key: \refcite{<key>} prints [n], the number of the item with \label{ref:<key>} in chapters/references.tex.
+\newcommand{\refcite}[1]{[\ref{ref:#1}]}
 
 %% The title registered with the school. Change it here only: the title page uses it twice.
 \newcommand{\thesistitle}{Breadit: A real-time hybrid social networking platform with social-graph-aware personalized feed ranking}
