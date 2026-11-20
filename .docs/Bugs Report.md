@@ -13,18 +13,18 @@ How the report was made: first I read the code and listed 26 suspected problems.
 | | Count |
 |---|---|
 | Findings in the review | 36 (T1–T10, S1–S6, B1–B10, N1–N10) |
-| **Resolved** | **29** (14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed`, N6 in task `p7-cost-benchmark`, and 11 in task `p9-bug-quick-wins`: R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7) |
-| **Still open** | **10 of the 36, plus 4 found later (R3–R6), plus 5 from the demo sweep (V1–V5) = 19** |
+| **Resolved** | **34** (14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed`, N6 in task `p7-cost-benchmark`, 11 in task `p9-bug-quick-wins`: R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7, and 5 in task `p10-demo-fixes`: V1–V5) |
+| **Still open** | **10 of the 36, plus 4 found later (R3–R6) = 14** |
 | Open decision | 0 (D1 decided on 2026-10-28 and built on 2026-11-10, section 4) |
 
-Open items by priority: **P1 = 1, P2 = 5, P3 = 4, P4 = 9.** What the levels mean is in section 2.
+Open items by priority: **P1 = 1, P2 = 5, P3 = 2, P4 = 6.** What the levels mean is in section 2.
 
 The fixes were checked like this:
 - The same curl script ran on the unfixed code (**42 passed, 53 failed**) and on the final code on a freshly seeded database (**95 passed, 0 failed**). Output: [works/2026-10-21-bugs-sweep/sweep-before.txt](works/2026-10-21-bugs-sweep/sweep-before.txt) and [works/2026-10-21-bugs-sweep/sweep-after.txt](works/2026-10-21-bugs-sweep/sweep-after.txt).
 - 99 unit tests and 108 integration tests pass. Each fix started with a test that failed.
-- Task `p9-bug-quick-wins` (2026-11-20) added 7 unit tests and 22 integration tests (`quick-wins.it-spec.ts`). The backend now has 211 unit tests and 168 integration tests.
+- Task `p9-bug-quick-wins` (2026-11-20) added 7 unit tests and 22 integration tests (`quick-wins.it-spec.ts`). Task `p10-demo-fixes` (2026-11-20) added 3 integration tests (`demo-fixes.it-spec.ts`). The backend now has 211 unit tests and 171 integration tests.
 - In Chrome: B4, T1 and T8 were confirmed in the UI. A sweep of 26 page checks gave the expected status codes.
-- The demo sweep (task `p10-demo-sweep`, 2026-11-20) walked all 28 pages and 15 flows in Chrome: 5 new findings (V1–V5, §3.5) and a new symptom of T6. Record: [works/2026-11-20-p10-demo-sweep/sweep.md](works/2026-11-20-p10-demo-sweep/sweep.md).
+- The demo sweep (task `p10-demo-sweep`, 2026-11-20) walked all 28 pages and 15 flows in Chrome: 5 new findings (V1–V5, fixed in task `p10-demo-fixes`, §5.5) and a new symptom of T6. Record: [works/2026-11-20-p10-demo-sweep/sweep.md](works/2026-11-20-p10-demo-sweep/sweep.md).
 
 ---
 
@@ -87,15 +87,7 @@ Code locations use function and file names, because line numbers moved during th
 
 ### 3.5 Found in the demo sweep (task `p10-demo-sweep`, 2026-11-20)
 
-Found while walking the demo path in Chrome (dev data in schema `public`, `next dev`). Evidence per row is in [works/2026-11-20-p10-demo-sweep/sweep.md](works/2026-11-20-p10-demo-sweep/sweep.md).
-
-| ID | Problem and effect | Evidence from the run | How to fix | Effort |
-|---|---|---|---|---|
-| **V1** (P3) | `/messages` and `/messages/:id` fail hydration in `ConversationList`: the server HTML says "No conversations yet", the client shows the list, and React throws away the server tree. Users see the right list, but the console shows an exception. Likely cause (not proven): `ChatDrawer`, always in the `(board)` layout through `ChatDrawerManager`, uses the same query key `["conversations"]` with no `initialData`, so `ConversationList`'s `initialData` is not used on the server. | P20 and P21: console EXCEPTION "Hydration failed …", diff `<button>` (client) against `<p>` "No conversations yet" (server). | Give the two queries their own keys, or seed the shared key from the server data once. Check with the console on `/messages`. | S |
-| **V2** (P4) | After a new comment, the comment count on the post stays the same until a reload. | W6: comment 772 shown at once; the header count stayed 1, then 2 after a reload. | Update or invalidate the post's count when the comment is created (not checked which component holds it). | XS–S |
-| **V3** (P4) | An approved community post shows "(edited)". Cause (from code): `moderatePost` (`communities.service.ts`) updates the post row with `isApproved: true`, so Prisma moves `updatedAt`, and `Post.tsx` shows "(edited)" when `updatedAt` is more than 1 s after `createdAt`. | W9: post 929, approved by the owner, shows "(edited)". | Mark edits with their own field or time, or keep `updatedAt` on approve. | XS |
-| **V4** (P4) | After the owner approves a post, the community feed does not show it until the 10 s feed cache runs out and the page is reloaded. Same family as the T3 note (writes that do not bump a cache version). | W9: after Approve the header said "1 Posts" and the feed was empty; after 10 s and a reload the post was there. | Bump the cache version that the community feed reads when a post is approved, and refetch the feed on the client. | S |
-| **V5** (P3) | `app/sign-in/layout.tsx` renders its own `<html>` and `<body>` inside the root layout. On every client navigation to `/sign-in` (logout, a ban), React logs "In HTML, `<html>` cannot be a child of `<body>`" and "You are mounting a new html component …". A direct load of `/sign-in` showed no error. | W13 and W15: three console errors right after the page reached `/sign-in`. | Let the sign-in layout return only its children (keep the metadata). | XS |
+V1–V5 are resolved in task `p10-demo-fixes` (2026-11-20). See §5.5.
 
 ---
 
@@ -107,7 +99,7 @@ Found while walking the demo path in Chrome (dev data in schema `public`, `next 
 
 ## 5. Resolved bugs
 
-The 29 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed` (2026-11-10), N6 in task `p7-cost-benchmark` (2026-11-12), and 11 in task `p9-bug-quick-wins` (2026-11-20): R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7. "Where" is the code at the tag `v1-prethesis`. Details of each sweep test are in [Pre-thesis verify.md](Pre-thesis%20verify.md).
+The 34 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed` (2026-11-10), N6 in task `p7-cost-benchmark` (2026-11-12), 11 in task `p9-bug-quick-wins` (2026-11-20): R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7, and 5 in task `p10-demo-fixes` (2026-11-20): V1–V5. "Where" is the code at the tag `v1-prethesis`. Details of each sweep test are in [Pre-thesis verify.md](Pre-thesis%20verify.md).
 
 ### 5.1 Thesis path
 
@@ -158,7 +150,20 @@ The 29 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 i
 - The thesis baselines BL0 to BL5 are computed from events by the harness. The fixes change the **live** counts only when deleted rows exist, and the synthetic generator writes none. So the harness results do not change.
 - The Explore numbers in the old pre-thesis report were measured with the buggy counts and the old rate limit. They are not comparable with new runs (see section 7).
 - The P9 fixes (`p9-bug-quick-wins`) do not change the harness results either: the harness reads events, not the API, and the synthetic data have no pending interactions, deleted tags or blocked comments.
+- The `p10-demo-fixes` changes do not change the harness results either: they touch the approve path of a community post and four frontend files, not the ranking or the pool.
 - The setup commit `84e84a7` added the Jest tests, `app.setup.ts` and the two verify scripts (`scripts/verify-bug-sweep.sh`, `scripts/verify-socket.cjs`). No behavior change.
+
+### 5.5 Demo fixes (task `p10-demo-fixes`, 2026-11-20)
+
+Found by the demo sweep (task `p10-demo-sweep`, record in [works/2026-11-20-p10-demo-sweep/sweep.md](works/2026-11-20-p10-demo-sweep/sweep.md)). The backend parts have IT tests (`demo-fixes.it-spec.ts`: TC1 to TC3, each failed before the fix). The frontend has no tests; its Chrome checks are items A1 to A4 of [works/2026-11-20-p10-demo-fixes/plan.md](works/2026-11-20-p10-demo-fixes/plan.md).
+
+| ID | Problem (where) | Evidence before the fix | Fix | Commit |
+|---|---|---|---|---|
+| **V1** (P3) | `/messages` and `/messages/:id` failed hydration in `ConversationList`: the server HTML said "No conversations yet", the client showed the list. Likely cause (not proven): `ChatDrawer` and `ConversationList` used the same query key `["conversations"]`, and the drawer has no `initialData`. | P20 and P21: console EXCEPTION "Hydration failed …", diff `<button>` (client) against `<p>` "No conversations yet" (server). | `ChatDrawer` uses its own key `["conversations", "drawer"]`. `ConversationList` keeps `["conversations"]` with its `initialData`. | `b0782fe` |
+| **V2** (P4) | After a new comment, the comment count on the post stayed the same until a reload (`PostInteractions.tsx`, `Comments.tsx`). | W6: comment 772 shown at once; the header count stayed 1, then 2 after a reload. | `Comments.tsx` sends the window event `post:comment-added` with `{ postId }` after a comment or a reply is created. `PostInteractions` listens (removed on unmount) and adds 1 for its own `postId`. | `b0782fe` |
+| **V3** (P4) | An approved community post showed "(edited)": `moderatePost` moved `updatedAt`, and `Post.tsx` shows "(edited)" when `updatedAt` is more than 1 s after `createdAt`. | W9: post 929, approved by the owner, shows "(edited)". | The APPROVE branch writes `updatedAt: post.updatedAt` with `isApproved: true`. IT test TC1: before the fix `updatedAt` moved by 70 ms; after it, it equals `createdAt`. | `8a28bbc` |
+| **V4** (P4) | After the owner approved a post, the community feed did not show it until the 10 s feed cache ran out and the page was reloaded. | W9: after Approve the header said "1 Posts" and the feed was empty; after 10 s and a reload the post was there. | Backend: approve bumps `v:user` of the approver and the author (one bump if they are the same user). Other members see the post within 10 s (the T3 rule). Frontend: `PendingPostsBanner` also invalidates the `["posts"]` queries after an approve. IT tests TC2 (owner) and TC3 (mod and author), with the cache on. | `8a28bbc`, `b0782fe` |
+| **V5** (P3) | `app/sign-in/layout.tsx` rendered its own `<html>` and `<body>` inside the root layout. On every client navigation to `/sign-in` (logout, a ban), React logged "In HTML, `<html>` cannot be a child of `<body>`" and "You are mounting a new html component …". | W13 and W15: three console errors right after the page reached `/sign-in`. | The sign-in layout returns only its children and keeps the `metadata` export (title "Breadit"). | `b0782fe` |
 
 ---
 
@@ -171,7 +176,7 @@ The 29 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 i
 | **E7** (cost run) | done in task `p7-cost-benchmark` (2026-11-12): N6, and the T3 note (E7 ran with the cache off) |
 | **P9, before the demo** (task `p9-bug-quick-wins`, implementation-plan §5 row 20) | done on 2026-11-20: R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7, and the README corrections of section 7 |
 | **P10, before sharing the app** (task `p10-security-fixes`, row 29, only for a shared server) | B1, S4, S6, B5, R3, R6 |
-| **P10, before the demo** (proposed task `p10-demo-fixes`, before row 22; the author decides, `p10-demo-sweep` Open question 1) | V1–V5 |
+| **P10, before the demo** (task `p10-demo-fixes`, row 21b) | done on 2026-11-20: V1–V5 |
 | **Future work** (thesis Chapter 9) | the schema migration above, R5, N7, N9, B8 |
 
 ---
