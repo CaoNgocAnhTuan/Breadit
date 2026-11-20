@@ -1,6 +1,6 @@
 # Plan: Demo sweep before the demo script
 
-Status: approved · 2026-11-20
+Status: done · 2026-11-20
 Design: [design.md](design.md) · Folder: `.docs/works/2026-11-20-p10-demo-sweep/`
 
 This task changes no code (DW9). Steps 1–3 are for Sonnet; steps 4–7 are done by Opus, because the Chrome tab group belongs to the main session (Design: Approach, "Who does what"). Docker db and redis must run. All commits go on `test-app` and are never pushed. Approving this plan approves the commits below.
