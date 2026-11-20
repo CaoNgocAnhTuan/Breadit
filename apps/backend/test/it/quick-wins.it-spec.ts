@@ -148,4 +148,82 @@ describe('p9 quick wins', () => {
       expect((await guest().get(`/api/posts/${plain.body.id}/comments`)).status).toBe(200);
     });
   });
+
+  describe('N2, R1: comments (TC4, TC5)', () => {
+    type C = { id: number; user: { username: string }; _count: { replies: number }; replies?: C[] };
+    const flat = (list: C[]): C[] => list.flatMap((c) => [c, ...flat(c.replies ?? [])]);
+    const names = (list: C[]) => flat(list).map((c) => c.user.username);
+    const comment = async (u: U, postId: number, text: string, parentId?: number) => {
+      const res = await as(u).form('POST', `/api/posts/${postId}/comments`, {
+        body: text,
+        ...(parentId ? { parentCommentId: String(parentId) } : {}),
+      });
+      expect(res.status).toBe(201);
+      return res.body.id as number;
+    };
+
+    it('N2: carol blocks dave; dave\'s comments and replies are gone for carol, and for bob they stay', async () => {
+      const [bob, carol, dave, erin] = await Promise.all([
+        createUserWithCookie({ username: uniq('n2bob') }),
+        createUserWithCookie({ username: uniq('n2carol') }),
+        createUserWithCookie({ username: uniq('n2dave') }),
+        createUserWithCookie({ username: uniq('n2erin') }),
+      ]);
+      const post = await as(bob).form('POST', '/api/posts', { desc: 'a post for the N2 check' });
+      const postId = post.body.id;
+      const bobTop = await comment(bob, postId, 'bob top');
+      const daveReply = await comment(dave, postId, 'dave reply to bob', bobTop);
+      const daveTop = await comment(dave, postId, 'dave top');
+      await comment(erin, postId, 'erin reply under dave', daveTop); // hidden with its parent
+      await comment(erin, postId, 'erin reply under dave reply', daveReply); // hidden with its parent
+      await comment(erin, postId, 'erin top');
+
+      expect((await as(carol).post(`/api/users/${dave.user.id}/block`)).body).toEqual({ blocked: true });
+
+      const forCarol = (await as(carol).get(`/api/posts/${postId}/comments`)).body as C[];
+      expect(names(forCarol)).not.toContain(dave.user.username);
+      expect(names(forCarol).sort()).toEqual([bob.user.username, erin.user.username].sort());
+      // The thread under a blocked comment goes away with it (design, rejected option).
+      expect(flat(forCarol).map((c) => c.id)).not.toContain(daveTop);
+
+      const forBob = (await as(bob).get(`/api/posts/${postId}/comments`)).body as C[];
+      expect(names(forBob).filter((n) => n === dave.user.username)).toHaveLength(2);
+      expect(flat(forBob)).toHaveLength(6);
+      // A guest has no block list: nothing is hidden.
+      expect(flat((await guest().get(`/api/posts/${postId}/comments`)).body as C[])).toHaveLength(6);
+    });
+
+    it('N2: the block hides in both directions (dave blocked by carol also does not see carol)', async () => {
+      const [bob, carol, dave] = await Promise.all([
+        createUserWithCookie({ username: uniq('n2bob') }),
+        createUserWithCookie({ username: uniq('n2carol') }),
+        createUserWithCookie({ username: uniq('n2dave') }),
+      ]);
+      const postId = (await as(bob).form('POST', '/api/posts', { desc: 'both ways' })).body.id;
+      await comment(carol, postId, 'carol top');
+      await comment(dave, postId, 'dave top');
+      await as(carol).post(`/api/users/${dave.user.id}/block`);
+      const forDave = (await as(dave).get(`/api/posts/${postId}/comments`)).body as C[];
+      expect(names(forDave)).toEqual([dave.user.username]);
+    });
+
+    it('R1: _count.replies counts only live replies', async () => {
+      const [bob, carol] = await Promise.all([
+        createUserWithCookie({ username: uniq('r1bob') }),
+        createUserWithCookie({ username: uniq('r1carol') }),
+      ]);
+      const postId = (await as(bob).form('POST', '/api/posts', { desc: 'a post for the R1 check' })).body.id;
+      const top = await comment(bob, postId, 'top');
+      const keep = await comment(carol, postId, 'reply to keep', top);
+      const gone = await comment(carol, postId, 'reply to delete', top);
+      await comment(bob, postId, 'nested reply', keep);
+      expect((await as(carol).delete(`/api/comments/${gone}`)).status).toBe(200);
+
+      const list = (await as(bob).get(`/api/posts/${postId}/comments`)).body as C[];
+      expect(list).toHaveLength(1);
+      expect(list[0]._count.replies).toBe(1);
+      expect(list[0].replies).toHaveLength(1);
+      expect(list[0].replies![0]._count.replies).toBe(1);
+    });
+  });
 });

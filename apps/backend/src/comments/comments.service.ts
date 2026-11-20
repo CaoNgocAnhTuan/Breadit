@@ -9,6 +9,7 @@ import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { COMMENT_BODY_MAX, isTooLong } from '../common/limits';
 import { canSeePost } from '../posts/visibility';
+import { BlockService } from '../block/block.service';
 
 @Injectable()
 export class CommentsService {
@@ -16,6 +17,7 @@ export class CommentsService {
     private readonly prisma: PrismaService,
     private readonly uploadsService: UploadsService,
     private readonly notificationsService: NotificationsService,
+    private readonly blockService: BlockService,
   ) {}
 
   private mentionInclude() {
@@ -32,7 +34,8 @@ export class CommentsService {
       user: { select: { displayName: true, username: true, img: true } },
       mentions: this.mentionInclude(),
       media: true,
-      _count: { select: { replies: true, likes: true } },
+      // R1: only live replies; a deleted reply is not a reply
+      _count: { select: { replies: { where: { deletedAt: null } }, likes: true } },
       likes: userId
         ? { where: { userId }, select: { id: true } }
         : (false as const),
@@ -69,6 +72,12 @@ export class CommentsService {
 
     const include = this.commentInclude(userId);
 
+    // N2: a blocked peer's comments and replies are left out at every level, so the thread under
+    // a hidden comment goes with it. Block rows in both directions count.
+    const blocked = userId ? await this.blockService.getAllBlockedPeerIds(userId) : new Set<string>();
+    const notBlocked = blocked.size > 0 ? { userId: { notIn: [...blocked] } } : {};
+    const liveWhere = { deletedAt: null, ...notBlocked };
+
     // Top-level comment sort; replies always chronological
     let topLevelOrderBy: object | object[];
     if (sort === 'top') {
@@ -81,27 +90,27 @@ export class CommentsService {
     }
 
     const comments = await this.prisma.comment.findMany({
-      where: { postId, parentCommentId: null, deletedAt: null },
+      where: { postId, parentCommentId: null, ...liveWhere },
       orderBy: topLevelOrderBy,
       include: {
         ...include,
         replies: {
-          where: { deletedAt: null },
+          where: liveWhere,
           orderBy: { createdAt: 'asc' },
           include: {
             ...include,
             replies: {
-              where: { deletedAt: null },
+              where: liveWhere,
               orderBy: { createdAt: 'asc' },
               include: {
                 ...include,
                 replies: {
-                  where: { deletedAt: null },
+                  where: liveWhere,
                   orderBy: { createdAt: 'asc' },
                   include: {
                     ...include,
                     replies: {
-                      where: { deletedAt: null },
+                      where: liveWhere,
                       orderBy: { createdAt: 'asc' },
                       include,
                     },
