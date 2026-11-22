@@ -1,6 +1,6 @@
 # Appendix
 
-> **Draft, 2026-11-22.** Appendix A only. Appendix B (full tables) is written by a later task. Every file and count was checked against the repository on 2026-11-22 (see the notes at the end). Remove this box and the notes at the end before the final version.
+> **First draft 2026-11-22, before the supervisor's feedback.** Appendix A (full test list) and Appendix B (full result tables). Budget: at most 10 pages for the two together. Every file and count of Appendix A was checked against the repository on 2026-11-22; Appendix B reads the committed result file at build time (see the notes at the end). Remove this box and the notes at the end before the final version.
 
 ## Appendix A. Full test list
 
@@ -138,9 +138,38 @@ Forty-three files, 434 tests. Run with `npm run verify -w @breadit/eval`, which 
 
 **Manual checks.** The UI sweep of 2026-11-20 walked 28 pages and 15 flows in Chrome (`.docs/works/2026-11-20-p10-demo-sweep/sweep.md`). The demo rehearsal of 2026-11-22 played 9 steps (`.docs/works/2026-11-22-p10-demo-script/rehearsal.md`). Chapter 8 gives their results.
 
+## Appendix B. Full result tables
+
+Chapter 6 shows the ten tables of the results report (tuning, test users and left-out users, and E1 to E8) in full, so this appendix does not repeat them. It gives what Chapter 6 only describes: the two statistical families of Chapter 3, for all three values of *K* (5, 10 and 20). Table 6.4 (E2) shows family F1 at *K* = 10 only, and family F2 has no table in Chapter 6.
+
+The rows are read from the result file `.docs/results/p7-main/compare.csv` when the thesis is built, with six decimals as in the file. The file is listed with its SHA-256 in the manifest of the run `p7-main`, a Class D result, so every value is the same on every rebuild (Chapter 3). The columns are:
+- **Group.** The history group (Chapter 3). The group "all" holds every test user whose test post is in the pool (family F2 only).
+- **Users.** The number of users in the group, after the left-out users are removed.
+- **Gain.** The mean over users of NDCG@*K* of *H* minus NDCG@*K* of the baseline in the first column. A negative gain means that the baseline is better.
+- **CI low, CI high.** The paired bootstrap 95% confidence interval of the gain.
+- ***p* and *p* (Holm).** The *p*-value of the paired randomization test, and the same value after the Holm correction in its family on its dataset.
+
+H1 is decided only for *K* = 10 and group 0–4 (Chapter 3). The rows for *K* = 5 and *K* = 20 are given for completeness and do not change that decision.
+
+### B.1 Family F1: the hybrid against BL2
+
+Family F1 holds the 15 comparisons *H* − BL2 for each *K* and each history group. Two tables give them, one for `syn-W2M-M` and one for `digg2009`.
+
+**Table B.1. Family F1 on `syn-W2M-M`: *H* against BL2, NDCG@*K*.** 15 rows, one for each *K* and history group (0, 1–4, 0–4, 5–19, 20+). The values come from `compare.csv` (dataset `syn-W2M-M`, family `F1`) and are not copied here.
+
+**Table B.2. Family F1 on `digg2009`: *H* against BL2, NDCG@*K*.** The same 15 rows for `digg2009`.
+
+### B.2 Family F2: the hybrid against the other baselines
+
+Family F2 holds *H* against each of the seven baselines other than BL2 (BL0, BL1, BL2t, BL3, BL4, BL5 and BL6) for each *K* and for the groups 0–4, 5–19, 20 or more, and all users. Two tables give them.
+
+**Table B.3. Family F2 on `syn-W2M-M`: *H* against each other baseline, NDCG@*K*.** 84 rows (7 baselines, 3 values of *K*, 4 groups), from `compare.csv` (family `F2`).
+
+**Table B.4. Family F2 on `digg2009`: *H* against each other baseline, NDCG@*K*.** The same 84 rows for `digg2009`.
+
 ## Notes for the author (remove before the final version)
 
-1. **Only Appendix A is here.** Appendix B (full tables) is added later by another task, below Appendix A in `chapters/appendix.tex` (a comment marks the place).
+1. **Appendix B is built from the committed CSV, not from `tables/`.** Chapter 6 already shows all ten files of `.docs/results/p7-report/tables/` in full, so there was no table left to `\input`. Appendix B instead shows the families F1 and F2 of `.docs/results/p7-main/compare.csv` (198 rows) for all three K. Chapter 6 shows F1 at K = 10 only and has no F2 table. A small loop in `chapters/appendix.tex` reads the file at build time with the table reader of pgfplots (`main.tex` does not load `pgfplotstable`, and I may not edit it), so no number is typed. A better long-term home for these four tables is the report script (`npm run report`), which would write them into `.docs/results/p7-report/tables/` with a hash in the manifest. That is a task for later.
 2. **Where the counts come from.**
    - Ranking (85, per file 9, 13, 3, 14, 5, 4, 37), backend unit (211, 18 files), demo helpers (22) and evaluation (434, 43 files): I ran the suites on 2026-11-22 and counted the tests of each file (Jest `--json`, and `node --test` one file at a time).
    - Integration (171, 14 files): not run (no Docker). Counted from the files: 137 `it(` lines, plus the cases of the `it.each` tables (`input-errors` 53, `quick-wins` 22, `feed-algo` 11), which gives 171. The same total is in `verify.sh` of 2026-11-22 (`.docs/works/2026-11-22-p10-demo-script/plan.md`).
@@ -148,3 +177,5 @@ Forty-three files, 434 tests. Run with `npm run verify -w @breadit/eval`, which 
    - Replay: 95 checks, 11 from `scripts/verify-socket.cjs` (`record(` calls), so 84 from the bash script (the output `sweep-after.txt` has 95 `PASS` lines).
 3. **The IDs in brackets** (T1, S5, N4, V3 and so on) are IDs of `.docs/Bugs Report.md`. D1 is its decision D1. I took each ID from the name of the test or the describe block.
 4. **Layout.** The four tables use `\scriptsize` so that Appendix A is 5 pages (pages 75 to 79 in the build of 2026-11-22). The Table numbers run on from Chapter 8 in the PDF (Tables 31 to 34); the working names above are A.1 to A.4.
+5. **Appendix B layout and size.** Four long tables in `\scriptsize`: 15 + 15 + 84 + 84 rows. Appendix A and B together are 9 pages (pages 77 to 85 in the build of 2026-11-22; A is 5 pages, B is 4).
+6. **Rows of Appendix B that a reader may ask about.** On `digg2009`, family F1 at K = 20 has two rows where both H1 conditions hold (group 0 and group 0–4, gains of a few ten-thousandths of NDCG and a Holm *p* below 0.05). They are not part of H1, which is decided at K = 10 and group 0–4 only (Chapter 3), and the text of Appendix B says so. Chapter 6 does not mention them. See the Result section of the task.

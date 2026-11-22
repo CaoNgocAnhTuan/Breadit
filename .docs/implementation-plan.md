@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.25 · 2026-11-22 · Status: approved 2026-10-28
+Version 1.26 · 2026-11-22 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -296,11 +296,11 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-22. ✅ mea
 | ✅ 11-20 | 21 | `p10-demo-sweep` | P10 | 20 | run `verify-bug-sweep.sh` and `verify-socket.cjs` again, walk the demo path in Chrome, add new bugs to the Bugs Report | 0.5 | — | — |
 | ✅ 11-20 | 21b | `p10-demo-fixes` | P10 | 21 | V1–V5 of the demo sweep | — | — | V1–V5 |
 | ✅ 11-22 | 22 | `p10-demo-script` | P10 | 21 | `scripts/demo/`: load `syn-W2M-M` with `--rebase-to` now, start the app, two demo users (little and long history), a checklist (the three `algo` side by side, a live direct message, a notification, a ban that logs out), cleanup | 1 | — | — |
-| ⬜ | 23 | Writing: Chapter 8 Test Cases and Demonstration | P9 | 22 | the test summary table, a demo rehearsal, about eight screenshots | 0.5 | — | — |
-| ⬜ | 24 | Writing: Chapters 1 and 2 | P9 | — | introduction; literature review from `.docs/related-work.md` | 1 | — | — |
-| ⬜ | 25 | Checks for the supervisor progress check | P9 ★ | 17–24 | `verify.sh`, `test:parity`, `results:manifest`, PDF build and page count, no typed numbers | 0.5 | — | — |
-| ⬜ | 26 | Progress slides for the supervisor | P10 | 25 | status, results, demo | 0.5 | — | — |
-| ⬜ | 27 | Writing: supervisor feedback, Chapter 9, abstract, acknowledgements, appendix | P9 | 26 | after the progress check | 1–2 | — | — |
+| ✅ 11-22 | 23 | Writing: Chapter 8 Test Cases and Demonstration | P9 | 22 | the test summary table, a demo rehearsal, about eight screenshots | 0.5 | — | — |
+| ✅ 11-22 | 24 | Writing: Chapters 1 and 2 | P9 | — | introduction; literature review from `.docs/related-work.md` | 1 | — | — |
+| ✅ 11-22 | 25 | Checks for the supervisor progress check | P9 ★ | 17–24 | `verify.sh`, `test:parity`, `results:manifest`, PDF build and page count, no typed numbers | 0.5 | — | — |
+| ✅ 11-22 | 26 | Progress slides for the supervisor | P10 | 25 | status, results, demo | 0.5 | — | — |
+| ✅ 11-22 (draft; feedback after 11-30) | 27 | Writing: supervisor feedback, Chapter 9, abstract, acknowledgements, appendix | P9 | 26 | after the progress check | 1–2 | — | — |
 | ⬜ | 28 | `p10-final-checks` | P10 | 27 | every number a macro, every citation verified in super-plan §10, the abstract matches Chapter 6, a local overlap check against the pre-thesis text and the paper extracts, at most 100 pages | 1 | — | — |
 | ⬜ | 29 | `p10-security-fixes` (only for a shared server) | P10 | — | the P2 bugs of the Bugs Report | 1 | — | S4, S6, B1, R6, B5, R3 |
 | ⬜ | 30 | `p10-defense-package` | P10 | 28 | defense slides from the same figures and macros, the defense demo script | 1 | — | — |
@@ -363,3 +363,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.23 · 2026-11-20 · §5 row 21 ✅: task `p10-demo-sweep` closed. All 28 pages and 15 flows walked in Chrome; 5 new findings V1–V5 in the Bugs Report §3.5, proposed for a short task `p10-demo-fixes` before row 22 (the author decides). No contract, rule or frozen value changed.
 - 1.24 · 2026-11-20 · §5 new row 21b ✅: task `p10-demo-fixes`. V1–V5 of the demo sweep are fixed (Bugs Report §5.5). No contract, rule or frozen value changed.
 - 1.25 · 2026-11-22 · §5 row 22 ✅: task `p10-demo-script`. `npm run demo:start|users|stop` (`scripts/demo/`) loads `syn-W2M-M` rebased to now into the new schema `eval_demo` with Redis database 3, adds the admin `demo_admin`, and picks the two demo users (`u0000000787`, history 2; `u0000000064`, history 28). Rehearsal: every checklist step PASS, no new bug. `eval_load` and the parity test are not touched. No contract, rule or frozen value changed.
+- 1.26 · 2026-11-22 · §5 rows 23–27 ✅ (writing, light path; task folders `2026-11-22-p9-ch8-tests-demo`, `p9-ch1-2`, `p10-progress-slides`, `p9-ch9-front-back`). Chapters 1, 2, 8 and 9, the abstract, the acknowledgements (names left as placeholders), Appendix A (full test list) and B (F1 at K = 5, 10, 20 and F2, read from `p7-main/compare.csv`), and the Beamer progress deck (`.docs/Thesis-Report/slides/`, 20 frames). Row 25 checks: `verify.sh` all PASS, `test:parity` 102/102, `results:manifest` equal (162 files), the thesis builds with no error or undefined reference, 96 PDF pages (Chapters 1–9 pp. 1–72, appendix pp. 77–85), no typed decimal in any chapter; two `\macromissing` marks remain in Chapter 6 (lines 262 and 345), for `p10-final-checks`. Row 27 still takes the supervisor's feedback after 2026-11-30. No contract, rule or frozen value changed.

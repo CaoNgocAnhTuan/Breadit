@@ -1,6 +1,7 @@
 % Appendix. Draft: drafts/10-appendix.md
 % Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. Appendix A has no experiment result:
-% it lists the test suites with their counts (facts of the code, counted on 2026-11-22). Appendix B (full tables) is added later below.
+% it lists the test suites with their counts (facts of the code, counted on 2026-11-22). Appendix B (full result tables) is below it and reads
+% .docs/results/p7-main/compare.csv at build time (no number is typed).
 % main.tex sets \chapter*{APPENDIX} before this file, so each appendix here is a starred \section.
 % Layout settings for this appendix only (they are put back at the end of Appendix A): the tables hold long file names.
 \setlength{\emergencystretch}{3em}
@@ -362,4 +363,128 @@ Forty-three files, 434 tests. Run with \texttt{npm run verify -w @breadit/eval},
 \textbf{Manual checks.} The UI sweep of 2026-11-20 walked 28 pages and 15 flows in Chrome (\path{.docs/works/2026-11-20-p10-demo-sweep/sweep.md}). The demo rehearsal of 2026-11-22 played 9 steps (\path{.docs/works/2026-11-22-p10-demo-script/rehearsal.md}). Chapter 8 gives their results.\par}
 \setlength{\emergencystretch}{0pt}
 
-%% Appendix B (full tables) is added here by a later task.
+%% ─────────────────────────────────────────────────────────────────────────────
+%% Appendix B. Full result tables. First draft 2026-11-22, before the supervisor's feedback.
+%% Chapter 6 already shows the ten tables of \resultsdir/tables/ in full, so none of them is repeated here. What Chapter 6 does not show
+%% are the two statistical families of Chapter 3 for all three values of K. The rows are read at build time from the committed result file
+%% .docs/results/p7-main/compare.csv (a Class D file, listed in the manifest of the run p7-main), so no number is typed in this file.
+%% The loop is plain TeX with pgfplots' table reader, because main.tex does not load pgfplotstable. State is set globally (\global, \xdef),
+%% because every cell of a table is its own TeX group.
+\pgfplotstableread[col sep=comma]{\resultsdir/../p7-main/compare.csv}\appbdata
+\pgfplotstablegetrowsof{\appbdata}\edef\appbnrows{\pgfplotsretval}
+\newif\ifappbmatch
+\newcount\appbi
+\newcommand{\appbcell}[2]{\pgfplotstablegetelem{#1}{#2}\of\appbdata\pgfplotsretval}
+\def\appbsignx#1#2\relax{\if#1-\ensuremath{-}#2\else#1#2\fi}
+\newcommand{\appbnum}[2]{\pgfplotstablegetelem{#1}{#2}\of\appbdata\expandafter\appbsignx\pgfplotsretval\relax}
+\newcommand{\appbmatch}[1]{%
+  \pgfplotstablegetelem{#1}{dataset}\of\appbdata\xdef\appbgotds{\pgfplotsretval}%
+  \pgfplotstablegetelem{#1}{family}\of\appbdata\xdef\appbgotfam{\pgfplotsretval}%
+  \global\appbmatchfalse
+  \ifx\appbgotds\appbwantds\ifx\appbgotfam\appbwantfam\global\appbmatchtrue\fi\fi}
+\def\appbemit{%
+  \appbcell{\the\appbi}{ref} & \appbcell{\the\appbi}{k} & \appbcell{\the\appbi}{bucket} & \appbcell{\the\appbi}{n}
+  & \appbnum{\the\appbi}{mean_diff} & \appbnum{\the\appbi}{ci_low} & \appbnum{\the\appbi}{ci_high}
+  & \appbnum{\the\appbi}{p_raw} & \appbnum{\the\appbi}{p_holm} \\}
+\def\appbloop{%
+  \ifnum\appbi<\appbnrows\relax
+    \appbmatch{\the\appbi}%
+    \ifappbmatch\appbemit\fi
+    \global\advance\appbi by 1
+    \expandafter\appbloop
+  \fi}
+%% \appbrows{dataset}{family}: the rows of compare.csv of one dataset and one family, in the order of the file.
+\newcommand{\appbrows}[2]{\xdef\appbwantds{#1}\xdef\appbwantfam{#2}\global\appbi=0 \appbloop}
+
+\section*{Appendix B. Full result tables}
+\addcontentsline{toc}{section}{Appendix B. Full result tables}
+
+Chapter 6 shows the ten tables of the results report (tuning, test users and left-out users, and E1 to E8) in full, so this appendix does not repeat them. It gives what Chapter 6 only describes: the two statistical families of Chapter 3, for all three values of $K$ (5, 10 and 20). Table~\ref{tab:results-e2} shows family F1 at $K = 10$ only, and family F2 has no table in Chapter 6.
+
+The rows are read from the result file \texttt{.docs/results/p7-main/compare.csv} when the thesis is built, with six decimals as in the file. The file is listed with its SHA-256 in the manifest of the run \texttt{p7-main}, a Class D result, so every value is the same on every rebuild (Chapter 3). The columns are:
+\begin{itemize}
+  \item \textbf{Group.} The history group (Chapter 3). The group ``all'' holds every test user whose test post is in the pool (family F2 only).
+  \item \textbf{Users.} The number of users in the group, after the left-out users are removed.
+  \item \textbf{Gain.} The mean over users of NDCG@$K$ of $H$ minus NDCG@$K$ of the baseline in the first column. A negative gain means that the baseline is better.
+  \item \textbf{CI low, CI high.} The paired bootstrap 95\% confidence interval of the gain.
+  \item \textbf{$p$ and $p$ (Holm).} The $p$-value of the paired randomization test, and the same value after the Holm correction in its family on its dataset.
+\end{itemize}
+H1 is decided only for $K = 10$ and group 0--4 (Chapter 3). The rows for $K = 5$ and $K = 20$ are given for completeness and do not change that decision.
+
+\subsection*{B.1 Family F1: the hybrid against BL2}
+
+Family F1 holds the 15 comparisons $H - \text{BL2}$ for each $K$ and each history group. Tables~\ref{tab:app-f1-syn} and~\ref{tab:app-f1-digg} give them on the two datasets.
+
+{\scriptsize\singlespacing
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.0}
+\begin{longtable}{@{}l r l r r r r r r@{}}
+  \caption{Family F1 on \texttt{syn-W2M-M}: $H$ against BL2, NDCG@$K$.}
+  \label{tab:app-f1-syn}\\
+  \toprule
+  Baseline & $K$ & Group & Users & Gain & CI low & CI high & $p$ & $p$ (Holm) \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Baseline & $K$ & Group & Users & Gain & CI low & CI high & $p$ & $p$ (Holm) \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  \appbrows{syn-W2M-M}{F1}
+\end{longtable}
+
+\begin{longtable}{@{}l r l r r r r r r@{}}
+  \caption{Family F1 on \texttt{digg2009}: $H$ against BL2, NDCG@$K$.}
+  \label{tab:app-f1-digg}\\
+  \toprule
+  Baseline & $K$ & Group & Users & Gain & CI low & CI high & $p$ & $p$ (Holm) \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Baseline & $K$ & Group & Users & Gain & CI low & CI high & $p$ & $p$ (Holm) \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  \appbrows{digg2009}{F1}
+\end{longtable}}
+
+\subsection*{B.2 Family F2: the hybrid against the other baselines}
+
+Family F2 holds $H$ against each of the seven baselines other than BL2 (BL0, BL1, BL2t, BL3, BL4, BL5 and BL6) for each $K$ and for the groups 0--4, 5--19, 20 or more, and all users. Tables~\ref{tab:app-f2-syn} and~\ref{tab:app-f2-digg} give them.
+
+{\scriptsize\singlespacing
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.0}
+\begin{longtable}{@{}l r l r r r r r r@{}}
+  \caption{Family F2 on \texttt{syn-W2M-M}: $H$ against each other baseline, NDCG@$K$.}
+  \label{tab:app-f2-syn}\\
+  \toprule
+  Baseline & $K$ & Group & Users & Gain & CI low & CI high & $p$ & $p$ (Holm) \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Baseline & $K$ & Group & Users & Gain & CI low & CI high & $p$ & $p$ (Holm) \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  \appbrows{syn-W2M-M}{F2}
+\end{longtable}
+
+\begin{longtable}{@{}l r l r r r r r r@{}}
+  \caption{Family F2 on \texttt{digg2009}: $H$ against each other baseline, NDCG@$K$.}
+  \label{tab:app-f2-digg}\\
+  \toprule
+  Baseline & $K$ & Group & Users & Gain & CI low & CI high & $p$ & $p$ (Holm) \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Baseline & $K$ & Group & Users & Gain & CI low & CI high & $p$ & $p$ (Holm) \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  \appbrows{digg2009}{F2}
+\end{longtable}}

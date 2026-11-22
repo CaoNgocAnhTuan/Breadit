@@ -1,2 +1,81 @@
 % Chapter 9. Conclusion and Future Works. Draft: drafts/09-conclusion-and-future-works.md
-% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand.
+% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. The result numbers here are the macros of Chapter 6;
+% the bug IDs (T6, N3 and so on) are IDs of .docs/Bugs Report.md, as in Chapter 8.
+% The \chapter command is in main.tex, so this file starts with the introduction and then the sections.
+% Citations: \refcite{ma2008} and \refcite{wu2019}, keys of chapters/references.tex (no new key).
+% A macro followed by a space needs {} after it (TeX drops the space after a control word).
+
+\label{ch:concl}
+
+This chapter closes the thesis. Section~\ref{sec:concl-answers} answers the two research questions, and Section~\ref{sec:concl-contrib} says what each contribution delivered. Section~\ref{sec:concl-limits} gives the limits in short, and Section~\ref{sec:concl-future} lists the future work.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Answers to the research questions}
+\label{sec:concl-answers}
+
+\textbf{RQ1: not on these data.} Adding the follow graph and the community memberships to the ranking did not improve the For You feed for users with little history. For users with 0--4 earlier interactions, the gain in NDCG@10 over BL2 is \eTwoWTwoMNdcgTenZeroFourGain{} on \texttt{syn-W2M-M}, with a 95\% interval from \eTwoWTwoMNdcgTenZeroFourCiLow{} to \eTwoWTwoMNdcgTenZeroFourCiHigh{}, and \eTwoDiggNdcgTenZeroFourGainFull{} on \texttt{digg2009}. The Holm-adjusted $p$ is \eTwoWTwoMNdcgTenZeroFourPHolm{} and \eTwoDiggNdcgTenZeroFourPHolm{}. So H1 fails on both co-primary tests (Section~\ref{sec:results-e2}).
+
+\textbf{RQ2: there is no level where the social signal starts to help.} The gain is already there for users who follow nobody (\eThreeWTwoMNdcgTenZeroGain{} on the middle W2 world), and it does not rise with the number of followees. On Digg it stays at \eThreeDiggNdcgTenZeroGain{} in every bin of followees. So H2 is not supported (Section~\ref{sec:results-e3}).
+
+\textbf{What the hybrid score does use.} Over all users of \texttt{syn-W2M-M}, the hybrid reaches an NDCG@10 of \eOneWTwoMNdcgHTenAllValue{}, against \eOneWTwoMNdcgBLTwoTenAllValue{} for BL2. Almost all of this gain comes from the community term: H-comm alone gains \eFourWTwoMNdcgHCommTenAllGain{} and H-follow alone gains \eFourWTwoMNdcgHFollowTenAllGain{} (Section~\ref{sec:results-e4}). In the generator a community is a topic, so the term works as a topic signal (Chapter~\ref{ch:discussion}). On Digg, the hybrid and BL2 give the same NDCG@10 (\eOneDiggNdcgHTenAllValue{}), and the two ``hot'' formulas BL4 and BL5 are far better (\eOneDiggNdcgBLFourTenAllValue{} and \eOneDiggNdcgBLFiveTenAllValue{}).
+
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Contributions as delivered}
+\label{sec:concl-contrib}
+
+\textbf{C1. A hybrid social networking architecture.} Breadit joins communities with threaded discussion, X-style following and a personal timeline in one platform. Chapter 4 designs it, Chapter 5 describes it, and all automatic tests of Chapter 8 pass.
+
+\textbf{C2. Social-graph-aware hybrid ranking for the For You feed.} It was delivered as four things:
+\begin{itemize}
+  \item the hybrid score: the Explore score plus a follow-trust term and a community-affinity term, with two weights tuned on validation data and a prior that gives every user a score;
+  \item an offline evaluation with an as-of time rule, one global cut time, full ranking, tuned baselines, paired statistics with Holm correction, a null world and real data;
+  \item one ranking package for the live feed and the evaluation, with a parity test that checks that the live order equals the order of the evaluation;
+  \item one command that rebuilds every result and compares every output file with a recorded hash.
+\end{itemize}
+The result of C2 is negative (Section~\ref{sec:concl-answers}). The \texttt{social} feed is in the app as an option (\texttt{algo=social}). On our setup it costs the same time as the other two feeds (a median of \eSevenSocialMedian{}~ms for page 1, against \eSevenChronoMedian{}~ms for \texttt{chrono}, Section~\ref{sec:results-e7}). The default For You feed keeps its order, because H1 failed, and one environment variable (\texttt{FEED\_DEFAULT\_ALGO}) can change it later.
+
+\textbf{C3. A real-time interaction layer.} Breadit pushes notifications, direct messages, typing signals and the forced logout of a banned user over Socket.IO. Real socket clients test it (for example TC-11 and TC-12 in Chapter 8), and the demonstration shows it. It is tested for function and not for speed.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Limits in short}
+\label{sec:concl-limits}
+
+The answers hold under the limits of Section~\ref{sec:disc-limits}. The synthetic data come from our own generator. Digg is small and special (one month, only front-page stories) and has no communities, and no public data set had follows, dated actions and dated memberships together, so the community term has synthetic evidence only. Group 0--4 of \texttt{syn-W2M-M} has \eTwoWTwoMNdcgTenZeroFourN{} users, so a small gain could be missed. The chosen $\alpha$ and $\beta$ are at the edge of the grid. And the test is offline: it does not tell whether users are happier.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Future work}
+\label{sec:concl-future}
+
+\subsection{The ranking study}
+
+\begin{itemize}
+  \item \textbf{Real data for the community term.} Find a data set with follows, dated actions and dated community memberships. Hive was the one candidate, and it could not be accessed (Chapter~\ref{ch:discussion}). The community term carries the synthetic gain and has no real-data test.
+  \item \textbf{More users and a better measure of density.} Build the synthetic size L, which was cut from the plan, so that group 0--4 is larger. Measure social density also by the friend engagement in the pool, which H2 names and E3 did not use.
+  \item \textbf{Digg and the prior.} Run a larger $\alpha$ grid on Digg to test the reading about scale (Chapter~\ref{ch:discussion}); it would be exploratory, because the test split was used. Tune $m$ with $\alpha$ and $\beta$.
+  \item \textbf{A stronger time decay for Explore.} BL4 and BL5 beat BL2 on Digg, but not on the synthetic data. Test them on Breadit data first.
+  \item \textbf{A richer social signal.} Use 2 hops of the follow graph, let trust fade with time, and add learned social baselines such as SoRec~\refcite{ma2008} or DiffNet~\refcite{wu2019}.
+  \item \textbf{Real users.} A pilot with an impression log, then an online A/B test. If H1 then passes, \texttt{FEED\_DEFAULT\_ALGO} changes the default.
+\end{itemize}
+
+\subsection{The platform}
+
+Chapter 8 (Section~\ref{sec:test-bugs}) lists 8 open items that are future work: the four items of one schema migration (T6, N3, N10 and the schema part of R4) and four small items (R5, N7, N9 and B8).
+\begin{itemize}
+  \item \textbf{The schema migration.} T6: likes, saves and follows have no unique key, so two fast requests make a duplicate row; the migration removes the duplicates and adds the keys. With it come N3 (one conversation for a pair of users), N10 (one report for a user and a post) and the schema part of R4 (unused models and columns).
+  \item \textbf{R5.} The list of users to connect with is built in memory; page it in the database.
+  \item \textbf{N7.} Small API mistakes: an unknown profile gives 200 and not 404, \texttt{\%} in a search works as a wildcard, and an empty search returns a different response shape.
+  \item \textbf{N9.} Follow, unfollow and follow again sends the notification again.
+  \item \textbf{B8.} The notification of a comment like says ``liked your post''.
+\end{itemize}
+Six more items (B1, S4, S6, B5, R3 and R6) must be fixed before the app is put on a shared server, for example the fallback token secret (S6). Two kinds of test are also missing: the delay of a socket message, and an automatic test of the frontend.
+
+\subsection{Learned models}
+
+The pre-thesis report said that the For You feed had an offline pipeline with matrix factorization (LightFM). This was wrong. Breadit has no learned model. Before this thesis the For You feed was ordered by time only, and now it has three rule-based options (\texttt{chrono}, \texttt{engagement} and \texttt{social}); the default is still newest first. A learned recommender is a good next step: for example matrix factorization trained on likes, comments and reposts, with richer signals such as view time, which Breadit does not record today. It can be compared with the hybrid under the same protocol.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Closing remark}
+\label{sec:concl-close}
+
+The thesis set out to make the For You feed personal with the follow graph and the communities. On these data this does not help new users more than the current heuristic, and the hypotheses, the tuning and the test configs were frozen before the test split, so the negative answer is not an accident of the setup. Breadit now has a feed that can be ranked three ways, a test that tells which way is better, and a method that anyone can rebuild.
