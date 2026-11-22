@@ -223,7 +223,7 @@ ESM. The `.ts` files run directly on the pinned Node 22 (type stripping), tests 
 - **Checks** ✅ (`src/checks/`). Format, calibration against Digg, the social lift from W0 to W2H, the cut time T and the history bucket table.
 - **Harness** ✅ (`src/harness/`, `metrics.ts`, `stats.ts`). Runs a committed run config: picks each user's validation or test item, builds the pool and features as of that item's time, ranks with each method, and records the item's rank. Then it computes Recall@K, NDCG@K and coverage (K = 5, 10, 20), tunes parameters on the validation split, and compares methods with a paired bootstrap and a randomization test (10,000 each) with Holm correction. Since task 9 it also writes `compare.csv` (families F1 and F2 on `syn-W2M-M` and `digg2009`, or rows with no family), `density.csv` (E3), the H1 lines and the H0 gate line. A failed H0 gate stops the command after the files are written. Optional config keys give per-dataset params, a reversed tie-break (E6), the timestamp shuffle (E5) and the comparisons.
 - **`rank` command** ✅. Prints one ranking for one user at one time. The parity test uses it.
-- **Postgres loader** ✅ (task 7, `src/loader/`). `npm run load` writes a synthetic canonical dataset into its own Postgres schema `eval_load` (never `public`) with explicit ids, so the live app can run on it (parity test, E7, demo). It empties the schema and writes every row in one transaction. A like and a comment keep their `event_id`, and a repost becomes a `Post` row with `rePostId`. `npm run load:check` reads the rows back and checks that the six CSV files equal the manifest. It is the only part of `eval/` that imports `@prisma/client`. A demo-only `--rebase-to <time>` shifts all times by one constant so the last event lands on that time. Experiments never use it.
+- **Postgres loader** ✅ (task 7, `src/loader/`). `npm run load` writes a synthetic canonical dataset into its own Postgres schema `eval_load` (never `public`) with explicit ids, so the live app can run on it (parity test, E7). It empties the schema and writes every row in one transaction. A like and a comment keep their `event_id`, and a repost becomes a `Post` row with `rePostId`. `npm run load:check` reads the rows back and checks that the six CSV files equal the manifest. It is the only part of `eval/` that imports `@prisma/client`. A demo-only `--rebase-to <time>` shifts all times by one constant so the last event lands on that time. Experiments never use it. The demo (`npm run demo:start`, task `p10-demo-script`) loads with `--schema eval_demo --rebase-to <now>` into its own schema `eval_demo`, so the parity test and `thesis:repro` keep `eval_load` as they need it.
 - **`freeze` command** ✅ (task 9, `src/harness/freeze.ts`). Reads the committed tuning results, checks the tuning rule, and writes the ten P7 test configs with the chosen numbers. `--approve author` adds the author's approval of the test split, and `--check` proves that the configs still equal the tuning.
 - **Report** ✅ (task 9, `src/report/`). `npm run report` reads the P7 results folders (each file checked against its run manifest) and writes `.docs/results/p7-report/`: `macros.csv`, `results-macros.tex`, ten LaTeX tables, `results.md` (the same tables in Markdown) and the figure data of E2, E3 and E5 (`fig-e2-history.csv`, `fig-e3-density.csv`, `fig-e5-worlds.csv`). Every macro traces to one CSV cell, so the thesis text never contains a typed number.
 
@@ -233,9 +233,12 @@ ESM. The `.ts` files run directly on the pinned Node 22 (type stripping), tests 
 |---|---|---|
 | PostgreSQL 16, schema `public` | live app data (dev seed, demo users) | backend |
 | PostgreSQL 16, schema `it_test` | integration test data | backend IT tests |
-| PostgreSQL 16, schema `eval_load` | a loaded synthetic dataset with explicit ids, emptied and refilled by each `npm run load` (task 7 chose a separate schema) | parity test, E7, demo |
+| PostgreSQL 16, schema `eval_load` | a loaded synthetic dataset with explicit ids, emptied and refilled by each `npm run load` (task 7 chose a separate schema) | parity test, E7 |
+| PostgreSQL 16, schema `eval_demo` | `syn-W2M-M` loaded with `--rebase-to` the current time, plus one extra admin user (`demo_admin`); emptied and refilled by each `npm run demo:start` | demo |
 | Redis 7, db 0 | JSON cache, rate limit, Socket.IO adapter, token blacklist | backend |
 | Redis 7, db 1 | integration tests | backend IT tests |
+| Redis 7, db 2 | parity test and the E7 prepare step | backend parity test, E7 |
+| Redis 7, db 3 | the demo backend's cache, login counters and logout blacklist; emptied by `demo:start` and `demo:stop` (E7 also uses db 3, and the two never run together) | demo, E7 |
 | `eval/data/<datasetId>/` | canonical CSVs and `manifest.json` (git-ignored, rebuilt from the seed or the zips) | harness, checks, loader |
 | `.docs/results/<runId>/` | committed results CSVs and run manifest | thesis, report |
 | `datasets/raw/digg2009/` | the Digg zips (git-ignored, downloaded by hand) | Digg adapter |
@@ -543,7 +546,7 @@ Breadit/
 │   ├── Guidance-Manual/              # guidance manual
 │   └── Pre-thesis/                   # the pre-thesis package: report chapters, diagrams, ADRs, k6 scripts, its LaTeX in Latex/ · frozen
 ├── .claude/                          # workflow harness: /task, /bugfix, /approve, hooks, rules, templates
-├── scripts/                          # verify-bug-sweep.sh, verify-socket.cjs, dataset-humans.ps1, e7/ (E7 k6 script and runner), repro/ (thesis-repro.mjs, `npm run thesis:repro`)
+├── scripts/                          # verify-bug-sweep.sh, verify-socket.cjs, dataset-humans.ps1, e7/ (E7 k6 script and runner), repro/ (thesis-repro.mjs, `npm run thesis:repro`), demo/ (demo.mjs: `npm run demo:start`, `demo:users`, `demo:stop`; CHECKLIST.md for the presenter)
 ├── docker-compose.yml                # db (Postgres 16), redis (Redis 7), backend, frontend
 ├── Makefile                          # rebuild, backend-rebuild, frontend-rebuild, logs
 ├── package.json                      # npm workspaces: apps/*, packages/*, eval
@@ -569,4 +572,5 @@ Breadit/
 | Cost benchmark E7 | P7 · task 10 | ✅ |
 | `npm run thesis:repro`, merged manifest, tuned α and β in the app | P8 · task 11 | ✅ |
 | Default `algo`: For You stays as it is (H1 failed on both main tests) | P8 · task 11 | ✅ no code change |
-| Slides and demo | P10 · task 13 | 🔜 |
+| Demo script (`npm run demo:start`, checklist) | P10 · `p10-demo-script` | ✅ |
+| Slides | P10 · task 13 | 🔜 |
