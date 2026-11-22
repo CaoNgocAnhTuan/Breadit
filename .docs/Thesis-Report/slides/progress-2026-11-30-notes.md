@@ -93,7 +93,7 @@ The data is generated, so the posts have generated names.
 
 ## 19. Status
 Done: the data, the ranking package and the harness, the social feed in the app, the experiments, the repro command, Chapters 3 to 7, the demo.
-Left: the Chapter 4 figures, Chapters 1, 2 and 8, then Chapter 9, the abstract and the appendix after your feedback, the final checks, the defense slides and the freeze.
+Left: the Chapter 4 figures, then the changes from your feedback (all chapters are drafted), the final checks, the defense slides and the freeze.
 Update this slide before the talk if more chapters are finished.
 
 ## 20. Three questions
