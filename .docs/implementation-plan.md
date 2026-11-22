@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.24 · 2026-11-20 · Status: approved 2026-10-28
+Version 1.25 · 2026-11-22 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -268,7 +268,7 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 
 ## 5. Task list
 
-Written on 2026-10-28; the Status column was last updated on 2026-11-20. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
+Written on 2026-10-28; the Status column was last updated on 2026-11-22. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
 
 | Status | # | Task | Phase | Depends on | Scope (short) | Days | Ends | Bugs placed here |
 |---|---|---|---|---|---|---|---|---|
@@ -295,7 +295,7 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-20. ✅ mea
 | ✅ 11-20 | 20 | `p9-bug-quick-wins` | P9 | — | the open bugs a demo shows; README corrections of Bugs Report §7; the parity test stays green | 1 | — | R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7 |
 | ✅ 11-20 | 21 | `p10-demo-sweep` | P10 | 20 | run `verify-bug-sweep.sh` and `verify-socket.cjs` again, walk the demo path in Chrome, add new bugs to the Bugs Report | 0.5 | — | — |
 | ✅ 11-20 | 21b | `p10-demo-fixes` | P10 | 21 | V1–V5 of the demo sweep | — | — | V1–V5 |
-| ⬜ | 22 | `p10-demo-script` | P10 | 21 | `scripts/demo/`: load `syn-W2M-M` with `--rebase-to` now, start the app, two demo users (little and long history), a checklist (the three `algo` side by side, a live direct message, a notification, a ban that logs out), cleanup | 1 | — | — |
+| ✅ 11-22 | 22 | `p10-demo-script` | P10 | 21 | `scripts/demo/`: load `syn-W2M-M` with `--rebase-to` now, start the app, two demo users (little and long history), a checklist (the three `algo` side by side, a live direct message, a notification, a ban that logs out), cleanup | 1 | — | — |
 | ⬜ | 23 | Writing: Chapter 8 Test Cases and Demonstration | P9 | 22 | the test summary table, a demo rehearsal, about eight screenshots | 0.5 | — | — |
 | ⬜ | 24 | Writing: Chapters 1 and 2 | P9 | — | introduction; literature review from `.docs/related-work.md` | 1 | — | — |
 | ⬜ | 25 | Checks for the supervisor progress check | P9 ★ | 17–24 | `verify.sh`, `test:parity`, `results:manifest`, PDF build and page count, no typed numbers | 0.5 | — | — |
@@ -362,3 +362,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.22 · 2026-11-20 · §5 row 20 ✅: task `p9-bug-quick-wins` closed. R2 (interaction part), S5 (HTTP part), N2, R1, B7, B10, B2, B9, N5, N8 and R7 are fixed, and `dev:reset` is removed. No contract, rule or frozen value changed.
 - 1.23 · 2026-11-20 · §5 row 21 ✅: task `p10-demo-sweep` closed. All 28 pages and 15 flows walked in Chrome; 5 new findings V1–V5 in the Bugs Report §3.5, proposed for a short task `p10-demo-fixes` before row 22 (the author decides). No contract, rule or frozen value changed.
 - 1.24 · 2026-11-20 · §5 new row 21b ✅: task `p10-demo-fixes`. V1–V5 of the demo sweep are fixed (Bugs Report §5.5). No contract, rule or frozen value changed.
+- 1.25 · 2026-11-22 · §5 row 22 ✅: task `p10-demo-script`. `npm run demo:start|users|stop` (`scripts/demo/`) loads `syn-W2M-M` rebased to now into the new schema `eval_demo` with Redis database 3, adds the admin `demo_admin`, and picks the two demo users (`u0000000787`, history 2; `u0000000064`, history 28). Rehearsal: every checklist step PASS, no new bug. `eval_load` and the parity test are not touched. No contract, rule or frozen value changed.

@@ -42,7 +42,7 @@ If `start` prints other users, use those. The steps are the same.
 5. **A live notification.** In B, on the profile of the long user, click the heart of the first post. Watch the **Notifications** item in A's left bar.
    - Expected: the notification count in A goes up without a reload. The list in A (`/notifications`) shows "User 787 liked your post".
 
-6. **An admin ban logs the user out.** In A, click the account menu (the dots at the bottom of the left bar) and **Logout**. Sign in as the admin. Click **Admin Console**, then **Users**, search `u0000000787`, click **Ban**.
+6. **An admin ban logs the user out.** In A, click the account menu (the dots at the bottom of the left bar) and **Logout**. Sign in as the admin. The admin's For You is empty (the admin follows nobody), so do not show it. Click **Admin Console** in the left bar: it opens **Manage Users**. Search `u0000000787`, click **Ban**.
    - Expected: the row shows BANNED. In B, which stays on any page, the user is logged out at once and lands on `/sign-in?banned=true` with "Your account has been suspended."
    - Ban only the little user. Never ban `demo_admin` (an admin can ban themselves: known bug R6).
 
