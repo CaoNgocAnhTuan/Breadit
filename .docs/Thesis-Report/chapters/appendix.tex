@@ -1,2 +1,365 @@
 % Appendix. Draft: drafts/10-appendix.md
-% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand.
+% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. Appendix A has no experiment result:
+% it lists the test suites with their counts (facts of the code, counted on 2026-11-22). Appendix B (full tables) is added later below.
+% main.tex sets \chapter*{APPENDIX} before this file, so each appendix here is a starred \section.
+% Layout settings for this appendix only (they are put back at the end of Appendix A): the tables hold long file names.
+\setlength{\emergencystretch}{3em}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section*{Appendix A. Full test list}
+\addcontentsline{toc}{section}{Appendix A. Full test list}
+
+This appendix lists every test suite of the project, with its file and its number of tests, grouped by level. The counts are those of 2026-11-22, and they equal the totals of Table~\ref{tab:test-levels} in Chapter 8. A suite is one test file. A suite with 5 tests or fewer also lists its tests; for the others, the last column says what the suite covers. The letters and numbers in brackets (T1, S5, N4 and so on) are IDs of the Bugs Report of the project: the problem that the suite guards.
+
+\subsection*{A.1 Ranking package unit tests}
+
+Seven suites, 85 tests. Run with \texttt{npm run test -w @breadit/ranking}.
+
+{\scriptsize\singlespacing
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.0}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{4.2cm} >{\raggedright\arraybackslash}p{0.9cm} >{\raggedright\arraybackslash}p{9.8cm}@{}}
+  \caption{Unit tests of \texttt{packages/ranking/src}.}
+  \label{tab:app-ranking}\\
+  \toprule
+  File & Tests & What it covers \\
+  \midrule
+  \endfirsthead
+  \toprule
+  File & Tests & What it covers \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  \path{asof.spec.ts} & 5 & The as-of rule and the age of a post:\newline
+    -- an event before \texttt{asOf.t} is visible, whatever its id\newline
+    -- an event at \texttt{asOf.t} is visible only with an id smaller than \texttt{beforeEventId}\newline
+    -- an event at \texttt{asOf.t} is not visible when there is no \texttt{beforeEventId}\newline
+    -- an event after \texttt{asOf.t} is never visible\newline
+    -- the age is (\texttt{asOf.t} $-$ \texttt{createdAt}) / 3600 \\
+  \addlinespace[2pt]
+  \path{determinism.spec.ts} & 3 & No clock, no randomness, no outside import:\newline
+    -- the detector finds each forbidden pattern and honours \texttt{harness-allow}\newline
+    -- it allows \texttt{node:} modules and relative files, and finds every other import\newline
+    -- the package source has no forbidden pattern and no import outside \texttt{node:} modules and package files \\
+  \addlinespace[2pt]
+  \path{explore.spec.ts} & 4 & The Explore score:\newline
+    -- it equals the old backend function on a fixed table of inputs\newline
+    -- it equals the old backend function on a grid of small inputs\newline
+    -- it gives hand-computed values (1 per like, 2 per comment, 3 per repost, minus 0.25 per hour, times 100)\newline
+    -- it returns an integer \\
+  \addlinespace[2pt]
+  \path{features.spec.ts} & 14 & The as-of features of a user (follows, memberships, positives) and of a post (likes, comments, reposts, engagers); events at or after \texttt{asOf} do not count \\
+  \addlinespace[2pt]
+  \path{pool.spec.ts} & 13 & \texttt{buildPool}: the window edges, own posts, earlier positives, blocked authors, deleted and unapproved posts, the cap and ties \\
+  \addlinespace[2pt]
+  \path{rank.spec.ts} & 9 & \texttt{rankPool}: order by score and post id, input order does not matter, a NaN score throws, the \texttt{id-asc} tie rule \\
+  \addlinespace[2pt]
+  \path{scorers.spec.ts} & 37 & The 13 scorers: BL0 and BL1, BL2, BL2t and BL3, BL4 and BL5, BL6, H and its ablations, the errors of \texttt{scorer}, and random fixtures \\
+  \addlinespace[2pt]
+  \textbf{Total} & \textbf{85} & \\
+\end{longtable}}
+
+\subsection*{A.2 Backend unit tests}
+
+Eighteen suites, 211 tests. Run with \texttt{npm run test -w @breadit/backend} (the Jest project \texttt{unit}). Prisma and Redis are replaced by test doubles.
+
+{\scriptsize\singlespacing
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.0}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{5.2cm} >{\raggedright\arraybackslash}p{0.9cm} >{\raggedright\arraybackslash}p{8.8cm}@{}}
+  \caption{Unit tests of \texttt{apps/backend/src}.}
+  \label{tab:app-unit}\\
+  \toprule
+  File & Tests & What it covers \\
+  \midrule
+  \endfirsthead
+  \toprule
+  File & Tests & What it covers \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  \path{all-exceptions.filter.spec.ts} & 9 & \texttt{AllExceptionsFilter}: Prisma errors become 400, 404 or 409 (T7), no database detail in the message, other errors become 500 \\
+  \addlinespace[2pt]
+  \path{auth/banned-guard-coverage.spec.ts} & 6 & \texttt{BannedUserGuard} is on every write route, with \texttt{JwtAuthGuard} first (S3) \\
+  \addlinespace[2pt]
+  \path{auth/session.spec.ts} & 7 & \texttt{readSession}: good, bad, expired and logged-out tokens (S5) \\
+  \addlinespace[2pt]
+  \path{common/limits.spec.ts} & 4 & Text limits:\newline
+    -- they match the database column sizes\newline
+    -- an emoji counts as one character, like Postgres\newline
+    -- B3: exactly the maximum is allowed, one more is rejected\newline
+    -- \texttt{undefined} is not too long \\
+  \addlinespace[2pt]
+  \path{common/parse-cursor.spec.ts} & 15 & \texttt{parseCursor}: bad, missing and repeated cursors (T7) \\
+  \addlinespace[2pt]
+  \path{common/validators/image-ref.spec.ts} & 25 & The rule \texttt{@IsImageRef} for avatars and covers, and its allowed hosts (N4) \\
+  \addlinespace[2pt]
+  \path{communities/communities.service.spec.ts} & 5 & Cache after a ban or a delete of a community (B6):\newline
+    -- a ban clears \texttt{graph:communities} and bumps \texttt{v:user} of the target, after the transaction\newline
+    -- no cache change when the actor is not a mod or an owner\newline
+    -- no cache change when the target is the owner\newline
+    -- a delete reads the member ids inside the transaction, then clears and bumps every former member after it\newline
+    -- no cache change when the caller is not the owner \\
+  \addlinespace[2pt]
+  \path{feed/feed.config.spec.ts} & 11 & \texttt{readFeedConfig}: \texttt{FEED\_DEFAULT\_ALGO} and \texttt{FEED\_ASOF\_ENABLED}, wrong values, the flag in production \\
+  \addlinespace[2pt]
+  \path{feed/feed.constants.spec.ts} & 7 & The constants of the feed equal \path{frozen-v1.json} and the approved run config \path{p7-main.json} \\
+  \addlinespace[2pt]
+  \path{feed/feed.cursor.spec.ts} & 28 & The cursor \texttt{t:score:id}: reading, writing, the 24 hour rule, and the page after a cursor \\
+  \addlinespace[2pt]
+  \path{feed/feed.mapping.spec.ts} & 9 & Prisma rows to the plain types of the package, whole seconds, the bounds of the window \\
+  \addlinespace[2pt]
+  \path{feed/feed.options.spec.ts} & 18 & \texttt{resolveFeedOptions}: the rules for \texttt{algo} and \texttt{asOf} \\
+  \addlinespace[2pt]
+  \path{feed/feed.service.spec.ts} & 10 & \texttt{FeedService.rank} equals the package called by hand; the queries it makes; it does not read the clock \\
+  \addlinespace[2pt]
+  \path{notifications/notifications.gateway.spec.ts} & 20 & The gateway: authentication before the connection, own room, \texttt{joinConversation}, typing events (S1, S5) \\
+  \addlinespace[2pt]
+  \path{posts/engagement.spec.ts} & 6 & \texttt{engagementSelect}: counts ignore soft-deleted reposts and comments (T1, T2) \\
+  \addlinespace[2pt]
+  \path{posts/posts.service.spec.ts} & 3 & Cache version of the author (T3):\newline
+    -- create bumps the author after the row is written\newline
+    -- remove bumps the author after the row is updated\newline
+    -- remove of a post that is not yours bumps nothing \\
+  \addlinespace[2pt]
+  \path{throttle/throttle.config.spec.ts} & 14 & \texttt{readThrottleLimit}: the default 1,000 and the reading of \texttt{THROTTLE\_LIMIT} (N6) \\
+  \addlinespace[2pt]
+  \path{users/users.service.spec.ts} & 14 & Follow, block, suggestions and private profile fields (T5, T8, T9, S2) \\
+  \addlinespace[2pt]
+  \textbf{Total} & \textbf{211} & \\
+\end{longtable}}
+
+\subsection*{A.3 Backend integration tests}
+
+Fourteen files, 171 tests. Run with \texttt{npm run test:it -w @breadit/backend} (the Jest project \texttt{it}). The tests start the real app on the Postgres schema \texttt{it\_test} and Redis database 1. A table-driven test counts once for each row of its table.
+
+{\scriptsize\singlespacing
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.0}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{4.2cm} >{\raggedright\arraybackslash}p{0.9cm} >{\raggedright\arraybackslash}p{9.8cm}@{}}
+  \caption{Integration tests of \texttt{apps/backend/test/it}.}
+  \label{tab:app-it}\\
+  \toprule
+  File & Tests & What it covers \\
+  \midrule
+  \endfirsthead
+  \toprule
+  File & Tests & What it covers \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  \path{avatar.it-spec.ts} & 8 & Avatar and cover URLs (N4) \\
+  \addlinespace[2pt]
+  \path{community-post.it-spec.ts} & 5 & Who may post in a community (D1):\newline
+    -- a non-member gets 403 and no post is made\newline
+    -- a banned user gets the ban 403, not the join one\newline
+    -- a plain member gets 201 and the post waits for approval\newline
+    -- the owner gets 201 and the post is approved\newline
+    -- a post with no community is not affected \\
+  \addlinespace[2pt]
+  \path{counts.it-spec.ts} & 8 & Counts ignore soft-deleted reposts and comments, likes are unchanged (T1, T2) \\
+  \addlinespace[2pt]
+  \path{demo-fixes.it-spec.ts} & 3 & Approving a community post:\newline
+    -- V3: approve keeps \texttt{updatedAt}, so the post does not look edited\newline
+    -- V4: after the owner approves, the owner reads the post at once\newline
+    -- V4: after a mod approves, the mod and the author read the post at once \\
+  \addlinespace[2pt]
+  \path{explore-asof.it-spec.ts} & 3 & Explore with \texttt{asOf} (T4):\newline
+    -- two calls with the same \texttt{asOf} give byte-identical pages and cursors\newline
+    -- a guest gets the same pages as a user with no blocks, byte for byte\newline
+    -- a post 8 days before \texttt{asOf} is not in Explore, one 1 day before is \\
+  \addlinespace[2pt]
+  \path{feed-algo.it-spec.ts} & 11 & The \texttt{algo} feeds: For You without \texttt{algo}, the fixture rules for each \texttt{algo}, the HTTP order equals \texttt{FeedService.rank}, a follow stored twice (T6), paging, an empty pool \\
+  \addlinespace[2pt]
+  \path{feed-default.it-spec.ts} & 3 & The default \texttt{algo}:\newline
+    -- For You without \texttt{algo} gives the same body as \texttt{algo=social} at the same \texttt{asOf}\newline
+    -- an explicit \texttt{algo} still wins over the default\newline
+    -- the default does not apply to a guest, to Following or to a profile \\
+  \addlinespace[2pt]
+  \path{feed-options.it-spec.ts} & 16 & The input rules of \texttt{algo} and \texttt{asOf}, the cursor, the flag \texttt{FEED\_ASOF\_ENABLED} and the refusal to start \\
+  \addlinespace[2pt]
+  \path{graph.it-spec.ts} & 11 & Follow and block rules, recommendations and the connect list (T5, T8, T9) \\
+  \addlinespace[2pt]
+  \path{health.it-spec.ts} & 2 & The test app:\newline
+    -- it boots the real app and answers \texttt{GET /api/health}\newline
+    -- it answers 401 on a protected route without a cookie \\
+  \addlinespace[2pt]
+  \path{input-errors.it-spec.ts} & 53 & Bad or missing ids, bad cursors on eleven routes, text length limits, empty posts and comments, other unknown ids (T7, B3, N1) \\
+  \addlinespace[2pt]
+  \path{quick-wins.it-spec.ts} & 22 & The fixes of task \texttt{p9-bug-quick-wins}: the logout blacklist on public routes (S5), no action on a pending post (R2), blocked comments (N2), reply counts (R1), trending hashtags (B7), the unread cache (B10), the community slug (B2) \\
+  \addlinespace[2pt]
+  \path{socket.it-spec.ts} & 9 & Real Socket.IO clients: a client cannot take another user's room or push a fake notification, typing events for members only, logged-out and missing cookies cannot connect, \texttt{accountBanned} arrives (S1, S5) \\
+  \addlinespace[2pt]
+  \path{visibility.it-spec.ts} & 17 & Posts waiting for approval, private profile fields, banned users cannot write (T10, S2, S3) \\
+  \addlinespace[2pt]
+  \textbf{Total} & \textbf{171} & \\
+\end{longtable}}
+
+\subsection*{A.4 Parity test}
+
+{\small\singlespacing
+One file, \path{apps/backend/test/parity/parity.parity-spec.ts}, with 102 tests. Run with \texttt{npm run test:parity -w @breadit/backend} (the Jest project \texttt{parity}); it reads the schema \texttt{eval\_load} and Redis database 2. One test checks that the map of \texttt{algo} to method and the parameters of the backend equal the parity sample. One test checks that the committed files are the ones the manifest describes: 100 pairs and 300 expected rows. Then one test for each of the 100 pairs: for each of the three \texttt{algo} values, the whole order of \texttt{FeedService.rank} and the first two pages of \texttt{GET /api/posts} equal the harness order.\par}
+
+\subsection*{A.5 Evaluation tests}
+
+Forty-three files, 434 tests. Run with \texttt{npm run verify -w @breadit/eval}, which runs the type check (\texttt{tsc --noEmit}) and then \texttt{node --test}.
+
+{\scriptsize\singlespacing
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.0}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{4.2cm} >{\raggedright\arraybackslash}p{0.9cm} >{\raggedright\arraybackslash}p{9.8cm}@{}}
+  \caption{Tests of \texttt{eval/src}.}
+  \label{tab:app-eval}\\
+  \toprule
+  File & Tests & What it covers \\
+  \midrule
+  \endfirsthead
+  \toprule
+  File & Tests & What it covers \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  \path{adapters/digg-parse.test.ts} & 25 & The parser of the Digg vote and friend files: line ends, the last line, the error messages \\
+  \addlinespace[2pt]
+  \path{adapters/digg.test.ts} & 24 & The Digg adapter: the config, the hashes of the zips, the mapping, two runs give the same files \\
+  \addlinespace[2pt]
+  \path{adapters/zip.test.ts} & 11 & The reader of the password-protected zip files (ZipCrypto): right and wrong password, damaged data, kinds of zip that it refuses \\
+  \addlinespace[2pt]
+  \path{bench/e7.test.ts} & 17 & The helpers of the E7 benchmark: median, bootstrap median \\
+  \addlinespace[2pt]
+  \path{bench/write.test.ts} & 10 & The summary files of the E7 benchmark and their manifest \\
+  \addlinespace[2pt]
+  \path{canonical/canonical.test.ts} & 8 & The six canonical tables, the writer and the strict reader \\
+  \addlinespace[2pt]
+  \path{checks/buckets.test.ts} & 15 & The cut time $T$, the test items and the history groups \\
+  \addlinespace[2pt]
+  \path{checks/calibration.test.ts} & 9 & The calibration of the generated data to the Digg targets \\
+  \addlinespace[2pt]
+  \path{checks/format.test.ts} & 19 & The format checks of a dataset: follow and interaction rules, community membership at the time of the post, sorting, line ends, and the files against the manifest \\
+  \addlinespace[2pt]
+  \path{checks/lift.test.ts} & 5 & The social lift check:\newline
+    -- every action on an exposed post gives a lift above 1\newline
+    -- with no follows the lift is not computed, and the report says so\newline
+    -- a follow dated at or after the action does not count\newline
+    -- a post a followee acted on before is exposed\newline
+    -- an action by the followee after the follower's action does not expose it \\
+  \addlinespace[2pt]
+  \path{checks/pool-crosscheck.test.ts} & 1 & \texttt{buildPool} agrees with \texttt{inPool} and \texttt{poolSize} on random fixtures \\
+  \addlinespace[2pt]
+  \path{checks/run.test.ts} & 10 & \texttt{checkAll} on a generated dataset (it passes, it is repeatable, it fails on a changed file or an empty folder), the commands \texttt{check} and \texttt{gen}, and the bucket table for \texttt{digg2009} and \texttt{syn-W2M-M} \\
+  \addlinespace[2pt]
+  \path{forbidden.test.ts} & 2 & No clock and no unseeded randomness in \path{eval/src}:\newline
+    -- the detector finds each forbidden pattern and honours \texttt{harness-allow}\newline
+    -- there is no forbidden pattern in \path{eval/src} \\
+  \addlinespace[2pt]
+  \path{frozen.test.ts} & 10 & The frozen values (seed, epoch, sizes, history groups, window and pool cap, cut times, grids) equal the super-plan; the check of the Node version \\
+  \addlinespace[2pt]
+  \path{generator/config.test.ts} & 4 & The generator parameters:\newline
+    -- every parameter is marked calibrated or chosen, and a calibrated one has a target\newline
+    -- the targets come from the config\newline
+    -- \texttt{makeParams} reads the sizes and the epoch span from the frozen values\newline
+    -- the three W2 cells differ only in influence, at the same homophily as W1 \\
+  \addlinespace[2pt]
+  \path{generator/generate.test.ts} & 7 & The eight dataset ids, two runs give byte-identical files, the keys of the manifest \\
+  \addlinespace[2pt]
+  \path{generator/stages.test.ts} & 22 & The stages of the generator: users, follows, communities, posts, interactions and the activity counts \\
+  \addlinespace[2pt]
+  \path{harness/commands.test.ts} & 11 & The commands \texttt{harness} and \texttt{rank}: output, two runs equal, the approval of the test split, the H0 gate \\
+  \addlinespace[2pt]
+  \path{harness/compare.test.ts} & 11 & The comparison files: the families of tests, the $p$-values and the Holm correction \\
+  \addlinespace[2pt]
+  \path{harness/config.test.ts} & 13 & The validation of a run config: split approval, params, grids, pool, \texttt{datasetParams}, compare, density and the H0 gate \\
+  \addlinespace[2pt]
+  \path{harness/freeze.test.ts} & 9 & \texttt{freeze}: the ten test configs and the approval line \\
+  \addlinespace[2pt]
+  \path{harness/index-data.test.ts} & 5 & The index of the harness:\newline
+    -- user ids are \texttt{u} plus 10 digits and sort like the integers\newline
+    -- history counts equal \texttt{historyCount} of \path{buckets.ts}, ties broken by event id\newline
+    -- \texttt{positiveEvents} are sorted by $(t, \text{id})$, and the index accepts unsorted input\newline
+    -- \texttt{windowCandidates} gives the posts with $t - W \le \text{createdAt} < t$\newline
+    -- \texttt{followeeEngagement} lists, per post, the followees with a visible positive \\
+  \addlinespace[2pt]
+  \path{harness/post-features.test.ts} & 2 & Fast and reference post features:\newline
+    -- they give the same counts and scores on random datasets\newline
+    -- they give the same scores on \texttt{syn-W2M-S} \\
+  \addlinespace[2pt]
+  \path{harness/run.test.ts} & 21 & The harness run: golden dataset (hand work, files), leakage, fast against reference mode, the $T$ guard, the large pool, tie rule, labels \\
+  \addlinespace[2pt]
+  \path{harness/shuffle.test.ts} & 8 & The shuffled-engagers control: valid output, repeatable, not a no-op \\
+  \addlinespace[2pt]
+  \path{harness/split.test.ts} & 6 & The validation and test items of a user \\
+  \addlinespace[2pt]
+  \path{harness/tuning.test.ts} & 9 & The frozen grids, the best value by NDCG@10, tuning on the golden dataset \\
+  \addlinespace[2pt]
+  \path{harness/write.test.ts} & 4 & Result files:\newline
+    -- the four files and a manifest with rows and SHA-256 of each\newline
+    -- a \texttt{per\_user.csv} over the limit goes to the external folder, and its hash stays in the manifest\newline
+    -- two writes into two empty folders give byte-identical files (double run)\newline
+    -- rows are sorted by dataset, split, method order and user id \\
+  \addlinespace[2pt]
+  \path{imports.test.ts} & 3 & Where \texttt{@prisma/client} may be imported:\newline
+    -- the detector finds each form of import and ignores comments\newline
+    -- no file outside \path{src/loader/} imports it\newline
+    -- inside \path{src/loader/}, only \path{db.ts} imports it \\
+  \addlinespace[2pt]
+  \path{loader/ids.test.ts} & 5 & Ids of the loader:\newline
+    -- \texttt{appUserId} is \texttt{u} plus the integer padded to 10 digits\newline
+    -- \texttt{appUserId} refuses a number that is not a non-negative integer or has more than 10 digits\newline
+    -- \texttt{canonicalUserId} reverses \texttt{appUserId} and refuses anything else\newline
+    -- \texttt{repostOffset} is the largest post id, and 0 for no posts\newline
+    -- \texttt{PASSWORD\_HASH} looks like a bcrypt hash of cost 10 \\
+  \addlinespace[2pt]
+  \path{loader/map.test.ts} & 16 & The mapping between the CSV tables and the app rows, and back \\
+  \addlinespace[2pt]
+  \path{loader/target.test.ts} & 7 & The target schema: only names \texttt{eval\_\ldots{}}, never \texttt{public} \\
+  \addlinespace[2pt]
+  \path{loader/time.test.ts} & 9 & \texttt{--rebase-to}: the accepted format and the shift \\
+  \addlinespace[2pt]
+  \path{metrics.test.ts} & 10 & Recall, NDCG and coverage, with hand values \\
+  \addlinespace[2pt]
+  \path{parity/expected.test.ts} & 5 & The expected orders of the parity sample:\newline
+    -- the map of \texttt{algo} to method is chrono BL0, engagement BL2, social H\newline
+    -- one row for each pair and \texttt{algo}, in a fixed order\newline
+    -- the expected orders equal \texttt{rankAt} for each pair and method\newline
+    -- the top of each row is what the \texttt{rank} command prints\newline
+    -- \texttt{orderSha256} is the SHA-256 of the ids joined by newlines \\
+  \addlinespace[2pt]
+  \path{parity/sample.test.ts} & 9 & The draw of the 100 parity pairs \\
+  \addlinespace[2pt]
+  \path{parity/write.test.ts} & 5 & The files of the parity sample:\newline
+    -- two writes give byte-identical files\newline
+    -- \path{pairs.csv} has the columns of the design\newline
+    -- \path{expected.csv} has one row for each pair and \texttt{algo}\newline
+    -- \path{orders.csv} has the whole orders and stays out of the committed folder\newline
+    -- \path{manifest.json} has the params, the map, the epoch, the counts and the hashes \\
+  \addlinespace[2pt]
+  \path{report/macros.test.ts} & 9 & The names and values of the LaTeX macros \\
+  \addlinespace[2pt]
+  \path{report/report.test.ts} & 13 & The report: every file of the design, the manifest, two runs give the same bytes \\
+  \addlinespace[2pt]
+  \path{report/round.test.ts} & 6 & Decimal rounding for the tables \\
+  \addlinespace[2pt]
+  \path{repro/merged.test.ts} & 16 & The merged manifest and its compare (Class D and Class R) \\
+  \addlinespace[2pt]
+  \path{rng.test.ts} & 7 & The seeded random streams: equal seed and stage give equal sequences, a known-answer vector, range and bias, an unknown stage \\
+  \addlinespace[2pt]
+  \path{stats.test.ts} & 16 & The paired bootstrap, the randomization test (exact and sampled), the Holm correction, the H1 and H0 decisions and the comparison file \\
+  \addlinespace[2pt]
+  \textbf{Total} & \textbf{434} & \\
+\end{longtable}}
+
+\subsection*{A.6 Demo helper tests, replay and manual checks}
+
+{\small\singlespacing
+\textbf{Demo helper tests.} One file, \path{scripts/demo/lib.test.mjs}, with 22 tests, run with \texttt{node --test}. They cover \texttt{rebaseIso} (3 tests), \texttt{feedIds} (3), \texttt{pagesNotAllSame} (4), \texttt{overlap} (1), \texttt{orderCandidates} (6) and \texttt{pickUser} (5).
+
+\textbf{HTTP and Socket.IO replay.} \path{scripts/verify-bug-sweep.sh} makes 84 curl checks against a running backend and runs \path{scripts/verify-socket.cjs}, which makes 11 Socket.IO checks. The last run, on 2026-11-20, gave 95 passed and 0 failed.
+
+\textbf{Manual checks.} The UI sweep of 2026-11-20 walked 28 pages and 15 flows in Chrome (\path{.docs/works/2026-11-20-p10-demo-sweep/sweep.md}). The demo rehearsal of 2026-11-22 played 9 steps (\path{.docs/works/2026-11-22-p10-demo-script/rehearsal.md}). Chapter 8 gives their results.\par}
+\setlength{\emergencystretch}{0pt}
+
+%% Appendix B (full tables) is added here by a later task.

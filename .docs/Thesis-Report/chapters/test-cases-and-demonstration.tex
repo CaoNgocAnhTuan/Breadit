@@ -1,2 +1,213 @@
 % Chapter 8. Test Cases and Demonstration. Draft: drafts/08-test-cases-and-demonstration.md
-% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand.
+% Numbers: macros only (\resultsdir/results-macros.tex), never typed by hand. This chapter has no experiment result:
+% it points to Chapter 6. The test counts are facts of the code (counted on 2026-11-22) and are typed; Appendix A lists them by suite.
+% The \chapter command is in main.tex, so this file starts with the introduction and then the sections.
+% This chapter cites no reference, so it adds no key to references.tex.
+% Figures: \thesisdiagram{<name>}{<width>} (macro in main.tex) shows images/<name>.png; the eight names are fig8-1 to fig8-8.
+% Layout settings for this chapter only (they are put back at the end of this file): the tables hold long file names,
+% and the figures may sit at the top of a page with text below them, so no page is left half empty.
+\setlength{\emergencystretch}{3em}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.8}
+
+\label{ch:tests}
+
+This chapter shows how we know that the platform works. Section~\ref{sec:test-strategy} summarizes the test levels in one table. Section~\ref{sec:test-cases} describes the twelve test cases that matter most for the thesis. Section~\ref{sec:test-bugs} says what the tests and the checks found. Section~\ref{sec:test-demo} shows the demonstration with eight screenshots. Section~\ref{sec:impl-tests} says how the tests run, and Appendix~A lists every test suite. This chapter gives no experiment result. Chapter 6 gives them.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Test strategy and summary}
+\label{sec:test-strategy}
+
+The strategy has four parts.
+\begin{itemize}
+  \item The ranking code is pure, so it is tested without a database: the same input must give the same output.
+  \item The app is tested as a whole on a real PostgreSQL and a real Redis. The integration tests start the real app, and the Socket.IO tests connect real clients.
+  \item One test ties the two parts together. The parity test checks that the live feed gives the same order as the evaluation harness (test case TC-07).
+  \item The frontend has no automatic test. It is checked by hand in Chrome, and at the end by the rehearsal of the demo.
+\end{itemize}
+Table~\ref{tab:test-levels} gives one row for each level.
+
+{\footnotesize\singlespacing
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.1}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.3cm} >{\raggedright\arraybackslash}p{4.6cm} >{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}p{1.7cm} >{\raggedright\arraybackslash}p{1.8cm}@{}}
+  \caption{The test levels, with the counts of 2026-11-22.}
+  \label{tab:test-levels}\\
+  \toprule
+  Level & What it checks & Tool and command & Tests & Result \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Level & What it checks & Tool and command & Tests & Result \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  Ranking unit tests & The pure ranking code: the as-of rule, the pool, the features, the 13 scorers, the final sort, the Explore score, and the ban on clock and randomness & Jest, \path{packages/ranking}; \texttt{npm run test -w @breadit/ranking} & 85 in 7 suites & 85 pass \\
+  \midrule
+  Backend unit tests & Services, guards, the feed module (options, cursor, constants, mapping), the gateway and the input rules; Prisma and Redis are test doubles & Jest project \texttt{unit}; \texttt{npm run test -w @breadit/backend} & 211 in 18 suites & 211 pass \\
+  \midrule
+  Backend integration tests & The real app on a real Postgres schema (\texttt{it\_test}) and Redis database 1: feeds, visibility, input errors, counts, socket authentication & Jest project \texttt{it}, \path{apps/backend/test/it/}; \texttt{npm run test:it -w @breadit/backend} & 171 in 14 files & 171 pass \\
+  \midrule
+  Parity test & The live order equals the harness order: \texttt{syn-W2M-M}, 100 pairs of a user and a time, 3 \texttt{algo} values & Jest project \texttt{parity}; \texttt{npm run test:parity -w @breadit/backend} & 102 & 102 pass \\
+  \midrule
+  Evaluation checks & The type check, then the tests of the evaluation code: generator, Digg adapter, harness (golden, leakage, double run), loader, report, manifests & \texttt{npm run verify -w @breadit/eval} (\texttt{tsc}, then \texttt{node --test}) & 434 in 43 files & type check clean, 434 pass \\
+  \midrule
+  Demo helper tests & The helpers of the demo script: the start time, the choice of the two users, the comparison of feeds & \texttt{node --test} \path{scripts/demo/lib.test.mjs} & 22 & 22 pass \\
+  \midrule
+  HTTP and Socket.IO replay & The curl checks of the bug sweep against a running backend, and the Socket.IO checks & \texttt{bash} \path{scripts/verify-bug-sweep.sh}, which runs \path{scripts/verify-socket.cjs} & 95 checks (11 on sockets) & 95 pass \\
+  \midrule
+  Manual UI sweep & Every page and every user flow, driven in Chrome (record \texttt{.docs/works/\allowbreak 2026-11-20-\allowbreak p10-\allowbreak demo-\allowbreak sweep/\allowbreak sweep.md}) & Chrome & 28 pages, 15 flows & 15 flows pass; 24 pages pass, 4 fail (2 are V1, fixed since; 2 are T6, open) \\
+  \midrule
+  Demo rehearsal & The steps of the demo checklist on the demo data (record \texttt{.docs/works/\allowbreak 2026-11-22-\allowbreak p10-\allowbreak demo-\allowbreak script/\allowbreak rehearsal.md}) & Chrome and a script & 9 steps & 9 pass \\
+\end{longtable}}
+
+The first six rows are automatic tests: 1,025 tests in all, and all of them pass. The replay, the sweep and the rehearsal are checks that a person starts, so we count them apart. The parity test and the integration tests need \texttt{docker compose up db redis -d}, and the parity test also needs \texttt{syn-W2M-M} loaded into the schema \texttt{eval\_load}.
+
+Two things are not tested. No test measures the speed of the feed or the delay of a socket message. The cost of one feed page is measured in experiment E7 (Section~\ref{sec:results-e7}), and the thesis sets no delivery time target (NFR4 in Table~\ref{tab:design-nfr}). And there is no browser test suite, so the frontend is covered only by what a person sees in Chrome.
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Selected test cases}
+\label{sec:test-cases}
+
+Table~\ref{tab:test-cases} lists twelve test cases. Each one guards a claim of the thesis: the evaluation is correct and repeatable, the live feed is the evaluated feed, and the real-time and admin parts of the platform work. The IDs TC-01 to TC-12 are used only in this chapter. The column ``File and test'' gives the file and the name of the test, so that the test can be found. Every case passed on 2026-11-22.
+
+{\footnotesize\singlespacing
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.1}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{1.0cm} >{\raggedright\arraybackslash}p{2.4cm} >{\raggedright\arraybackslash}p{3.8cm} >{\raggedright\arraybackslash}p{2.3cm} >{\raggedright\arraybackslash}p{3.7cm} >{\raggedright\arraybackslash}p{1.0cm}@{}}
+  \caption{Twelve selected test cases.}
+  \label{tab:test-cases}\\
+  \toprule
+  ID & Purpose & Steps & Expected result & File and test & Result \\
+  \midrule
+  \endfirsthead
+  \toprule
+  ID & Purpose & Steps & Expected result & File and test & Result \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endlastfoot
+  TC-01 & The ranking code uses no clock and no random source & Search every source file of \path{packages/ranking} for nine patterns (\texttt{Date.now}, \texttt{new Date()}, \texttt{Math.random}, \texttt{localeCompare}, \texttt{.sort()} without a compare function and others) and for any import that is not a \texttt{node:} module or a file of the package & No match & \path{packages/ranking/src/determinism.spec.ts}, ``has no forbidden pattern and no import outside node: modules and ./ files'' & Pass \\
+  \midrule
+  TC-02 & The harness computes the right ranks and metrics & Run all 13 methods on the golden dataset (9 users, 12 posts, 33 likes, comments and reposts); compare the ranks of users 4, 1 and 7 with a table worked out by hand, and the result files with committed files & Ranks and metrics equal the hand work; files equal byte for byte & \path{eval/src/harness/run.test.ts}, ``golden: ranks of users 4, 1 and 7 equal the hand work'' and ``golden: the validation CSV files equal the committed expected files byte for byte'' & Pass \\
+  \midrule
+  TC-03 & No leakage: the future never changes a ranking & For each user, delete, change or stuff with new events everything after the user's test item, and rank again & The rows of that user do not change (all golden users, and 30 users of \texttt{syn-W2M-S}) & \path{eval/src/harness/run.test.ts}, ``leakage, golden'' and ``leakage, syn-W2M-S: 30 users'' & Pass \\
+  \midrule
+  TC-04 & The fast harness equals the slow reference & Compute the features with the fast index and with the reference code that visits every event, on the golden dataset and on \texttt{syn-W2M-S} & The \texttt{per\_user} rows are byte-identical & \path{eval/src/harness/run.test.ts}, ``fast and reference modes give byte-identical per\_user rows'' & Pass \\
+  \midrule
+  TC-05 & A run can be repeated (the double run) & Run one config into two empty folders & Every file, the manifest included, is byte-identical & \path{eval/src/harness/commands.test.ts}, ``harness runs a config into --out \ldots{} and runs twice to the same bytes'' & Pass \\
+  \midrule
+  TC-06 & The live feed uses the frozen and tuned values & Compare \texttt{POOL\_PARAMS}, \texttt{PRIOR\_M} and \texttt{SOCIAL\_PARAMS} of the backend with \path{frozen-v1.json} and with the approved run config \path{p7-main.json} & Equal & \path{apps/backend/src/feed/feed.constants.spec.ts}, ``TC1: alpha and beta equal the approved H params of syn-W2M-M in p7-main.json'' & Pass \\
+  \midrule
+  TC-07 & The live feed gives the order of the evaluation (parity) & For each of 100 pairs and each of the 3 \texttt{algo} values: compare the whole order of \texttt{FeedService.rank} (size and SHA-256) and the first two pages of \texttt{GET /api/posts} with the harness & Equal; the first 20 posts are equal & \path{apps/backend/test/parity/parity.parity-spec.ts}, one test for each pair & 102 of 102 pass \\
+  \midrule
+  TC-08 & The test-only \texttt{asOf} cannot reach production & Start the app with \texttt{FEED\_\allowbreak ASOF\_\allowbreak ENABLED=true} and \texttt{NODE\_\allowbreak ENV=production}; call the feed with \texttt{asOf} while the flag is off & The app does not start; the call gives 400 & \path{apps/backend/test/it/feed-options.it-spec.ts}, ``F12: the backend does not start with the flag on and NODE\_\allowbreak ENV=production'' and ``with the flag off, asOf is 400'' & Pass \\
+  \midrule
+  TC-09 & Paging stays at one time $t$ & Walk all pages of 27 posts at a fixed \texttt{asOf}, for each \texttt{algo}; ask page 2 two seconds after page 1, without \texttt{asOf} & No repeat and no gap; the order equals \texttt{FeedService.\allowbreak rank} & \path{apps/backend/test/it/feed-algo.it-spec.ts}, ``DW7: paging'' (2 tests) & Pass \\
+  \midrule
+  TC-10 & The feed leaves out what it must, blocked users included & Build a fixture with blocked, own, deleted, pending, repost-row, reply, old and future posts; read the feed for each \texttt{algo} & Only the three allowed posts, in the order of \texttt{FeedService.\allowbreak rank} & \path{apps/backend/test/it/feed-algo.it-spec.ts}, ``DW5: the fixture rules'' & Pass \\
+  \midrule
+  TC-11 & A socket is the user of the cookie, not the name it claims & Alice sends \texttt{newUser} with Bob's name; Carol sends Bob a direct message & Alice gets no message; Bob gets it & \path{apps/backend/test/it/socket.it-spec.ts}, ``S1: alice claims to be bob with newUser and still does NOT get bob's DM'' & Pass \\
+  \midrule
+  TC-12 & A ban logs the user out at once & A user is connected; an admin bans the user; the banned user writes with a valid cookie & The socket gets \texttt{account\allowbreak Banned}; the write gives 403 & \path{socket.it-spec.ts}, ``accountBanned still reaches the banned user''; \path{visibility.it-spec.ts}, ``the guard reads the database, so a ban takes effect at once for a valid cookie''; the browser part is Figure~\ref{fig:demo-banned} & Pass \\
+\end{longtable}}
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{The bugs the tests found}
+\label{sec:test-bugs}
+
+The tests and the checks found 48 problems in the app. First a code review listed 26 suspected problems. Then we ran the app (curl scripts, Socket.IO scripts and Chrome). The run confirmed 25, half confirmed 1, and found 10 new ones: 36 findings. The fixes found 7 more small items (R1 to R7), and the demo sweep found 5 (V1 to V5). Of the 48 problems, 34 are fixed and 14 are open. The numbers come from the Bugs Report of the project (\texttt{.docs/Bugs Report.md}, section 1).
+
+Each fix started with a test that failed. The same curl script gave 42 passed and 53 failed on the code before the fixes, and 95 passed and 0 failed after them. The bugs of the thesis path are covered by test cases of this chapter: the clock in Explore (T4) by the \texttt{asOf} tests, the stale feed cache (T3) and the duplicate follow (T6, in the feed) by \path{feed-algo.it-spec.ts}, and the socket rooms (S1) by TC-11.
+
+Of the 14 open items, 8 are future work (Chapter 9): the missing unique keys of likes, saves and follows (T6) with the three items that need the same migration (N3, N10 and the schema part of R4), and four small items (R5, N7, N9 and B8). The other 6 (B1, S4, S6, B5, R3 and R6) are needed before the app is put on a shared server, for example the fallback token secret (S6) and the missing check of moderation actions (B1). The demo runs on one machine, so they do not touch it. T6 is the only open item on the thesis path. It can make duplicate rows, but the social feed counts each followee once, and a test checks this (``T6: a follow stored twice counts once (social)'').
+
+%% ─────────────────────────────────────────────────────────────────────────────
+\section{Demonstration}
+\label{sec:test-demo}
+
+The demo runs on generated data, not on the development data. The command \texttt{npm run demo:start} loads the dataset \texttt{syn-W2M-M} (1,000 users) into its own Postgres schema \texttt{eval\_demo}. The loader moves all times by one constant (\texttt{--rebase-to}), so that the newest event has the time of the start. Without this, Explore, which looks at the last 7 days, would be empty. The demo uses Redis database 3, so the development data (schema \texttt{public}) and the parity data (schema \texttt{eval\_load}, Redis database 2) are not touched. The command also adds one admin account (\texttt{demo\_admin}), starts the backend and the frontend, and prints the logins. It took 17 seconds in the rehearsal.
+
+Two users play the demo. The long-history user \texttt{u0000000064} has 28 positive actions before the start time and follows 426 users. The little-history user \texttt{u0000000787} has 2 positive actions and follows 273 users. The password of both is \texttt{password}. The checklist \path{scripts/demo/CHECKLIST.md} has the steps with their expected results, for two browser windows: a normal one and a private one, each with its own cookies. The rehearsal of 2026-11-22 played every step, and all nine passed (Table~\ref{tab:test-levels}). The screenshots below come from the same demo. Only one browser session was available, so a script (\path{peer.mjs}) played the second user; in the real demo, the second user has a second window.
+
+Figures~\ref{fig:demo-chrono} to~\ref{fig:demo-social} show the For You page of the long-history user, with the three values of \texttt{algo} (requirement FR21 in Table~\ref{tab:design-fr}). Figure~\ref{fig:demo-chrono} is Chronological, the baseline BL0 (Table~\ref{tab:method-methods}). The first posts are the newest ones, Post 19994, 19992 and 19991.
+
+\begin{figure}[htbp]
+  \centering
+  \thesisdiagram{fig8-1-foryou-chrono}{\textwidth}
+  \caption{For You with Chronological (\texttt{algo=chrono}, BL0).}
+  \label{fig:demo-chrono}
+\end{figure}
+
+Figure~\ref{fig:demo-engagement} is Engagement, the method BL2. The posts are ranked by the engagement score (likes, comments, reposts and age), so the first posts, Post 19981, 19957 and 19821, are not the newest.
+
+\begin{figure}[htbp]
+  \centering
+  \thesisdiagram{fig8-2-foryou-engagement}{\textwidth}
+  \caption{For You with Engagement (\texttt{algo=engagement}, BL2).}
+  \label{fig:demo-engagement}
+\end{figure}
+
+Figure~\ref{fig:demo-social} is Social, the hybrid score $H$ of this thesis (contribution C2). Many posts are marked with a community (c/c5, c/c6) and are one or two days old: the score brings forward older posts from followees and joined communities. None of its first 10 posts is in the first 10 of Chronological (the output of \texttt{npm run demo:users}).
+
+\begin{figure}[htbp]
+  \centering
+  \thesisdiagram{fig8-3-foryou-social}{\textwidth}
+  \caption{For You with Social (\texttt{algo=social}, the hybrid $H$).}
+  \label{fig:demo-social}
+\end{figure}
+
+The three orders differ for the same user. This shows that the option works. It does not show that Social is better: Chapter 6 measures that, and Chapter 7 discusses the result.
+
+Figure~\ref{fig:demo-explore} shows Explore (requirement FR22). Explore ranks the newest posts of the last 7 days with the same engagement score as BL2. So its first posts are the same as those of Figure~\ref{fig:demo-engagement}, and the first four are only 1 to 11 hours old, because the data was rebased to the start time.
+
+\begin{figure}[htbp]
+  \centering
+  \thesisdiagram{fig8-4-explore}{\textwidth}
+  \caption{The Explore feed.}
+  \label{fig:demo-explore}
+\end{figure}
+
+Figures~\ref{fig:demo-dm} to~\ref{fig:demo-banned} show the real-time parts (NFR4). In Figure~\ref{fig:demo-dm}, the little-history user writes to the long-history user, who has the conversation open. The second message, ``This one arrives live, without a reload.'', came over Socket.IO while the page was open, and the badge of Messages shows 1 (requirement FR15).
+
+\begin{figure}[htbp]
+  \centering
+  \thesisdiagram{fig8-5-direct-message}{\textwidth}
+  \caption{A direct message that arrives live in an open conversation.}
+  \label{fig:demo-dm}
+\end{figure}
+
+Figure~\ref{fig:demo-notification} shows a like. The little-history user likes a post of the long-history user, and the notification ``User 787 liked your post'' is pushed to the open page (requirement FR16). It is saved first, so a user who is offline sees it later.
+
+\begin{figure}[htbp]
+  \centering
+  \thesisdiagram{fig8-6-notification}{\textwidth}
+  \caption{A live notification.}
+  \label{fig:demo-notification}
+\end{figure}
+
+Figure~\ref{fig:demo-admin} shows the admin console (requirement FR18). The admin searches for the little-history user and bans the account. The row shows BANNED, and the button changes to Unban.
+
+\begin{figure}[htbp]
+  \centering
+  \thesisdiagram{fig8-7-admin-ban}{\textwidth}
+  \caption{The admin console after a ban.}
+  \label{fig:demo-admin}
+\end{figure}
+
+Figure~\ref{fig:demo-banned} shows the other side of the ban (requirements FR18 and NFR4). The page of the banned user was open. It went to \texttt{/sign-in?banned=true} at once, with the text ``Your account has been suspended. Please contact support.'' This is the event \texttt{accountBanned} of Section~\ref{sec:impl-realtime}, handled by the browser. The command \texttt{npm run demo:stop} lifts the ban at the end.
+
+\begin{figure}[htbp]
+  \centering
+  \thesisdiagram{fig8-8-banned-signin}{\textwidth}
+  \caption{The banned user is signed out at once.}
+  \label{fig:demo-banned}
+\end{figure}
+\setlength{\emergencystretch}{0pt}
+\renewcommand{\topfraction}{0.7}
+\renewcommand{\bottomfraction}{0.3}
+\renewcommand{\textfraction}{0.2}
+\renewcommand{\floatpagefraction}{0.5}
