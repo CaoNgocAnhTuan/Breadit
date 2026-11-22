@@ -77,3 +77,23 @@ Exit 0.
 | a Node process on :3000, then `demo:stop` | prints `port 3000 is still in use (F14)` with the `lsof` line, exits 1. Without the stranger it exits 0 |
 
 The redis container was not stopped in this tryout (A2 of the plan does that in step 8). The test listeners were plain Node servers, not the backend of `run-safe.sh`, so `public` and Redis database 0 were never used.
+
+## Step 5: the peer helper against the demo
+
+A second `demo:start` (18 s, the frontend build was warm) chose the same two users. Then, as `node .docs/works/2026-11-22-p10-demo-script/peer.mjs <account> <command>`:
+
+| Command | Result |
+|---|---|
+| `u0000000787 dm u0000000064 "peer tryout hello"` | login 200; `GET /api/users/u0000000064` 200; `POST /api/conversations` 201 (id 1); `POST /api/conversations/1/messages` 201; prints `conversationId=1`; exit 0 |
+| `u0000000787 typing 1` | login 200; "socket connected"; `startTyping` sent, 3 s wait, `stopTyping` sent; exit 0 |
+| `u0000000787 like 19988` (a post of `u0000000064`), twice | `{"liked":true,"count":1}`, then `{"liked":false,"count":0}`: a toggle, as in the sweep helper |
+| `demo_admin ban u0000000787` (a demo user, no `--force`) | refused before any login, exit 2 |
+| `demo_admin ban demo-admin --force` | refused (R6), exit 2 |
+| `demo_admin ban u0000000100` (a loaded user, not a demo user) | login 200; `POST /api/admin/users/u0000000100/ban` 200 `{"ok":true}`; the database showed `banned = t` |
+| `demo_admin unban u0000000100` | 200 `{"ok":true}`; the database showed `banned = f` |
+
+F13 on the way: `demo_admin ban u0000000101`, then `npm run demo:stop` printed `bans: lifted for u0000000101`; a count of banned users in `eval_demo` was 0 after it.
+
+After the last stop: :3000 and :4000 free, `run-safe.sh status` says "backend not running", Redis database 3 has 0 keys, Redis database 0 still has 31 keys, and `git status` shows no change under `apps/`, `packages/` or `eval/src/`.
+
+What the helper showed for the checklist: a conversation exists as soon as B clicks the message icon (`POST /api/conversations` makes it, with both users as members, and the conversation list of a user holds every conversation of the user, also an empty one). So in step 4 of the checklist A can open the conversation before B sends.
