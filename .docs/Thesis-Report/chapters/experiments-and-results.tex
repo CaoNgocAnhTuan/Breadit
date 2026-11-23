@@ -195,6 +195,8 @@ Table~\ref{tab:results-e2} gives the gain of $H$ over BL2 for each history group
 
 \textbf{\texttt{digg2009}.} In group 0--4, the gain is \eTwoDiggNdcgTenZeroFourGain{} at three decimals (\eTwoDiggNdcgTenZeroFourGainFull{} at six decimals). The lower end of the interval is above 0, but only by a very small amount: the interval runs from \eTwoDiggNdcgTenZeroFourCiLowFull{} to \eTwoDiggNdcgTenZeroFourCiHighFull{}. The Holm $p$ is \eTwoDiggNdcgTenZeroFourPHolm{}, above the Holm level. H1 needs both conditions, so \textbf{H1 fails on \texttt{digg2009}}.
 
+\textbf{\texttt{digg2009} at other values of $K$.} At $K = 20$, groups 0 and 0--4 pass both conditions of H1: the interval is above 0 and the Holm $p$ is below the Holm level (Table~\ref{tab:app-f1-digg} in Appendix~B). This does not change the result, because H1 is decided at $K = 10$ only, and there it fails. The gains at $K = 20$ are tiny, far below the gap between BL4 or BL5 and BL2 (Table~\ref{tab:results-e1}). So we do not read them as a pass of H1.
+
 \textbf{Other groups.} On \texttt{syn-W2M-M}, the gain grows with history. It is largest for users with 20 or more earlier interactions (gain \eTwoWTwoMNdcgTenTwentyPlusGain{}, interval from \eTwoWTwoMNdcgTenTwentyPlusCiLow{} to \eTwoWTwoMNdcgTenTwentyPlusCiHigh{}, Holm $p$ \eTwoWTwoMNdcgTenTwentyPlusPHolm{}). This is the only F1 row at $K = 10$ where both conditions hold. In group 5--19, the interval is above 0, but the Holm $p$ is not below the level (\eTwoWTwoMNdcgTenFiveNineteenPHolm{}). On \texttt{digg2009}, the gain is near 0 in every group.
 
 %% ─────────────────────────────────────────────────────────────────────────────

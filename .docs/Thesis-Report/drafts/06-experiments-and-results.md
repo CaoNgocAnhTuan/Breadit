@@ -54,6 +54,8 @@ Table 6.4 (`e2.tex`) gives the gain of H over BL2 for each history group, with i
 
 **`digg2009`.** In group 0–4, the gain is \eTwoDiggNdcgTenZeroFourGain at three decimals [MACRO?: Digg gain in group 0–4 with more decimals]. The lower end of the interval is above 0, but only by a very small amount [MACRO?: Digg CI low and CI high in group 0–4 with more decimals]. The Holm p is \eTwoDiggNdcgTenZeroFourPHolm, above the Holm level. H1 needs both conditions, so **H1 fails on `digg2009`**.
 
+**`digg2009` at other values of K.** At K = 20, groups 0 and 0–4 pass both conditions of H1: the interval is above 0 and the Holm p is below the Holm level (Table B.2 in Appendix B). This does not change the result, because H1 is decided at K = 10 only, and there it fails. The gains at K = 20 are tiny, far below the gap between BL4 or BL5 and BL2 (Table 6.3). So we do not read them as a pass of H1.
+
 **Other groups.** On `syn-W2M-M`, the gain grows with history. It is largest for users with 20 or more earlier interactions [MACRO?: syn-W2M-M gain, CI and Holm p in group 20+]. This is the only F1 row at K = 10 where both conditions hold. In group 5–19, the interval is above 0, but the Holm p is not below the level [MACRO?: syn-W2M-M Holm p in group 5–19]. On `digg2009`, the gain is near 0 in every group.
 
 ## 6.7 E3: social density (H2)

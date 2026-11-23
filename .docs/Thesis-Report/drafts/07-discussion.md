@@ -18,7 +18,7 @@ We see two reasons, and both may play a part:
 
 **Digg.** On `digg2009`, the social terms change almost nothing (Section 6.6 and E4 in Section 6.8). Our reading is a matter of scale. The engagement part of the score grows with the number of votes, and Digg stories have many votes, because every story in the data reached the front page (Chapter 3). The social part has a fixed upper bound: by the formula in Chapter 3, each sum of trust values is at most 1, so the social term is at most 2, and α times it is small next to hundreds of votes. The tuning chose the largest α in the grid, which also suggests that the grid did not reach the scale Digg needs. This reading was not tested.
 
-**What does work on Digg is time.** BL4 and BL5 divide the score by a power of the post's age, while BL2 only subtracts a small linear age term. On Digg, BL2 is close to plain popularity (BL3, Table 6.3), and the "hot" formulas are far better than both (Section 6.5). Even BL2t, with the largest age weight of its grid, stays far below them [MACRO?: tuned age weight of BL2t on digg2009]. So on these data, how fast a post gets old matters much more than who the user follows.
+**What does work on Digg is time.** BL5 divides the score by a power of the post's age. BL4 adds a time term to the logarithm of the likes, which works like an exponential decay of the likes. BL2 only subtracts a small linear age term. On Digg, BL2 is close to plain popularity (BL3, Table 6.3), and the "hot" formulas are far better than both (Section 6.5). Even BL2t, with the largest age weight of its grid, stays far below them [MACRO?: tuned age weight of BL2t on digg2009]. So on these data, how fast a post gets old matters much more than who the user follows.
 
 ## 7.2 RQ2: when does the social signal start to help?
 
@@ -67,6 +67,12 @@ Two smaller points from E4:
 **What the offline test measures.** Each user has one test item: the last post they liked, commented on or reposted. The test asks whether a method ranks that post high. It does not measure whether users are happier with the feed. The logged likes also depend on what the users were shown at the time, for example the Digg front page. Recommendation systems trained or tested on such logs can be biased towards what was already shown [24].
 
 **Social density.** E3 uses only the number of followees, not the amount of friend engagement in the pool, which H2 also names.
+
+**One hop only.** Trust uses 1 hop: only the accounts that the user follows count, and the accounts that those accounts follow do not (Chapter 2). DiffNet, a learned model, gives its best result at 2 steps [3], so 1 hop may leave a gain unused. Our trust is a count, so this is only a hint. We did not test 2 hops.
+
+**No fade of trust over time.** Trust is a smoothed count of earlier positives, so an old like counts as much as a new one. RealGraph decays old interactions [5]. We did not test whether a fade would help.
+
+**No learned social baseline.** Every baseline is a fixed formula or a count, tuned like the hybrid. We did not compare with a learned social model such as SoRec [2] or DiffNet [3], and such a model may be stronger.
 
 **Cost.** E7 ran on one machine with one virtual user and the page cache off, and the machine was not quiet at the start (its load is in the E7 manifest). It shows that the three feeds cost about the same for one user. It says nothing about many users at once.
 

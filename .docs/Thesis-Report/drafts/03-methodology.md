@@ -6,11 +6,11 @@ This chapter describes how the research questions are answered. Section 3.1 give
 
 ## 3.1 Research design
 
-The thesis asks two questions. **RQ1:** does adding social-graph signals (follow trust and community affinity) to the ranking improve the "For You" feed over the current heuristic, especially for users with little history? **RQ2:** how does the amount of social interaction change the ranking quality, and where does the social signal start to help?
+The thesis asks two questions. **RQ1:** does adding social-graph signals (follow trust and community affinity) to the ranking improve the "For You" feed over the current heuristic, especially for users with little history? **RQ2:** how does the level of social interaction between users change the ranking quality? What is the minimum level where the social signal starts to help?
 
 Each question has a hypothesis that was written down and frozen before any test result existed:
 - **H1 (RQ1).** For users with 0–4 earlier interactions, the hybrid score H has a higher NDCG@10 than BL2, the score of the current Explore feed. H1 has two co-primary tests: one on synthetic data (the middle-influence world, Section 3.4) and one on real data (Digg 2009). Each test is judged on its own.
-- **H2 (RQ2).** The gain over BL2 grows with social density, and it is about zero for a user who follows nobody and has no community.
+- **H2 (RQ2).** The gain over BL2 grows with social density (number of followees, amount of friend engagement in the pool). It is about zero when the user follows nobody and has no community.
 - **H0 (sanity).** In the null world W0, where follows are random, the follow part of the hybrid must not beat BL2. A win there would mean a bug or a leak, so H0 is checked first, as a gate.
 
 The design is an **offline evaluation**: the methods rank posts for past moments, and we check whether each user's next real action is ranked high. It does not need real users, and every number can be rebuilt. Its limits are discussed in Chapter 7.
