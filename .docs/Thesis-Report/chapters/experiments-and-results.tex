@@ -259,7 +259,7 @@ Table~\ref{tab:results-e3} and Figure~\ref{fig:results-e3} give the gain by the 
   \label{fig:results-e3}
 \end{figure}
 
-On the three W2 cells, the gain is already positive for users who follow nobody: \eThreeWTwoLNdcgTenZeroGain{} (low influence), \eThreeWTwoMNdcgTenZeroGain{} (middle) and \eThreeWTwoHNdcgTenZeroGain{} (high). For users with 20 or more followees, it is \eThreeWTwoLNdcgTenTwentyPlusGain{}, \eThreeWTwoMNdcgTenTwentyPlusGain{} and \eThreeWTwoHNdcgTenTwentyPlusGain{}. So the gain does not rise with the number of followees; on all three cells it is lower at 20 or more than at 0. The bin 1--4 holds only \macromissing{E3: number of users in bin 1--4 (one value per synthetic world)} in each synthetic world, so it is not read.
+On the three W2 cells, the gain is already positive for users who follow nobody: \eThreeWTwoLNdcgTenZeroGain{} (low influence), \eThreeWTwoMNdcgTenZeroGain{} (middle) and \eThreeWTwoHNdcgTenZeroGain{} (high). For users with 20 or more followees, it is \eThreeWTwoLNdcgTenTwentyPlusGain{}, \eThreeWTwoMNdcgTenTwentyPlusGain{} and \eThreeWTwoHNdcgTenTwentyPlusGain{}. So the gain does not rise with the number of followees; on all three cells it is lower at 20 or more than at 0. The bin 1--4 holds only \eThreeWTwoLNdcgTenOneFourN{}, \eThreeWTwoMNdcgTenOneFourN{} and \eThreeWTwoHNdcgTenOneFourN{} users in the three cells, so it is not read.
 
 On \texttt{digg2009}, the gain is 0 in every bin (for example \eThreeDiggNdcgTenZeroGain{} at 0 followees and \eThreeDiggNdcgTenTwentyPlusGain{} at 20 or more).
 
@@ -342,7 +342,7 @@ Table~\ref{tab:results-e5} runs $H$ against BL2 in every synthetic world, each w
 \section{E6: ties}
 \label{sec:results-e6}
 
-Table~\ref{tab:results-e6} repeats E1 with the reversed tie-break. With it, $H$ gives \eSixWTwoMNdcgHTenAllValue{} and BL2 gives \eSixWTwoMNdcgBLTwoTenAllValue{} on \texttt{syn-W2M-M}, and $H$ and BL2 both give \eSixDiggNdcgHTenAllValue{} on \texttt{digg2009}: the same values as in E1. Over all methods and both datasets, NDCG@10 changes by at most \macromissing{largest NDCG@10 change in E6}. Ties do not change any result of this chapter.
+Table~\ref{tab:results-e6} repeats E1 with the reversed tie-break. With it, $H$ gives \eSixWTwoMNdcgHTenAllValue{} and BL2 gives \eSixWTwoMNdcgBLTwoTenAllValue{} on \texttt{syn-W2M-M}, and $H$ and BL2 both give \eSixDiggNdcgHTenAllValue{} on \texttt{digg2009}: the same values as in E1. Over all methods and both datasets, the largest change is for BL4 on \texttt{syn-W2M-M}: its NDCG@10 goes from \eOneWTwoMNdcgBLFourTenAllValueFull{} to \eSixWTwoMNdcgBLFourTenAllValueFull{}. BL4 is the method most sensitive to ties. $H$ and BL2 do not change, so ties do not change H1 to H3.
 
 \begin{table}[htbp]
   \centering
