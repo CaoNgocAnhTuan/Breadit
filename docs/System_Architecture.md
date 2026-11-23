@@ -546,7 +546,7 @@ Breadit/
 │   ├── Guidance-Manual/              # guidance manual
 │   └── Pre-thesis/                   # the pre-thesis package: report chapters, diagrams, ADRs, k6 scripts, its LaTeX in Latex/ · frozen
 ├── .claude/                          # workflow harness: /task, /bugfix, /approve, hooks, rules, templates
-├── scripts/                          # verify-bug-sweep.sh, verify-socket.cjs, dataset-humans.ps1, e7/ (E7 k6 script and runner), repro/ (thesis-repro.mjs, `npm run thesis:repro`), demo/ (demo.mjs: `npm run demo:start`, `demo:users`, `demo:stop`; CHECKLIST.md for the presenter)
+├── scripts/                          # verify-bug-sweep.sh, verify-socket.cjs, dataset-humans.ps1, e7/ (E7 k6 script and runner), repro/ (thesis-repro.mjs, `npm run thesis:repro`), demo/ (demo.mjs: `npm run demo:start`, `demo:users`, `demo:stop`; CHECKLIST.md for the presenter), thesis-check/ (check.mjs: `npm run thesis:check`, the final checks of the thesis; lib.mjs with its tests; allow-numbers.tsv)
 ├── docker-compose.yml                # db (Postgres 16), redis (Redis 7), backend, frontend
 ├── Makefile                          # rebuild, backend-rebuild, frontend-rebuild, logs
 ├── package.json                      # npm workspaces: apps/*, packages/*, eval
