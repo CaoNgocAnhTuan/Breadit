@@ -1,0 +1,74 @@
+Task p10-overlap-quotes-only: the output of thesis:check before and after the change.
+
+1. Before the change (plan step 1, --no-build, check 4 summary and its findings from the extracts)
+FAIL overlap: 8-word runs in 12 thesis files against 22 extract md, 29 pre-thesis md, 15 pre-thesis tex: extract 8 matches (77 words, 8 FAIL, 0 INFO); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/literature-review.tex:24: FAIL [overlap] 8 words also in .docs/works/2026-10-23-p1-literature/extracts/01.md:9 [extract]: reports findings from positive and negative experiences and
+  .docs/Thesis-Report/chapters/literature-review.tex:26: FAIL [overlap] 9 words also in .docs/works/2026-10-23-p1-literature/extracts/02.md:9 [extract]: a factor analysis approach based on probabilistic matrix factorization
+  .docs/Thesis-Report/chapters/literature-review.tex:47: FAIL [overlap] 11 words also in .docs/works/2026-10-23-p1-literature/extracts/12.md:13 [extract]: score votes 1 0 8 age in hours 2 1 8
+  .docs/Thesis-Report/chapters/literature-review.tex:50: FAIL [overlap] 9 words also in .docs/works/2026-10-23-p1-literature/extracts/12.md:24 [extract]: penalty system is more complex than the published code
+  .docs/Thesis-Report/chapters/literature-review.tex:54: FAIL [overlap] 8 words also in .docs/works/2026-10-23-p1-literature/extracts/05.md:8 [extract]: the destination user in the future it is
+  .docs/Thesis-Report/chapters/literature-review.tex:74: FAIL [overlap] 9 words also in .docs/works/2026-10-23-p1-literature/extracts/15.md:45 [extract]: can disagree with the exact metrics even on average
+  .docs/Thesis-Report/chapters/literature-review.tex:76: FAIL [overlap] 10 words also in .docs/works/2026-10-23-p1-literature/extracts/17.md:13 [extract]: the share of available items that the system ever recommends
+  .docs/Thesis-Report/chapters/literature-review.tex:76: FAIL [overlap] 13 words also in .docs/works/2026-10-23-p1-literature/extracts/18.md:12 [extract]: when scores are tied the order of the tied results can change
+
+2. After step 3, before the text fix (plan step 4, --no-build; exit 1)
+FAIL overlap: 8-word runs in 12 thesis files against 22 extract md (quotes only), 29 pre-thesis md, 15 pre-thesis tex: extract 1 match (9 words, 1 FAIL, 0 INFO); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/literature-review.tex:26: FAIL [overlap] 9 words also in .docs/works/2026-10-23-p1-literature/extracts/02.md:9 [extract]: a factor analysis approach based on probabilistic matrix factorization
+Checks 1, 2, 3 and 5 and the slides checks: the same lines as in 1 (a diff of the two outputs shows only the overlap lines and the findings that went away).
+
+3. Final output after step 5 (the full command with the build; exit 0). A second run gives the same output byte for byte.
+
+thesis:check (builds the PDF; overlap run of 8 words)
+
+PASS numbers (thesis): 76 typed decimals or percentages, 76 allowed, 0 not allowed; 146 macro uses (94 distinct), 0 macro problems
+PASS citations (thesis): 44 keys used, 44 defined, 44 verified
+PASS abstract: 10 distinct macros in the abstract, 10 also in Chapter 6
+PASS overlap: 8-word runs in 12 thesis files against 22 extract md (quotes only), 29 pre-thesis md, 15 pre-thesis tex: extract 1 match (9 words, 0 FAIL, 1 INFO); pre-thesis 0 matches (0 words)
+PASS pages: 97 pages in total (FAIL above 120); Chapters 1-9 take 73 pages (WARN above 100) (built now)
+PASS numbers (slides): 51 typed decimals or percentages, 51 allowed, 0 not allowed; 67 macro uses (59 distinct), 0 macro problems
+PASS citations (slides): 0 keys used on the slides, 44 defined in references.tex, 0 used entries verified
+
+overlap, per chapter:
+  .docs/Thesis-Report/chapters/abstract.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/acknowledgement.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/appendix.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/conclusion.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/discussion.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/experiments-and-results.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/implementation.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/introduction.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/literature-review.tex: extract 1 match (9 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/methodology.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/system-analysis-and-design.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+  .docs/Thesis-Report/chapters/test-cases-and-demonstration.tex: extract 0 matches (0 words); pre-thesis 0 matches (0 words)
+
+Findings: 0 FAIL, 0 WARN, 27 INFO
+.docs/Thesis-Report/chapters/literature-review.tex:26: INFO [overlap] 9 words also in .docs/works/2026-10-23-p1-literature/extracts/02.md:9 [extract, quotation with citation]: a factor analysis approach based on probabilistic matrix factorization
+.docs/Thesis-Report/chapters/literature-review.tex:26: INFO [citations] cites dadgar2022 (§10 [35], "do not cite a finding"); read the sentence: Dadgar and Hamzeh (2022) study how social trust can help recommenders, and propose a similarity measure for social trust~\refcite{dadgar2022}.
+.docs/Thesis-Report/chapters/literature-review.tex:26: INFO [citations] cites stefanopoulos2025 (§10 [37], "do not cite a finding"); read the sentence: Stefanopoulos, Chatterjee and Zehmakan (2025) study recommenders that use item ratings, item similarity and a trust graph~\refcite{stefanopoulos2025}.
+.docs/Thesis-Report/chapters/literature-review.tex:26: INFO [citations] cites zhou2024 (§10 [33], "do not cite a finding"); read the sentence: Zhou, Li, Jiang and Zhang (2024) describe a matrix factorization model for rating prediction that defines an interaction strength between users and links it to social relations and to group-participation features~\refcite{zhou2024}.
+.docs/Thesis-Report/chapters/literature-review.tex:32: INFO [citations] cites jaspal2025 (§10 [31], "do not cite a finding"); read the sentence: The first stage shows a new item to the connections of its creator, and the second uses early engagement and learned user embeddings~\refcite{jaspal2025}.
+.docs/Thesis-Report/chapters/literature-review.tex:32: INFO [citations] cites lee2022 (§10 [38], "do not cite a finding"); read the sentence: The thesis follows~\refcite{lee2022} in one point: it reports results for groups of users by the length of their history.
+.docs/Thesis-Report/chapters/literature-review.tex:32: INFO [citations] cites lee2022 (§10 [38], "do not cite a finding"); read the sentence: Their algorithm uses both with mutual constraints, and they test it on all users, active users, inactive users and cold-start users as separate groups~\refcite{lee2022}.
+.docs/Thesis-Report/chapters/literature-review.tex:60: INFO [citations] cites jiang2025 (§10 [34], "do not cite a finding"); read the sentence: Jiang, Yang and Lin (CIKM 2025) also recommend communities and not posts, with a model named CASO~\refcite{jiang2025}.
+.docs/Thesis-Report/chapters/literature-review.tex:62: INFO [citations] cites elkishky2022 (§10 [44], "do not cite a finding"); read the sentence: The abstract of TwHIN (El-Kishky et al., KDD 2022) says that it treats Twitter as a heterogeneous information network and learns knowledge-graph embeddings of its users and content~\refcite{elkishky2022}.
+.docs/Thesis-Report/chapters/literature-review.tex:62: INFO [citations] cites satuluri2020 (§10 [43], "do not cite a finding"); read the sentence: The abstract of SimClusters (Satuluri et al., KDD 2020) says that it is a representation layer based on overlapping communities, where users and content become sparse vectors for many recommendation tasks at Twitter~\refcite{satuluri2020}.
+.docs/Thesis-Report/chapters/literature-review.tex:62: INFO [citations] cites weyl2025 (§10 [32], "do not cite a finding"); read the sentence: Weyl et al. (2025, arXiv preprint) argue that platforms use the social fabric as an input and may erode it, and they propose a platform model in which the social fabric is also an explicit output~\refcite{weyl2025}.
+.docs/Thesis-Report/chapters/literature-review.tex:64: INFO [citations] cites akpinar2025 (§10 [36], "do not cite a finding"); read the sentence: Akpinar and Fazelpour (Synthese, 2025) use a simulation to study visibility under a recommendation algorithm~\refcite{akpinar2025}.
+.docs/Thesis-Report/chapters/literature-review.tex:64: INFO [citations] cites chen2026 (§10 [40], "do not cite a finding"); read the sentence: They add debiasing terms for the viewer, the item and the request~\refcite{chen2026}.
+.docs/Thesis-Report/chapters/literature-review.tex:64: INFO [citations] cites cinus2023 (§10 [39], "do not cite a finding"); read the sentence: Their approach re-weights the importance of the accounts that a user follows~\refcite{cinus2023}.
+.docs/Thesis-Report/chapters/literature-review.tex:64: INFO [citations] cites gauthier2026 (§10 [42], "do not cite a finding"); read the sentence: Gauthier, Hodler, Widmer and Zhuravskaya (Nature, 2026) report a field experiment on the feed of X~\refcite{gauthier2026}.
+.docs/Thesis-Report/chapters/literature-review.tex:64: INFO [citations] cites milli2025 (§10 [41], "do not cite a finding"); read the sentence: Milli et al. (PNAS Nexus, 2025) audit the engagement-based ranking of Twitter~\refcite{milli2025}.
+.docs/Thesis-Report/chapters/literature-review.tex:70: INFO [citations] cites gauthier2026 (§10 [42], "do not cite a finding"); read the sentence: The field experiment on the feed of X is an example~\refcite{gauthier2026}.
+.docs/Thesis-Report/chapters/literature-review.tex:111: INFO [citations] cites lee2022 (§10 [38], "do not cite a finding"); read the sentence: & Sedhain et al.~\refcite{sedhain2014}, Lee et al.~\refcite{lee2022}, the $m$-estimate~\refcite{cestnik1990}\refcite{castellano2020} & Mix the counts of the user with a prior, so that a user with no history still gets a score.
+.docs/Thesis-Report/chapters/literature-review.tex:129: INFO [citations] cites stefanopoulos2025 (§10 [37], "do not cite a finding"); read the sentence: \begin{itemize} \item Social recommenders from research mostly learn their parameters from past ratings or actions~\refcite{ma2008}\refcite{wu2019}\refcite{zhou2024}\refcite{stefanopoulos2025}.
+.docs/Thesis-Report/chapters/literature-review.tex:129: INFO [citations] cites zhou2024 (§10 [33], "do not cite a finding"); read the sentence: \begin{itemize} \item Social recommenders from research mostly learn their parameters from past ratings or actions~\refcite{ma2008}\refcite{wu2019}\refcite{zhou2024}\refcite{stefanopoulos2025}.
+.docs/Thesis-Report/chapters/literature-review.tex:131: INFO [citations] cites jiang2025 (§10 [34], "do not cite a finding"); read the sentence: \item Work on communities mostly recommends communities, not posts~\refcite{chen2009}\refcite{jiang2025}.
+.docs/Thesis-Report/chapters/literature-review.tex:149: INFO [citations] cites zhou2024 (§10 [33], "do not cite a finding"); read the sentence: \begin{table}[htbp] \centering \caption{The closest works and the difference in this thesis.} \label{tab:lit-gap} \small \renewcommand{\arraystretch}{1.15} \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.3cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}} \t...
+.docs/Thesis-Report/chapters/literature-review.tex:150: INFO [citations] cites jaspal2025 (§10 [31], "do not cite a finding"); read the sentence: \begin{table}[htbp] \centering \caption{The closest works and the difference in this thesis.} \label{tab:lit-gap} \small \renewcommand{\arraystretch}{1.15} \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.3cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}} \t...
+.docs/Thesis-Report/chapters/literature-review.tex:151: INFO [citations] cites cinus2023 (§10 [39], "do not cite a finding"); read the sentence: \begin{table}[htbp] \centering \caption{The closest works and the difference in this thesis.} \label{tab:lit-gap} \small \renewcommand{\arraystretch}{1.15} \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.3cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}} \t...
+.docs/Thesis-Report/chapters/literature-review.tex:152: INFO [citations] cites chen2026 (§10 [40], "do not cite a finding"); read the sentence: \begin{table}[htbp] \centering \caption{The closest works and the difference in this thesis.} \label{tab:lit-gap} \small \renewcommand{\arraystretch}{1.15} \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.3cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}} \t...
+.docs/Thesis-Report/chapters/literature-review.tex:153: INFO [citations] cites weyl2025 (§10 [32], "do not cite a finding"); read the sentence: \begin{table}[htbp] \centering \caption{The closest works and the difference in this thesis.} \label{tab:lit-gap} \small \renewcommand{\arraystretch}{1.15} \begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{3.3cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}} \t...
+.docs/Thesis-Report/chapters/methodology.tex:123: INFO [citations] cites hogg2012 (§10 [50], "do not cite a finding"); read the sentence: \textbf{Real data: Digg 2009}~\refcite{lerman-digg}\refcite{lerman-digg-archive}\refcite{hogg2012}.
+
+Result: 7 PASS, 0 WARN, 0 FAIL
