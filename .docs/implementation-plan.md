@@ -1,6 +1,6 @@
 # Implementation blueprint
 
-Version 1.27 · 2026-11-23 · Status: approved 2026-10-28
+Version 1.28 · 2026-11-23 · Status: approved 2026-10-28
 Super-plan: [super-plan.md](super-plan.md) · Task: `.docs/works/2026-10-28-p2-implementation-blueprint/`
 
 How the pieces of P3 to P10 fit together in the code. A thing is here only if two or more tasks share it. Detail that one task owns stays in that task's `design.md`. Frozen values live in super-plan §7. This file points to them as "§7, <row name>" and does not copy them.
@@ -268,7 +268,7 @@ One table links RQ, hypothesis, experiment, output file, table and chapter. Meth
 
 ## 5. Task list
 
-Written on 2026-10-28; the Status column was last updated on 2026-11-22. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
+Written on 2026-10-28; the Status column was last updated on 2026-11-23. ✅ means the task folder is closed, with the date it closed. ▶ is the next task. The day budget counts the three approvals of each task. One task runs at a time. Writing (P9) runs next to the code tasks, done by the author outside tasks. A dagger (†) marks a task that depends on the supervisor's answer (section 6).
 
 | Status | # | Task | Phase | Depends on | Scope (short) | Days | Ends | Bugs placed here |
 |---|---|---|---|---|---|---|---|---|
@@ -301,10 +301,10 @@ Written on 2026-10-28; the Status column was last updated on 2026-11-22. ✅ mea
 | ✅ 11-22 | 25 | Checks for the supervisor progress check | P9 ★ | 17–24 | `verify.sh`, `test:parity`, `results:manifest`, PDF build and page count, no typed numbers | 0.5 | — | — |
 | ✅ 11-22 | 26 | Progress slides for the supervisor | P10 | 25 | status, results, demo | 0.5 | — | — |
 | ✅ 11-22 (draft; feedback after 11-30) | 27 | Writing: supervisor feedback, Chapter 9, abstract, acknowledgements, appendix | P9 | 26 | after the progress check | 1–2 | — | — |
-| ⬜ | 28 | `p10-final-checks` | P10 | 27 | every number a macro, every citation verified in super-plan §10, the abstract matches Chapter 6, a local overlap check against the pre-thesis text and the paper extracts, at most 100 pages | 1 | — | — |
+| ✅ 11-23 (run again after the feedback) | 28 | `p10-final-checks` | P10 | 27 | every number a macro, every citation verified in super-plan §10, the abstract matches Chapter 6, a local overlap check against the pre-thesis text and the paper extracts, at most 100 pages | 1 | — | — |
 | ⬜ | 29 | `p10-security-fixes` (only for a shared server) | P10 | — | the P2 bugs of the Bugs Report | 1 | — | S4, S6, B1, R6, B5, R3 |
-| ⬜ | 30 | `p10-defense-package` | P10 | 28 | defense slides from the same figures and macros, the defense demo script | 1 | — | — |
-| ⬜ | 31 | Freeze | P10 | 30 | clean clone, `thesis:repro` if the ranking or eval code changed, tag `v3-thesis-final`, fast-forward `main`, push (each needs the author) | 0.5 | — | — |
+| ⬜ | 30 | `p10-defense-package` | P10 | 28 | defense slides from the same figures and macros, the defense demo script; then run `npm run thesis:check` again | 1 | — | — |
+| ⬜ | 31 | Freeze | P10 | 30 | `npm run thesis:check` passes, clean clone, `thesis:repro` if the ranking or eval code changed, tag `v3-thesis-final`, fast-forward `main`, push (each needs the author) | 0.5 | — | — |
 
 **Order from row 12 on** (decided by the author on 2026-11-19). No dates: the author works through the rows as fast as possible. One task runs at a time; "Writing" rows are not tasks and run next to them. Rows 12 to 26 come before the supervisor progress check on 2026-11-30, which needs Chapters 3 to 7 in PDF and the demo. Not done, and listed as future work in Chapter 9: the schema migration (T6, N3, N10, R4), R5, N7, N9, B8, and Hive.
 
@@ -365,3 +365,4 @@ The supervisor checkpoints (★) are sends, not stops. The next task starts, and
 - 1.25 · 2026-11-22 · §5 row 22 ✅: task `p10-demo-script`. `npm run demo:start|users|stop` (`scripts/demo/`) loads `syn-W2M-M` rebased to now into the new schema `eval_demo` with Redis database 3, adds the admin `demo_admin`, and picks the two demo users (`u0000000787`, history 2; `u0000000064`, history 28). Rehearsal: every checklist step PASS, no new bug. `eval_load` and the parity test are not touched. No contract, rule or frozen value changed.
 - 1.26 · 2026-11-22 · §5 rows 23–27 ✅ (writing, light path; task folders `2026-11-22-p9-ch8-tests-demo`, `p9-ch1-2`, `p10-progress-slides`, `p9-ch9-front-back`). Chapters 1, 2, 8 and 9, the abstract, the acknowledgements (names left as placeholders), Appendix A (full test list) and B (F1 at K = 5, 10, 20 and F2, read from `p7-main/compare.csv`), and the Beamer progress deck (`.docs/Thesis-Report/slides/`, 20 frames). Row 25 checks: `verify.sh` all PASS, `test:parity` 102/102, `results:manifest` equal (162 files), the thesis builds with no error or undefined reference, 96 PDF pages (Chapters 1–9 pp. 1–72, appendix pp. 77–85), no typed decimal in any chapter; two `\macromissing` marks remain in Chapter 6 (lines 262 and 345), for `p10-final-checks`. Row 27 still takes the supervisor's feedback after 2026-11-30. No contract, rule or frozen value changed.
 - 1.27 · 2026-11-23 · §5 row 28 ("every number a macro"), first part: task `p9-missing-macros`. The two `\macromissing` marks of Chapter 6 (lines 262 and 345) are filled with macros. `p7-report` has 172 macros: 19 new (the E3 counts of the bin 1–4 in the three W2 cells, the E6 NDCG@10 of the nine methods on both datasets, two 6-decimal values of BL4 on `syn-W2M-M`), and the old 153 keep their names and values. The report now runs `checkTieChanges` before it writes: it stops when the largest E6 change is not BL4 on `syn-W2M-M`, when another pair has the same change, or when H or BL2 change at 3 decimals. The E6 text now says that BL4 is the most sensitive method and that H and BL2 do not change. `results:manifest` equal (162 files). Row 28 stays open (citations, abstract check, overlap check, page limit). No contract, rule or frozen value changed.
+- 1.28 · 2026-11-23 · §5 row 28 ✅: task `p10-final-checks`. `npm run thesis:check` (`scripts/thesis-check/`) runs the five final checks (numbers, citations, abstract, overlap, pages) on the thesis and checks 1–2 on the slides. First run: numbers, citations (44 of 44 verified), abstract and pages (97 in total, 73 for Chapters 1–9) PASS; overlap FAILs on 8 runs of 8 words or more in Chapter 2 that repeat lines of the P1 literature extracts, listed in the task's `triage.md` for the author; 0 runs shared with the pre-thesis text. Rows 30 and 31 run the command again after the supervisor's feedback.
