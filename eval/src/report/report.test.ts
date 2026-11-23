@@ -94,6 +94,23 @@ test("an input file that differs from its run manifest stops the report, and so 
   assert.throws(() => reportCommand(["--results-dir", join(noRun, "p7-main"), "--out", tempDir()]), /p7-tune-main/);
 });
 
+test("TC5 (task p9-missing-macros): when another pair has the largest E6 change, the report stops with the tie-check message and writes no file", () => {
+  const first = tempDir();
+  writeResultsFixture(first);
+  // BL5 on digg2009: its E6 cell is the E1 cell plus 0.020000, in whole millionths, so it moves more than BL4 on syn-W2M-M (0.010000)
+  const e1 = readRun(first, "p7-main").files.get("summary.csv")!.rows.find((r) => r.dataset === "digg2009" && r.split === "test" && r.method === "BL5" && r.k === "10" && r.bucket === "all")!.ndcg as string;
+  const [whole, frac] = e1.split(".") as [string, string];
+  const moved = Number(whole) * 1_000_000 + Number(frac) + 20_000;
+  const e6 = `${Math.floor(moved / 1_000_000)}.${String(moved % 1_000_000).padStart(6, "0")}`;
+  const dir = tempDir();
+  writeResultsFixture(dir, { cells: { "p7-e6-ties/summary.csv|digg2009|test|BL5|10|all|ndcg": e6 } });
+  const out = tempDir();
+  assert.throws(() => report(dir, out), (e: Error) => e.message.includes("BL5") && e.message.includes("digg2009") && e.message.includes("BL4") && e.message.includes("syn-W2M-M") && /largest/.test(e.message));
+  assert.deepEqual(readdirSync(out), [], "nothing was written");
+  // the fixture as it is (BL4 on syn-W2M-M is the largest, H and BL2 do not change) passes
+  report(first, tempDir());
+});
+
 test("per_user.csv is never read: the manifests list it and the files are not there", () => {
   const dir = tempDir();
   writeResultsFixture(dir);

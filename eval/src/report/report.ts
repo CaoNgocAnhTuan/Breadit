@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { canonicalJson } from "../canonical/manifest.ts";
 import { sha256Hex } from "../canonical/csv.ts";
 import { csvText } from "../results-csv.ts";
-import { buildMacros, macrosCsv, macrosTex, verifyMacros } from "./macros.ts";
+import { buildMacros, checkTieChanges, macrosCsv, macrosTex, verifyMacros } from "./macros.ts";
 import type { MacroRow } from "./macros.ts";
 import { parseCsv, readRun } from "./read.ts";
 import type { RunFiles, RunFilesMap } from "./read.ts";
@@ -57,6 +57,7 @@ export function reportCommand(argv: string[]): string[] {
 
   const runs: RunFilesMap = new Map<string, RunFiles>(REPORT_RUNS.map((id) => [id, readRun(resultsDir, id)]));
   const macros = buildMacros(runs);
+  checkTieChanges(runs); // Chapter 6 names the largest E6 change and says H and BL2 do not change: stop before any file is written if that is not true
   const tables = buildTables(runs);
   const fig = figE3Rows(runs);
   const figE2 = figE2Rows(runs);

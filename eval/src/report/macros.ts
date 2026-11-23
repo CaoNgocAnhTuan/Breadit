@@ -146,6 +146,9 @@ function sum(exp: string, run: string, dataset: string, method: string): MacroSp
   };
 }
 
+/** The pair with the largest NDCG@10 change between E1 and E6 (the one Chapter 6 names). `checkTieChanges` keeps this true. */
+export const E6_LARGEST: Readonly<{ dataset: string; method: string }> = { dataset: "syn-W2M-M", method: "BL4" };
+
 function build(): MacroSpec[] {
   const out: MacroSpec[] = [];
   // Tuning (p7-tune-main): the chosen value of each tuned method on both main datasets, and two validation NDCG@10 of H at full precision.
@@ -206,6 +209,16 @@ function build(): MacroSpec[] {
       });
     }
   }
+  // E3: the number of users in the bin 1-4 of the three W2 cells (the text says the bin is too small to read). One cell each.
+  for (const d of ["syn-W2L-M", "syn-W2M-M", "syn-W2H-M"]) {
+    out.push({
+      parts: ["eThree", word(DATASET_WORD, d, "dataset"), "Ndcg", "Ten", word(GROUP_WORD, "1-4", "bin"), word(WHAT_WORD, "n", "column")],
+      run: "p7-e5-worlds",
+      file: "density.csv",
+      key: { dataset: d, density_bin: "1-4", method: "H", ref: "BL2" },
+      column: "n",
+    });
+  }
   // E4: the gain of each ablation (Digg leaves out H-comm: its community term is 0) and of each m of the sweep.
   for (const d of MAIN_DATASETS) {
     for (const m of ["H", "H-follow", "H-comm", "H-noauthor", "H-noengager"]) {
@@ -218,8 +231,14 @@ function build(): MacroSpec[] {
   for (const [run, d] of [["p7-e5-worlds", "syn-W0-M"], ["p7-e5-worlds", "syn-W1-M"], ["p7-e5-worlds", "syn-W2L-M"], ["p7-e5-worlds", "syn-W2M-M"], ["p7-e5-worlds", "syn-W2H-M"], ["p7-e5-shuffle", "syn-W2M-M-shuffled"]] as const) {
     for (const column of ["mean_diff", "ci_low"]) out.push(cmp("eFive", run, d, "none", "H", "all", column));
   }
-  // E6 and E8: NDCG@10 of H and BL2 with the reversed tie-break and with the larger pool.
-  for (const d of MAIN_DATASETS) for (const m of ["H", "BL2"]) out.push(sum("eSix", "p7-e6-ties", d, m));
+  // E6: NDCG@10 of all nine methods with the reversed tie-break, like E1. The pair the text names (BL4 on syn-W2M-M, the largest change,
+  // see checkTieChanges) also at full precision, in E1 and in E6, because 3 decimals hide most of the change.
+  for (const d of MAIN_DATASETS) for (const m of NINE_METHODS) out.push(sum("eSix", "p7-e6-ties", d, m));
+  for (const [exp, run] of [["eOne", "p7-main"], ["eSix", "p7-e6-ties"]] as const) {
+    const s6 = sum(exp, run, E6_LARGEST.dataset, E6_LARGEST.method);
+    out.push({ ...s6, parts: [...s6.parts, "Full"] });
+  }
+  // E8: NDCG@10 of H and BL2 with the larger pool.
   for (const m of ["H", "BL2"]) out.push(sum("eEight", "p7-e8-pool", "syn-W2M-M", m));
   // E7: the cost of the three feeds. Median latency of the kept runs with its interval and p95 (latency.csv, ms), and the mean Prisma queries per request.
   for (const algo of ["chrono", "engagement", "social"]) {
@@ -231,7 +250,7 @@ function build(): MacroSpec[] {
   return out;
 }
 
-/** The macros of the report (153): the numbers the text is likely to cite. */
+/** The macros of the report (172): the numbers the text is likely to cite. */
 export const MACRO_SPECS: readonly MacroSpec[] = build();
 
 function rowKeyOf(file: string, row: Readonly<Record<string, string>>): string {
@@ -297,4 +316,74 @@ export function latexValue(value: string): string {
 export function macrosTex(rows: readonly MacroRow[]): string {
   const lines = ["% Written by `npm run report -w @breadit/eval`. Do not edit: change the results and run it again.", ...rows.map((r) => `\\newcommand{\\${r.name}}{${latexValue(r.value)}}`)];
   return lines.join("\n") + "\n";
+}
+
+// ---- the E6 check (task p9-missing-macros) ----
+// Chapter 6 names the largest change of NDCG@10 between E1 and E6 and says that H and BL2 do not change. The text cannot type those
+// facts as numbers, so the report checks them against the results and stops when they are no longer true.
+
+export interface TieChange {
+  dataset: string;
+  method: string;
+  /** NDCG@10 in E1 (p7-main), as written in the cell (6 decimals). */
+  e1: string;
+  /** NDCG@10 in E6 (p7-e6-ties), as written in the cell. */
+  e6: string;
+  /** |E6 - E1| in whole millionths. */
+  changeMicro: number;
+}
+
+/** A 6-decimal cell as whole millionths, so no float sum decides an order. */
+function toMicro(cell: string, what: string): number {
+  const m = /^(0|[1-9][0-9]*)\.([0-9]{6})$/.exec(cell);
+  if (m === null) throw new Error(`${what}: "${cell}" is not a number with 6 decimals`);
+  return Number(m[1]) * 1_000_000 + Number(m[2]);
+}
+
+function microText(micro: number): string {
+  return `${Math.floor(micro / 1_000_000)}.${String(micro % 1_000_000).padStart(6, "0")}`;
+}
+
+function cmpText(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
+/** |E6 - E1| of NDCG@10 (test split, K 10, bucket all) for the nine methods on both main datasets: the largest change first, then by dataset, then by method. */
+export function tieChanges(runs: RunFilesMap): TieChange[] {
+  const ndcg = (run: string, dataset: string, method: string): string => {
+    const row = findRow(runs, run, "summary.csv", (r) => r.dataset === dataset && r.split === "test" && r.method === method && r.k === "10" && r.bucket === "all", `tie change ${method} on ${dataset}`);
+    return row.ndcg as string;
+  };
+  const out: TieChange[] = [];
+  for (const dataset of MAIN_DATASETS) {
+    for (const method of NINE_METHODS) {
+      const e1 = ndcg("p7-main", dataset, method);
+      const e6 = ndcg("p7-e6-ties", dataset, method);
+      out.push({ dataset, method, e1, e6, changeMicro: Math.abs(toMicro(e6, `${method} on ${dataset} in p7-e6-ties`) - toMicro(e1, `${method} on ${dataset} in p7-main`)) });
+    }
+  }
+  return out.sort((a, b) => b.changeMicro - a.changeMicro || cmpText(a.dataset, b.dataset) || cmpText(a.method, b.method));
+}
+
+/**
+ * Throws when the largest change is not `want`, when another pair has the same change, or when H or BL2 differ between E1 and E6 at 3
+ * decimals. The message names the pairs, so the author can change `E6_LARGEST` and the E6 paragraph of Chapter 6 together.
+ */
+export function checkTieChanges(runs: RunFilesMap, want: Readonly<{ dataset: string; method: string }> = E6_LARGEST): void {
+  const changes = tieChanges(runs);
+  const top = changes[0];
+  if (top === undefined) throw new Error("E6: no change of NDCG@10 to check");
+  const label = (c: TieChange): string => `${c.method} on ${c.dataset} (${c.e1} to ${c.e6}, change ${microText(c.changeMicro)})`;
+  const tied = changes.filter((c) => c.changeMicro === top.changeMicro);
+  if (tied.length > 1) {
+    throw new Error(`E6: not one largest pair: ${tied.map(label).join("; ")} share the largest change of NDCG@10. Chapter 6 must name them all`);
+  }
+  if (top.dataset !== want.dataset || top.method !== want.method) {
+    throw new Error(`E6: the largest change of NDCG@10 is ${label(top)}, not ${want.method} on ${want.dataset}. Change E6_LARGEST (macros.ts) and the E6 paragraph of Chapter 6 together`);
+  }
+  for (const c of changes) {
+    if ((c.method === "H" || c.method === "BL2") && roundDecimal(c.e1, 3) !== roundDecimal(c.e6, 3)) {
+      throw new Error(`E6: ${label(c)} differs between E1 and E6 at 3 decimals, but Chapter 6 says that ties do not change H and BL2. Change the E6 paragraph of Chapter 6`);
+    }
+  }
 }

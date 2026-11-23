@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { MACRO_SPECS, buildMacros, macroName, macrosTex, macrosCsv, verifyMacros } from "./macros.ts";
-import type { MacroRow } from "./macros.ts";
+import { E6_LARGEST, MACRO_SPECS, buildMacros, checkTieChanges, macroName, macrosTex, macrosCsv, tieChanges, verifyMacros } from "./macros.ts";
+import type { MacroRow, TieChange } from "./macros.ts";
 import { readRun } from "./read.ts";
 import type { RunFiles, RunFilesMap } from "./read.ts";
 import { FIXTURE_RUNS, editResultsFile, writeResultsFixture } from "./fixture.ts";
@@ -37,11 +37,11 @@ test("macroName: letters only, and it throws on a digit, on an empty name and on
   assert.throws(() => macroName(["e", "One"], used), /twice|already|repeat/);
 });
 
-test("MACRO_SPECS: 138 specs of the P7 runs and 15 of E7, every name is letters only and none repeats", () => {
+test("MACRO_SPECS: 157 specs of the P7 runs and 15 of E7, every name is letters only and none repeats", () => {
   const e7 = MACRO_SPECS.filter((s) => s.run === "p7-e7");
   assert.equal(e7.length, 15);
-  assert.equal(MACRO_SPECS.length - e7.length, 138, "the 70 macros of the P7 runs, 68 new ones (task p9-report-macros)");
-  assert.equal(MACRO_SPECS.length, 153);
+  assert.equal(MACRO_SPECS.length - e7.length, 157, "138 after task p9-report-macros, 19 new ones (task p9-missing-macros)");
+  assert.equal(MACRO_SPECS.length, 172);
   const used = new Set<string>();
   for (const s of MACRO_SPECS) {
     const name = macroName(s.parts, used);
@@ -203,6 +203,141 @@ test("new macros (task p9-report-macros): tuning, E1 for nine methods, E2 for fi
   assert.equal(pick("eFiveWZeroNdcgTenAllGain").file, "p7-e5-worlds/compare.csv");
 });
 
+/** The 6-decimal text of a cell as whole millionths (no float). */
+function micro(cell: string): number {
+  const m = /^(0|[1-9][0-9]*)\.([0-9]{6})$/.exec(cell);
+  assert.ok(m, `"${cell}" is not a 6-decimal cell`);
+  return Number(m[1]) * 1_000_000 + Number(m[2]);
+}
+
+/** Whole millionths (>= 0) as a 6-decimal text. */
+function fromMicro(n: number): string {
+  assert.ok(Number.isInteger(n) && n >= 0, `${n} is not whole millionths >= 0`);
+  return `${Math.floor(n / 1_000_000)}.${String(n % 1_000_000).padStart(6, "0")}`;
+}
+
+const SUMMARY = "summary.csv";
+
+/** The E1 NDCG@10 cell (p7-main) of a method on a dataset, test split, bucket all, as written. */
+function e1Cell(runs: RunFilesMap, dataset: string, method: string): string {
+  const hits = (runs.get("p7-main")?.files.get(SUMMARY)?.rows ?? []).filter((r) => r.dataset === dataset && r.split === "test" && r.method === method && r.k === "10" && r.bucket === "all");
+  assert.equal(hits.length, 1, `${dataset} ${method}`);
+  return (hits[0] as Record<string, string>).ndcg as string;
+}
+
+/** A fixture where the E6 NDCG@10 of each listed pair is its E1 cell plus `deltaMicro` (the fixture is written twice, once to read the E1 cells). */
+function fixtureWithE6Shift(shifts: ReadonlyArray<readonly [dataset: string, method: string, deltaMicro: number]>): RunFilesMap {
+  const first = tempDir();
+  writeResultsFixture(first);
+  const base = load(first);
+  const cells: Record<string, string> = {};
+  for (const [dataset, method, delta] of shifts) cells[`p7-e6-ties/${SUMMARY}|${dataset}|test|${method}|10|all|ndcg`] = fromMicro(micro(e1Cell(base, dataset, method)) + delta);
+  const dir = tempDir();
+  writeResultsFixture(dir, { cells });
+  return load(dir);
+}
+
+test("new macros (task p9-missing-macros): E3 counts of the bin 1-4, E6 for nine methods on both datasets, two Full values of BL4 on syn-W2M-M", () => {
+  const dir = tempDir();
+  writeResultsFixture(dir);
+  const runs = load(dir);
+  const macros = buildMacros(runs);
+  const byName = new Map(macros.map((m) => [m.name, m]));
+  const pick = (name: string): MacroRow => {
+    const m = byName.get(name);
+    assert.ok(m, `no macro ${name}`);
+    return m;
+  };
+  // E3: the n of the bin 1-4 in the three W2 cells, a plain integer, read from p7-e5-worlds/density.csv
+  for (const [dWord, d] of [["WTwoL", "syn-W2L-M"], ["WTwoM", "syn-W2M-M"], ["WTwoH", "syn-W2H-M"]] as const) {
+    const m = pick(`eThree${dWord}NdcgTenOneFourN`);
+    assert.equal(m.file, "p7-e5-worlds/density.csv");
+    assert.equal(m.rowKey, `${d}|1-4|H|BL2`);
+    assert.equal(m.column, "n");
+    assert.match(m.value, /^[0-9]+$/, m.name);
+    assert.equal(m.value, cellOf(runs, m), m.name);
+  }
+  assert.ok(!byName.has("eThreeDiggNdcgTenOneFourN"), "the text reads the bin 1-4 in the three W2 cells only");
+  // E6: NDCG@10 of all nine methods on both datasets (the four of H and BL2 keep their names), 3 decimals, from p7-e6-ties
+  const nine: [string, string][] = [["BLZero", "BL0"], ["BLOne", "BL1"], ["BLTwo", "BL2"], ["BLTwoT", "BL2t"], ["BLThree", "BL3"], ["BLFour", "BL4"], ["BLFive", "BL5"], ["BLSix", "BL6"], ["H", "H"]];
+  for (const [dWord, d] of [["WTwoM", "syn-W2M-M"], ["Digg", "digg2009"]] as const) {
+    for (const [mWord, m] of nine) {
+      const macro = pick(`eSix${dWord}Ndcg${mWord}TenAllValue`);
+      assert.equal(macro.file, "p7-e6-ties/summary.csv");
+      assert.equal(macro.rowKey, `${d}|test|${m}|10|all`);
+      assert.equal(macro.column, "ndcg");
+      assert.equal(macro.value, roundDecimal(cellOf(runs, macro), 3), macro.name);
+    }
+  }
+  // the two Full values of the pair the text names: 6 decimals, E1 from p7-main and E6 from p7-e6-ties, and the 3-decimal macros stay
+  const e1 = pick("eOneWTwoMNdcgBLFourTenAllValueFull");
+  const e6 = pick("eSixWTwoMNdcgBLFourTenAllValueFull");
+  assert.equal(e1.file, "p7-main/summary.csv");
+  assert.equal(e6.file, "p7-e6-ties/summary.csv");
+  for (const m of [e1, e6]) {
+    assert.equal(m.rowKey, "syn-W2M-M|test|BL4|10|all");
+    assert.equal(m.column, "ndcg");
+    assert.match(m.value, /^[0-9]\.[0-9]{6}$/, m.name);
+    assert.equal(m.value, cellOf(runs, m), m.name);
+  }
+  assert.equal(micro(e1.value) - micro(e6.value), 10_000, "the fixture moves BL4 on syn-W2M-M by 0.010000");
+  assert.equal(pick("eOneWTwoMNdcgBLFourTenAllValue").value, roundDecimal(e1.value, 3));
+  assert.equal(pick("eSixWTwoMNdcgBLFourTenAllValue").value, roundDecimal(e6.value, 3));
+  assert.equal(macros.filter((m) => m.name.startsWith("eSix")).length, 19, "18 values and one Full");
+});
+
+test("tieChanges: 18 rows (nine methods, two datasets), |E6 - E1| in whole millionths, largest first, the same on a second call", () => {
+  const dir = tempDir();
+  writeResultsFixture(dir);
+  const runs = load(dir);
+  const changes = tieChanges(runs);
+  assert.equal(changes.length, 18);
+  const first = changes[0] as TieChange;
+  assert.deepEqual([first.dataset, first.method, first.changeMicro], ["syn-W2M-M", "BL4", 10_000]);
+  assert.equal(micro(first.e1) - micro(first.e6), 10_000);
+  assert.equal(first.e1, e1Cell(runs, "syn-W2M-M", "BL4"));
+  assert.ok(Number.isInteger(first.changeMicro));
+  // H and BL2 do not change, and every other row is 0 too, so the order of the rest is dataset, then method (string order)
+  for (const c of changes.slice(1)) assert.equal(c.changeMicro, 0, `${c.dataset} ${c.method}`);
+  const methods = ["BL0", "BL1", "BL2", "BL2t", "BL3", "BL4", "BL5", "BL6", "H"];
+  assert.deepEqual(
+    changes.slice(1).map((c) => `${c.dataset}|${c.method}`),
+    [...methods.map((m) => `digg2009|${m}`), ...methods.filter((m) => m !== "BL4").map((m) => `syn-W2M-M|${m}`)],
+  );
+  assert.deepEqual(tieChanges(runs), changes, "the same order on a second call");
+  // the order is by the change, not by the name: a larger change on a later name comes first, and a change down counts as much as one up
+  const moved = tieChanges(fixtureWithE6Shift([["digg2009", "H", 30_000], ["syn-W2M-M", "BL0", -5_000]]));
+  assert.equal(moved.length, 18);
+  assert.deepEqual(moved.slice(0, 3).map((c) => [c.dataset, c.method, c.changeMicro]), [["digg2009", "H", 30_000], ["syn-W2M-M", "BL4", 10_000], ["syn-W2M-M", "BL0", 5_000]]);
+  // E6_LARGEST is the pair of the real results, and the first row of the fixture
+  assert.deepEqual({ ...E6_LARGEST }, { dataset: "syn-W2M-M", method: "BL4" });
+});
+
+test("checkTieChanges: passes on the fixture; throws on another wanted pair, on a tie for the largest change, and when H or BL2 changes at 3 decimals", () => {
+  const dir = tempDir();
+  writeResultsFixture(dir);
+  const runs = load(dir);
+  checkTieChanges(runs);
+  checkTieChanges(runs, { dataset: "syn-W2M-M", method: "BL4" });
+  // another wanted pair: the message names the pair that is the largest and the pair that was wanted
+  assert.throws(
+    () => checkTieChanges(runs, { dataset: "digg2009", method: "BL4" }),
+    (e: Error) => e.message.includes("BL4") && e.message.includes("syn-W2M-M") && e.message.includes("digg2009") && /largest/.test(e.message),
+  );
+  // two pairs share the largest change (BL4 on digg2009 moves by 0.010000 too)
+  assert.throws(() => checkTieChanges(fixtureWithE6Shift([["digg2009", "BL4", -10_000]])), (e: Error) => /not one largest pair/.test(e.message) && e.message.includes("digg2009") && e.message.includes("BL4"));
+  // another pair moves more than the wanted one
+  assert.throws(() => checkTieChanges(fixtureWithE6Shift([["digg2009", "BL5", 20_000]])), (e: Error) => e.message.includes("BL5") && e.message.includes("digg2009") && /largest/.test(e.message));
+  // H and BL2: a change at 3 decimals stops the check, on both datasets (the change is far below the largest one)
+  for (const [dataset, method] of [["syn-W2M-M", "H"], ["digg2009", "H"], ["syn-W2M-M", "BL2"], ["digg2009", "BL2"]] as const) {
+    assert.throws(() => checkTieChanges(fixtureWithE6Shift([[dataset, method, 1_000]])), (e: Error) => e.message.includes(method) && e.message.includes(dataset) && /3 decimals|ties/.test(e.message), `${dataset} ${method}`);
+  }
+  // a change in the sixth decimal that does not move the 3-decimal text is fine
+  const small = fixtureWithE6Shift([["syn-W2M-M", "H", 1]]);
+  assert.equal(roundDecimal(e1Cell(small, "syn-W2M-M", "H"), 3), roundDecimal(fromMicro(micro(e1Cell(small, "syn-W2M-M", "H")) + 1), 3), "the fixture value does not sit on a rounding edge");
+  checkTieChanges(small);
+});
+
 test("Full macros: the Digg H1 row keeps its 6 decimals, and the 3-decimal macros keep their rounding", () => {
   const dir = tempDir();
   const compare = "p7-main/compare.csv|digg2009|F1|H|BL2|10|0-4|";
@@ -220,7 +355,7 @@ test("Full macros: the Digg H1 row keeps its 6 decimals, and the 3-decimal macro
     assert.equal(byName.get(`eTwoDiggNdcgTenZeroFour${what}`)?.value, "0.000", "the 3-decimal macro keeps its rounding");
   }
   assert.equal(byName.get("eTwoDiggNdcgTenZeroFourPHolm")?.value, "0.335");
-  assert.equal(macros.filter((m) => m.name.endsWith("Full")).length, 5, "three Digg macros and two tuning points");
+  assert.equal(macros.filter((m) => m.name.endsWith("Full")).length, 7, "three Digg macros, two tuning points and two E6 values of BL4 on syn-W2M-M");
   // a Full macro with a tuning cell: the 6 decimals of val_ndcg10
   const tuneRow = (byName.get("tuneWTwoMHValNdcgTenTenTwentyFourFull") as MacroRow).value;
   assert.match(tuneRow, /^0\.[0-9]{6}$/);

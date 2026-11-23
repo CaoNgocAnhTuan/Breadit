@@ -68,14 +68,27 @@ function groupSize(dataset: string, group: string): number {
   return (base[group] as number) + d;
 }
 
+/** `cell` (a 6-decimal number, 0 or more) minus `micro` millionths, by whole millionths (no float). */
+function minusMicro(cell: string, micro: number): string {
+  const [whole, frac] = cell.split(".") as [string, string];
+  const left = Number(whole) * 1_000_000 + Number(frac) - micro;
+  if (left < 0) throw new Error(`fixture: ${cell} minus ${micro} millionths is below 0`);
+  return `${Math.floor(left / 1_000_000)}.${String(left % 1_000_000).padStart(6, "0")}`;
+}
+
 function summary(run: FixtureRun): Table {
   const rows: Rec[] = [];
   for (const dataset of run.datasets) {
     for (const method of run.methods) {
       for (const k of KS) {
         for (const group of GROUPS) {
-          const seed = `${run.id}|${dataset}|${method}|${k}|${group}`;
-          rows.push({ dataset, split: run.split, method, k: String(k), bucket: group, n_users: String(groupSize(dataset, group)), recall: num(`r${seed}`, 0.01, 0.6), ndcg: num(`n${seed}`, 0.01, 0.4) });
+          // Task p9-missing-macros: the E6 rows at K 10, bucket all, equal the E1 rows (same seed), as in the real results where ties
+          // do not move H and BL2. One pair moves clearly: BL4 on syn-W2M-M is the E1 value minus 0.010000.
+          const asE1 = run.id === "p7-e6-ties" && k === 10 && group === "all";
+          const seed = `${asE1 ? "p7-main" : run.id}|${dataset}|${method}|${k}|${group}`;
+          const e1Ndcg = num(`n${seed}`, 0.01, 0.4);
+          const ndcg = asE1 && dataset === "syn-W2M-M" && method === "BL4" ? minusMicro(e1Ndcg, 10_000) : e1Ndcg;
+          rows.push({ dataset, split: run.split, method, k: String(k), bucket: group, n_users: String(groupSize(dataset, group)), recall: num(`r${seed}`, 0.01, 0.6), ndcg });
         }
       }
     }
