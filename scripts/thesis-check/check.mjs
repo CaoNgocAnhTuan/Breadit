@@ -165,7 +165,7 @@ function main() {
     ...walk(PRE_THESIS, new Set(['Latex', 'output']))
       .filter((p) => p.endsWith('.md'))
       .map((p) => ({ path: p, group: 'pre-thesis', kind: 'md', text: read(p) })),
-    ...list(EXTRACTS, '.md').map((f) => ({ path: `${EXTRACTS}/${f}`, group: 'extract', kind: 'md', text: read(`${EXTRACTS}/${f}`) })),
+    ...list(EXTRACTS, '.md').map((f) => ({ path: `${EXTRACTS}/${f}`, group: 'extract', kind: 'md-quotes', text: read(`${EXTRACTS}/${f}`) })),
   ];
   const overlap = checkOverlap(
     chapters.filter((c) => c.path !== REFERENCES).map((c) => ({ path: c.path, text: c.commentFree.join('\n') })),

@@ -481,6 +481,34 @@ export function words(lines, kind) {
   return out;
 }
 
+/**
+ * The text inside each pair of straight double quotes, one piece per quote, with its real line (1-based).
+ * The pairs are taken left to right on one line; a line with an odd number of '"' gives no piece for its last,
+ * unclosed quote. Task p10-overlap-quotes-only: only these pieces are words of a paper in an extract file.
+ * @param {string} text
+ * @returns {{ line: number, text: string }[]}
+ */
+export function quotePieces(text) {
+  const out = [];
+  text.split(/\r?\n/).forEach((raw, i) => {
+    const parts = raw.split('"');
+    for (let k = 1; k + 1 < parts.length; k += 2) out.push({ line: i + 1, text: parts[k] });
+  });
+  return out;
+}
+
+/**
+ * The words arrays that one source is compared with. kind 'md-quotes': one array per quote, each placed on its real
+ * line, so a run of words never crosses two quotes or the note text between them. Any other kind: one array for the
+ * whole text.
+ * @param {{ kind: string, text: string }} source
+ * @returns {{ w: string, line: number, offset: number }[][]}
+ */
+export function sourcePieces(source) {
+  if (source.kind !== 'md-quotes') return [words(source.text.split(/\r?\n/), source.kind)];
+  return quotePieces(source.text).map((q) => words([...Array(q.line - 1).fill(''), q.text], 'md'));
+}
+
 const SHINGLES = new WeakMap(); // words array -> Map(n -> keys); only a speed-up, no change of result
 
 function shingleKeys(ws, n) {
@@ -551,13 +579,14 @@ const plural = (n, one, many) => (n === 1 ? one : many);
 /**
  * Check 4. `thesis`: `{ path, text }` (comment-free text); `sources`: `{ path, group, kind, text }` with group
  * 'pre-thesis' (matches are WARN) or 'extract' (FAIL, or INFO inside a quotation that has a \refcite).
- * One finding per match and group; the source with the longest run is named, the others are counted.
+ * kind 'tex' and 'md' compare the whole text; kind 'md-quotes' only the text inside "..." pairs, each quote on its own.
+ * One finding per match and group; the file with the longest run is named, the other files are counted.
  * `table` has one line per thesis file: matches and matched words per group.
  */
 export function checkOverlap(thesis, sources, n = 8, name = 'overlap') {
   const prepared = [...sources]
     .sort((a, b) => cmp(a.path, b.path))
-    .map((s) => ({ ...s, w: words(s.text.split(/\r?\n/), s.kind) }));
+    .map((s) => ({ ...s, pieces: sourcePieces(s) }));
   const groups = [...new Set(sources.map((s) => s.group))].sort(cmp);
   const findings = [];
   const table = [];
@@ -571,7 +600,15 @@ export function checkOverlap(thesis, sources, n = 8, name = 'overlap') {
       const byStart = new Map();
       for (const s of prepared) {
         if (s.group !== g) continue;
-        for (const m of overlaps(tw, s.w, n)) {
+        // the longest match per start offset inside this file (its first piece wins a tie), then one match per file
+        const inFile = new Map();
+        for (const piece of s.pieces) {
+          for (const m of overlaps(tw, piece, n)) {
+            const best = inFile.get(m.startOffset);
+            if (!best || m.length > best.length) inFile.set(m.startOffset, m);
+          }
+        }
+        for (const m of inFile.values()) {
           const cur = byStart.get(m.startOffset);
           if (!cur) byStart.set(m.startOffset, { m, s, others: 0 });
           else if (m.length > cur.m.length) byStart.set(m.startOffset, { m, s, others: cur.others + 1 });
@@ -600,7 +637,10 @@ export function checkOverlap(thesis, sources, n = 8, name = 'overlap') {
     table.push(`${t.path}: ${cells.join('; ')}`);
   }
   const kinds = new Map();
-  for (const s of sources) kinds.set(`${s.group} ${s.kind}`, (kinds.get(`${s.group} ${s.kind}`) || 0) + 1);
+  for (const s of sources) {
+    const key = `${s.group} ${s.kind === 'md-quotes' ? 'md (quotes only)' : s.kind}`;
+    kinds.set(key, (kinds.get(key) || 0) + 1);
+  }
   const read = [...kinds.keys()].sort(cmp).map((k) => `${kinds.get(k)} ${k}`).join(', ');
   const parts = groups.map((g) => {
     const tot = totals.get(g);

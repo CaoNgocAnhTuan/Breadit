@@ -1,4 +1,5 @@
-// Tests of scripts/thesis-check/lib.mjs (task p10-final-checks, plan steps 1-2, TC1-TC10).
+// Tests of scripts/thesis-check/lib.mjs (task p10-final-checks, plan steps 1-2, TC1-TC10;
+// task p10-overlap-quotes-only, plan step 2, the tests named "quotes-only TC1" to "quotes-only TC5").
 // Run: node --test 'scripts/thesis-check/*.test.mjs'   (Node 22, no db, no LaTeX build, no real thesis file)
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -24,7 +25,9 @@ import {
   parsePages,
   parseReferences,
   parseSection10,
+  quotePieces,
   refKeys,
+  sourcePieces,
   statusOf,
   stripComments,
   stripTex,
@@ -423,6 +426,101 @@ test('TC8 checkOverlap counts matches per chapter and source group, and passes w
   assert.match(r.table[1], /chapters\/b\.tex.*pre-thesis 0 match/);
   const none = checkOverlap([thesis[1]], [sourceOf('p.md', 'pre-thesis', RUN8)], 8);
   assert.equal(none.status, 'PASS');
+});
+
+// Task p10-overlap-quotes-only: an extract source of kind 'md-quotes' is read only inside its "..." pairs.
+const extractOf = (path, text, kind = 'md-quotes') => ({ path, group: 'extract', kind, text });
+const quoteOf = (...runs) => runs.map((r) => `"${r}"`).join(' ');
+
+test('quotes-only TC1 quotePieces gives one piece per quote with its real line, and none for an unclosed quote', () => {
+  assert.deepEqual(quotePieces('a "one two" b "three"\nx\ny "four five" z'), [
+    { line: 1, text: 'one two' },
+    { line: 1, text: 'three' },
+    { line: 3, text: 'four five' },
+  ]);
+  assert.deepEqual(quotePieces('say "one" then "two\nnext line'), [{ line: 1, text: 'one' }]);
+  assert.deepEqual(quotePieces('a\r\nb "x y"\r\nc'), [{ line: 2, text: 'x y' }]);
+  assert.deepEqual(quotePieces('no quote here\nnor here'), []);
+  assert.deepEqual(quotePieces(''), []);
+});
+
+test('quotes-only TC1 sourcePieces gives one words array per quote for md-quotes and one for the whole text otherwise', () => {
+  const text = `Note ${RUN8}.\nQ. "alpha bravo" and "charlie delta"`;
+  const q = sourcePieces(extractOf('e.md', text));
+  assert.equal(q.length, 2);
+  assert.deepEqual(q[0].map((x) => [x.w, x.line]), [['alpha', 2], ['bravo', 2]]);
+  assert.deepEqual(q[1].map((x) => [x.w, x.line]), [['charlie', 2], ['delta', 2]]);
+  const whole = sourcePieces(extractOf('e.md', text, 'md'));
+  assert.equal(whole.length, 1);
+  assert.equal(whole[0].length, words(text.split('\n'), 'md').length);
+  assert.deepEqual(sourcePieces(extractOf('e.md', 'no quote at all')), []);
+});
+
+test('quotes-only TC2 checkOverlap gives nothing for 8 shared words in the note text outside the quotes', () => {
+  const text = ['# 01', `Says: ${RUN8} is in our note.`, 'Q1. The paper says "something else entirely".'].join('\n');
+  const r = checkOverlap([{ path: 'chapters/a.tex', text: `We say ${RUN8} here.` }], [extractOf('.docs/e/01.md', text)], 8);
+  assert.deepEqual(r.findings, []);
+  assert.equal(r.status, 'PASS');
+  const old = checkOverlap([{ path: 'chapters/a.tex', text: `We say ${RUN8} here.` }], [extractOf('.docs/e/01.md', text, 'md')], 8);
+  assert.equal(old.status, 'FAIL');
+});
+
+test('quotes-only TC2 checkOverlap gives FAIL for 8 shared words inside one quote, with the real line of the extract', () => {
+  const text = ['# 01', `Says: ${RUN8} is in our note.`, `Q1. The paper says "${RUN8}" and more.`].join('\n');
+  const r = checkOverlap([{ path: 'chapters/a.tex', text: `First.\nWe say ${RUN8} here.` }], [extractOf('.docs/e/01.md', text)], 8);
+  assert.equal(r.status, 'FAIL');
+  assert.equal(r.findings.length, 1);
+  assert.deepEqual([r.findings[0].level, r.findings[0].path, r.findings[0].line], ['FAIL', 'chapters/a.tex', 2]);
+  assert.match(r.findings[0].message, /\.docs\/e\/01\.md:3 \[extract\]/);
+});
+
+test('quotes-only TC3 checkOverlap gives nothing for a run split over two quotes, or over a quote and the note text next to it', () => {
+  const thesis = [{ path: 'chapters/a.tex', text: `We say ${RUN8} here.` }];
+  const two = `Q. "alpha bravo charlie delta", "echo foxtrot golf hotel" end`;
+  const quoteThenNote = 'Q. "alpha bravo charlie delta" echo foxtrot golf hotel';
+  const noteThenQuote = 'Q. alpha bravo charlie delta "echo foxtrot golf hotel"';
+  for (const text of [two, quoteThenNote, noteThenQuote]) {
+    const r = checkOverlap(thesis, [extractOf('.docs/e/01.md', text)], 8);
+    assert.deepEqual(r.findings, [], text);
+    // control: read as a whole text, the same line would match, so the test is sensitive to the rule
+    const whole = checkOverlap(thesis, [extractOf('.docs/e/01.md', text, 'md')], 8);
+    assert.equal(whole.findings.length, 1, text);
+  }
+});
+
+test('quotes-only TC4 checkOverlap gives INFO for a match inside a thesis quotation with a refcite', () => {
+  const src = [extractOf('.docs/e/01.md', `Q. "${RUN8}"`)];
+  const quoted = checkOverlap([{ path: 'chapters/a.tex', text: `They write \`\`${RUN8}'' \\refcite{k} and we agree.` }], src, 8);
+  assert.equal(quoted.status, 'PASS');
+  assert.equal(quoted.findings.length, 1);
+  assert.equal(quoted.findings[0].level, 'INFO');
+  assert.match(quoted.findings[0].message, /\[extract, quotation with citation\]/);
+  const bare = checkOverlap([{ path: 'chapters/a.tex', text: `We say ${RUN8} in our text.` }], src, 8);
+  assert.equal(bare.findings[0].level, 'FAIL');
+});
+
+test('quotes-only TC5 checkOverlap counts other files, not other quotes of the same file', () => {
+  const thesis = [{ path: 'chapters/a.tex', text: `We say ${RUN8} here.` }];
+  const twoFiles = checkOverlap(thesis, [extractOf('.docs/e/01.md', `Q. ${quoteOf(RUN8)}`), extractOf('.docs/e/02.md', `Q. ${quoteOf(RUN8)}`)], 8);
+  assert.equal(twoFiles.findings.length, 1);
+  assert.match(twoFiles.findings[0].message, /\.docs\/e\/01\.md:1 \[extract, 1 more file\]/);
+  const threeFiles = checkOverlap(thesis, [extractOf('.docs/e/01.md', quoteOf(RUN8)), extractOf('.docs/e/02.md', quoteOf(RUN8)), extractOf('.docs/e/03.md', quoteOf(RUN8))], 8);
+  assert.match(threeFiles.findings[0].message, /\[extract, 2 more files\]/);
+  const sameFile = checkOverlap(thesis, [extractOf('.docs/e/01.md', `first\nQ. ${quoteOf(RUN8)}\nmid\nQ. ${quoteOf(RUN8)}`)], 8);
+  assert.equal(sameFile.findings.length, 1);
+  assert.match(sameFile.findings[0].message, /\.docs\/e\/01\.md:2 \[extract\]/);
+  // the longest run of the file wins, and the other file is still counted once
+  const longer = checkOverlap([{ path: 'chapters/a.tex', text: `We say ${RUN16} here.` }], [extractOf('.docs/e/01.md', `${quoteOf(RUN8)}\n${quoteOf(RUN16)}`), extractOf('.docs/e/02.md', quoteOf(RUN8))], 8);
+  assert.equal(longer.findings.length, 1);
+  assert.match(longer.findings[0].message, /^16 words also in \.docs\/e\/01\.md:2 \[extract, 1 more file\]/);
+});
+
+test('quotes-only TC5 the summary says quotes only for the extracts and keeps the other groups as before', () => {
+  const thesis = [{ path: 'chapters/a.tex', text: 'nothing in common with anything at all in this line' }];
+  const r = checkOverlap(thesis, [extractOf('.docs/e/01.md', quoteOf(RUN8)), extractOf('.docs/e/02.md', quoteOf(RUN8)), sourceOf('p.md', 'pre-thesis', RUN8)], 8);
+  assert.match(r.summary, /against 2 extract md \(quotes only\), 1 pre-thesis md: /);
+  const pre = checkOverlap([{ path: 'chapters/a.tex', text: `${RUN8} here` }], [sourceOf('p.md', 'pre-thesis', `Note ${RUN8}`)], 8);
+  assert.equal(pre.findings[0].level, 'WARN');
 });
 
 // TC9: parsePages + checkPages
