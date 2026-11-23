@@ -13,16 +13,16 @@
       "sha256": "fa5baaa695b82164a4e6a779859d80b1f2898129eb28a5819776848421c0942c"
     },
     "macros.csv": {
-      "rows": 154,
-      "sha256": "5d794fbebb884b9b89f0cc65197ab938c81eb276c20dc4de05f249ef0e7b0bde"
+      "rows": 173,
+      "sha256": "9f0cf361a49e91c9830adf4a263874b0e720211dd4c74dab71616a67b85b90e0"
     },
     "results-macros.tex": {
-      "rows": 154,
-      "sha256": "d865936390dfc456c7cd62a3288ab22e9d20cc021a4cdf10819a05f8c3e0ef6b"
+      "rows": 173,
+      "sha256": "82ed9ffd8e102aa093cf3e9424f6f9c06f47b02c30bb148e86dac181b3e0dd0d"
     },
     "results.md": {
-      "rows": 312,
-      "sha256": "047a83279e2877a309372bc6c9530c6dcaed6b60e42688fa5c4350adae87e936"
+      "rows": 331,
+      "sha256": "a436d9204db6f571bbc3fa18346cffce9f497d9e3e430d79f6686bd7d82641da"
     },
     "tables/e1.tex": {
       "rows": 16,
