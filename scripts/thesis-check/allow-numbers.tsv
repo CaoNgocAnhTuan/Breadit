@@ -1,0 +1,84 @@
+file	number	context	reason
+abstract.tex	95\%	interval	the level of the confidence interval, a setting of the method (Chapter 3)
+appendix.tex	0.25	minus 0.25 per hour	a weight of the BL2 formula, a setting frozen in super-plan section 7 (not a result)
+appendix.tex	1.0	arraystretch	row spacing of a table: layout setting, not a result
+appendix.tex	95\%	bootstrap	the level of the confidence interval, a setting of the method (Chapter 3)
+conclusion.tex	95\%	interval	the level of the confidence interval, a setting of the method (Chapter 3)
+experiments-and-results.tex	0.02	legend style	legend position in a figure: layout setting, not a result
+experiments-and-results.tex	0.08	enlarge x limits	figure axis margin: layout setting, not a result
+experiments-and-results.tex	0.25	change log (version	version number of the super-plan change log, not a result
+experiments-and-results.tex	0.32	legend style	legend position in a figure: layout setting, not a result
+experiments-and-results.tex	0.37	width=	figure width: layout setting, not a result
+experiments-and-results.tex	0.5	legend style	legend position in a figure: layout setting, not a result
+experiments-and-results.tex	0.72	tabular	column width of a table: layout setting, not a result
+experiments-and-results.tex	0.9	width=	figure width: layout setting, not a result
+experiments-and-results.tex	0.97	legend style	legend position in a figure: layout setting, not a result
+experiments-and-results.tex	95\%	interval	the level of the confidence interval, a setting of the method (Chapter 3)
+implementation.tex	0.1	fraction	float placement setting of the page: layout setting, not a result
+implementation.tex	0.2	fraction	float placement setting of the page: layout setting, not a result
+implementation.tex	0.3	fraction	float placement setting of the page: layout setting, not a result
+implementation.tex	0.5	fraction	float placement setting of the page: layout setting, not a result
+implementation.tex	0.7	fraction	float placement setting of the page: layout setting, not a result
+implementation.tex	0.8	fraction	float placement setting of the page: layout setting, not a result
+implementation.tex	0.9	fraction	float placement setting of the page: layout setting, not a result
+implementation.tex	1.15	arraystretch	row spacing of a table: layout setting, not a result
+introduction.tex	95\%	interval	the level of the confidence interval, a setting of the method (Chapter 3)
+literature-review.tex	0.5284	Kendall	number quoted from the cited paper (Meng et al. 2020), not a result of this thesis
+literature-review.tex	0.7630	Kendall	number quoted from the cited paper (Meng et al. 2020), not a result of this thesis
+literature-review.tex	0.8	votes	exponent of the Hacker News formula, quoted from the cited source (Shirriff 2013)
+literature-review.tex	1.15	arraystretch	row spacing of a table: layout setting, not a result
+literature-review.tex	1.8	age in hours	exponent of the Hacker News formula, quoted from the cited source (Shirriff 2013)
+literature-review.tex	2.50\%	On Yelp and Flickr	number quoted from the cited paper (Wu et al. 2019, DiffNet), not a result of this thesis
+literature-review.tex	2.96\%	On Yelp and Flickr	number quoted from the cited paper (Wu et al. 2019, DiffNet), not a result of this thesis
+literature-review.tex	89.5\%	as much as	number quoted from the cited paper (Ji et al. 2023), not a result of this thesis
+methodology.tex	0.05	Holm-adjusted	the significance level, a frozen setting of the protocol (super-plan section 7)
+methodology.tex	0.0625	BL2t (age weight	a bound of a tuning grid, a frozen setting (super-plan section 7)
+methodology.tex	0.25	ageHours	a weight of the BL2 formula, a setting frozen in super-plan section 7 (not a result)
+methodology.tex	0.5	low, middle and high	a parameter of a synthetic world, a frozen setting of the generator (super-plan section 7)
+methodology.tex	0.6	BL5 (gravity	a bound of a tuning grid, a frozen setting (super-plan section 7)
+methodology.tex	0.7	homophily only	a parameter of a synthetic world, a frozen setting of the generator (super-plan section 7)
+methodology.tex	0.7	low, middle and high	a parameter of a synthetic world, a frozen setting of the generator (super-plan section 7)
+methodology.tex	0.8	(P - 1)	exponent of the Hacker News formula, quoted from the cited source (Shirriff 2013)
+methodology.tex	0.8	lceil	the 80% share of the temporal split, a frozen setting of the protocol (super-plan section 7)
+methodology.tex	1.15	arraystretch	row spacing of a table: layout setting, not a result
+methodology.tex	2.4	BL5 (gravity	a bound of a tuning grid, a frozen setting (super-plan section 7)
+methodology.tex	95\%	confidence interval	the level of the confidence interval, a setting of the method (Chapter 3)
+test-cases-and-demonstration.tex	0.1	fraction	float placement setting of the page: layout setting, not a result
+test-cases-and-demonstration.tex	0.2	fraction	float placement setting of the page: layout setting, not a result
+test-cases-and-demonstration.tex	0.3	fraction	float placement setting of the page: layout setting, not a result
+test-cases-and-demonstration.tex	0.5	fraction	float placement setting of the page: layout setting, not a result
+test-cases-and-demonstration.tex	0.7	fraction	float placement setting of the page: layout setting, not a result
+test-cases-and-demonstration.tex	0.8	fraction	float placement setting of the page: layout setting, not a result
+test-cases-and-demonstration.tex	0.9	fraction	float placement setting of the page: layout setting, not a result
+test-cases-and-demonstration.tex	1.1	arraystretch	row spacing of a table: layout setting, not a result
+slides/progress-2026-11-30.tex	0.02	legend style	legend position in a figure: layout setting, not a result
+slides/progress-2026-11-30.tex	0.05	Holm	the significance level, a frozen setting of the protocol (super-plan section 7)
+slides/progress-2026-11-30.tex	0.08	enlarge x limits	figure axis margin: layout setting, not a result
+slides/progress-2026-11-30.tex	0.2	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	0.25	ageHours	a weight of the BL2 formula, a setting frozen in super-plan section 7 (not a result)
+slides/progress-2026-11-30.tex	0.32	legend style	legend position in a figure: layout setting, not a result
+slides/progress-2026-11-30.tex	0.36	width=	figure width: layout setting, not a result
+slides/progress-2026-11-30.tex	0.44	column	column width of a slide: layout setting, not a result
+slides/progress-2026-11-30.tex	0.46	column	column width of a slide: layout setting, not a result
+slides/progress-2026-11-30.tex	0.48	column	column width of a slide: layout setting, not a result
+slides/progress-2026-11-30.tex	0.49	column	column width of a slide: layout setting, not a result
+slides/progress-2026-11-30.tex	0.5	legend style	legend position in a figure: layout setting, not a result
+slides/progress-2026-11-30.tex	0.50	column	column width of a slide: layout setting, not a result
+slides/progress-2026-11-30.tex	0.52	column	column width of a slide: layout setting, not a result
+slides/progress-2026-11-30.tex	0.88	width=	figure width: layout setting, not a result
+slides/progress-2026-11-30.tex	0.9	\draw	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	0.9	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	0.95	resizebox	table width: layout setting, not a result
+slides/progress-2026-11-30.tex	0.97	legend style	legend position in a figure: layout setting, not a result
+slides/progress-2026-11-30.tex	1.15	arraystretch	row spacing of a table: layout setting, not a result
+slides/progress-2026-11-30.tex	1.18	compat	compatibility version of the pgfplots package, a software version
+slides/progress-2026-11-30.tex	1.75	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	12.2	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	2.2	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	3.15	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	3.7	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	4.0	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	4.25	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	8.2	\node	coordinate in the architecture drawing: layout setting, not a result
+slides/progress-2026-11-30.tex	80\%	Temporal split	the 80% share of the temporal split, a frozen setting of the protocol (super-plan section 7)
+slides/progress-2026-11-30.tex	95\%	interval	the level of the confidence interval, a setting of the method (Chapter 3)

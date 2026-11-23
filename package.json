@@ -15,6 +15,7 @@
     "demo:users": "node scripts/demo/demo.mjs users",
     "demo:stop": "node scripts/demo/demo.mjs stop",
     "thesis:repro": "node scripts/repro/thesis-repro.mjs",
+    "thesis:check": "node scripts/thesis-check/check.mjs",
     "test:backend": "npm run test -w @breadit/backend && npm run test:it -w @breadit/backend",
     "dataset:humans": "powershell -ExecutionPolicy Bypass -File scripts/dataset-humans.ps1",
     "prepare":   "husky"
