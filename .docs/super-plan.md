@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.36 · 2026-11-19 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.37 · 2026-11-23 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The supervisor checks progress on **2026-11-30** (2026-11-20 was only the author's own target); the submission and defense dates are not known yet. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -470,7 +470,7 @@ The thesis results do not need the schema migration: generated data has no dupli
 47. Mislove, Marcon, Gummadi, Druschel, Bhattacharjee (2007). Measurement and analysis of online social networks. *IMC*. https://socialnetworks.mpi-sws.org/data-imc2007.html · search only (the paper was not opened; the citation was read on the data page [48]; do not cite)
 48. Flickr IMC 2007 data set (links, users, groups, group memberships). https://socialnetworks.mpi-sws.org/data-imc2007.html · verified (page opened 2026-10-26; file headers and the first 50,000 lines of each file read; see `.docs/datasets.md`)
 49. Lerman. Digg 2009 data set page (Internet Archive snapshot 20221130205157). http://web.archive.org/web/20221130205157id_/https://www.isi.edu/~lerman/downloads/digg2009.html · verified (archive copy opened 2026-10-26 and read again that day at 18:39 UTC; the live download links were dead). The two zips were then opened in full from Internet Archive captures of 2013-08-26 (2026-10-26 UTC): http://web.archive.org/web/20130826053517id_/http://www.isi.edu/~lerman/downloads/digg_votes.zip and http://web.archive.org/web/20130826053527id_/http://www.isi.edu/~lerman/downloads/digg_friends.zip. The SHA-256 of both zips is in `.docs/datasets.md` section 4
-50. Hogg, Lerman (2012). Social dynamics of Digg. *EPJ Data Science* 1(5). https://doi.org/10.1140/epjds5 · search only (named on the Digg page [49], which asks users of the data to cite it; the paper was not opened; do not cite a finding from it; check the record before the thesis cites it as the data source)
+50. Hogg, Lerman (2012). Social dynamics of Digg. *EPJ Data Science* 1(5). https://doi.org/10.1140/epjds5 · verified (Crossref record read 2026-11-23: Tad Hogg, Kristina Lerman, *EPJ Data Science* volume 1, issue 1, article 5, published online 2012-06-18; the article page needs a login, so no full text; cited only as the source of the Digg data, as the Digg page [49] asks; do not cite a finding from it)
 
 ---
 
@@ -525,3 +525,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.34 · 2026-11-19 · Task `p9-report-macros` closed: a P9 status paragraph; §4 row P9 (`p9-report-macros` ✅); §11 item 4 (the tag proposal moves to the task's closing commit). No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.35 · 2026-11-19 · Task `p9-figure-data` closed: the P9 status paragraph and the §4 row P9. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.36 · 2026-11-19 · §4 row P9: task `p9-diagrams` dropped by the author; the diagrams are drawn by hand (draw.io, and the Mermaid web editor for sequence diagrams). No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.37 · 2026-11-23 · §10 [50] Hogg and Lerman (2012): "search only" → verified from its Crossref record, so the thesis cites it as the source of the Digg data (Chapter 3), as the Digg page asks. No frozen value changed; §5, §6 and §7 are byte-identical.
