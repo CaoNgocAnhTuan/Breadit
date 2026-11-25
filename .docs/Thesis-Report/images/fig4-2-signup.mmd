@@ -11,7 +11,10 @@ flowchart TD
     A3 --> A4["Make a 6-digit code, valid 15 minutes,<br/>and email it"]
     A4 --> A5["Open /verify and enter the code"]
     A5 --> A6["POST /api/auth/verify"]
-    A6 --> D3{"Code right and<br/>not expired?"}
+    A6 --> D5{"More than 5 tries for<br/>this email in 15 minutes?"}
+    D5 -->|yes| R3["429: wait, then ask<br/>for a new code"]
+    R3 --> D4
+    D5 -->|no| D3{"Code right and<br/>not expired?"}
     D3 -->|no| D4{"Ask for a new code?"}
     D4 -->|yes| A7["POST /api/auth/verify/resend:<br/>a new code replaces the old one"]
     A7 --> A5

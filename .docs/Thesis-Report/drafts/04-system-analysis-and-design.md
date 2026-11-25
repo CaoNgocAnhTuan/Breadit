@@ -184,7 +184,10 @@ flowchart TD
     A3 --> A4["Make a 6-digit code, valid 15 minutes,<br/>and email it"]
     A4 --> A5["Open /verify and enter the code"]
     A5 --> A6["POST /api/auth/verify"]
-    A6 --> D3{"Code right and<br/>not expired?"}
+    A6 --> D5{"More than 5 tries for<br/>this email in 15 minutes?"}
+    D5 -->|yes| R3["429: wait, then ask<br/>for a new code"]
+    R3 --> D4
+    D5 -->|no| D3{"Code right and<br/>not expired?"}
     D3 -->|no| D4{"Ask for a new code?"}
     D4 -->|yes| A7["POST /api/auth/verify/resend:<br/>a new code replaces the old one"]
     A7 --> A5
@@ -299,14 +302,14 @@ sequenceDiagram
     alt wrong email or password
         AS-->>B: 401 Invalid email or password
     else right
-        AS->>AS: signJwt: HS256, a new jti, 30 days
+        AS->>AS: signJwt: HS256, a new jti, pwv = passwordVersion, 30 days
         AS-->>B: 200 user, Set-Cookie breadit_session (httpOnly)
     end
     Note over B,R: Every later request sends the cookie
     B->>G: GET /api/... with the cookie
     G->>G: readSession: verifyJwt
-    G->>R: GET auth:blacklist:jti
-    R-->>G: not found
+    G->>R: MGET auth:blacklist:jti, auth:pwv:userId
+    R-->>G: not blacklisted, version equals the pwv of the token
     G->>G: req.user = id, username, emailVerified, role, banned
     U->>B: sign out
     B->>AC: POST /api/auth/logout with the cookie
@@ -314,9 +317,10 @@ sequenceDiagram
     AS->>R: SET auth:blacklist:jti until the token expires
     AS-->>B: 200, clear the cookie
     B->>G: a request with the old token
-    G->>R: GET auth:blacklist:jti
-    R-->>G: found
+    G->>R: MGET auth:blacklist:jti, auth:pwv:userId
+    R-->>G: blacklisted
     G-->>B: 401
+    Note over B,R: After a password reset, the version is one higher, so every older token also gets 401
 ```
 
 Checked against (again on 2026-11-20): `auth.controller.ts` (`login`, `logout`), `auth.service.ts` (`signJwt`, `setSessionCookie`, `login`, `logout`, `BLACKLIST_PREFIX`), `jwt.guard.ts` and `session.ts` (`readSession`: the token check and the blacklist read, shared with `OptionalJwtAuthGuard`; a Redis error gives 401). Sign-in does not refuse a banned or unverified user; `BannedUserGuard` and `EmailVerifiedGuard` stop their writes later.
@@ -378,7 +382,7 @@ sequenceDiagram
     participant GW as Gateway and Redis adapter
     participant B as Bob's browser
     B->>GW: connect with the cookie
-    GW->>GW: check the cookie and the logout blacklist
+    GW->>GW: readSession: the cookie, the logout blacklist and the password version
     GW->>GW: join the room "bob"
     A->>C: POST /api/conversations/:id/messages with the cookie
     C->>C: JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard
@@ -556,6 +560,7 @@ erDiagram
         DateTime emailVerified
         Role role
         Boolean banned
+        Int passwordVersion
         DateTime createdAt
     }
     VerificationToken {

@@ -86,7 +86,7 @@ flowchart LR
 - **File to save:** `images/fig4-2-signup.pdf` (or `images/fig4-2-signup.png`). Source: `images/fig4-2-signup.mmd`.
 - **Tool:** draw.io (an activity diagram: round start and end, diamonds for decisions).
 - **Size:** Full text width, portrait. About 14 nodes in a column: it needs 14 to 18 cm of height. If it is taller, put the "verify" part in a second column.
-- **Checked against the code:** 2026-11-19.
+- **Checked against the code:** 2026-11-25 (changed: the limit of 5 code tries for each email, task `p10-security-fixes`).
 - The two loops (400 or 409 back to the form, and "ask for a new code" back to the code step) must be easy to follow.
 
 ```mermaid
@@ -103,7 +103,10 @@ flowchart TD
     A3 --> A4["Make a 6-digit code, valid 15 minutes,<br/>and email it"]
     A4 --> A5["Open /verify and enter the code"]
     A5 --> A6["POST /api/auth/verify"]
-    A6 --> D3{"Code right and<br/>not expired?"}
+    A6 --> D5{"More than 5 tries for<br/>this email in 15 minutes?"}
+    D5 -->|yes| R3["429: wait, then ask<br/>for a new code"]
+    R3 --> D4
+    D5 -->|no| D3{"Code right and<br/>not expired?"}
     D3 -->|no| D4{"Ask for a new code?"}
     D4 -->|yes| A7["POST /api/auth/verify/resend:<br/>a new code replaces the old one"]
     A7 --> A5
@@ -192,7 +195,7 @@ flowchart TD
 - **File to save:** `images/fig4-5-auth-session.pdf` (or `images/fig4-5-auth-session.png`). Source: `images/fig4-5-auth-session.mmd`.
 - **Tool:** Mermaid web editor (mermaid.live). A sequence diagram needs no redraw.
 - **Size:** Full text width. Seven participants and about 20 messages: it is tall (up to 20 cm). Check that the text is still readable at 15.5 cm width (about 7 pt or more).
-- **Checked against the code:** 2026-11-20 (changed: `readSession`).
+- **Checked against the code:** 2026-11-25 (changed: `readSession` reads the blacklist and the password version in one `MGET`; the token holds `pwv`; task `p10-security-fixes`).
 - Changed on 2026-11-20: the step "verifyJwt" is now "readSession: verifyJwt", because `JwtAuthGuard` calls `readSession` (`auth/session.ts`).
 
 ```mermaid
@@ -213,14 +216,14 @@ sequenceDiagram
     alt wrong email or password
         AS-->>B: 401 Invalid email or password
     else right
-        AS->>AS: signJwt: HS256, a new jti, 30 days
+        AS->>AS: signJwt: HS256, a new jti, pwv = passwordVersion, 30 days
         AS-->>B: 200 user, Set-Cookie breadit_session (httpOnly)
     end
     Note over B,R: Every later request sends the cookie
     B->>G: GET /api/... with the cookie
     G->>G: readSession: verifyJwt
-    G->>R: GET auth:blacklist:jti
-    R-->>G: not found
+    G->>R: MGET auth:blacklist:jti, auth:pwv:userId
+    R-->>G: not blacklisted, version equals the pwv of the token
     G->>G: req.user = id, username, emailVerified, role, banned
     U->>B: sign out
     B->>AC: POST /api/auth/logout with the cookie
@@ -228,9 +231,10 @@ sequenceDiagram
     AS->>R: SET auth:blacklist:jti until the token expires
     AS-->>B: 200, clear the cookie
     B->>G: a request with the old token
-    G->>R: GET auth:blacklist:jti
-    R-->>G: found
+    G->>R: MGET auth:blacklist:jti, auth:pwv:userId
+    R-->>G: blacklisted
     G-->>B: 401
+    Note over B,R: After a password reset, the version is one higher, so every older token also gets 401
 ```
 
 ## Figure 4.6. Like a post, with the notification saved and pushed
@@ -284,7 +288,7 @@ sequenceDiagram
 - **File to save:** `images/fig4-7-direct-message.pdf` (or `images/fig4-7-direct-message.png`). Source: `images/fig4-7-direct-message.mmd`.
 - **Tool:** Mermaid web editor (mermaid.live).
 - **Size:** Full text width, up to 18 cm tall.
-- **Checked against the code:** 2026-11-20 (no change).
+- **Checked against the code:** 2026-11-25 (changed: the socket uses `readSession`, task `p10-security-fixes`).
 
 ```mermaid
 sequenceDiagram
@@ -297,7 +301,7 @@ sequenceDiagram
     participant GW as Gateway and Redis adapter
     participant B as Bob's browser
     B->>GW: connect with the cookie
-    GW->>GW: check the cookie and the logout blacklist
+    GW->>GW: readSession: the cookie, the logout blacklist and the password version
     GW->>GW: join the room "bob"
     A->>C: POST /api/conversations/:id/messages with the cookie
     C->>C: JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard
@@ -441,7 +445,7 @@ flowchart LR
 - **File to save:** `images/fig4-11-erd.pdf` (or `images/fig4-11-erd.png`). Source: `images/fig4-11-erd.mmd`.
 - **Tool:** draw.io (the ERD of the database: tables with fields, crow's-foot lines).
 - **Size:** It is the biggest one: 23 tables and 39 lines. Try a landscape page (the page rotated by 90 degrees; not set up yet, it needs `\usepackage{pdflscape}` in `main.tex`). If it still does not fit, cut each table to its keys (PK, FK, UK) and change the LaTeX caption to say so.
-- **Checked against the code:** 2026-11-19 (from `schema.prisma`; the schema has not changed since).
+- **Checked against the code:** 2026-11-25 (from `schema.prisma`; new column `User.passwordVersion`, task `p10-security-fixes`).
 - The caption is already in the `.tex`: 23 of the 25 models; `Account` and `Session` are left out, because no code reads them.
 - How to read a line: `User ||--o{ Post : "userId"` means one user has zero or more posts, and each post has exactly one user, through `Post.userId`. `|o` means the foreign key may be empty.
 - mermaid.live draws a very large picture for this script. Use it only as a guide. Redraw the tables in draw.io.
@@ -455,6 +459,7 @@ erDiagram
         DateTime emailVerified
         Role role
         Boolean banned
+        Int passwordVersion
         DateTime createdAt
     }
     VerificationToken {

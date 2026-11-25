@@ -8,7 +8,7 @@ sequenceDiagram
     participant GW as Gateway and Redis adapter
     participant B as Bob's browser
     B->>GW: connect with the cookie
-    GW->>GW: check the cookie and the logout blacklist
+    GW->>GW: readSession: the cookie, the logout blacklist and the password version
     GW->>GW: join the room "bob"
     A->>C: POST /api/conversations/:id/messages with the cookie
     C->>C: JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard
