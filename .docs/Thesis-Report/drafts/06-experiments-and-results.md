@@ -10,7 +10,7 @@ All quality numbers use NDCG@10 unless a table says otherwise. "Gain" always mea
 
 **Datasets.** Five synthetic worlds of size M (`syn-W0-M`, `syn-W1-M`, and the three W2 cells `syn-W2L-M`, `syn-W2M-M`, `syn-W2H-M`) and the real dataset Digg 2009 (`digg2009`). H1 has two co-primary tests: `syn-W2M-M` (the middle W2 cell) and `digg2009`.
 
-**Order of work.** First, every tuned parameter was chosen on the validation items only, all before the cut time T. Second, the choices were frozen into the test configs, and the author approved them. Third, the test split was run once. No test result was seen before the tuning was frozen.
+**Order of work.** First, every tuned parameter was chosen on the validation items only, all before the cut time T. Second, the choices were frozen into the test configs, and the author approved them. Third, the test split was run once. No test result was seen before the tuning was frozen. One analysis was added after the test run, because the Orientation of the thesis asks for it: the groups of the Orientation (Section 6.6.1). It reads the same test ranks, changes no frozen value and no test config, and is reported as exploratory.
 
 **Two changes before the test split.** Both were decided from validation results only, and both are recorded in the super-plan change log (version 0.25):
 - **The H0 gate now tests H-follow, not the full H.** On W0, the full hybrid beat BL2 on validation, almost only through the community term. In the generator a community is a topic, so this term carries topic interest even when there is no social influence. H-follow (β = 0) has only the follow terms, and follows are random in W0, so it is the right null test.

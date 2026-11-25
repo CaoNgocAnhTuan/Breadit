@@ -21,7 +21,7 @@ The main finding is a negative one: on these data, the follow graph adds little 
 
 We see two reasons, and both may play a part:
 \begin{itemize}
-  \item \textbf{Few users.} Group 0--4 holds only \eTwoWTwoMNdcgTenZeroFourN{} users, so the interval is wide (\eTwoWTwoMNdcgTenZeroFourCiLow{} to \eTwoWTwoMNdcgTenZeroFourCiHigh{}). A real but small gain for new users cannot be told apart from 0 with this many users.
+  \item \textbf{Few users.} Group 0--4 holds only \eTwoWTwoMNdcgTenZeroFourN{} users, so the interval is wide (\eTwoWTwoMNdcgTenZeroFourCiLow{} to \eTwoWTwoMNdcgTenZeroFourCiHigh{}). A real but small gain for new users cannot be told apart from 0 with this many users. The groups of the Orientation show how fragile this is (Section~\ref{sec:results-orient}): with the bound ``5 or fewer'' instead of 0--4, which only adds the users with exactly 5 interactions, the interval of the NDCG@10 gain runs from \orientWTwoMNdcgTenZeroFiveCiLow{} to \orientWTwoMNdcgTenZeroFiveCiHigh{}, above 0. That comparison is exploratory and does not change H1, but it shows that with this many users the result depends on where the group ends.
   \item \textbf{The score has little to say about a new user.} For a user with no history, the smoothing (Chapter 3) gives every followee the same trust and every joined community the same weight. The score then only says ``this post is by someone you follow'' or ``this post is in a community you joined''. It cannot say which of them the user likes. As history grows, the counts replace the prior, and the score becomes personal. This fits the result that the gain grows with history (Section~\ref{sec:results-e2}). The smoothing makes the score safe for new users, but it does not make it strong for them.
 \end{itemize}
 

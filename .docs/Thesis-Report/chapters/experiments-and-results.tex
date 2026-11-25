@@ -71,7 +71,7 @@ All quality numbers use NDCG@10 unless a table says otherwise. ``Gain'' always m
 
 \textbf{Datasets.} Five synthetic worlds of size M (\texttt{syn-W0-M}, \texttt{syn-W1-M}, and the three W2 cells \texttt{syn-W2L-M}, \texttt{syn-W2M-M}, \texttt{syn-W2H-M}) and the real dataset Digg 2009 (\texttt{digg2009}). H1 has two co-primary tests: \texttt{syn-W2M-M} (the middle W2 cell) and \texttt{digg2009}.
 
-\textbf{Order of work.} First, every tuned parameter was chosen on the validation items only, all before the cut time $T$. Second, the choices were frozen into the test configs, and the author approved them. Third, the test split was run once. No test result was seen before the tuning was frozen.
+\textbf{Order of work.} First, every tuned parameter was chosen on the validation items only, all before the cut time $T$. Second, the choices were frozen into the test configs, and the author approved them. Third, the test split was run once. No test result was seen before the tuning was frozen. One analysis was added after the test run, because the Orientation of the thesis asks for it: the groups of the Orientation (Section~\ref{sec:results-orient}). It reads the same test ranks, changes no frozen value and no test config, and is reported as exploratory.
 
 \textbf{Two changes before the test split.} Both were decided from validation results only, and both are recorded in the super-plan change log (version 0.25):
 \begin{itemize}
