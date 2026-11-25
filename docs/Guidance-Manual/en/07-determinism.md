@@ -90,7 +90,7 @@ number in the PDF → macro name → macros.csv row → results CSV cell → man
 3. Run a harness config and compare `.docs/results/<runId>/manifest.json`.
 4. `npm run thesis:repro` does all of it in one step. It needs Docker `db` and `redis` and the two Digg zips, and it takes about 3 hours. It deletes the Class D results, rebuilds them from nothing, and compares every hash with `.docs/results/manifest.json`. It stops at the first step that fails and at the first hash that differs, and it names the file.
 
-**The merged manifest.** `.docs/results/manifest.json` holds the SHA-256 of the manifest of each of the 16 results folders and of the 9 dataset manifests. Each of those manifests lists its files with their SHA-256, so one compare checks every file, including the git-ignored ones. The E7 folder is marked Class R (latency never gives the same bytes), so it is listed but not compared.
+**The merged manifest.** `.docs/results/manifest.json` holds the SHA-256 of the manifest of each of the 17 results folders (16 until 2026-11-25, when `p9-orient-groups` was added) and of the 9 dataset manifests. Each of those manifests lists its files with their SHA-256, so one compare checks every file, including the git-ignored ones. The E7 folder is marked Class R (latency never gives the same bytes), so it is listed but not compared.
 
 ## 9. Check yourself
 

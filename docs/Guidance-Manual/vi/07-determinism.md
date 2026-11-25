@@ -92,7 +92,7 @@ number in the PDF → macro name → macros.csv row → results CSV cell → man
 3. Chạy một harness config rồi so `.docs/results/<runId>/manifest.json`.
 4. `npm run thesis:repro` làm tất cả trong một bước. Nó cần Docker `db` và `redis` cùng hai file zip Digg, và chạy khoảng 3 giờ. Nó xoá các kết quả Class D, dựng lại từ đầu, rồi so mọi hash với `.docs/results/manifest.json`. Nó dừng ở bước đầu tiên bị lỗi và ở hash đầu tiên khác, và nêu tên file.
 
-**Manifest gộp.** `.docs/results/manifest.json` giữ SHA-256 của manifest của từng thư mục trong 16 thư mục kết quả và của 9 manifest dataset. Mỗi manifest đó liệt kê các file của nó kèm SHA-256, nên một lần so sánh kiểm tra mọi file, kể cả file bị git bỏ qua. Thư mục E7 được đánh dấu Class R (độ trễ không bao giờ cho cùng các byte), nên nó được liệt kê nhưng không bị so sánh.
+**Manifest gộp.** `.docs/results/manifest.json` giữ SHA-256 của manifest của từng thư mục trong 17 thư mục kết quả (16 cho tới ngày 2026-11-25, khi thêm `p9-orient-groups`) và của 9 manifest dataset. Mỗi manifest đó liệt kê các file của nó kèm SHA-256, nên một lần so sánh kiểm tra mọi file, kể cả file bị git bỏ qua. Thư mục E7 được đánh dấu Class R (độ trễ không bao giờ cho cùng các byte), nên nó được liệt kê nhưng không bị so sánh.
 
 ## 9. Tự kiểm tra
 
