@@ -387,6 +387,9 @@ model CommentMedia {
   comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+
+  // Made by migration add_comment_media; kept here so `prisma migrate dev` does not propose to drop it.
+  @@index([commentId])
 }
 
 model CommentLike {

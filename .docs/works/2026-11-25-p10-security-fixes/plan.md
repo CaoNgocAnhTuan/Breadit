@@ -117,4 +117,4 @@ Done 2026-11-25, with one item not met (A7, below). Delivered: B1, R6, S4, S6, B
 
 **Open for the author.**
 1. A7: accepted as future work by the author (2026-11-25).
-2. The `CommentMedia_commentId_idx` drift: add `@@index([commentId])` to `schema.prisma` (no migration needed), or drop the index in a migration.
+2. The `CommentMedia_commentId_idx` drift: fixed after the close, on the author's request (2026-11-25), with no task: `@@index([commentId])` added to `schema.prisma`, no migration; `prisma migrate diff` from `public` and from `it_test` to the schema is empty.
