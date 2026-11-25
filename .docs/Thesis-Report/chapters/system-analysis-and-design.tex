@@ -375,12 +375,12 @@ This is the main design rule of the thesis: all ranking logic lives in the packa
 \section{Database design}
 \label{sec:design-database}
 
-The database is PostgreSQL 16, used through Prisma 6. The schema has 25 models. Figure~\ref{fig:design-erd} shows 23 of them. \texttt{Account} and \texttt{Session} are left out, because no code reads them. Each line of the figure is one foreign key, named by its field. For example, the line from \texttt{User} to \texttt{Post} named \texttt{userId} means that one user has zero or more posts, and each post has exactly one user, through \texttt{Post.userId}. A line that may be empty on one side means that the foreign key can be empty: a post may have no community.
+The database is PostgreSQL 16, used through Prisma 6. The schema has 25 models. Figure~\ref{fig:design-erd} shows 23 of them. \texttt{Account} and \texttt{Session} are left out, because no code reads them. Each line of the figure is one foreign key, named by its field. For example, the line from \texttt{User} to \texttt{Post} named \texttt{userId} means that one user has zero or more posts, and each post has exactly one user, through \texttt{Post.userId}. A line that may be empty on one side means that the foreign key can be empty: a post may have no community. Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its dates (without \texttt{updatedAt}); the other fields are in \texttt{schema.prisma}. The colours mark five groups of tables: users (blue), posts (green), comments (yellow), communities (purple), and messages with notifications (teal).
 
-\begin{figure}[htbp]
+\begin{figure}[p]
   \centering
-  \thesisdiagram{fig4-11-erd}{\textwidth}
-  \caption{The ERD of the database: 23 of the 25 models (\texttt{Account} and \texttt{Session} are left out, because no code reads them). Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its dates (without \texttt{updatedAt}); the other fields are in \texttt{schema.prisma}.}
+  \thesisdiagram[0.87\textheight]{fig4-11-erd}{\textwidth}
+  \caption{The ERD of the database: 23 of the 25 models (\texttt{Account} and \texttt{Session} are left out), coloured by group: users blue, posts green, comments yellow, communities purple, messages and notifications teal.}
   \label{fig:design-erd}
 \end{figure}
 

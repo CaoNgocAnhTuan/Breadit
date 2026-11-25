@@ -542,9 +542,9 @@ This is the main design rule of the thesis: all ranking logic lives in the packa
 
 ## 4.6 Database design (about 2.5 pages)
 
-The database is PostgreSQL 16, used through Prisma 6. The schema has 25 models. Figure 4.11 shows 23 of them. `Account` and `Session` are left out, because no code reads them. Each line of the figure is one foreign key, named by its field. For example, the line from `User` to `Post` named `userId` means that one user has zero or more posts, and each post has exactly one user, through `Post.userId`. A line that may be empty on one side means that the foreign key can be empty: a post may have no community.
+The database is PostgreSQL 16, used through Prisma 6. The schema has 25 models. Figure 4.11 shows 23 of them. `Account` and `Session` are left out, because no code reads them. Each line of the figure is one foreign key, named by its field. For example, the line from `User` to `Post` named `userId` means that one user has zero or more posts, and each post has exactly one user, through `Post.userId`. A line that may be empty on one side means that the foreign key can be empty: a post may have no community. Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its dates (without `updatedAt`); the other fields are in `schema.prisma`. The colours mark five groups of tables: users (blue), posts (green), comments (yellow), communities (purple), and messages with notifications (teal).
 
-**Figure 4.11. The ERD.** Caption in the LaTeX: the ERD of the database: 23 of the 25 models (`Account` and `Session` are left out, because no code reads them). Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its dates (without `updatedAt`); the other fields are in `schema.prisma`.
+**Figure 4.11. The ERD.** Caption in the LaTeX: the ERD of the database: 23 of the 25 models (`Account` and `Session` are left out), coloured by group: users blue, posts green, comments yellow, communities purple, messages and notifications teal. It has a page of its own, up to 87% of the text height.
 
 The script was made from `apps/backend/prisma/schema.prisma` on 2026-11-19, with a one-off script that is not in the repo.
 - **Tables:** 23 of the 25 models. `Account` and `Session` are left out, because no code reads them (Bugs Report R4); the caption should say so.
@@ -743,6 +743,16 @@ erDiagram
     Post |o--o{ Mention : "postId"
     Comment |o--o{ Mention : "commentId"
     User ||--o{ Mention : "userId"
+    classDef users fill:#dbeafe,stroke:#1d4ed8
+    classDef posts fill:#dcfce7,stroke:#15803d
+    classDef comments fill:#fef3c7,stroke:#b45309
+    classDef communities fill:#f3e8ff,stroke:#7e22ce
+    classDef messages fill:#ccfbf1,stroke:#0f766e
+    class User,VerificationToken,Follow,Block users
+    class Post,PostMedia,Hashtag,PostTag,Like,SavedPosts,Report posts
+    class Comment,CommentMedia,CommentLike,Mention comments
+    class Community,CommunityMember,CommunityBannedUser,CommunityRule communities
+    class Conversation,ConversationMember,Message,Notification messages
 ```
 
 How to read a line: `User ||--o{ Post : "userId"` means one user has zero or more posts, and each post has exactly one user, through `Post.userId`. `|o` means the foreign key may be empty. For example, a post may have no community.

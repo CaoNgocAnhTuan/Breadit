@@ -149,11 +149,12 @@
 %% Citation by key: \refcite{<key>} prints [n], the number of the item with \label{ref:<key>} in chapters/references.tex.
 \newcommand{\refcite}[1]{[\ref{ref:#1}]}
 %% Diagram by name: \thesisdiagram{<name>}{<width>} shows images/<name>.pdf if it exists, else images/<name>.png,
-%% else a framed placeholder. The author only saves the image (see diagrams.md); no .tex edit. The image is never taller than 80% of the text.
-\newcommand{\thesisdiagram}[2]{%
-  \IfFileExists{images/#1.pdf}{\includegraphics[width=#2,height=0.8\textheight,keepaspectratio]{#1.pdf}}{%
-  \IfFileExists{images/#1.png}{\includegraphics[width=#2,height=0.8\textheight,keepaspectratio]{#1.png}}{%
-  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/#1.pdf}}}}}}
+%% else a framed placeholder. The author only saves the image (see diagrams.md); no .tex edit. The image is never taller than 80% of the text,
+%% unless the optional first argument gives another maximum height (the ERD: \thesisdiagram[0.87\textheight]{fig4-11-erd}{\textwidth}).
+\newcommand{\thesisdiagram}[3][0.8\textheight]{%
+  \IfFileExists{images/#2.pdf}{\includegraphics[width=#3,height=#1,keepaspectratio]{#2.pdf}}{%
+  \IfFileExists{images/#2.png}{\includegraphics[width=#3,height=#1,keepaspectratio]{#2.png}}{%
+  \fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering Figure to be drawn: \texttt{images/#2.pdf}}}}}}
 
 %% The title registered with the school. Change it here only: the title page uses it twice.
 \newcommand{\thesistitle}{Breadit: A real-time hybrid social networking platform with social-graph-aware personalized feed ranking}

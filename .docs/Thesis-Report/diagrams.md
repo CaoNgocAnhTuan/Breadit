@@ -10,9 +10,9 @@ This file lists every diagram of the thesis: its figure number, where it is used
 4. Keep the source next to the image: the `.mmd` file is already there. If you redraw the figure in draw.io, also save `images/fig4-<n>-<name>.drawio`.
 5. Build: `latexmk -pdf main.tex` in `.docs/Thesis-Report/`. Do not edit the `.tex`. The macro `\thesisdiagram` (in `main.tex`) shows `images/<name>.pdf` if it exists, else `images/<name>.png`, else a box with the text "Figure to be drawn". The first time you add an image, plain `latexmk` says "up-to-date" and does not see it, so run `latexmk -g -pdf main.tex` once (`-g` forces a full build). Later changes of the same file are seen by themselves.
 
-The macro shows the figure at the text width, and never taller than 80% of the page text height. Each figure keeps its caption and label in `chapters/system-analysis-and-design.tex`.
+The macro shows the figure at the text width, and never taller than 80% of the page text height. The ERD (Figure 4.11) is the one exception: it has a page of its own, up to 87% of the text height. Each figure keeps its caption and label in `chapters/system-analysis-and-design.tex`.
 
-**One style for all figures.** Use one font in every diagram (a sans-serif font such as Arial or Helvetica, 10 pt in the final size) and few colours: black lines, white or light grey fill, and one accent colour (for example blue) for the new parts of the thesis, such as the ranking package. In mermaid.live, use the same theme for all sequence diagrams (the theme `neutral` is grey and prints well).
+**One style for all figures.** The ERD is the one exception to the colours: five light group colours, set in its script (the author's choice, 2026-11-25). Use one font in every diagram (a sans-serif font such as Arial or Helvetica, 10 pt in the final size) and few colours: black lines, white or light grey fill, and one accent colour (for example blue) for the new parts of the thesis, such as the ranking package. In mermaid.live, use the same theme for all sequence diagrams (the theme `neutral` is grey and prints well).
 
 **Checked scripts.** On 2026-11-20 all 11 scripts were parsed and drawn with Mermaid 11.16.0, with no error. If mermaid.live shows a syntax error, the text was probably changed when you copied it: copy the script again from this file.
 
@@ -448,7 +448,8 @@ flowchart LR
 - **Checked against the code:** 2026-11-25 (from `schema.prisma`; new column `User.passwordVersion`, task `p10-security-fixes`).
 - The caption is already in the `.tex`: 23 of the 25 models; `Account` and `Session` are left out, because no code reads them.
 - How to read a line: `User ||--o{ Post : "userId"` means one user has zero or more posts, and each post has exactly one user, through `Post.userId`. `|o` means the foreign key may be empty.
-- The script starts with a `config` block (theme `neutral`, layout `elk`, direction `LR`): keep it when you paste into mermaid.live, it gives the most compact start.
+- The script starts with a `config` block (theme `neutral`, layout `elk`, direction `LR`): keep it when you paste into mermaid.live, it gives the most compact start. It ends with `classDef` and `class` lines: the five group colours (users blue `#dbeafe`, posts green `#dcfce7`, comments yellow `#fef3c7`, communities purple `#f3e8ff`, messages and notifications teal `#ccfbf1`), the same as in the caption.
+- On its own page (87% of the text height) the figure is limited by the text width: about 3 pt text at print size. Read it zoomed in the PDF.
 
 ```mermaid
 ---
@@ -642,4 +643,14 @@ erDiagram
     Post |o--o{ Mention : "postId"
     Comment |o--o{ Mention : "commentId"
     User ||--o{ Mention : "userId"
+    classDef users fill:#dbeafe,stroke:#1d4ed8
+    classDef posts fill:#dcfce7,stroke:#15803d
+    classDef comments fill:#fef3c7,stroke:#b45309
+    classDef communities fill:#f3e8ff,stroke:#7e22ce
+    classDef messages fill:#ccfbf1,stroke:#0f766e
+    class User,VerificationToken,Follow,Block users
+    class Post,PostMedia,Hashtag,PostTag,Like,SavedPosts,Report posts
+    class Comment,CommentMedia,CommentLike,Mention comments
+    class Community,CommunityMember,CommunityBannedUser,CommunityRule communities
+    class Conversation,ConversationMember,Message,Notification messages
 ```

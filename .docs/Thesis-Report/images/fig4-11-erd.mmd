@@ -189,3 +189,13 @@ erDiagram
     Post |o--o{ Mention : "postId"
     Comment |o--o{ Mention : "commentId"
     User ||--o{ Mention : "userId"
+    classDef users fill:#dbeafe,stroke:#1d4ed8
+    classDef posts fill:#dcfce7,stroke:#15803d
+    classDef comments fill:#fef3c7,stroke:#b45309
+    classDef communities fill:#f3e8ff,stroke:#7e22ce
+    classDef messages fill:#ccfbf1,stroke:#0f766e
+    class User,VerificationToken,Follow,Block users
+    class Post,PostMedia,Hashtag,PostTag,Like,SavedPosts,Report posts
+    class Comment,CommentMedia,CommentLike,Mention comments
+    class Community,CommunityMember,CommunityBannedUser,CommunityRule communities
+    class Conversation,ConversationMember,Message,Notification messages
