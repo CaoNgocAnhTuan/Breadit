@@ -1,11 +1,16 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { randomInt } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
+import { readJwtSecret } from './auth.config';
+import { setMax } from './session';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcryptjs';
@@ -17,7 +22,12 @@ const VERIFY_PREFIX = 'email-verify';
 const RESET_PREFIX = 'password-reset';
 
 function getJwtSecret() {
-  return new TextEncoder().encode(process.env.JWT_SECRET ?? 'dev-secret-change-in-prod');
+  return new TextEncoder().encode(readJwtSecret(process.env));
+}
+
+/** S6.2: a 6-digit email code from the crypto random source, from 100000 to 999999. */
+export function generate6DigitCode(): string {
+  return String(randomInt(100000, 1000000));
 }
 
 async function signJwt(payload: Record<string, unknown>): Promise<string> {
@@ -35,6 +45,15 @@ export async function verifyJwt(token: string) {
 
 /** Redis key for token blacklist entries */
 export const BLACKLIST_PREFIX = 'auth:blacklist';
+
+/** S6.4: Redis copy of `User.passwordVersion`, key `auth:pwv:<userId>`. Written only through `setMax` (session.ts). */
+export const PWV_PREFIX = 'auth:pwv';
+export const PWV_TTL_SECONDS = 3600;
+
+/** S6.3: wrong-code tries per email, key `auth:verify-tries:<email>`, 15 minutes (the life of a code). */
+export const VERIFY_TRIES_PREFIX = 'auth:verify-tries';
+export const VERIFY_MAX_TRIES = 5;
+const VERIFY_TRIES_WINDOW_SECONDS = 15 * 60;
 
 function setSessionCookie(reply: FastifyReply, token: string) {
   reply.setCookie('breadit_session', token, {
@@ -82,13 +101,9 @@ export class AuthService {
 
   // ─── Token helpers ────────────────────────────────────────────────────────
 
-  private generate6DigitCode(): string {
-    return String(Math.floor(100000 + Math.random() * 900000));
-  }
-
   private async createVerificationCode(email: string): Promise<string> {
     const identifier = `${VERIFY_PREFIX}:${email}`;
-    const code = this.generate6DigitCode();
+    const code = generate6DigitCode();
     const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
     await this.prisma.verificationToken.deleteMany({ where: { identifier } });
     // Prefix with email to guarantee uniqueness on the token field
@@ -192,7 +207,17 @@ export class AuthService {
   async login(dto: LoginDto, reply: FastifyReply) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
-      select: { id: true, email: true, username: true, img: true, password: true, emailVerified: true, role: true, banned: true },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        img: true,
+        password: true,
+        emailVerified: true,
+        role: true,
+        banned: true,
+        passwordVersion: true,
+      },
     });
     if (!user?.password) throw new UnauthorizedException('Invalid email or password');
 
@@ -206,6 +231,7 @@ export class AuthService {
       emailVerified: user.emailVerified?.toISOString() ?? null,
       role: user.role,
       banned: user.banned,
+      pwv: user.passwordVersion,
     });
     setSessionCookie(reply, token);
 
@@ -268,12 +294,26 @@ export class AuthService {
   }
 
   async verifyEmail(email: string, code: string) {
+    // S6.3: count the tries of this email before the code is read. INCR is atomic, so two fast requests cannot both
+    // get the 5th try. EXPIRE ... NX in the same MULTI sets the life once and never leaves a key with no life.
+    const triesKey = `${VERIFY_TRIES_PREFIX}:${email}`;
+    const counted = await this.redis.multi().incr(triesKey).expire(triesKey, VERIFY_TRIES_WINDOW_SECONDS, 'NX').exec();
+    const tries = Number(counted?.[0]?.[1]);
+    if (!Number.isFinite(tries)) throw new Error('Could not count the verification tries');
+    if (tries > VERIFY_MAX_TRIES) {
+      throw new HttpException(
+        'Too many tries. Wait 15 minutes, then ask for a new code.',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
+
     const result = await this.consumeVerificationCode(email, code);
     if (!result) throw new BadRequestException('Invalid or expired code');
     await this.prisma.user.update({
       where: { email: result.email },
       data: { emailVerified: new Date() },
     });
+    await this.redis.del(triesKey);
     return { ok: true };
   }
 
@@ -310,7 +350,25 @@ export class AuthService {
     const result = await this.consumePasswordResetToken(token);
     if (!result) throw new BadRequestException('Token is invalid or has expired');
     const hashed = await bcrypt.hash(password, 10);
-    await this.prisma.user.update({ where: { email: result.email }, data: { password: hashed } });
+    // S6.4: the hash and the counter change in one update. Every token made before it has an older `pwv`.
+    const updated = await this.prisma.user.update({
+      where: { email: result.email },
+      data: { password: hashed, passwordVersion: { increment: 1 } },
+      select: { id: true, passwordVersion: true },
+    });
+    const pwvKey = `${PWV_PREFIX}:${updated.id}`;
+    try {
+      await setMax(this.redis, pwvKey, updated.passwordVersion, PWV_TTL_SECONDS);
+    } catch (err) {
+      // F1: the copy may still hold the old version. Delete it, so the next read loads the column.
+      console.error('Failed to write the password version copy:', err);
+      try {
+        await this.redis.del(pwvKey);
+      } catch (delErr) {
+        // Redis is down: every session is refused until it is back (readSession throws), so nothing stays open.
+        console.error('Failed to delete the password version copy:', delErr);
+      }
+    }
     return { ok: true };
   }
 }

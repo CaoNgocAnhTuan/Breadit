@@ -43,8 +43,9 @@ export type Res = {
 /**
  * Small HTTP client over Fastify `inject` (no network).
  * `cookie` is the value from `cookieFor(user)`; leave it out for a guest.
+ * `ip` sets the remote address (the throttler counts per IP); the default is the one `inject` uses.
  */
-export function client(app: NestFastifyApplication, cookie?: string) {
+export function client(app: NestFastifyApplication, cookie?: string, ip?: string) {
   const fastify = app.getHttpAdapter().getInstance();
 
   async function send(
@@ -64,6 +65,7 @@ export function client(app: NestFastifyApplication, cookie?: string) {
       url,
       headers,
       payload,
+      ...(ip ? { remoteAddress: ip } : {}),
     });
     let body: unknown = undefined;
     try {

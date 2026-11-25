@@ -28,13 +28,14 @@ function fakeSocket(cookie?: string, rooms: string[] = []) {
   };
 }
 
-function setup(opts: { blacklisted?: boolean; isMember?: boolean } = {}) {
+function setup(opts: { blacklisted?: boolean; isMember?: boolean; storedPwv?: string } = {}) {
   const prisma = {
     conversationMember: {
       findUnique: jest.fn().mockResolvedValue(opts.isMember ? { userId: 'x' } : null),
     },
   };
-  const redis = { get: jest.fn().mockResolvedValue(opts.blacklisted ? '1' : null) };
+  // `authenticate` calls `readSession`: one MGET of [blacklist key, password-version copy] (S5, S6).
+  const redis = { mget: jest.fn().mockResolvedValue([opts.blacklisted ? '1' : null, opts.storedPwv ?? '0']) };
   const gateway = new NotificationsGateway(prisma as any, redis as any);
   return { gateway, prisma, redis };
 }
@@ -69,7 +70,12 @@ describe('NotificationsGateway (S1)', () => {
     it('S5: a logged-out (blacklisted) token is rejected', async () => {
       const { gateway, redis } = setup({ blacklisted: true });
       await expect(gateway.authenticate(fakeSocket(aliceCookie) as any)).rejects.toThrow();
-      expect(redis.get).toHaveBeenCalledWith(`${BLACKLIST_PREFIX}:jti-1`);
+      expect(redis.mget).toHaveBeenCalledWith(`${BLACKLIST_PREFIX}:jti-1`, 'auth:pwv:id-alice');
+    });
+
+    it('S6: a token made before the last password reset is rejected', async () => {
+      const { gateway } = setup({ storedPwv: '1' }); // the token has no pwv claim, so it says 0
+      await expect(gateway.authenticate(fakeSocket(aliceCookie) as any)).rejects.toThrow();
     });
   });
 

@@ -4,6 +4,7 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import * as fs from 'fs';
 import * as path from 'path';
 import { AppModule } from './app.module';
+import { readJwtSecret } from './auth/auth.config';
 import { MAX_UPLOAD_BYTES, setupApp } from './app.setup';
 
 function resolveUploadDir(): string {
@@ -23,6 +24,9 @@ function resolveUploadDir(): string {
 }
 
 async function bootstrap() {
+  // S6.1: a missing or weak JWT_SECRET in production stops the backend here, not at the first login.
+  readJwtSecret(process.env);
+
   const uploadDir = resolveUploadDir();
 
   const app = await NestFactory.create<NestFastifyApplication>(

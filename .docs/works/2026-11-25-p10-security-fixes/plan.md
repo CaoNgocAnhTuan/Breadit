@@ -17,9 +17,9 @@ Five fix groups in the order of the Design ("Answers to the open questions", 3):
 
 - [x] 5. **S4 code.** New `uploads/media-types.ts` (`VIDEO_EXT`, `mediaKind`). In `uploads.service.ts`: the type check at the top of `saveFile`, the video extension from `VIDEO_EXT`, a `sharp` error → 400 with nothing written, `isVideo` through `mediaKind`. In `app.setup.ts`: `setHeaders` with `X-Content-Type-Options: nosniff`. Run the unit and IT tests (`avatar.it-spec.ts` and the post and comment media tests must stay green). (Design: Approach, S4; Code files.) Commit: `fix(security): S4 uploads keep only image and video types, nosniff on /uploads/`
 
-- [ ] 6. **S6 tests.** New `auth/auth.config.spec.ts` with TC9. A new `auth/auth.service.spec.ts` (Prisma and Redis stubs) with TC10 and TC15. In `auth/session.spec.ts`, TC12 (the existing S5 cases stay and are moved to the new signature in step 7). In `security-fixes.it-spec.ts`, TC11, TC13 and TC14. See them fail. (Design: Approach, S6 parts 1–4; Failure modes F1–F5, F7.)
+- [x] 6. **S6 tests.** New `auth/auth.config.spec.ts` with TC9. A new `auth/auth.service.spec.ts` (Prisma and Redis stubs) with TC10 and TC15. In `auth/session.spec.ts`, TC12 (the existing S5 cases stay and are moved to the new signature in step 7). In `security-fixes.it-spec.ts`, TC11, TC13 and TC14. See them fail. (Design: Approach, S6 parts 1–4; Failure modes F1–F5, F7.)
 
-- [ ] 7. **S6 code.** In this order:
+- [x] 7. **S6 code.** In this order:
   1. `schema.prisma`: `User.passwordVersion Int @default(0)`, and a real migration named `user_password_version` made with `prisma migrate dev` (from the repo root, with `--schema`); then `prisma generate`. (Design: Data, schema and cache changes.)
   2. New `auth/auth.config.ts` (`JWT_SECRET_MIN_LENGTH`, `readJwtSecret`); `getJwtSecret` uses it; `main.ts` calls it first in `bootstrap()`.
   3. `auth.service.ts`: the code from `randomInt` (exported as a module function so TC10 can call it); the per-email tries in `verifyEmail` (`VERIFY_TRIES_PREFIX`, `VERIFY_MAX_TRIES = 5`, 900 s, 429); the `pwv` claim at login (select `passwordVersion`); in `resetPassword` the increment in the same update, then `setMax`, and on its error a delete of the key (F1).
@@ -28,7 +28,7 @@ Five fix groups in the order of the Design ("Answers to the open questions", 3):
 
   Run the unit tests and all IT tests (the S5 tests in `quick-wins.it-spec.ts` and `socket.it-spec.ts` must stay green). (Design: Approach, S6; Sequence diagrams 1–3; Code files.)
 
-- [ ] 8. **S6: the eval schema.** The parity setup never migrates (Failure modes F11). Load `syn-W2M-M` into `eval_load` again with the loader (no `--rebase-to`), run `load:check` (the six hashes must equal the manifest), then `test:parity` (102/102). If `load:check` is not equal, stop and report: do not change the loader. Commit steps 6–8 (the migration folder included). Commit: `fix(security): S6 JWT secret check, crypto codes, per-email tries, a reset ends old sessions`
+- [x] 8. **S6: the eval schema.** The parity setup never migrates (Failure modes F11). Load `syn-W2M-M` into `eval_load` again with the loader (no `--rebase-to`), run `load:check` (the six hashes must equal the manifest), then `test:parity` (102/102). If `load:check` is not equal, stop and report: do not change the loader. Commit steps 6–8 (the migration folder included). Commit: `fix(security): S6 JWT secret check, crypto codes, per-email tries, a reset ends old sessions`
 
 - [ ] 9. **B5 tests.** New `auth/email-verified.guard.spec.ts` with TC17. In `security-fixes.it-spec.ts`, TC16. See them fail. (Design: Approach, B5.)
 

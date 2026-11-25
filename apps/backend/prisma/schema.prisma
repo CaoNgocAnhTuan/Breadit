@@ -27,6 +27,8 @@ model User {
   cover         String?
   role          Role      @default(USER)
   banned        Boolean   @default(false)
+  // S6: a password reset adds 1. A session token carries the value it was made with (claim `pwv`) and is refused when it differs.
+  passwordVersion Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

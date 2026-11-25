@@ -10,7 +10,7 @@ import {
 import { createAdapter } from '@socket.io/redis-adapter';
 import Redis from 'ioredis';
 import type { Server, Socket } from 'socket.io';
-import { BLACKLIST_PREFIX, verifyJwt } from '../auth/auth.service';
+import { passwordVersionOf, readSession, type PasswordVersionOf } from '../auth/session';
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
 
@@ -43,10 +43,14 @@ function conversationRoom(conversationId: unknown): { id: number; room: string }
 export class NotificationsGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer() server: Server;
 
+  private readonly versionOf: PasswordVersionOf;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
-  ) {}
+  ) {
+    this.versionOf = passwordVersionOf(prisma);
+  }
 
   afterInit(server: Server) {
     const redisUrl = process.env.REDIS_URL ?? 'redis://redis:6379';
@@ -64,22 +68,20 @@ export class NotificationsGateway implements OnGatewayInit, OnGatewayConnection 
   }
 
   /**
-   * Checks the login cookie (and the logout blacklist, finding S5) and stores the user on the
-   * socket. Throws if the cookie is missing, invalid, expired or logged out.
+   * Checks the login cookie with `readSession`, the same check as the HTTP guards (logout blacklist, finding S5;
+   * a password reset since the login, S6), and stores the user on the socket. Throws if the cookie is missing,
+   * invalid, expired, logged out or older than the last password reset.
    */
   async authenticate(socket: Socket): Promise<void> {
     const cookieHeader = socket.handshake.headers.cookie ?? '';
     const match = /breadit_session=([^;]+)/.exec(cookieHeader);
     if (!match) throw new Error('No session cookie');
 
-    const payload = await verifyJwt(decodeURIComponent(match[1]));
-    const jti = payload['jti'] as string | undefined;
-    if (jti && (await this.redis.get(`${BLACKLIST_PREFIX}:${jti}`))) {
-      throw new Error('Session was logged out');
-    }
-    if (!payload.sub || typeof payload['username'] !== 'string') throw new Error('Bad token');
+    const session = await readSession(decodeURIComponent(match[1]), this.redis, this.versionOf);
+    if (!session) throw new Error('Session is not valid');
+    if (!session.id || typeof session.username !== 'string') throw new Error('Bad token');
 
-    socket.data.user = { id: String(payload.sub), username: payload['username'] } satisfies SocketUser;
+    socket.data.user = { id: session.id, username: session.username } satisfies SocketUser;
   }
 
   async handleConnection(socket: Socket) {
