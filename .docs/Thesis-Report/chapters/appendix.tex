@@ -499,37 +499,3 @@ Family F2 holds $H$ against each of the seven baselines other than BL2 (BL0, BL1
   \endlastfoot
   \appbrows{digg2009}{F2}
 \end{longtable}}
-
-%% ─────────────────────────────────────────────────────────────────────────────
-\section*{Appendix C. Database tables}
-\addcontentsline{toc}{section}{Appendix C. Database tables}
-
-Figure~\ref{fig:design-erd} in Chapter 4 shows the 23 tables of the database and their links, with the name of each table only. The four figures of this appendix show the fields of each table, in four groups: users, the social graph and messages (Figure~\ref{fig:app-erd-users}), posts (Figure~\ref{fig:app-erd-posts}), comments (Figure~\ref{fig:app-erd-comments}) and communities (Figure~\ref{fig:app-erd-communities}). Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its dates (without \texttt{updatedAt}); the other fields are in \texttt{schema.prisma}. Each foreign key line is drawn once, in the figure of the table that holds the key. A table of another group that such a line reaches is drawn as a box with its name only.
-
-\begin{figure}[htbp]
-  \centering
-  \thesisdiagram{figC-1-erd-users}{\textwidth}
-  \caption{The tables of users, the social graph, messages and notifications, with their fields.}
-  \label{fig:app-erd-users}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \thesisdiagram{figC-2-erd-posts}{\textwidth}
-  \caption{The tables of posts, with their fields.}
-  \label{fig:app-erd-posts}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \thesisdiagram{figC-3-erd-comments}{\textwidth}
-  \caption{The tables of comments, with their fields.}
-  \label{fig:app-erd-comments}
-\end{figure}
-
-\begin{figure}[htbp]
-  \centering
-  \thesisdiagram{figC-4-erd-communities}{\textwidth}
-  \caption{The tables of communities, with their fields.}
-  \label{fig:app-erd-communities}
-\end{figure}
