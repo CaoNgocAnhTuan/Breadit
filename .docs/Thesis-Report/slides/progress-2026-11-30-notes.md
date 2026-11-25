@@ -1,10 +1,10 @@
 # Speaker notes: progress check, 2026-11-30
 
-Deck: `progress-2026-11-30.tex` (20 slides, about 20 minutes). Every number on a slide is a macro of `.docs/results/p7-report/results-macros.tex`, so say the numbers as they are on the slide. Do not round them.
+Deck: `progress-2026-11-30.tex` (22 slides, about 22 minutes). Every number on a slide is a macro of `.docs/results/p7-report/results-macros.tex`, so say the numbers as they are on the slide. Do not round them.
 
 ## 1. Title
 Thank the supervisor. Say what this talk is: a progress check, with the results of Chapters 3 to 7 and a demo.
-Time plan: about 12 minutes for the slides, 6 minutes for the demo, the rest for questions.
+Time plan: about 14 minutes for the slides, 6 minutes for the demo, the rest for questions.
 
 ## 2. The problem and the research questions
 Today "For You" shows the posts of you and your followees, newest first. Explore uses one engagement score for everyone.
@@ -56,47 +56,59 @@ Left is the synthetic world. The gain grows with history. The group of H1 (0 to 
 Right is Digg, on its own and much smaller scale. It is near 0 in every group.
 The dashed line is 0.
 
-## 12. E3: the gain by social density
+## 12. Your groups (exploratory)
+This is the comparison you asked for in the Orientation: 5 or fewer interactions against more than 20, with Recall@10 (and NDCG@10).
+Say first that it is exploratory: the bounds are not our frozen groups and it was added after the test run, so it has no p-value and does not change H1.
+Synthetic, 5 or fewer: both intervals are above 0. The group 0 to 4 of H1 has the same users except those with exactly 5 interactions, and there the interval contains 0. So with this few users the answer depends on where the group ends.
+More than 20 gains the most. On Digg H and BL2 are about equal in both groups.
+
+## 13. E3: the gain by social density
 The gain is already there for users who follow nobody, and it does not rise with the number of followees.
 So H2 is not supported. The bin 1 to 4 has almost no users in the synthetic worlds, so it has no mark.
 Digg is 0 in every bin.
 
-## 13. E5: is the result built into the data?
+## 14. E5: is the result built into the data?
 The gain grows with the influence in the data, from W0 to W2H. Good: the method picks influence up when it is there.
 But W0 and W1 have no influence and still show a gain. And shuffling the engagement times keeps most of the gain.
 So most of the gain is a topic signal from the community term, not influence.
 
-## 14. E7: the cost
+## 15. E7: the cost
 We measured the live backend: page 1 of each feed, one machine, page cache off. The three medians are about the same, and the intervals overlap.
 The three feeds run the same queries. So cost is not the reason for the decision.
 This is a repeatable result, not an identical one.
 
-## 15. What it means (1)
+## 16. What it means (1)
 RQ1: not on these data. Two reasons: few users in the group, and a prior that gives equal trust to every followee when there is no history.
 RQ2: there is no level where it starts to help. The gain at 0 followees comes from the community term.
 E4: almost all the gain is the community term. In the generator a community is a topic. So the hybrid works as a topic signal.
 
-## 16. What it means (2)
+## 17. What it means (2)
 The default feed stays as it is, by the rule we set before the test. `social` stays as an option, and one variable changes the default.
 The offline numbers describe the live code. A stronger time decay may help Explore, but only on some data, so it is future work.
 Limits: synthetic data is ours, Digg is small and has no communities, the Hive data was not reachable, and the test is offline with one item per user.
 
-## 17. The demo plan
+## 18. Why H1 failed, and a proposal
+Four causes. Two were measured: on Digg the time-decay baselines are far better than BL2, and on synthetic data the gain is the community term. Two are our reading and were not tested: the scale of the terms, and the flat prior for new users.
+The proposal is a round 2 with a new score, Hv2: one scale, a time-decayed base, and a prior from all users. It runs offline, H and the app stay as they are.
+Be clear about honesty: we saw the test split, so Hv2 is tuned on validation, tested on a new synthetic seed, and Digg is post-hoc. Round 1 stays in the thesis. The full note is in .docs (English and Vietnamese); offer to send it.
+
+## 19. The demo plan
 Run `npm run demo:start` close to the demo. Two windows: A is normal, B is private.
 Seven steps: sign in, the three feeds, Explore, a direct message, a notification, an admin ban, cleanup.
 If a step fails, say so and go on. The checklist has the fix for each step: `scripts/demo/CHECKLIST.md`.
 
-## 18. The demo: two screens
+## 20. The demo: two screens
 These are backup pictures from the demo run, in case the live demo fails.
 Left: "For You" with the Social feed. Right: a live direct message.
 The data is generated, so the posts have generated names.
 
-## 19. Status
-Done: the data, the ranking package and the harness, the social feed in the app, the experiments, the repro command, Chapters 3 to 7, the demo.
-Left: the Chapter 4 figures, then the changes from your feedback (all chapters are drafted), the final checks, the defense slides and the freeze.
-Update this slide before the talk if more chapters are finished.
+## 21. Status
+Done: the data, the ranking package and the harness, the social feed in the app, the experiments with your Orientation metrics, the repro command, Chapters 1 to 9 with the final checks, the security fixes, the demo and a run guide.
+Left: the Chapter 4 figures, the changes from your feedback, round 2 if you agree, the defense slides and the freeze.
 
-## 20. Three questions
-One: do you agree that "For You" stays as it is, because H1 failed on both tests?
-Two: is the limit 120 pages with or without the appendix, and are our nine chapters the required ones?
-Three: what are the dates of the final submission and the defense?
+## 22. Questions
+One: we have not met since the pre-thesis. Do you confirm the research questions, the two datasets and the design of the score?
+Two: H1 is reported as it is. Then round 2 with Hv2, or only future work?
+Three: do you agree that "For You" stays as it is, because H1 failed on both tests?
+Four: is the exploratory subsection in Chapter 6 the right place for your two groups?
+Five: the page limit with or without the appendix, the required chapters, and the dates of the submission and the defense.

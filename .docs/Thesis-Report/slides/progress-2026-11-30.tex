@@ -405,7 +405,32 @@
   \small On \texttt{syn-W2M-M} the gain grows with history: \eTwoWTwoMNdcgTenZeroFourGain{} in group 0--4 and \eTwoWTwoMNdcgTenTwentyPlusGain{} in group 20+. On Digg it is near 0 in every group.
 \end{frame}
 
-%% ── 12. Figure E3 ────────────────────────────────────────────────────────────
+%% ── 12. The groups of the Orientation (exploratory) ──────────────────────────
+\begin{frame}
+  \frametitle{Your groups: 5 or fewer against more than 20 interactions (exploratory)}
+  \centering
+  \footnotesize
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{llrcll}
+    \toprule
+    Test & Group & Users & Recall@10: BL2 $\to$ H & Recall@10 gain [CI] & NDCG@10 gain [CI] \\
+    \midrule
+    \texttt{syn-W2M-M} & 5 or fewer & \orientWTwoMZeroFiveN{} & \orientWTwoMRecallBLTwoTenZeroFiveValue{} $\to$ \orientWTwoMRecallHTenZeroFiveValue{} & \orientWTwoMRecallTenZeroFiveGain{} [\orientWTwoMRecallTenZeroFiveCiLow{}, \orientWTwoMRecallTenZeroFiveCiHigh{}] & \orientWTwoMNdcgTenZeroFiveGain{} [\orientWTwoMNdcgTenZeroFiveCiLow{}, \orientWTwoMNdcgTenZeroFiveCiHigh{}] \\
+    \texttt{syn-W2M-M} & more than 20 & \orientWTwoMTwentyOnePlusN{} & \orientWTwoMRecallBLTwoTenTwentyOnePlusValue{} $\to$ \orientWTwoMRecallHTenTwentyOnePlusValue{} & \orientWTwoMRecallTenTwentyOnePlusGain{} [\orientWTwoMRecallTenTwentyOnePlusCiLow{}, \orientWTwoMRecallTenTwentyOnePlusCiHigh{}] & \orientWTwoMNdcgTenTwentyOnePlusGain{} [\orientWTwoMNdcgTenTwentyOnePlusCiLow{}, \orientWTwoMNdcgTenTwentyOnePlusCiHigh{}] \\
+    \texttt{digg2009} & 5 or fewer & \orientDiggZeroFiveN{} & \orientDiggRecallBLTwoTenZeroFiveValue{} $\to$ \orientDiggRecallHTenZeroFiveValue{} & \orientDiggRecallTenZeroFiveGain{} [\orientDiggRecallTenZeroFiveCiLow{}, \orientDiggRecallTenZeroFiveCiHigh{}] & \orientDiggNdcgTenZeroFiveGain{} [\orientDiggNdcgTenZeroFiveCiLow{}, \orientDiggNdcgTenZeroFiveCiHigh{}] \\
+    \texttt{digg2009} & more than 20 & \orientDiggTwentyOnePlusN{} & \orientDiggRecallBLTwoTenTwentyOnePlusValue{} $\to$ \orientDiggRecallHTenTwentyOnePlusValue{} & \orientDiggRecallTenTwentyOnePlusGain{} [\orientDiggRecallTenTwentyOnePlusCiLow{}, \orientDiggRecallTenTwentyOnePlusCiHigh{}] & \orientDiggNdcgTenTwentyOnePlusGain{} [\orientDiggNdcgTenTwentyOnePlusCiLow{}, \orientDiggNdcgTenTwentyOnePlusCiHigh{}] \\
+    \bottomrule
+  \end{tabular}}
+  \par\vspace{2mm}
+  \raggedright\small
+  \begin{itemize}
+    \item \textbf{Exploratory.} The bounds come from your Orientation, not from the frozen groups, and the table was added after the test run: a paired bootstrap interval (CI), no $p$-value. H1 does not change. Thesis: Chapter 6 and Appendix B (Recall and Coverage at $K$ = 5, 10, 20).
+    \item \textbf{\texttt{syn-W2M-M}, 5 or fewer:} both intervals are above 0, but for group 0--4 (E2) the interval contains 0. The only difference is the users with exactly 5 interactions (\orientWTwoMZeroFiveN{} against \eTwoWTwoMNdcgTenZeroFourN{} users). With so few users, the result depends on where the group ends.
+    \item \textbf{More than 20} gains the most: again the opposite of ``better at cold start''. \textbf{Digg:} H and BL2 are about equal in both groups.
+  \end{itemize}
+\end{frame}
+
+%% ── 13. Figure E3 ────────────────────────────────────────────────────────────
 \begin{frame}
   \frametitle{E3: the gain by social density (H2)}
   \centering
@@ -457,7 +482,7 @@
   \small The gain is already there at 0 followees (W2L \eThreeWTwoLNdcgTenZeroGain{}, W2M \eThreeWTwoMNdcgTenZeroGain{}, W2H \eThreeWTwoHNdcgTenZeroGain{}) and is lower at 20 or more (\eThreeWTwoLNdcgTenTwentyPlusGain{}, \eThreeWTwoMNdcgTenTwentyPlusGain{}, \eThreeWTwoHNdcgTenTwentyPlusGain{}). \textbf{H2 is not supported.}
 \end{frame}
 
-%% ── 13. Figure E5 ────────────────────────────────────────────────────────────
+%% ── 14. Figure E5 ────────────────────────────────────────────────────────────
 \begin{frame}
   \frametitle{E5: is the result built into the data?}
   \centering
@@ -495,7 +520,7 @@
   \end{itemize}
 \end{frame}
 
-%% ── 14. E7 cost ──────────────────────────────────────────────────────────────
+%% ── 15. E7 cost ──────────────────────────────────────────────────────────────
 \begin{frame}
   \frametitle{E7: the cost of the three feeds}
   \centering
@@ -511,7 +536,7 @@
   \end{itemize}
 \end{frame}
 
-%% ── 15. What it means (1) ────────────────────────────────────────────────────
+%% ── 16. What it means (1) ────────────────────────────────────────────────────
 \begin{frame}
   \frametitle{What it means (1): the answers to RQ1 and RQ2}
   \begin{itemize}\small
@@ -529,7 +554,7 @@
   \end{itemize}
 \end{frame}
 
-%% ── 16. What it means (2) ────────────────────────────────────────────────────
+%% ── 17. What it means (2) ────────────────────────────────────────────────────
 \begin{frame}
   \frametitle{What it means (2): for Breadit, and the limits}
   \begin{columns}[T]
@@ -555,7 +580,35 @@
   \end{columns}
 \end{frame}
 
-%% ── 17. Demo plan ────────────────────────────────────────────────────────────
+%% ── 18. Why H1 failed, and a proposal (discussion note) ─────────────────────
+\begin{frame}
+  \frametitle{Why H1 failed, and a proposal for a round 2 (Hv2)}
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \textbf{Four causes}
+      \begin{enumerate}\footnotesize
+        \setlength\itemsep{1pt}
+        \item \textbf{Scale} (our reading, not tested). Engagement has no upper bound; social is at most 2, community at most 1. On Digg every variant of H equals BL2; $\alpha$ sits at the top of its grid.
+        \item \textbf{A weak base in time} (tested on Digg). BL4 and BL5 reach \eOneDiggNdcgBLFourTenAllValue{} and \eOneDiggNdcgBLFiveTenAllValue{}, BL2 only \eOneDiggNdcgBLTwoTenAllValue{}.
+        \item \textbf{Cold start} (our reading). With no history every followee gets the same trust $1/|F_u|$, so the social part is almost flat; and group 0--4 is small.
+        \item \textbf{A topic signal} (tested on synthetic data). H-comm gains \eFourWTwoMNdcgHCommTenAllGain{} of the \eFourWTwoMNdcgHTenAllGain{} of H: the community term, not the follow graph.
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \textbf{Proposal: Hv2, offline, a new method id}
+      \begin{itemize}\footnotesize
+        \setlength\itemsep{1pt}
+        \item \textbf{A. One scale:} a log of engagement, or a boost $\text{base}\times(1+\alpha\,\text{social}+\beta\,\text{community})$.
+        \item \textbf{B. A base with time decay} (the BL4 form), and Hv2 compared with that same base, so the social part is measured alone.
+        \item \textbf{C. A prior from all users} instead of the flat $1/|F_u|$ (the simple form uses data the feed already loads).
+        \item \textbf{An honest test:} tune on validation only; a new synthetic seed for the test; Digg reported as post-hoc; round 1 stays in the thesis.
+        \item About 2 days; H and the app stay as they are. Details: our note in \texttt{.docs/} (English and Vietnamese).
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+%% ── 19. Demo plan ────────────────────────────────────────────────────────────
 \begin{frame}
   \frametitle{The demo plan}
   \small
@@ -572,7 +625,7 @@
   \end{enumerate}
 \end{frame}
 
-%% ── 18. Screenshots ──────────────────────────────────────────────────────────
+%% ── 20. Screenshots ──────────────────────────────────────────────────────────
 \begin{frame}
   \frametitle{The demo: two screens}
   \centering
@@ -592,7 +645,7 @@
   \raggedright\small The screenshots come from the demo run on generated data, so the posts have generated names and the users have no picture.
 \end{frame}
 
-%% ── 19. Status ───────────────────────────────────────────────────────────────
+%% ── 21. Status ───────────────────────────────────────────────────────────────
 \begin{frame}
   \frametitle{Status: what is done and what is left}
   \begin{columns}[T]
@@ -602,10 +655,10 @@
         \item \textbf{Data} (P3, P4): the synthetic generator, the Digg 2009 adapter, the loader into Postgres.
         \item \textbf{Ranking and harness} (P5): \texttt{@breadit/ranking}, metrics, statistics, the leakage and double-run tests.
         \item \textbf{Social feed in the app} (P6): \texttt{algo}, the parity test, the feed toggle.
-        \item \textbf{Experiments} (P7): E1 to E8, the H0 gate, the cost benchmark E7.
+        \item \textbf{Experiments} (P7): E1 to E8, the H0 gate, the cost benchmark E7, and your Orientation metrics.
         \item \textbf{Reproduction} (P8): \texttt{npm run thesis:repro}, and the default feed decided by the rule.
-        \item \textbf{Thesis} (P9): Chapters 1 to 9 drafted in LaTeX, with abstract and appendix; bug quick wins.
-        \item \textbf{Demo} (P10): a sweep of all pages, fixes, the demo script.
+        \item \textbf{Thesis} (P9): Chapters 1 to 9, abstract and appendix in LaTeX; the final checks pass.
+        \item \textbf{App and demo} (P10): page sweep and fixes, security fixes, the demo script, a run guide.
       \end{itemize}
     \end{column}
     \begin{column}{0.44\textwidth}
@@ -613,22 +666,24 @@
       \begin{itemize}\footnotesize
         \item The figures of Chapter 4 (drawn by hand).
         \item After your feedback: revise the chapters, Chapter 9 and the abstract.
-        \item Final checks: every number a macro, every citation verified, the page limit.
-        \item Defense slides, then the freeze (tag, clean clone).
-        \item Future work, not planned: the schema migration for some known bugs, and the Hive check.
+        \item Round 2 (Hv2), if you agree; otherwise future work.
+        \item Defense slides, then the freeze (\texttt{thesis:check} again, tag, clean clone).
+        \item Future work: the schema migration, the Hive check, NestJS and Fastify upgrades.
       \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
 
-%% ── 20. Questions ────────────────────────────────────────────────────────────
+%% ── 22. Questions ────────────────────────────────────────────────────────────
 \begin{frame}
-  \frametitle{Three questions for the supervisor}
-  \begin{enumerate}
-    \setlength\itemsep{4mm}
-    \item \textbf{Default feed rule.} H1 failed on both tests, so ``For You'' stays as it is today and \texttt{social} stays an option. Do you agree?
-    \item \textbf{Thesis rules.} The limit is at most 120 pages. Does the appendix count? Are our nine chapters the required ones?
-    \item \textbf{Dates.} When are the final submission and the defense?
+  \frametitle{Questions for the supervisor}
+  \begin{enumerate}\small
+    \setlength\itemsep{2.5mm}
+    \item \textbf{Research questions, data and design.} We have not met since the pre-thesis. Do you confirm RQ1, RQ2, the two datasets and the design of the hybrid score?
+    \item \textbf{The negative result.} H1 is reported as it is. Then: a round 2 with Hv2 (about 2 days, marked post-hoc where needed), or Hv2 only as future work?
+    \item \textbf{Default feed rule.} H1 failed on both tests, so ``For You'' stays as it is and \texttt{social} stays an option. Do you agree?
+    \item \textbf{Your groups.} Is an exploratory subsection in Chapter 6 the right place for the 5-or-fewer and more-than-20 comparison?
+    \item \textbf{Rules and dates.} Is the limit 120 pages with or without the appendix, and are our nine chapters the required ones? When are the submission and the defense?
   \end{enumerate}
 \end{frame}
 
