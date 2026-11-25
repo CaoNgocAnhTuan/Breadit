@@ -1,0 +1,41 @@
+---
+config:
+  theme: neutral
+  layout: elk
+---
+erDiagram
+    Comment {
+        Int id PK
+        DateTime createdAt
+        DateTime deletedAt
+        String userId FK
+        Int postId FK
+        Int parentCommentId FK
+    }
+    CommentMedia {
+        Int id PK
+        Int commentId FK
+        DateTime createdAt
+    }
+    CommentLike {
+        Int id PK
+        DateTime createdAt
+        String userId FK, UK "unique pair"
+        Int commentId FK, UK "unique pair"
+    }
+    Mention {
+        Int id PK
+        DateTime createdAt
+        Int postId FK
+        Int commentId FK
+        String userId FK
+    }
+    User ||--o{ Comment : "userId"
+    Post ||--o{ Comment : "postId"
+    Comment |o--o{ Comment : "parentCommentId"
+    Comment ||--o{ CommentMedia : "commentId"
+    User ||--o{ CommentLike : "userId"
+    Comment ||--o{ CommentLike : "commentId"
+    Post |o--o{ Mention : "postId"
+    Comment |o--o{ Mention : "commentId"
+    User ||--o{ Mention : "userId"

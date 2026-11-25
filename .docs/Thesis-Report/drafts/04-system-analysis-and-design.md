@@ -542,162 +542,23 @@ This is the main design rule of the thesis: all ranking logic lives in the packa
 
 ## 4.6 Database design (about 2.5 pages)
 
-The database is PostgreSQL 16, used through Prisma 6. The schema has 25 models. Figure 4.11 shows 23 of them. `Account` and `Session` are left out, because no code reads them. Each line of the figure is one foreign key, named by its field. For example, the line from `User` to `Post` named `userId` means that one user has zero or more posts, and each post has exactly one user, through `Post.userId`. A line that may be empty on one side means that the foreign key can be empty: a post may have no community.
+The database is PostgreSQL 16, used through Prisma 6. The schema has 25 models. Figure 4.11 shows 23 of them, with their links. `Account` and `Session` are left out, because no code reads them. The figure shows only the name of each table; the fields of each table are in Appendix C, in four groups (Figures C.1 to C.4). Each line of the figure is one foreign key, named by its field. For example, the line from `User` to `Post` named `userId` means that one user has zero or more posts, and each post has exactly one user, through `Post.userId`. A line that may be empty on one side means that the foreign key can be empty: a post may have no community.
 
-**Figure 4.11. The ERD.** Caption in the LaTeX: the ERD of the database: 23 of the 25 models (`Account` and `Session` are left out, because no code reads them). Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its dates (without `updatedAt`); the other fields are in `schema.prisma`.
+**Figure 4.11. The ERD.** Caption in the LaTeX: the ERD of the database: 23 of the 25 models and their links (`Account` and `Session` are left out, because no code reads them). Each line is one foreign key, named by its field. The fields of each table are in Appendix C.
 
 The script was made from `apps/backend/prisma/schema.prisma` on 2026-11-19, with a one-off script that is not in the repo.
 - **Tables:** 23 of the 25 models. `Account` and `Session` are left out, because no code reads them (Bugs Report R4); the caption should say so.
-- **Fields:** each table shows its keys (PK, FK, UK), its enum and Boolean fields, and its `DateTime` fields except `updatedAt`. The other fields are in the schema; the caption should say so.
+- **Fields:** Figure 4.11 shows the table names only (decided 2026-11-25: with the fields, the whole ERD on one A4 page gave text of about 1.5 pt). The fields are in Appendix C, in four figures (`images/figC-1-erd-users.mmd` to `images/figC-4-erd-communities.mmd`): each table shows its keys (PK, FK, UK), its enum and Boolean fields, and its `DateTime` fields except `updatedAt`.
 - **Relations:** each line is one foreign key, named by its field. There are 39 lines: the 41 relations of the schema, without the 2 of `Account` and `Session`.
 
 ```mermaid
+---
+config:
+  theme: neutral
+  layout: elk
+---
 erDiagram
-    User {
-        String id PK
-        String email UK
-        String username UK
-        DateTime emailVerified
-        Role role
-        Boolean banned
-        Int passwordVersion
-        DateTime createdAt
-    }
-    VerificationToken {
-        String identifier UK "unique pair"
-        String token UK "unique pair"
-        DateTime expires
-    }
-    Post {
-        Int id PK
-        DateTime createdAt
-        DateTime deletedAt
-        Boolean isSensitive
-        Boolean isApproved
-        String userId FK
-        Int rePostId FK
-        Int parentPostId FK
-        Int communityId FK
-    }
-    Hashtag {
-        Int id PK
-        String tag UK
-        DateTime createdAt
-    }
-    PostTag {
-        Int postId PK, FK
-        Int hashtagId PK, FK
-    }
-    Like {
-        Int id PK
-        DateTime createdAt
-        String userId FK
-        Int postId FK
-    }
-    SavedPosts {
-        Int id PK
-        DateTime createdAt
-        String userId FK
-        Int postId FK
-    }
-    Notification {
-        Int id PK
-        NotificationType type
-        String recipientId FK
-        String actorId FK
-        Int postId FK
-        Int commentId FK
-        DateTime readAt
-        DateTime createdAt
-    }
-    Follow {
-        Int id PK
-        DateTime createdAt
-        Boolean notify
-        String followerId FK
-        String followingId FK
-    }
-    Block {
-        Int id PK
-        DateTime createdAt
-        String blockerId FK, UK "unique pair"
-        String blockedId FK, UK "unique pair"
-    }
-    Report {
-        Int id PK
-        DateTime createdAt
-        ReportStatus status
-        String reporterId FK
-        Int postId FK
-    }
-    Conversation {
-        Int id PK
-        DateTime createdAt
-    }
-    ConversationMember {
-        Int conversationId PK, FK
-        String userId PK, FK
-        DateTime lastReadAt
-    }
-    Message {
-        Int id PK
-        Int conversationId FK
-        String senderId FK
-        DateTime createdAt
-    }
-    PostMedia {
-        Int id PK
-        Int postId FK
-        DateTime createdAt
-    }
-    Community {
-        Int id PK
-        String slug UK
-        DateTime createdAt
-    }
-    CommunityMember {
-        Int id PK
-        CommunityRole role
-        DateTime createdAt
-        String userId FK, UK "unique pair"
-        Int communityId FK, UK "unique pair"
-    }
-    CommunityRule {
-        Int id PK
-        Int communityId FK
-    }
-    CommunityBannedUser {
-        Int id PK
-        DateTime createdAt
-        String userId FK, UK "unique pair"
-        Int communityId FK, UK "unique pair"
-    }
-    Comment {
-        Int id PK
-        DateTime createdAt
-        DateTime deletedAt
-        String userId FK
-        Int postId FK
-        Int parentCommentId FK
-    }
-    CommentMedia {
-        Int id PK
-        Int commentId FK
-        DateTime createdAt
-    }
-    CommentLike {
-        Int id PK
-        DateTime createdAt
-        String userId FK, UK "unique pair"
-        Int commentId FK, UK "unique pair"
-    }
-    Mention {
-        Int id PK
-        DateTime createdAt
-        Int postId FK
-        Int commentId FK
-        String userId FK
-    }
+    direction LR
     User ||--o{ Post : "userId"
     Post |o--o{ Post : "rePostId"
     Post |o--o{ Post : "parentPostId"
@@ -737,6 +598,7 @@ erDiagram
     Post |o--o{ Mention : "postId"
     Comment |o--o{ Mention : "commentId"
     User ||--o{ Mention : "userId"
+    VerificationToken
 ```
 
 How to read a line: `User ||--o{ Post : "userId"` means one user has zero or more posts, and each post has exactly one user, through `Post.userId`. `|o` means the foreign key may be empty. For example, a post may have no community.
@@ -763,7 +625,7 @@ The next table lists the main entities and the rules the design keeps. Three rul
 ## Notes for the author
 
 1. **Diagram tools** (decided 2026-11-19): the author draws the diagrams by hand: draw.io, or the Mermaid web editor with the scripts above. Each image goes in `images/` as PDF (or PNG at 300 dpi or more), with its editable source next to it (see `Report Architecture.md`, "Diagrams").
-2. **Main flows only.** A diagram that does not support a sentence in the text is cut. The ERD is large; if it does not fit one page, put it on a landscape page or cut the field lists down to the keys.
+2. **Main flows only.** A diagram that does not support a sentence in the text is cut. The ERD is large: Chapter 4 shows the tables and their links only, and Appendix C shows the fields in four figures (decided 2026-11-25).
 3. **Checked again on 2026-11-20, after `p9-bug-quick-wins` and `p10-demo-fixes`.** Figures 4.3, 4.5, 4.6 and 4.7 were compared with the code (and 4.4 and 4.8, which use `posts.service.ts`). Two scripts changed:
    - **Figure 4.5.** The token check and the blacklist read are now in one function, `readSession` (`auth/session.ts`), that `JwtAuthGuard` and `OptionalJwtAuthGuard` both call (fix S5). The step "verifyJwt" is now "readSession: verifyJwt". The flow is the same: a logged-out token gives 401.
    - **Figure 4.6.** `InteractionsService.assertPostLive` now calls `canSeePost` (`posts/visibility.ts`, fix R2). A post that waits for approval gives 404 to everybody except its author, the community owner and the moderators. The figure has a new step and the 404 branch says so. Saves, reposts and comments use the same rule.

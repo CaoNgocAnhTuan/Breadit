@@ -172,6 +172,18 @@ Family F2 holds *H* against each of the seven baselines other than BL2 (BL0, BL1
 
 **Table B.4. Family F2 on `digg2009`: *H* against each other baseline, NDCG@*K*.** The same 84 rows for `digg2009`.
 
+## Appendix C. Database tables
+
+Figure 4.11 in Chapter 4 shows the 23 tables of the database and their links, with the name of each table only. The four figures of this appendix show the fields of each table, in four groups: users, the social graph and messages (Figure C.1), posts (Figure C.2), comments (Figure C.3) and communities (Figure C.4). Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its dates (without `updatedAt`); the other fields are in `schema.prisma`. Each foreign key line is drawn once, in the figure of the table that holds the key. A table of another group that such a line reaches is drawn as a box with its name only.
+
+**Figure C.1.** Caption in the LaTeX: the tables of users, the social graph, messages and notifications, with their fields. Image: `images/figC-1-erd-users.pdf` (script in `images/figC-1-erd-users.mmd`).
+
+**Figure C.2.** Caption in the LaTeX: the tables of posts, with their fields. Image: `images/figC-2-erd-posts.pdf` (script in `images/figC-2-erd-posts.mmd`).
+
+**Figure C.3.** Caption in the LaTeX: the tables of comments, with their fields. Image: `images/figC-3-erd-comments.pdf` (script in `images/figC-3-erd-comments.mmd`).
+
+**Figure C.4.** Caption in the LaTeX: the tables of communities, with their fields. Image: `images/figC-4-erd-communities.pdf` (script in `images/figC-4-erd-communities.mmd`).
+
 ## Notes for the author (remove before the final version)
 
 1. **Appendix B is built from the committed CSV, not from `tables/`.** Chapter 6 already shows all ten files of `.docs/results/p7-report/tables/` in full, so there was no table left to `\input`. Appendix B instead shows the families F1 and F2 of `.docs/results/p7-main/compare.csv` (198 rows) for all three K. Chapter 6 shows F1 at K = 10 only and has no F2 table. A small loop in `chapters/appendix.tex` reads the file at build time with the table reader of pgfplots (`main.tex` does not load `pgfplotstable`, and I may not edit it), so no number is typed. A better long-term home for these four tables is the report script (`npm run report`), which would write them into `.docs/results/p7-report/tables/` with a hash in the manifest. That is a task for later.

@@ -1,0 +1,72 @@
+---
+config:
+  theme: neutral
+  layout: elk
+---
+erDiagram
+    direction LR
+    User {
+        String id PK
+        String email UK
+        String username UK
+        DateTime emailVerified
+        Role role
+        Boolean banned
+        Int passwordVersion
+        DateTime createdAt
+    }
+    VerificationToken {
+        String identifier UK "unique pair"
+        String token UK "unique pair"
+        DateTime expires
+    }
+    Follow {
+        Int id PK
+        DateTime createdAt
+        Boolean notify
+        String followerId FK
+        String followingId FK
+    }
+    Block {
+        Int id PK
+        DateTime createdAt
+        String blockerId FK, UK "unique pair"
+        String blockedId FK, UK "unique pair"
+    }
+    Conversation {
+        Int id PK
+        DateTime createdAt
+    }
+    ConversationMember {
+        Int conversationId PK, FK
+        String userId PK, FK
+        DateTime lastReadAt
+    }
+    Message {
+        Int id PK
+        Int conversationId FK
+        String senderId FK
+        DateTime createdAt
+    }
+    Notification {
+        Int id PK
+        NotificationType type
+        String recipientId FK
+        String actorId FK
+        Int postId FK
+        Int commentId FK
+        DateTime readAt
+        DateTime createdAt
+    }
+    User ||--o{ Notification : "recipientId"
+    User ||--o{ Notification : "actorId"
+    Post |o--o{ Notification : "postId"
+    Comment |o--o{ Notification : "commentId"
+    User ||--o{ Follow : "followerId"
+    User ||--o{ Follow : "followingId"
+    User ||--o{ Block : "blockerId"
+    User ||--o{ Block : "blockedId"
+    Conversation ||--o{ ConversationMember : "conversationId"
+    User ||--o{ ConversationMember : "userId"
+    Conversation ||--o{ Message : "conversationId"
+    User ||--o{ Message : "senderId"

@@ -1,6 +1,6 @@
 # Diagrams of the thesis
 
-This file lists every diagram of the thesis: its figure number, where it is used, the file name to save, the tool, the size, and the Mermaid script. Today there are 11, all in Chapter 4. The scripts are the same as in `drafts/04-system-analysis-and-design.md`. They were checked against the code (see "Checked" in each entry). The number in a title (Figure 4.1) is a working name: in the PDF, figure numbers run through the whole thesis and follow by themselves.
+This file lists every diagram of the thesis: its figure number, where it is used, the file name to save, the tool, the size, and the Mermaid script. Today there are 15: 11 in Chapter 4 and 4 in Appendix C (the fields of the database tables). The scripts are the same as in `drafts/04-system-analysis-and-design.md`. They were checked against the code (see "Checked" in each entry). The number in a title (Figure 4.1) is a working name: in the PDF, figure numbers run through the whole thesis and follow by themselves.
 
 ## How to make a diagram
 
@@ -8,7 +8,8 @@ This file lists every diagram of the thesis: its figure number, where it is used
 2. Export the image. From draw.io: File → Export as → PDF (a PDF stays sharp at every size). From mermaid.live: PNG or SVG. A PNG must be at least 1,850 px wide, which is 300 dpi at the 15.5 cm text width. Use a PDF whenever the tool can give one.
 3. Save it in `.docs/Thesis-Report/images/` with the name of the entry: `images/fig4-<n>-<name>.pdf`, or `.png`.
 4. Keep the source next to the image: the `.mmd` file is already there. If you redraw the figure in draw.io, also save `images/fig4-<n>-<name>.drawio`.
-5. Build: `latexmk -pdf main.tex` in `.docs/Thesis-Report/`. Do not edit the `.tex`. The macro `\thesisdiagram` (in `main.tex`) shows `images/<name>.pdf` if it exists, else `images/<name>.png`, else a box with the text "Figure to be drawn". The first time you add an image, plain `latexmk` says "up-to-date" and does not see it, so run `latexmk -g -pdf main.tex` once (`-g` forces a full build). Later changes of the same file are seen by themselves.
+5. The five ERD scripts (Figure 4.11 and Appendix C) start with a `config` block: theme `neutral`, layout `elk` (a layout that packs the tables closer). mermaid.live reads it, so keep it when you paste.
+6. Build: `latexmk -pdf main.tex` in `.docs/Thesis-Report/`. Do not edit the `.tex`. The macro `\thesisdiagram` (in `main.tex`) shows `images/<name>.pdf` if it exists, else `images/<name>.png`, else a box with the text "Figure to be drawn". The first time you add an image, plain `latexmk` says "up-to-date" and does not see it, so run `latexmk -g -pdf main.tex` once (`-g` forces a full build). Later changes of the same file are seen by themselves.
 
 The macro shows the figure at the text width, and never taller than 80% of the page text height. Each figure keeps its caption and label in `chapters/system-analysis-and-design.tex`.
 
@@ -443,160 +444,20 @@ flowchart LR
 
 - **Used in:** Chapter 4, Section 4.6 (Database design), `\label{fig:design-erd}` in `chapters/system-analysis-and-design.tex`.
 - **File to save:** `images/fig4-11-erd.pdf` (or `images/fig4-11-erd.png`). Source: `images/fig4-11-erd.mmd`.
-- **Tool:** draw.io (the ERD of the database: tables with fields, crow's-foot lines).
-- **Size:** It is the biggest one: 23 tables and 39 lines. Try a landscape page (the page rotated by 90 degrees; not set up yet, it needs `\usepackage{pdflscape}` in `main.tex`). If it still does not fit, cut each table to its keys (PK, FK, UK) and change the LaTeX caption to say so.
+- **Tool:** mermaid.live (the script sets layout `elk` and direction `LR`, left to right).
+- **Size:** Full text width. 23 tables and 39 lines, names only, no fields. Measured on 2026-11-25 with Mermaid 11.12.0: 1,339 × 1,748 px, so the text is about 5 pt at the page size. With the fields, the same ERD was 2,636 px wide (text about 1.5 pt): this is why the fields moved to Appendix C.
 - **Checked against the code:** 2026-11-25 (from `schema.prisma`; new column `User.passwordVersion`, task `p10-security-fixes`).
-- The caption is already in the `.tex`: 23 of the 25 models; `Account` and `Session` are left out, because no code reads them.
+- The caption is already in the `.tex`: 23 of the 25 models; `Account` and `Session` are left out, because no code reads them. `VerificationToken` has no foreign key, so it stands alone.
 - How to read a line: `User ||--o{ Post : "userId"` means one user has zero or more posts, and each post has exactly one user, through `Post.userId`. `|o` means the foreign key may be empty.
-- mermaid.live draws a very large picture for this script. Use it only as a guide. Redraw the tables in draw.io.
 
 ```mermaid
+---
+config:
+  theme: neutral
+  layout: elk
+---
 erDiagram
-    User {
-        String id PK
-        String email UK
-        String username UK
-        DateTime emailVerified
-        Role role
-        Boolean banned
-        Int passwordVersion
-        DateTime createdAt
-    }
-    VerificationToken {
-        String identifier UK "unique pair"
-        String token UK "unique pair"
-        DateTime expires
-    }
-    Post {
-        Int id PK
-        DateTime createdAt
-        DateTime deletedAt
-        Boolean isSensitive
-        Boolean isApproved
-        String userId FK
-        Int rePostId FK
-        Int parentPostId FK
-        Int communityId FK
-    }
-    Hashtag {
-        Int id PK
-        String tag UK
-        DateTime createdAt
-    }
-    PostTag {
-        Int postId PK, FK
-        Int hashtagId PK, FK
-    }
-    Like {
-        Int id PK
-        DateTime createdAt
-        String userId FK
-        Int postId FK
-    }
-    SavedPosts {
-        Int id PK
-        DateTime createdAt
-        String userId FK
-        Int postId FK
-    }
-    Notification {
-        Int id PK
-        NotificationType type
-        String recipientId FK
-        String actorId FK
-        Int postId FK
-        Int commentId FK
-        DateTime readAt
-        DateTime createdAt
-    }
-    Follow {
-        Int id PK
-        DateTime createdAt
-        Boolean notify
-        String followerId FK
-        String followingId FK
-    }
-    Block {
-        Int id PK
-        DateTime createdAt
-        String blockerId FK, UK "unique pair"
-        String blockedId FK, UK "unique pair"
-    }
-    Report {
-        Int id PK
-        DateTime createdAt
-        ReportStatus status
-        String reporterId FK
-        Int postId FK
-    }
-    Conversation {
-        Int id PK
-        DateTime createdAt
-    }
-    ConversationMember {
-        Int conversationId PK, FK
-        String userId PK, FK
-        DateTime lastReadAt
-    }
-    Message {
-        Int id PK
-        Int conversationId FK
-        String senderId FK
-        DateTime createdAt
-    }
-    PostMedia {
-        Int id PK
-        Int postId FK
-        DateTime createdAt
-    }
-    Community {
-        Int id PK
-        String slug UK
-        DateTime createdAt
-    }
-    CommunityMember {
-        Int id PK
-        CommunityRole role
-        DateTime createdAt
-        String userId FK, UK "unique pair"
-        Int communityId FK, UK "unique pair"
-    }
-    CommunityRule {
-        Int id PK
-        Int communityId FK
-    }
-    CommunityBannedUser {
-        Int id PK
-        DateTime createdAt
-        String userId FK, UK "unique pair"
-        Int communityId FK, UK "unique pair"
-    }
-    Comment {
-        Int id PK
-        DateTime createdAt
-        DateTime deletedAt
-        String userId FK
-        Int postId FK
-        Int parentCommentId FK
-    }
-    CommentMedia {
-        Int id PK
-        Int commentId FK
-        DateTime createdAt
-    }
-    CommentLike {
-        Int id PK
-        DateTime createdAt
-        String userId FK, UK "unique pair"
-        Int commentId FK, UK "unique pair"
-    }
-    Mention {
-        Int id PK
-        DateTime createdAt
-        Int postId FK
-        Int commentId FK
-        String userId FK
-    }
+    direction LR
     User ||--o{ Post : "userId"
     Post |o--o{ Post : "rePostId"
     Post |o--o{ Post : "parentPostId"
@@ -636,4 +497,264 @@ erDiagram
     Post |o--o{ Mention : "postId"
     Comment |o--o{ Mention : "commentId"
     User ||--o{ Mention : "userId"
+    VerificationToken
+```
+
+## Appendix C. The fields of the database tables
+
+Four figures, one per group of tables. Each table shows its keys (PK, FK, UK), its enum and Boolean fields and its `DateTime` fields except `updatedAt`. Each foreign key line is drawn once, in the figure of the table that holds the key; a table of another group that the line reaches is drawn as a box with its name only. Together the four figures hold the 23 tables and the 39 lines of Figure 4.11. Measured on 2026-11-25 with Mermaid 11.12.0, the text is 6 to 8 pt at the page size.
+
+## Figure C.1. The tables of users, the social graph and messages
+
+- **Used in:** Appendix C, `\label{fig:app-erd-users}` in `chapters/appendix.tex`.
+- **File to save:** `images/figC-1-erd-users.pdf` (or `images/figC-1-erd-users.png`). Source: `images/figC-1-erd-users.mmd`.
+- **Tool:** mermaid.live (the script sets theme `neutral` and layout `elk`).
+- **Content:** users, the social graph and messages (8 tables, 12 lines; `Post` and `Comment` drawn as names only).
+- **Checked against the code:** 2026-11-25 (from `schema.prisma`).
+
+```mermaid
+---
+config:
+  theme: neutral
+  layout: elk
+---
+erDiagram
+    direction LR
+    User {
+        String id PK
+        String email UK
+        String username UK
+        DateTime emailVerified
+        Role role
+        Boolean banned
+        Int passwordVersion
+        DateTime createdAt
+    }
+    VerificationToken {
+        String identifier UK "unique pair"
+        String token UK "unique pair"
+        DateTime expires
+    }
+    Follow {
+        Int id PK
+        DateTime createdAt
+        Boolean notify
+        String followerId FK
+        String followingId FK
+    }
+    Block {
+        Int id PK
+        DateTime createdAt
+        String blockerId FK, UK "unique pair"
+        String blockedId FK, UK "unique pair"
+    }
+    Conversation {
+        Int id PK
+        DateTime createdAt
+    }
+    ConversationMember {
+        Int conversationId PK, FK
+        String userId PK, FK
+        DateTime lastReadAt
+    }
+    Message {
+        Int id PK
+        Int conversationId FK
+        String senderId FK
+        DateTime createdAt
+    }
+    Notification {
+        Int id PK
+        NotificationType type
+        String recipientId FK
+        String actorId FK
+        Int postId FK
+        Int commentId FK
+        DateTime readAt
+        DateTime createdAt
+    }
+    User ||--o{ Notification : "recipientId"
+    User ||--o{ Notification : "actorId"
+    Post |o--o{ Notification : "postId"
+    Comment |o--o{ Notification : "commentId"
+    User ||--o{ Follow : "followerId"
+    User ||--o{ Follow : "followingId"
+    User ||--o{ Block : "blockerId"
+    User ||--o{ Block : "blockedId"
+    Conversation ||--o{ ConversationMember : "conversationId"
+    User ||--o{ ConversationMember : "userId"
+    Conversation ||--o{ Message : "conversationId"
+    User ||--o{ Message : "senderId"
+```
+
+## Figure C.2. The tables of posts
+
+- **Used in:** Appendix C, `\label{fig:app-erd-posts}` in `chapters/appendix.tex`.
+- **File to save:** `images/figC-2-erd-posts.pdf` (or `images/figC-2-erd-posts.png`). Source: `images/figC-2-erd-posts.mmd`.
+- **Tool:** mermaid.live (the script sets theme `neutral` and layout `elk`).
+- **Content:** posts (7 tables, 13 lines; `User` and `Community` drawn as names only).
+- **Checked against the code:** 2026-11-25 (from `schema.prisma`).
+
+```mermaid
+---
+config:
+  theme: neutral
+  layout: elk
+---
+erDiagram
+    direction LR
+    Post {
+        Int id PK
+        DateTime createdAt
+        DateTime deletedAt
+        Boolean isSensitive
+        Boolean isApproved
+        String userId FK
+        Int rePostId FK
+        Int parentPostId FK
+        Int communityId FK
+    }
+    PostMedia {
+        Int id PK
+        Int postId FK
+        DateTime createdAt
+    }
+    Hashtag {
+        Int id PK
+        String tag UK
+        DateTime createdAt
+    }
+    PostTag {
+        Int postId PK, FK
+        Int hashtagId PK, FK
+    }
+    Like {
+        Int id PK
+        DateTime createdAt
+        String userId FK
+        Int postId FK
+    }
+    SavedPosts {
+        Int id PK
+        DateTime createdAt
+        String userId FK
+        Int postId FK
+    }
+    Report {
+        Int id PK
+        DateTime createdAt
+        ReportStatus status
+        String reporterId FK
+        Int postId FK
+    }
+    User ||--o{ Post : "userId"
+    Post |o--o{ Post : "rePostId"
+    Post |o--o{ Post : "parentPostId"
+    Community |o--o{ Post : "communityId"
+    Post ||--o{ PostTag : "postId"
+    Hashtag ||--o{ PostTag : "hashtagId"
+    User ||--o{ Like : "userId"
+    Post ||--o{ Like : "postId"
+    User ||--o{ SavedPosts : "userId"
+    Post ||--o{ SavedPosts : "postId"
+    User ||--o{ Report : "reporterId"
+    Post ||--o{ Report : "postId"
+    Post ||--o{ PostMedia : "postId"
+```
+
+## Figure C.3. The tables of comments
+
+- **Used in:** Appendix C, `\label{fig:app-erd-comments}` in `chapters/appendix.tex`.
+- **File to save:** `images/figC-3-erd-comments.pdf` (or `images/figC-3-erd-comments.png`). Source: `images/figC-3-erd-comments.mmd`.
+- **Tool:** mermaid.live (the script sets theme `neutral` and layout `elk`).
+- **Content:** comments (4 tables, 9 lines; `User` and `Post` drawn as names only).
+- **Checked against the code:** 2026-11-25 (from `schema.prisma`).
+
+```mermaid
+---
+config:
+  theme: neutral
+  layout: elk
+---
+erDiagram
+    Comment {
+        Int id PK
+        DateTime createdAt
+        DateTime deletedAt
+        String userId FK
+        Int postId FK
+        Int parentCommentId FK
+    }
+    CommentMedia {
+        Int id PK
+        Int commentId FK
+        DateTime createdAt
+    }
+    CommentLike {
+        Int id PK
+        DateTime createdAt
+        String userId FK, UK "unique pair"
+        Int commentId FK, UK "unique pair"
+    }
+    Mention {
+        Int id PK
+        DateTime createdAt
+        Int postId FK
+        Int commentId FK
+        String userId FK
+    }
+    User ||--o{ Comment : "userId"
+    Post ||--o{ Comment : "postId"
+    Comment |o--o{ Comment : "parentCommentId"
+    Comment ||--o{ CommentMedia : "commentId"
+    User ||--o{ CommentLike : "userId"
+    Comment ||--o{ CommentLike : "commentId"
+    Post |o--o{ Mention : "postId"
+    Comment |o--o{ Mention : "commentId"
+    User ||--o{ Mention : "userId"
+```
+
+## Figure C.4. The tables of communities
+
+- **Used in:** Appendix C, `\label{fig:app-erd-communities}` in `chapters/appendix.tex`.
+- **File to save:** `images/figC-4-erd-communities.pdf` (or `images/figC-4-erd-communities.png`). Source: `images/figC-4-erd-communities.mmd`.
+- **Tool:** mermaid.live (the script sets theme `neutral` and layout `elk`).
+- **Content:** communities (4 tables, 5 lines; `User` drawn as a name only).
+- **Checked against the code:** 2026-11-25 (from `schema.prisma`).
+
+```mermaid
+---
+config:
+  theme: neutral
+  layout: elk
+---
+erDiagram
+    direction LR
+    Community {
+        Int id PK
+        String slug UK
+        DateTime createdAt
+    }
+    CommunityMember {
+        Int id PK
+        CommunityRole role
+        DateTime createdAt
+        String userId FK, UK "unique pair"
+        Int communityId FK, UK "unique pair"
+    }
+    CommunityBannedUser {
+        Int id PK
+        DateTime createdAt
+        String userId FK, UK "unique pair"
+        Int communityId FK, UK "unique pair"
+    }
+    CommunityRule {
+        Int id PK
+        Int communityId FK
+    }
+    User ||--o{ CommunityMember : "userId"
+    Community ||--o{ CommunityMember : "communityId"
+    Community ||--o{ CommunityRule : "communityId"
+    User ||--o{ CommunityBannedUser : "userId"
+    Community ||--o{ CommunityBannedUser : "communityId"
 ```
