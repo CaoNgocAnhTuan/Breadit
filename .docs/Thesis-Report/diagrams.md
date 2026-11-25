@@ -443,15 +443,21 @@ flowchart LR
 
 - **Used in:** Chapter 4, Section 4.6 (Database design), `\label{fig:design-erd}` in `chapters/system-analysis-and-design.tex`.
 - **File to save:** `images/fig4-11-erd.pdf` (or `images/fig4-11-erd.png`). Source: `images/fig4-11-erd.mmd`.
-- **Tool:** draw.io (the ERD of the database: tables with fields, crow's-foot lines).
-- **Size:** It is the biggest one: 23 tables and 39 lines. Try a landscape page (the page rotated by 90 degrees; not set up yet, it needs `\usepackage{pdflscape}` in `main.tex`). If it still does not fit, cut each table to its keys (PK, FK, UK) and change the LaTeX caption to say so.
+- **Tool:** mermaid.live gives the start; the tables are then arranged by hand to fit the page (draw.io, or any editor where the lines follow the tables).
+- **Size:** It is the biggest one: 23 tables and 39 lines, one complete figure (the author's choice, 2026-11-25). The page box is the text width (15.5 cm) and 80% of the text height. Measured on 2026-11-25 with Mermaid 11.12.0 (text 12 pt at full size): the default layout is 6,983 × 1,916 px, so the text would be about 1 pt; the script's layout `elk` with direction `LR` is 2,358 × 3,318 px, about 2.7 pt. The 23 tables alone take about 1.46 million px², so packed by hand with room for the lines the best is about 5 to 5.7 pt (like `\tiny`). A landscape page gives the same area, so it does not help. To gain more: put the tables in a grid of 4 or 5 columns by group (users and graph, posts, comments, communities and messages), keep `User` and `Post` in the middle so their many lines stay short, and delete the type column (String, Int …) and the "unique pair" notes if the editor allows it.
 - **Checked against the code:** 2026-11-25 (from `schema.prisma`; new column `User.passwordVersion`, task `p10-security-fixes`).
 - The caption is already in the `.tex`: 23 of the 25 models; `Account` and `Session` are left out, because no code reads them.
 - How to read a line: `User ||--o{ Post : "userId"` means one user has zero or more posts, and each post has exactly one user, through `Post.userId`. `|o` means the foreign key may be empty.
-- mermaid.live draws a very large picture for this script. Use it only as a guide. Redraw the tables in draw.io.
+- The script starts with a `config` block (theme `neutral`, layout `elk`, direction `LR`): keep it when you paste into mermaid.live, it gives the most compact start.
 
 ```mermaid
+---
+config:
+  theme: neutral
+  layout: elk
+---
 erDiagram
+    direction LR
     User {
         String id PK
         String email UK

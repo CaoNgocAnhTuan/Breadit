@@ -552,7 +552,13 @@ The script was made from `apps/backend/prisma/schema.prisma` on 2026-11-19, with
 - **Relations:** each line is one foreign key, named by its field. There are 39 lines: the 41 relations of the schema, without the 2 of `Account` and `Session`.
 
 ```mermaid
+---
+config:
+  theme: neutral
+  layout: elk
+---
 erDiagram
+    direction LR
     User {
         String id PK
         String email UK
@@ -763,7 +769,7 @@ The next table lists the main entities and the rules the design keeps. Three rul
 ## Notes for the author
 
 1. **Diagram tools** (decided 2026-11-19): the author draws the diagrams by hand: draw.io, or the Mermaid web editor with the scripts above. Each image goes in `images/` as PDF (or PNG at 300 dpi or more), with its editable source next to it (see `Report Architecture.md`, "Diagrams").
-2. **Main flows only.** A diagram that does not support a sentence in the text is cut. The ERD is large; if it does not fit one page, put it on a landscape page or cut the field lists down to the keys.
+2. **Main flows only.** A diagram that does not support a sentence in the text is cut. The ERD is large. It stays one complete figure (author, 2026-11-25): arrange the tables by hand in a grid by group to fit one page (see `diagrams.md`, Figure 4.11; a landscape page gives no more room).
 3. **Checked again on 2026-11-20, after `p9-bug-quick-wins` and `p10-demo-fixes`.** Figures 4.3, 4.5, 4.6 and 4.7 were compared with the code (and 4.4 and 4.8, which use `posts.service.ts`). Two scripts changed:
    - **Figure 4.5.** The token check and the blacklist read are now in one function, `readSession` (`auth/session.ts`), that `JwtAuthGuard` and `OptionalJwtAuthGuard` both call (fix S5). The step "verifyJwt" is now "readSession: verifyJwt". The flow is the same: a logged-out token gives 401.
    - **Figure 4.6.** `InteractionsService.assertPostLive` now calls `canSeePost` (`posts/visibility.ts`, fix R2). A post that waits for approval gives 404 to everybody except its author, the community owner and the moderators. The figure has a new step and the 404 branch says so. Saves, reposts and comments use the same rule.
