@@ -16,7 +16,7 @@ function load(dir: string): RunFilesMap {
 /** The cell of a macro, found by hand: file is <run>/<csv>, row_key the key cells joined with "|". */
 function cellOf(runs: RunFilesMap, m: MacroRow): string {
   const [run, csv] = m.file.split("/") as [string, string];
-  const keys: Record<string, number> = { "compare.csv": 6, "summary.csv": 5, "coverage.csv": 4, "leftout.csv": 3, "density.csv": 4, "tuning.csv": 4, "latency.csv": 1, "queries.csv": 1 };
+  const keys: Record<string, number> = { "compare.csv": 6, "summary.csv": 5, "coverage.csv": 4, "leftout.csv": 3, "density.csv": 4, "tuning.csv": 4, "latency.csv": 1, "queries.csv": 1, "groups.csv": 4 };
   const table = runs.get(run)?.files.get(csv);
   assert.ok(table, `${m.file} is not in the fixture`);
   const cols = table.header.slice(0, keys[csv] as number);
@@ -37,11 +37,14 @@ test("macroName: letters only, and it throws on a digit, on an empty name and on
   assert.throws(() => macroName(["e", "One"], used), /twice|already|repeat/);
 });
 
-test("MACRO_SPECS: 157 specs of the P7 runs and 15 of E7, every name is letters only and none repeats", () => {
+test("MACRO_SPECS: 157 specs of the P7 runs, 15 of E7 and 44 of the Orientation groups, every name is letters only and none repeats", () => {
   const e7 = MACRO_SPECS.filter((s) => s.run === "p7-e7");
+  const orient = MACRO_SPECS.filter((s) => s.run === "p9-orient-groups");
   assert.equal(e7.length, 15);
-  assert.equal(MACRO_SPECS.length - e7.length, 157, "138 after task p9-report-macros, 19 new ones (task p9-missing-macros)");
-  assert.equal(MACRO_SPECS.length, 172);
+  // 2 datasets x 2 groups: per metric (recall, ndcg) the gain, its interval and the two means (10), and the user count once (1)
+  assert.equal(orient.length, 44);
+  assert.equal(MACRO_SPECS.length - e7.length - orient.length, 157, "138 after task p9-report-macros, 19 new ones (task p9-missing-macros)");
+  assert.equal(MACRO_SPECS.length, 216);
   const used = new Set<string>();
   for (const s of MACRO_SPECS) {
     const name = macroName(s.parts, used);
@@ -73,7 +76,7 @@ test("buildMacros: each value is its cell after roundDecimal / formatP (counts p
             : roundDecimal(cell, 3);
     assert.equal(m.value, want, m.name);
     if (m.name.endsWith("Full")) assert.match(m.value, /^-?[0-9]+\.[0-9]{6}$/, m.name);
-    assert.match(m.file, /^p7-[a-z0-9-]+\/[a-z_]+\.csv$/);
+    assert.match(m.file, /^p[79]-[a-z0-9-]+\/[a-z_]+\.csv$/);
   }
   // five macros picked by hand
   const byName = new Map(macros.map((m) => [m.name, m]));

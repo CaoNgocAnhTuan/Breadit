@@ -12,8 +12,8 @@ import { roundDecimal } from "./round.ts";
 import { sha256Hex } from "../canonical/csv.ts";
 import { tempDir } from "../checks/fixture.ts";
 
-// TC11 (design DW6, DW9, DW10) and TC5 of task p7-cost-benchmark (DW6): the report on a hand-made results folder for the thirteen run ids.
-const TABLE_IDS = ["tuning", "leftout", "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"];
+// TC11 (design DW6, DW9, DW10) and TC5 of task p7-cost-benchmark (DW6): the report on a hand-made results folder for the fourteen run ids.
+const TABLE_IDS = ["tuning", "leftout", "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "orient", "recall-coverage"];
 const FILES = ["fig-e2-history.csv", "fig-e3-density.csv", "fig-e5-worlds.csv", "macros.csv", "manifest.json", "results-macros.tex", "results.md", ...TABLE_IDS.map((t) => `tables/${t}.tex`)];
 
 function report(dir: string, out: string): string[] {
@@ -29,9 +29,10 @@ function listFiles(dir: string): string[] {
   return out.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 
-test("REPORT_RUNS is the twelve runs of P7 and the E7 benchmark, and the fixture has the same thirteen", () => {
-  assert.equal(REPORT_RUNS.length, 13);
+test("REPORT_RUNS is the twelve runs of P7, the E7 benchmark and the Orientation groups, and the fixture has the same fourteen", () => {
+  assert.equal(REPORT_RUNS.length, 14);
   assert.equal(REPORT_RUNS[12], "p7-e7");
+  assert.equal(REPORT_RUNS[13], "p9-orient-groups");
   assert.deepEqual([...REPORT_RUNS], FIXTURE_RUNS.map((r) => r.id));
 });
 
@@ -335,7 +336,7 @@ test("TC5: the E7 table has one row per algo, and its cells are the cells of lat
   }
 });
 
-test("buildTables gives the ten tables of the design in order", () => {
+test("buildTables gives the twelve tables of the design in order", () => {
   const dir = tempDir();
   writeResultsFixture(dir);
   const runs = new Map(REPORT_RUNS.map((r) => [r, readRun(dir, r)]));

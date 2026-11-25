@@ -13,6 +13,7 @@
     "harness": "node --max-old-space-size=4096 src/cli/harness.ts",
     "freeze": "node src/cli/freeze.ts",
     "report": "node src/cli/report.ts",
+    "orient": "node --max-old-space-size=4096 src/cli/orient.ts",
     "results:manifest": "node src/cli/results-manifest.ts",
     "rank": "node --max-old-space-size=4096 src/cli/rank.ts",
     "parity": "node --max-old-space-size=4096 src/cli/parity.ts",

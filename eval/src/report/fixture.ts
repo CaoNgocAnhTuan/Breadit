@@ -7,7 +7,7 @@ import { GROUPS, f6, methodIndex } from "../metrics.ts";
 import { csvText } from "../results-csv.ts";
 import { pickBest } from "../harness/tuning.ts";
 
-// Test helper: a results folder with the thirteen P7 runs (the twelve of the harness and the E7 benchmark) and hand-made numbers, the shapes the harness writes (summary, coverage, leftout,
+// Test helper: a results folder with the thirteen P7 runs (the twelve of the harness and the E7 benchmark), the Orientation group run and hand-made numbers, the shapes the harness writes (summary, coverage, leftout,
 // compare, density, tuning, manifest). The numbers come from a hash of the row, so every run of a test gives the same files. Not used by
 // production code.
 
@@ -33,6 +33,8 @@ interface FixtureRun {
   tuning?: string[];
   /** The E7 run: latency.csv, queries.csv and runs.csv instead of the summary files. */
   e7?: boolean;
+  /** The Orientation group comparison: groups.csv instead of the summary files. */
+  groups?: boolean;
 }
 
 export const FIXTURE_RUNS: readonly FixtureRun[] = [
@@ -49,6 +51,7 @@ export const FIXTURE_RUNS: readonly FixtureRun[] = [
   { id: "p7-e8-pool", split: "test", datasets: ["syn-W2M-M"], methods: ["BL2", "BL4", "H"], compare: "none" },
   { id: "p7-e5-shuffle", split: "test", datasets: ["syn-W2M-M-shuffled"], methods: SWEEP_METHODS, compare: "none" },
   { id: "p7-e7", split: "test", datasets: [], methods: [], e7: true },
+  { id: "p9-orient-groups", split: "test", datasets: MAIN, methods: ["BL2", "H"], groups: true },
 ];
 
 /** A number from a hash of `seed`, in [lo, hi), with 6 decimals. */
@@ -115,6 +118,24 @@ function leftout(run: FixtureRun): Table {
     }
   }
   return { header: ["dataset", "split", "bucket", "n_test_users", "n_left_out"], rows };
+}
+
+/** groups.csv of the Orientation run: dataset, group (0-5, 21+), metric (recall, ndcg), K 10. */
+function groups(run: FixtureRun): Table {
+  const rows: Rec[] = [];
+  for (const dataset of run.datasets) {
+    for (const group of ["0-5", "21+"]) {
+      for (const metric of ["recall", "ndcg"]) {
+        const seed = `${run.id}|${dataset}|${group}|${metric}`;
+        const h = Number(num(`h${seed}`, 0.01, 0.2));
+        const bl2 = Number(num(`b${seed}`, 0.0, 0.05));
+        const half = Number(num(`w${seed}`, 0.002, 0.03));
+        const d = h - bl2;
+        rows.push({ dataset, group, metric, k: "10", n: String(groupSize(dataset, group === "0-5" ? "0-4" : "20+")), h: f6(h), bl2: f6(bl2), mean_diff: f6(d), ci_low: f6(d - half), ci_high: f6(d + half) });
+      }
+    }
+  }
+  return { header: ["dataset", "group", "metric", "k", "n", "h", "bl2", "mean_diff", "ci_low", "ci_high"], rows };
 }
 
 function compareRow(run: FixtureRun, dataset: string, family: string, method: string, ref: string, k: number, bucket: string, withP: boolean): Rec {
@@ -236,6 +257,7 @@ const KEY_OF: Record<string, string[]> = {
   "latency.csv": ["algo"],
   "queries.csv": ["algo"],
   "runs.csv": ["round", "algo"],
+  "groups.csv": ["dataset", "group", "metric", "k"],
 };
 
 export interface FixtureOptions {
@@ -243,13 +265,15 @@ export interface FixtureOptions {
   cells?: Record<string, string>;
 }
 
-/** Writes the thirteen run folders under `dir`, each with its CSV files and a manifest that matches them. */
+/** Writes the fourteen run folders under `dir`, each with its CSV files and a manifest that matches them. */
 export function writeResultsFixture(dir: string, o: FixtureOptions = {}): void {
   const used = new Set<string>();
   for (const run of FIXTURE_RUNS) {
     const files: Record<string, Table> = run.e7
       ? { "latency.csv": e7Latency(run), "queries.csv": e7Queries(run), "runs.csv": e7Runs(run) }
-      : { "summary.csv": summary(run), "coverage.csv": coverage(run), "leftout.csv": leftout(run) };
+      : run.groups
+        ? { "groups.csv": groups(run) }
+        : { "summary.csv": summary(run), "coverage.csv": coverage(run), "leftout.csv": leftout(run) };
     if (run.compare) files["compare.csv"] = compare(run);
     if (run.density) files["density.csv"] = density(run);
     if (run.tuning) files["tuning.csv"] = tuning(run);

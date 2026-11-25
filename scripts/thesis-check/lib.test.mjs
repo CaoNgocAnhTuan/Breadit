@@ -174,7 +174,7 @@ test('TC4 parseMacros reads the names of newcommand and providecommand', () => {
 });
 
 test('TC4 macroUses takes the longest letter run as the name and only the result prefixes', () => {
-  const uses = macroUses(['\\eOneAValue{} and \\eOneUnknownValue{}', 'the \\eOneWTwoMNdcgHTenAllValue{}x \\eTwoDiggFoo2', '\\textbf{\\emph{a}} \\eqref{x} \\tuneAlpha{} \\hZeroH{}']);
+  const uses = macroUses(['\\eOneAValue{} and \\eOneUnknownValue{}', 'the \\eOneWTwoMNdcgHTenAllValue{}x \\eTwoDiggFoo2', '\\textbf{\\emph{a}} \\eqref{x} \\tuneAlpha{} \\hZeroH{} \\orientDiggZeroFiveN{}']);
   assert.deepEqual(uses.map((u) => [u.line, u.name]), [
     [1, 'eOneAValue'],
     [1, 'eOneUnknownValue'],
@@ -182,6 +182,7 @@ test('TC4 macroUses takes the longest letter run as the name and only the result
     [2, 'eTwoDiggFoo'],
     [3, 'tuneAlpha'],
     [3, 'hZeroH'],
+    [3, 'orientDiggZeroFiveN'],
   ]);
 });
 

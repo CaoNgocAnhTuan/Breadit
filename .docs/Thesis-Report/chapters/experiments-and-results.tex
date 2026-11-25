@@ -199,6 +199,25 @@ Table~\ref{tab:results-e2} gives the gain of $H$ over BL2 for each history group
 
 \textbf{Other groups.} On \texttt{syn-W2M-M}, the gain grows with history. It is largest for users with 20 or more earlier interactions (gain \eTwoWTwoMNdcgTenTwentyPlusGain{}, interval from \eTwoWTwoMNdcgTenTwentyPlusCiLow{} to \eTwoWTwoMNdcgTenTwentyPlusCiHigh{}, Holm $p$ \eTwoWTwoMNdcgTenTwentyPlusPHolm{}). This is the only F1 row at $K = 10$ where both conditions hold. In group 5--19, the interval is above 0, but the Holm $p$ is not below the level (\eTwoWTwoMNdcgTenFiveNineteenPHolm{}). On \texttt{digg2009}, the gain is near 0 in every group.
 
+\subsection{The groups of the Orientation (exploratory)}
+\label{sec:results-orient}
+
+The Orientation of this thesis asks for one more comparison: Recall@10 for users with 5 or fewer earlier interactions, against users with more than 20. These bounds are not the history groups of the protocol (0--4 and 20 or more, Section~\ref{sec:method-protocol}), and they were added after the test run. So this subsection is exploratory. Table~\ref{tab:results-orient} gives Recall@10 and NDCG@10 of BL2 and $H$ in the two groups, with the mean paired gain and its 95\% paired bootstrap interval, with the same settings as E2. It has no $p$-value and no Holm correction, and it does not change the result of H1.
+
+\begin{table}[htbp]
+  \centering
+  \caption{E2 with the groups of the Orientation (exploratory): $H$ against BL2 for users with 5 or fewer and with more than 20 earlier interactions, $K = 10$, paired bootstrap interval, no $p$-value.}
+  \label{tab:results-orient}
+  \small
+  \resizebox{\textwidth}{!}{\input{\resultsdir/tables/orient.tex}}
+\end{table}
+
+\textbf{\texttt{syn-W2M-M}.} In the group with 5 or fewer interactions (\orientWTwoMZeroFiveN{} users), the gain in Recall@10 is \orientWTwoMRecallTenZeroFiveGain{} (interval from \orientWTwoMRecallTenZeroFiveCiLow{} to \orientWTwoMRecallTenZeroFiveCiHigh{}), and the gain in NDCG@10 is \orientWTwoMNdcgTenZeroFiveGain{} (interval from \orientWTwoMNdcgTenZeroFiveCiLow{} to \orientWTwoMNdcgTenZeroFiveCiHigh{}). Both intervals are above 0, while the interval of group 0--4 in E2 contains 0. The only difference between the two groups is the users with exactly 5 interactions (\orientWTwoMZeroFiveN{} users against \eTwoWTwoMNdcgTenZeroFourN{}). So, for new users, the synthetic result depends on where the bound is drawn: the group is small, and a few users move the interval. For users with more than 20 interactions (\orientWTwoMTwentyOnePlusN{} users), the gain is larger: \orientWTwoMRecallTenTwentyOnePlusGain{} in Recall@10 and \orientWTwoMNdcgTenTwentyOnePlusGain{} in NDCG@10. As in E2, the gain grows with history, which is the opposite of what RQ1 hoped for.
+
+\textbf{\texttt{digg2009}.} In both groups (\orientDiggZeroFiveN{} and \orientDiggTwentyOnePlusN{} users), $H$ and BL2 have about the same Recall@10 and NDCG@10 (Table~\ref{tab:results-orient}).
+
+Recall@$K$ and Coverage@$K$ at $K = 5$ and 20, for every method, are in Appendix~B (Table~\ref{tab:app-recall-coverage}).
+
 %% ─────────────────────────────────────────────────────────────────────────────
 \section{E3: social density (H2)}
 \label{sec:results-e3}

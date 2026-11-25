@@ -376,7 +376,7 @@ Forty-three files, 434 tests. Run with \texttt{npm run verify -w @breadit/eval},
 
 %% ─────────────────────────────────────────────────────────────────────────────
 %% Appendix B. Full result tables. First draft 2026-11-22, before the supervisor's feedback.
-%% Chapter 6 already shows the ten tables of \resultsdir/tables/ in full, so none of them is repeated here. What Chapter 6 does not show
+%% Chapter 6 already shows eleven of the twelve tables of \resultsdir/tables/ in full (B.3 below has the twelfth), so none of them is repeated here. What Chapter 6 does not show
 %% are the two statistical families of Chapter 3 for all three values of K. The rows are read at build time from the committed result file
 %% .docs/results/p7-main/compare.csv (a Class D file, listed in the manifest of the run p7-main), so no number is typed in this file.
 %% The loop is plain TeX with pgfplots' table reader, because main.tex does not load pgfplotstable. State is set globally (\global, \xdef),
@@ -410,7 +410,7 @@ Forty-three files, 434 tests. Run with \texttt{npm run verify -w @breadit/eval},
 \section*{Appendix B. Full result tables}
 \addcontentsline{toc}{section}{Appendix B. Full result tables}
 
-Chapter 6 shows the ten tables of the results report (tuning, test users and left-out users, and E1 to E8) in full, so this appendix does not repeat them. It gives what Chapter 6 only describes: the two statistical families of Chapter 3, for all three values of $K$ (5, 10 and 20). Table~\ref{tab:results-e2} shows family F1 at $K = 10$ only, and family F2 has no table in Chapter 6.
+Chapter 6 shows eleven tables of the results report (tuning, test users and left-out users, E1 to E8, and the groups of the Orientation) in full, so this appendix does not repeat them. Section B.3 gives the twelfth: Recall@$K$ and Coverage@$K$ at the three values of $K$. It gives what Chapter 6 only describes: the two statistical families of Chapter 3, for all three values of $K$ (5, 10 and 20). Table~\ref{tab:results-e2} shows family F1 at $K = 10$ only, and family F2 has no table in Chapter 6.
 
 The rows are read from the result file \texttt{.docs/results/p7-main/compare.csv} when the thesis is built, with six decimals as in the file. The file is listed with its SHA-256 in the manifest of the run \texttt{p7-main}, a Class D result, so every value is the same on every rebuild (Chapter 3). The columns are:
 \begin{itemize}
@@ -499,3 +499,15 @@ Family F2 holds $H$ against each of the seven baselines other than BL2 (BL0, BL1
   \endlastfoot
   \appbrows{digg2009}{F2}
 \end{longtable}}
+
+\subsection*{B.3 Recall@K and Coverage@K}
+
+Chapter 6 gives Recall@10 and Coverage@10 (Table~\ref{tab:results-e1}). Table~\ref{tab:app-recall-coverage} gives them at the three values of $K$, for every method, over all users of the test split. Recall@$K$ equals HitRate@$K$, because each user has one test item. The values come from \texttt{.docs/results/p7-main/summary.csv} and \texttt{coverage.csv}, through the results report.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Recall@$K$ and Coverage@$K$ of all methods on the test split, all users.}
+  \label{tab:app-recall-coverage}
+  \small
+  \resizebox{\textwidth}{!}{\input{\resultsdir/tables/recall-coverage.tex}}
+\end{table}

@@ -125,6 +125,8 @@ The figure data is `fig-e2-history.csv`: the F1 rows of H against BL2 at K = 10 
 
 **The surprise:** on `syn-W2M-M` the gain **grows with history**: 0.023 for 0–4, 0.031 for 5–19, 0.078 for 20+. The 20+ row is the only F1 row at K = 10 where both conditions hold. With little history the smoothing gives every followee and community the same weight, so the score cannot be personal yet; with more history the counts take over (Chapter 7).
 
+**The groups of the Orientation (exploratory, added 2026-11-25).** The supervisor's Orientation asked for Recall@10 with other bounds: 5 or fewer earlier interactions against more than 20. `npm run orient -w @breadit/eval` computes it from the per-user ranks of `p7-main` (`.docs/results/p9-orient-groups/groups.csv`; Chapter 6, Table "E2 with the groups of the Orientation"). It has a bootstrap interval and no p-value, because the bounds were chosen after the test run. On `syn-W2M-M` the "5 or fewer" group (194 users, the 174 of group 0–4 plus the users with exactly 5) has a Recall@10 gain of 0.062 (0.015 to 0.108) and an NDCG@10 gain of 0.038 (0.011 to 0.068): both intervals are above 0. The lesson is not "H1 passes": it is that a small group makes the result depend on where the bound is drawn. On Digg the gain is about 0 with every bound.
+
 ## 7. E3: social density (H2)
 
 The gain of H over BL2 by the number of followees at test time (Table e3; figure data `fig-e3-density.csv`):

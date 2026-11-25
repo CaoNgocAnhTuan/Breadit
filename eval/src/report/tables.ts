@@ -333,6 +333,64 @@ function e8Table(runs: RunFilesMap): Table {
 }
 
 /** The ten tables, in the order of the design. */
+/** The Orientation groups (exploratory): H against BL2 for 5 or fewer and more than 20 earlier interactions, Recall@10 and NDCG@10. */
+function orientTable(runs: RunFilesMap): Table {
+  const groups = rowsOf(runs, "p9-orient-groups", "groups.csv");
+  const rows: Cell[][] = [];
+  for (const dataset of MAIN) {
+    for (const [group, label] of [["0-5", "5 or fewer"], ["21+", "more than 20"]] as const) {
+      for (const [metric, name] of [["recall", "Recall@10"], ["ndcg", "NDCG@10"]] as const) {
+        const r = pick(groups, { dataset, group, metric, k: "10" }, "p9-orient-groups/groups.csv");
+        const c = (column: string): string => cellOf(r, column, "p9-orient-groups/groups.csv");
+        rows.push([text(dataset), text(label), text(name), int(c("n")), dec(c("bl2")), dec(c("h")), dec(c("mean_diff")), dec(c("ci_low")), dec(c("ci_high"))]);
+      }
+    }
+  }
+  return {
+    id: "orient",
+    caption: "Exploratory: H against BL2 in the groups of the Orientation (earlier interactions), K = 10, paired bootstrap interval, no p-value",
+    columns: ["Dataset", "Group", "Metric", "Users", "BL2", "H", "Gain", "CI low", "CI high"],
+    rows,
+  };
+}
+
+/** Recall@K and Coverage@K at every K of super-plan section 7, all methods, all users, test split (p7-main). */
+function recallCoverageTable(runs: RunFilesMap): Table {
+  const ks = loadFrozen().k.map(String);
+  const summary = rowsOf(runs, "p7-main", "summary.csv");
+  const coverage = rowsOf(runs, "p7-main", "coverage.csv");
+  const rows: Cell[][] = [];
+  for (const dataset of MAIN) {
+    for (const method of NINE) {
+      rows.push([
+        text(dataset),
+        text(method),
+        ...ks.map((k) => dec(cellOf(pick(summary, { dataset, split: "test", method, k, bucket: "all" }, "p7-main/summary.csv"), "recall", "summary"))),
+        ...ks.map((k) => dec(cellOf(pick(coverage, { dataset, split: "test", method, k }, "p7-main/coverage.csv"), "coverage", "coverage"))),
+      ]);
+    }
+  }
+  return {
+    id: "recall-coverage",
+    caption: "Recall@K and Coverage@K of all methods on the test split, all users",
+    columns: ["Dataset", "Method", ...ks.map((k) => `Recall@${k}`), ...ks.map((k) => `Coverage@${k}`)],
+    rows,
+  };
+}
+
 export function buildTables(runs: RunFilesMap): Table[] {
-  return [tuningTable(runs), leftoutTable(runs), e1Table(runs), e2Table(runs), e3Table(runs), e4Table(runs), e5Table(runs), e6Table(runs), e7Table(runs), e8Table(runs)];
+  return [
+    tuningTable(runs),
+    leftoutTable(runs),
+    e1Table(runs),
+    e2Table(runs),
+    e3Table(runs),
+    e4Table(runs),
+    e5Table(runs),
+    e6Table(runs),
+    e7Table(runs),
+    e8Table(runs),
+    orientTable(runs),
+    recallCoverageTable(runs),
+  ];
 }

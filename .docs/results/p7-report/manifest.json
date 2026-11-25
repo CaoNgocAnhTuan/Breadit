@@ -13,16 +13,16 @@
       "sha256": "fa5baaa695b82164a4e6a779859d80b1f2898129eb28a5819776848421c0942c"
     },
     "macros.csv": {
-      "rows": 173,
-      "sha256": "9f0cf361a49e91c9830adf4a263874b0e720211dd4c74dab71616a67b85b90e0"
+      "rows": 217,
+      "sha256": "a5ac47a05748139a56b9575c5ef668064dafcb05a7a02511d48e9bf9d82686a1"
     },
     "results-macros.tex": {
-      "rows": 173,
-      "sha256": "82ed9ffd8e102aa093cf3e9424f6f9c06f47b02c30bb148e86dac181b3e0dd0d"
+      "rows": 217,
+      "sha256": "ebe03dc719594a2de0b7eb3bb3d57dc7181fe6efdd48308a71fd0b268c7212a2"
     },
     "results.md": {
-      "rows": 331,
-      "sha256": "a436d9204db6f571bbc3fa18346cffce9f497d9e3e430d79f6686bd7d82641da"
+      "rows": 411,
+      "sha256": "8a5519799718fd7ac7284c96252bf93f6acd5e263eaa41b1414a531a73b4c7cb"
     },
     "tables/e1.tex": {
       "rows": 16,
@@ -60,6 +60,14 @@
       "rows": 19,
       "sha256": "69cf3de7e133dffaee873f9c85e074fcee77ba6680491d768469f86a75ba86be"
     },
+    "tables/orient.tex": {
+      "rows": 15,
+      "sha256": "37d758a516ea686bacdd6e8394c9f42be5405ad0c1530098a00bbe80d08f43c4"
+    },
+    "tables/recall-coverage.tex": {
+      "rows": 25,
+      "sha256": "68303f1e02d808e9041e92f1b19cb14aee21029497ac385d33ed8cb8ab7059d7"
+    },
     "tables/tuning.tex": {
       "rows": 21,
       "sha256": "6f5f39020489ecadd32ff99da504c307bec4a5e40fdc5bc6c5c2176389313819"
@@ -78,7 +86,8 @@
     "p7-h0": "6413fa7d4d2ebdaf8a92bc55f9dd86978b1ae83c65f0a83a2a7ab369399bb08f",
     "p7-main": "f1f66628ec2ad72832fa1de336167d42ae95ab6936f3f38404c423c6c12459dc",
     "p7-tune-main": "49b24031277ad2263f03e957a3823971cc4341e2cc67fc2f93a1eac17ee00383",
-    "p7-tune-worlds": "63c32579669669dfd32f65c3a4c765458951625ce68ad110da7ddc8df86d494f"
+    "p7-tune-worlds": "63c32579669669dfd32f65c3a4c765458951625ce68ad110da7ddc8df86d494f",
+    "p9-orient-groups": "f5e601cfeb20d051a29bf3b957d476e2a0d4a4bd27c4bc137ecdf16afd907384"
   },
   "schemaVersion": 1
 }

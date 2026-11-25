@@ -1,6 +1,6 @@
 # P7 results
 
-Written by `npm run report -w @breadit/eval` from the results of the thirteen P7 runs. Do not edit: change the results and run it again.
+Written by `npm run report -w @breadit/eval` from the results of the thirteen P7 runs and the Orientation group comparison (p9-orient-groups). Do not edit: change the results and run it again.
 
 ## tuning: Values chosen on the validation split (the highest NDCG@10, a tie to the smaller value)
 
@@ -152,6 +152,42 @@ Written by `npm run report -w @breadit/eval` from the results of the thirteen P7
 | BL2 | 0.009 | 0.012 | 0.008 | 0.011 |
 | BL6 | 0.011 | 0.017 | 0.010 | 0.016 |
 | H | 0.054 | 0.035 | 0.048 | 0.032 |
+
+## orient: Exploratory: H against BL2 in the groups of the Orientation (earlier interactions), K = 10, paired bootstrap interval, no p-value
+
+| Dataset | Group | Metric | Users | BL2 | H | Gain | CI low | CI high |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| syn-W2M-M | 5 or fewer | Recall@10 | 194 | 0.021 | 0.082 | 0.062 | 0.015 | 0.108 |
+| syn-W2M-M | 5 or fewer | NDCG@10 | 194 | 0.011 | 0.049 | 0.038 | 0.011 | 0.068 |
+| syn-W2M-M | more than 20 | Recall@10 | 184 | 0.005 | 0.147 | 0.141 | 0.092 | 0.196 |
+| syn-W2M-M | more than 20 | NDCG@10 | 184 | 0.003 | 0.084 | 0.081 | 0.049 | 0.116 |
+| digg2009 | 5 or fewer | Recall@10 | 23161 | 0.055 | 0.055 | 0.000 | 0.000 | 0.001 |
+| digg2009 | 5 or fewer | NDCG@10 | 23161 | 0.029 | 0.029 | 0.000 | 0.000 | 0.000 |
+| digg2009 | more than 20 | Recall@10 | 22393 | 0.049 | 0.049 | 0.000 | 0.000 | 0.000 |
+| digg2009 | more than 20 | NDCG@10 | 22393 | 0.021 | 0.021 | 0.000 | 0.000 | 0.000 |
+
+## recall-coverage: Recall@K and Coverage@K of all methods on the test split, all users
+
+| Dataset | Method | Recall@5 | Recall@10 | Recall@20 | Coverage@5 | Coverage@10 | Coverage@20 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| syn-W2M-M | BL0 | 0.007 | 0.009 | 0.037 | 0.287 | 0.447 | 0.619 |
+| syn-W2M-M | BL1 | 0.006 | 0.007 | 0.028 | 0.279 | 0.423 | 0.565 |
+| syn-W2M-M | BL2 | 0.011 | 0.017 | 0.035 | 0.071 | 0.250 | 0.498 |
+| syn-W2M-M | BL2t | 0.013 | 0.024 | 0.044 | 0.021 | 0.042 | 0.103 |
+| syn-W2M-M | BL3 | 0.009 | 0.013 | 0.033 | 0.007 | 0.013 | 0.023 |
+| syn-W2M-M | BL4 | 0.004 | 0.022 | 0.037 | 0.011 | 0.021 | 0.035 |
+| syn-W2M-M | BL5 | 0.013 | 0.020 | 0.039 | 0.037 | 0.052 | 0.075 |
+| syn-W2M-M | BL6 | 0.015 | 0.022 | 0.050 | 0.182 | 0.357 | 0.546 |
+| syn-W2M-M | H | 0.072 | 0.094 | 0.139 | 0.156 | 0.210 | 0.288 |
+| digg2009 | BL0 | 0.029 | 0.050 | 0.119 | 0.728 | 0.835 | 0.881 |
+| digg2009 | BL1 | 0.028 | 0.050 | 0.123 | 0.426 | 0.433 | 0.450 |
+| digg2009 | BL2 | 0.026 | 0.050 | 0.111 | 0.089 | 0.144 | 0.215 |
+| digg2009 | BL2t | 0.029 | 0.059 | 0.127 | 0.081 | 0.137 | 0.203 |
+| digg2009 | BL3 | 0.026 | 0.050 | 0.110 | 0.089 | 0.145 | 0.217 |
+| digg2009 | BL4 | 0.229 | 0.333 | 0.431 | 0.136 | 0.218 | 0.326 |
+| digg2009 | BL5 | 0.246 | 0.337 | 0.450 | 0.116 | 0.192 | 0.302 |
+| digg2009 | BL6 | 0.028 | 0.053 | 0.113 | 0.369 | 0.526 | 0.703 |
+| digg2009 | H | 0.026 | 0.050 | 0.111 | 0.088 | 0.144 | 0.216 |
 
 ## Macros
 
@@ -317,6 +353,50 @@ Written by `npm run report -w @breadit/eval` from the results of the thirteen P7
 | \hZeroWZeroNdcgHFollowTenAllCiHigh | 0.006 | p7-h0/compare.csv syn-W0-M|none|H-follow|BL2|10|all ci_high |
 | \hZeroWZeroNdcgHFollowTenAllCiLow | -0.004 | p7-h0/compare.csv syn-W0-M|none|H-follow|BL2|10|all ci_low |
 | \hZeroWZeroNdcgHFollowTenAllGain | 0.001 | p7-h0/compare.csv syn-W0-M|none|H-follow|BL2|10|all mean_diff |
+| \orientDiggNdcgBLTwoTenTwentyOnePlusValue | 0.021 | p9-orient-groups/groups.csv digg2009|21+|ndcg|10 bl2 |
+| \orientDiggNdcgBLTwoTenZeroFiveValue | 0.029 | p9-orient-groups/groups.csv digg2009|0-5|ndcg|10 bl2 |
+| \orientDiggNdcgHTenTwentyOnePlusValue | 0.021 | p9-orient-groups/groups.csv digg2009|21+|ndcg|10 h |
+| \orientDiggNdcgHTenZeroFiveValue | 0.029 | p9-orient-groups/groups.csv digg2009|0-5|ndcg|10 h |
+| \orientDiggNdcgTenTwentyOnePlusCiHigh | 0.000 | p9-orient-groups/groups.csv digg2009|21+|ndcg|10 ci_high |
+| \orientDiggNdcgTenTwentyOnePlusCiLow | 0.000 | p9-orient-groups/groups.csv digg2009|21+|ndcg|10 ci_low |
+| \orientDiggNdcgTenTwentyOnePlusGain | 0.000 | p9-orient-groups/groups.csv digg2009|21+|ndcg|10 mean_diff |
+| \orientDiggNdcgTenZeroFiveCiHigh | 0.000 | p9-orient-groups/groups.csv digg2009|0-5|ndcg|10 ci_high |
+| \orientDiggNdcgTenZeroFiveCiLow | 0.000 | p9-orient-groups/groups.csv digg2009|0-5|ndcg|10 ci_low |
+| \orientDiggNdcgTenZeroFiveGain | 0.000 | p9-orient-groups/groups.csv digg2009|0-5|ndcg|10 mean_diff |
+| \orientDiggRecallBLTwoTenTwentyOnePlusValue | 0.049 | p9-orient-groups/groups.csv digg2009|21+|recall|10 bl2 |
+| \orientDiggRecallBLTwoTenZeroFiveValue | 0.055 | p9-orient-groups/groups.csv digg2009|0-5|recall|10 bl2 |
+| \orientDiggRecallHTenTwentyOnePlusValue | 0.049 | p9-orient-groups/groups.csv digg2009|21+|recall|10 h |
+| \orientDiggRecallHTenZeroFiveValue | 0.055 | p9-orient-groups/groups.csv digg2009|0-5|recall|10 h |
+| \orientDiggRecallTenTwentyOnePlusCiHigh | 0.000 | p9-orient-groups/groups.csv digg2009|21+|recall|10 ci_high |
+| \orientDiggRecallTenTwentyOnePlusCiLow | 0.000 | p9-orient-groups/groups.csv digg2009|21+|recall|10 ci_low |
+| \orientDiggRecallTenTwentyOnePlusGain | 0.000 | p9-orient-groups/groups.csv digg2009|21+|recall|10 mean_diff |
+| \orientDiggRecallTenZeroFiveCiHigh | 0.001 | p9-orient-groups/groups.csv digg2009|0-5|recall|10 ci_high |
+| \orientDiggRecallTenZeroFiveCiLow | 0.000 | p9-orient-groups/groups.csv digg2009|0-5|recall|10 ci_low |
+| \orientDiggRecallTenZeroFiveGain | 0.000 | p9-orient-groups/groups.csv digg2009|0-5|recall|10 mean_diff |
+| \orientDiggTwentyOnePlusN | 22393 | p9-orient-groups/groups.csv digg2009|21+|recall|10 n |
+| \orientDiggZeroFiveN | 23161 | p9-orient-groups/groups.csv digg2009|0-5|recall|10 n |
+| \orientWTwoMNdcgBLTwoTenTwentyOnePlusValue | 0.003 | p9-orient-groups/groups.csv syn-W2M-M|21+|ndcg|10 bl2 |
+| \orientWTwoMNdcgBLTwoTenZeroFiveValue | 0.011 | p9-orient-groups/groups.csv syn-W2M-M|0-5|ndcg|10 bl2 |
+| \orientWTwoMNdcgHTenTwentyOnePlusValue | 0.084 | p9-orient-groups/groups.csv syn-W2M-M|21+|ndcg|10 h |
+| \orientWTwoMNdcgHTenZeroFiveValue | 0.049 | p9-orient-groups/groups.csv syn-W2M-M|0-5|ndcg|10 h |
+| \orientWTwoMNdcgTenTwentyOnePlusCiHigh | 0.116 | p9-orient-groups/groups.csv syn-W2M-M|21+|ndcg|10 ci_high |
+| \orientWTwoMNdcgTenTwentyOnePlusCiLow | 0.049 | p9-orient-groups/groups.csv syn-W2M-M|21+|ndcg|10 ci_low |
+| \orientWTwoMNdcgTenTwentyOnePlusGain | 0.081 | p9-orient-groups/groups.csv syn-W2M-M|21+|ndcg|10 mean_diff |
+| \orientWTwoMNdcgTenZeroFiveCiHigh | 0.068 | p9-orient-groups/groups.csv syn-W2M-M|0-5|ndcg|10 ci_high |
+| \orientWTwoMNdcgTenZeroFiveCiLow | 0.011 | p9-orient-groups/groups.csv syn-W2M-M|0-5|ndcg|10 ci_low |
+| \orientWTwoMNdcgTenZeroFiveGain | 0.038 | p9-orient-groups/groups.csv syn-W2M-M|0-5|ndcg|10 mean_diff |
+| \orientWTwoMRecallBLTwoTenTwentyOnePlusValue | 0.005 | p9-orient-groups/groups.csv syn-W2M-M|21+|recall|10 bl2 |
+| \orientWTwoMRecallBLTwoTenZeroFiveValue | 0.021 | p9-orient-groups/groups.csv syn-W2M-M|0-5|recall|10 bl2 |
+| \orientWTwoMRecallHTenTwentyOnePlusValue | 0.147 | p9-orient-groups/groups.csv syn-W2M-M|21+|recall|10 h |
+| \orientWTwoMRecallHTenZeroFiveValue | 0.082 | p9-orient-groups/groups.csv syn-W2M-M|0-5|recall|10 h |
+| \orientWTwoMRecallTenTwentyOnePlusCiHigh | 0.196 | p9-orient-groups/groups.csv syn-W2M-M|21+|recall|10 ci_high |
+| \orientWTwoMRecallTenTwentyOnePlusCiLow | 0.092 | p9-orient-groups/groups.csv syn-W2M-M|21+|recall|10 ci_low |
+| \orientWTwoMRecallTenTwentyOnePlusGain | 0.141 | p9-orient-groups/groups.csv syn-W2M-M|21+|recall|10 mean_diff |
+| \orientWTwoMRecallTenZeroFiveCiHigh | 0.108 | p9-orient-groups/groups.csv syn-W2M-M|0-5|recall|10 ci_high |
+| \orientWTwoMRecallTenZeroFiveCiLow | 0.015 | p9-orient-groups/groups.csv syn-W2M-M|0-5|recall|10 ci_low |
+| \orientWTwoMRecallTenZeroFiveGain | 0.062 | p9-orient-groups/groups.csv syn-W2M-M|0-5|recall|10 mean_diff |
+| \orientWTwoMTwentyOnePlusN | 184 | p9-orient-groups/groups.csv syn-W2M-M|21+|recall|10 n |
+| \orientWTwoMZeroFiveN | 194 | p9-orient-groups/groups.csv syn-W2M-M|0-5|recall|10 n |
 | \tuneDiggBLFiveChosen | 1.5 | p7-tune-main/tuning.csv digg2009|BL5|gravity|1.5 value |
 | \tuneDiggBLFourChosen | 45000 | p7-tune-main/tuning.csv digg2009|BL4|divisor|45000 value |
 | \tuneDiggBLSixChosen | 1024 | p7-tune-main/tuning.csv digg2009|BL6|alpha|1024 value |

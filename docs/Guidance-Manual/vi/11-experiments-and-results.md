@@ -125,6 +125,8 @@ Dữ liệu cho hình là `fig-e2-history.csv`: các dòng F1 của H so với B
 
 **Điều bất ngờ:** trên `syn-W2M-M`, gain **tăng theo lịch sử**: 0.023 cho 0–4, 0.031 cho 5–19, 0.078 cho 20+. Dòng 20+ là dòng F1 duy nhất ở K = 10 mà cả hai điều kiện đều đúng. Khi lịch sử ít, smoothing cho mọi followee và community cùng một trọng số, nên điểm chưa thể cá nhân hoá; khi lịch sử nhiều hơn, các con số đếm thay thế prior (Chương 7).
 
+**Các nhóm của Orientation (khám phá, thêm ngày 2026-11-25).** Orientation của thầy hướng dẫn yêu cầu Recall@10 với ranh giới khác: 5 tương tác trở xuống so với hơn 20. `npm run orient -w @breadit/eval` tính nó từ thứ hạng theo từng user của `p7-main` (`.docs/results/p9-orient-groups/groups.csv`; Chương 6, bảng "E2 with the groups of the Orientation"). Bảng có khoảng bootstrap và không có p-value, vì ranh giới được chọn sau lần chạy test. Trên `syn-W2M-M`, nhóm "5 trở xuống" (194 user: 174 user của nhóm 0–4 cộng các user có đúng 5 tương tác) có gain Recall@10 là 0.062 (0.015 đến 0.108) và gain NDCG@10 là 0.038 (0.011 đến 0.068): cả hai khoảng đều nằm trên 0. Bài học không phải là "H1 đạt", mà là: khi nhóm nhỏ, kết quả phụ thuộc vào chỗ đặt ranh giới. Trên Digg, gain gần bằng 0 với mọi ranh giới.
+
 ## 7. E3: mật độ social (H2)
 
 Gain của H so với BL2 theo số followee tại thời điểm test (bảng e3; dữ liệu hình `fig-e3-density.csv`):

@@ -109,15 +109,14 @@ Trên Digg, gain gần bằng 0 ở mọi nhóm (`R:` e2).
 
 **Các metric thầy đề xuất trong Orientation** (bước 5: Recall@K và NDCG@K tại K = 5, 10 và 20, và Coverage). Tất cả đều đã được tính cho mọi phương pháp và mọi nhóm lịch sử (`.docs/results/p7-main/summary.csv` và `coverage.csv`). Luận văn trình bày NDCG@K tại cả ba giá trị K (Phụ lục B), và Recall@10 cùng Coverage@10 (E1).
 
-**Phép so theo nhóm của thầy, với ranh giới của thầy** (5 tương tác trở xuống, so với hơn 20 tương tác). Bảng này là **khám phá** (exploratory). Nó được tính ngày 2026-11-25, sau lần chạy test, từ `eval/results/p7-main/per_user.csv` (SHA-256 của file có trong manifest của lần chạy), với khoảng tin cậy 95% bằng paired bootstrap, không có p-value và không hiệu chỉnh Holm. Script: `.docs/works/2026-11-25-p9-negative-result-note/recall-by-group.py` (kết quả: `recall-by-group.txt`). Cùng script cho ra hàng 0–4, khớp với `R:` e2, để kiểm tra.
+**Phép so theo nhóm của thầy, với ranh giới của thầy** (5 tương tác trở xuống, so với hơn 20 tương tác). Bảng này là **khám phá** (exploratory). Nó được tính ngày 2026-11-25, sau lần chạy test, từ `eval/results/p7-main/per_user.csv` (SHA-256 của file có trong manifest của lần chạy), với khoảng tin cậy 95% bằng paired bootstrap, không có p-value và không hiệu chỉnh Holm. Nguồn: `.docs/results/p9-orient-groups/groups.csv`, do `npm run orient -w @breadit/eval` ghi ra (bản đầu của bảng này lấy từ một script trong thư mục task; khoảng tin cậy ở đó được rút bằng một bộ sinh số ngẫu nhiên khác). Từ ngày 2026-11-25, bảng này cũng có trong luận văn (Chương 6, bảng "E2 with the groups of the Orientation"). Nhóm 0–4 nằm trong `R:` e2.
 
 | Nhóm | Bộ dữ liệu | Người dùng | Recall@10 H / BL2 | Gain Recall@10 (khoảng tin cậy) | Gain NDCG@10 (khoảng tin cậy) |
 |---|---|---:|---:|---:|---:|
-| ≤5 | `syn-W2M-M` | 194 | 0.0825 / 0.0206 | 0.0619 (0.0206 đến 0.1082) | 0.0383 (0.0110 đến 0.0683) |
-| >20 | `syn-W2M-M` | 184 | 0.1467 / 0.0054 | 0.1413 (0.0924 đến 0.1957) | 0.0810 (0.0494 đến 0.1156) |
-| 0–4 (nhóm của H1) | `syn-W2M-M` | 174 | 0.0632 / 0.0230 | 0.0402 (0.0000 đến 0.0862) | 0.0231 (−0.0029 đến 0.0511) |
+| ≤5 | `syn-W2M-M` | 194 | 0.0825 / 0.0206 | 0.0619 (0.0155 đến 0.1082) | 0.0383 (0.0108 đến 0.0684) |
+| >20 | `syn-W2M-M` | 184 | 0.1467 / 0.0054 | 0.1413 (0.0924 đến 0.1957) | 0.0810 (0.0491 đến 0.1158) |
 | ≤5 | `digg2009` | 23,161 | 0.0548 / 0.0546 | 0.0002 (−0.0000 đến 0.0005) | 0.0001 (0.0000 đến 0.0002) |
-| >20 | `digg2009` | 22,393 | 0.0489 / 0.0489 | −0.0000 (−0.0003 đến 0.0001) | −0.0000 (−0.0001 đến 0.0001) |
+| >20 | `digg2009` | 22,393 | 0.0489 / 0.0489 | −0.0000 (−0.0002 đến 0.0001) | −0.0000 (−0.0001 đến 0.0001) |
 
 **Cách đọc.** Với ranh giới "5 trở xuống", khoảng tin cậy trên dữ liệu tổng hợp nằm trên 0 với cả hai metric. Nhóm này thêm 20 người dùng có đúng 5 tương tác vào 174 người dùng của nhóm 0–4. Vậy kết quả tổng hợp cho người dùng mới phụ thuộc vào chỗ đặt ranh giới, đó chính là nguyên nhân 3 (nhóm nhỏ). Nó không làm thay đổi H1: H1 đã được khóa với nhóm 0–4, NDCG@10 và Holm p (mục 2), còn bảng này không có p-value. Orientation đưa ra cả hai ranh giới: abstract mẫu viết "fewer than five prior interactions" (0–4), còn bước 5 viết "≤5". Người dùng có hơn 20 tương tác được gain nhiều nhất trên dữ liệu tổng hợp, ngược với kỳ vọng "tốt hơn ở cold start, không tệ hơn với người dùng cũ". Trên Digg, H gần bằng BL2 với mọi ranh giới.
 

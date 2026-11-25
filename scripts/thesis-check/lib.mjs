@@ -211,11 +211,11 @@ export function applyAllowList(candidates, entries, allowPath) {
   return { remaining, findings, allowed: candidates.length - remaining.length };
 }
 
-const MACRO_PREFIX = /^(?:e(?:One|Two|Three|Four|Five|Six|Seven|Eight)|tune|hZero)/;
+const MACRO_PREFIX = /^(?:e(?:One|Two|Three|Four|Five|Six|Seven|Eight)|tune|hZero|orient)/;
 
 /**
  * The result macros used in stripped lines: a command whose name (the longest run of letters, as TeX reads it)
- * starts with eOne...eEight, tune or hZero.
+ * starts with eOne...eEight, tune, hZero or orient (the Orientation groups, task p9-orientation-metrics).
  * @param {string[]} lines
  * @returns {{ name: string, line: number }[]}
  */

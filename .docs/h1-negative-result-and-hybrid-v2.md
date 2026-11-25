@@ -109,15 +109,14 @@ On Digg the gain is about 0 in every group (`R:` e2).
 
 **The metrics you proposed in the Orientation** (step 5: Recall@K and NDCG@K at K = 5, 10 and 20, and Coverage). All of them are computed for every method and every history group (`.docs/results/p7-main/summary.csv` and `coverage.csv`). The thesis shows NDCG@K at the three values of K (Appendix B) and Recall@10 and Coverage@10 (E1).
 
-**Your group comparison, with your bounds** (5 or fewer against more than 20 earlier interactions). This table is **exploratory**. It was computed on 2026-11-25, after the test run, from `eval/results/p7-main/per_user.csv` (its SHA-256 is in the run manifest), with a 95% paired bootstrap interval and no p-value or Holm correction. Script: `.docs/works/2026-11-25-p9-negative-result-note/recall-by-group.py` (output: `recall-by-group.txt`). The same script gives the 0–4 row, which matches `R:` e2, as a check.
+**Your group comparison, with your bounds** (5 or fewer against more than 20 earlier interactions). This table is **exploratory**. It was computed on 2026-11-25, after the test run, from `eval/results/p7-main/per_user.csv` (its SHA-256 is in the run manifest), with a 95% paired bootstrap interval and no p-value or Holm correction. Source: `.docs/results/p9-orient-groups/groups.csv`, written by `npm run orient -w @breadit/eval` (the first version of this table came from a script in the task folder; its intervals were drawn with another random generator). Since 2026-11-25 the same table is in the thesis (Chapter 6, Table "E2 with the groups of the Orientation"). Group 0–4 is in `R:` e2.
 
 | Group | Dataset | Users | Recall@10 H / BL2 | Recall@10 gain (interval) | NDCG@10 gain (interval) |
 |---|---|---:|---:|---:|---:|
-| ≤5 | `syn-W2M-M` | 194 | 0.0825 / 0.0206 | 0.0619 (0.0206 to 0.1082) | 0.0383 (0.0110 to 0.0683) |
-| >20 | `syn-W2M-M` | 184 | 0.1467 / 0.0054 | 0.1413 (0.0924 to 0.1957) | 0.0810 (0.0494 to 0.1156) |
-| 0–4 (the H1 group) | `syn-W2M-M` | 174 | 0.0632 / 0.0230 | 0.0402 (0.0000 to 0.0862) | 0.0231 (−0.0029 to 0.0511) |
+| ≤5 | `syn-W2M-M` | 194 | 0.0825 / 0.0206 | 0.0619 (0.0155 to 0.1082) | 0.0383 (0.0108 to 0.0684) |
+| >20 | `syn-W2M-M` | 184 | 0.1467 / 0.0054 | 0.1413 (0.0924 to 0.1957) | 0.0810 (0.0491 to 0.1158) |
 | ≤5 | `digg2009` | 23,161 | 0.0548 / 0.0546 | 0.0002 (−0.0000 to 0.0005) | 0.0001 (0.0000 to 0.0002) |
-| >20 | `digg2009` | 22,393 | 0.0489 / 0.0489 | −0.0000 (−0.0003 to 0.0001) | −0.0000 (−0.0001 to 0.0001) |
+| >20 | `digg2009` | 22,393 | 0.0489 / 0.0489 | −0.0000 (−0.0002 to 0.0001) | −0.0000 (−0.0001 to 0.0001) |
 
 **Reading.** With the bound "5 or fewer", the synthetic interval is above 0 for both metrics. This group adds the 20 users with exactly 5 interactions to the 174 users of group 0–4. So the synthetic result for new users depends on where the bound is drawn, which is cause 3 (a small group). It does not change H1: H1 was frozen with group 0–4, NDCG@10 and the Holm p (section 2), and this table has no p-value. The Orientation gives both bounds: its sample abstract says "fewer than five prior interactions" (0–4), and its step 5 says "≤5". Users with more than 20 interactions gain the most on synthetic data, the opposite of the hope "better at cold start, not worse for existing users". On Digg, H is about equal to BL2 with every bound.
 

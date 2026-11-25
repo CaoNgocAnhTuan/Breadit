@@ -10,7 +10,8 @@
 //   4. data: gen, adapt:digg, check;
 //   5. runs: p5-baseline, the two P7 tuning runs, freeze --check, the ten approved test configs;
 //   6. parity: the sample (alpha and beta from p7-main.json), load and load:check of syn-W2M-M, the backend parity test;
-//   7. report, then the compare with .docs/results/manifest.json (its exit code is the exit code of this command).
+//   7. orient (the Orientation group comparison, from the per-user ranks of p7-main), report, then the compare with
+//      .docs/results/manifest.json (its exit code is the exit code of this command).
 //
 // Each step writes its output to eval/results/repro/<nn>-<name>.log (git-ignored). The terminal shows one line per step. The run time
 // is printed only and never saved (Class R). The first step that fails stops the command: it prints the last 30 log lines and exits 1.
@@ -181,6 +182,8 @@ export function steps(params) {
     npm('load', ev('load', PARITY_DATASET)),
     npm('load-check', ev('load:check', PARITY_DATASET)),
     npm('test-parity', ['test:parity', '-w', '@breadit/backend']),
+    // The Orientation group comparison (task p9-orientation-metrics) reads the per-user ranks of p7-main, so it runs after the harness runs.
+    npm('orient', ev('orient')),
     npm('report', ev('report')),
     npm('compare', ev('results:manifest')),
   ];

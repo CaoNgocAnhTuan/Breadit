@@ -10,14 +10,17 @@ import { parseCsv, readRun } from "./read.ts";
 import type { RunFiles, RunFilesMap } from "./read.ts";
 import { buildTables, figE2Rows, figE3Rows, figE5Rows, toLatex, toMarkdown } from "./tables.ts";
 
-// The report (design "Report"): reads the thirteen P7 runs, checks every file against its run manifest, and writes macros.csv,
+// The report (design "Report"): reads the thirteen P7 runs and p9-orient-groups, checks every file against its run manifest, and writes macros.csv,
 // results-macros.tex, one table file per table, results.md, the three figure files (fig-e2-history.csv, fig-e3-density.csv and
 // fig-e5-worlds.csv) and manifest.json into .docs/results/p7-report/.
 // Nothing here reads the clock or the folder name, so two runs write the same bytes.
 
 const REPO_ROOT = new URL("../../../", import.meta.url).pathname;
 
-/** The thirteen runs of P7: two tuning runs, ten test runs and the E7 cost benchmark. */
+/**
+ * The thirteen runs of P7 (two tuning runs, ten test runs and the E7 cost benchmark) and the Orientation group comparison
+ * (p9-orient-groups, made by `npm run orient` from the per-user ranks of p7-main).
+ */
 export const REPORT_RUNS: readonly string[] = [
   "p7-tune-main",
   "p7-tune-worlds",
@@ -32,6 +35,7 @@ export const REPORT_RUNS: readonly string[] = [
   "p7-e8-pool",
   "p7-e5-shuffle",
   "p7-e7",
+  "p9-orient-groups",
 ];
 
 // The three figure files have the same columns; the second one names the bin (E3), the history group (E2) or the variant (E5).
@@ -39,7 +43,7 @@ const FIG_HEADER = ["dataset", "bin", "n", "mean_diff", "ci_low", "ci_high"] as 
 const FIG_E5_HEADER = ["dataset", "variant", "n", "mean_diff", "ci_low", "ci_high"] as const;
 
 function resultsMd(tables: { caption: string; id: string; md: string }[], macros: readonly MacroRow[]): string {
-  const lines = ["# P7 results", "", "Written by `npm run report -w @breadit/eval` from the results of the thirteen P7 runs. Do not edit: change the results and run it again.", ""];
+  const lines = ["# P7 results", "", "Written by `npm run report -w @breadit/eval` from the results of the thirteen P7 runs and the Orientation group comparison (p9-orient-groups). Do not edit: change the results and run it again.", ""];
   for (const t of tables) lines.push(`## ${t.id}: ${t.caption}`, "", t.md);
   lines.push("## Macros", "", "| Macro | Value | Cell |", "| --- | ---: | --- |");
   for (const m of macros) lines.push(`| \\${m.name} | ${m.value} | ${m.file} ${m.rowKey} ${m.column} |`);

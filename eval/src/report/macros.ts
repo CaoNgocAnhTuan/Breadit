@@ -37,6 +37,8 @@ export const KEY_COLUMNS: Readonly<Record<string, readonly string[]>> = {
   // E7 (task p7-cost-benchmark): one row per algo.
   "latency.csv": ["algo"],
   "queries.csv": ["algo"],
+  // The Orientation group comparison (task p9-orientation-metrics): one row per dataset, group, metric and K.
+  "groups.csv": ["dataset", "group", "metric", "k"],
 };
 
 const LETTERS = /^[A-Za-z]+$/;
@@ -99,7 +101,9 @@ const METHOD_WORD: Readonly<Record<string, string>> = {
 const GRID_WORD: Readonly<Record<string, string>> = { "512/512": "FiveTwelve", "1024/1024": "TenTwentyFour" };
 const ALGO_WORD: Readonly<Record<string, string>> = { chrono: "Chrono", engagement: "Engagement", social: "Social" };
 const K_WORD: Readonly<Record<number, string>> = { 5: "Five", 10: "Ten", 20: "Twenty" };
-const GROUP_WORD: Readonly<Record<string, string>> = { "0": "Zero", "1-4": "OneFour", "0-4": "ZeroFour", "5-19": "FiveNineteen", "20+": "TwentyPlus", all: "All" };
+const GROUP_WORD: Readonly<Record<string, string>> = { "0": "Zero", "1-4": "OneFour", "0-4": "ZeroFour", "5-19": "FiveNineteen", "20+": "TwentyPlus", all: "All", "0-5": "ZeroFive", "21+": "TwentyOnePlus" };
+/** The two metrics of groups.csv. */
+const METRIC_WORD: Readonly<Record<string, string>> = { recall: "Recall", ndcg: "Ndcg" };
 const WHAT_WORD: Readonly<Record<string, string>> = {
   mean_diff: "Gain",
   ci_low: "CiLow",
@@ -240,6 +244,25 @@ function build(): MacroSpec[] {
   }
   // E8: NDCG@10 of H and BL2 with the larger pool.
   for (const m of ["H", "BL2"]) out.push(sum("eEight", "p7-e8-pool", "syn-W2M-M", m));
+  // The Orientation groups (p9-orient-groups, exploratory): for each dataset, group and metric at K 10, the mean of H and of BL2, the gain
+  // and its interval; and the number of users of each group.
+  for (const d of MAIN_DATASETS) {
+    for (const g of ["0-5", "21+"]) {
+      for (const metric of ["recall", "ndcg"]) {
+        const key = { dataset: d, group: g, metric, k: "10" };
+        const base = ["orient", word(DATASET_WORD, d, "dataset")];
+        const m = word(METRIC_WORD, metric, "metric");
+        const gw = word(GROUP_WORD, g, "group");
+        for (const [column, what] of [["mean_diff", "Gain"], ["ci_low", "CiLow"], ["ci_high", "CiHigh"]] as const) {
+          out.push({ parts: [...base, m, "Ten", gw, what], run: "p9-orient-groups", file: "groups.csv", key, column });
+        }
+        for (const [column, method] of [["h", "H"], ["bl2", "BL2"]] as const) {
+          out.push({ parts: [...base, `${m}${word(METHOD_WORD, method, "method")}`, "Ten", gw, "Value"], run: "p9-orient-groups", file: "groups.csv", key, column });
+        }
+        if (metric === "recall") out.push({ parts: [...base, gw, "N"], run: "p9-orient-groups", file: "groups.csv", key, column: "n" });
+      }
+    }
+  }
   // E7: the cost of the three feeds. Median latency of the kept runs with its interval and p95 (latency.csv, ms), and the mean Prisma queries per request.
   for (const algo of ["chrono", "engagement", "social"]) {
     for (const [what, column] of [["Median", "median_ms"], ["CiLow", "ci_low_ms"], ["CiHigh", "ci_high_ms"], ["PNinetyFive", "p95_ms"]] as const) {
@@ -250,7 +273,7 @@ function build(): MacroSpec[] {
   return out;
 }
 
-/** The macros of the report (172): the numbers the text is likely to cite. */
+/** The macros of the report (216): the numbers the text is likely to cite. */
 export const MACRO_SPECS: readonly MacroSpec[] = build();
 
 function rowKeyOf(file: string, row: Readonly<Record<string, string>>): string {

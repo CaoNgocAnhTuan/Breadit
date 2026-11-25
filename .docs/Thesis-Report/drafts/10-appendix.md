@@ -145,7 +145,7 @@ Forty-three files, 434 tests. Run with `npm run verify -w @breadit/eval`, which 
 
 ## Appendix B. Full result tables
 
-Chapter 6 shows the ten tables of the results report (tuning, test users and left-out users, and E1 to E8) in full, so this appendix does not repeat them. It gives what Chapter 6 only describes: the two statistical families of Chapter 3, for all three values of *K* (5, 10 and 20). Table 6.4 (E2) shows family F1 at *K* = 10 only, and family F2 has no table in Chapter 6.
+Chapter 6 shows eleven tables of the results report (tuning, test users and left-out users, E1 to E8, and the groups of the Orientation) in full, so this appendix does not repeat them. Section B.3 gives the twelfth: Recall@K and Coverage@K at the three values of K. It gives what Chapter 6 only describes: the two statistical families of Chapter 3, for all three values of *K* (5, 10 and 20). Table 6.4 (E2) shows family F1 at *K* = 10 only, and family F2 has no table in Chapter 6.
 
 The rows are read from the result file `.docs/results/p7-main/compare.csv` when the thesis is built, with six decimals as in the file. The file is listed with its SHA-256 in the manifest of the run `p7-main`, a Class D result, so every value is the same on every rebuild (Chapter 3). The columns are:
 - **Group.** The history group (Chapter 3). The group "all" holds every test user whose test post is in the pool (family F2 only).
@@ -171,6 +171,10 @@ Family F2 holds *H* against each of the seven baselines other than BL2 (BL0, BL1
 **Table B.3. Family F2 on `syn-W2M-M`: *H* against each other baseline, NDCG@*K*.** 84 rows (7 baselines, 3 values of *K*, 4 groups), from `compare.csv` (family `F2`).
 
 **Table B.4. Family F2 on `digg2009`: *H* against each other baseline, NDCG@*K*.** The same 84 rows for `digg2009`.
+
+### B.3 Recall@K and Coverage@K
+
+Chapter 6 gives Recall@10 and Coverage@10 (Table 6.1). Table B.3 (`recall-coverage.tex`) gives them at the three values of K, for every method, over all users of the test split. Recall@K equals HitRate@K, because each user has one test item. The values come from `.docs/results/p7-main/summary.csv` and `coverage.csv`, through the results report.
 
 ## Notes for the author (remove before the final version)
 

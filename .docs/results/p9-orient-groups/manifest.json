@@ -1,0 +1,18 @@
+{
+  "files": {
+    "groups.csv": {
+      "rows": 8,
+      "sha256": "6dd409ff6b006b5547bcf70b8f6d961ebdcb869b4ab591456189fa07555c27f7"
+    }
+  },
+  "masterSeed": 20261014,
+  "node": "v22.23.4",
+  "runId": "p9-orient-groups",
+  "schemaVersion": 1,
+  "source": {
+    "inputs": {
+      "p7-main/manifest.json": "f1f66628ec2ad72832fa1de336167d42ae95ab6936f3f38404c423c6c12459dc",
+      "p7-main/per_user.csv": "208623800cbea8d09ea3b50a27d405aa7f7989e77a6c9e941e884da4cd5f89d0"
+    }
+  }
+}

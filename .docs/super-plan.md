@@ -1,6 +1,6 @@
 # Breadit Thesis Super Plan
 
-Version 0.37 · 2026-11-23 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
+Version 0.38 · 2026-11-25 · Direction: Hướng A, Social-Graph-Aware Hybrid "For You" feed
 
 This is the blueprint for the whole thesis phase: code, datasets, benchmarks, statistics and writing. It is organized by phase, in the order the work depends on. The supervisor checks progress on **2026-11-30** (2026-11-20 was only the author's own target); the submission and defense dates are not known yet. If time runs short, §8 says what to drop first. The main rule is simple: **every number in the thesis must come from a command that gives the same result every time.**
 
@@ -526,3 +526,4 @@ The thesis results do not need the schema migration: generated data has no dupli
 - 0.35 · 2026-11-19 · Task `p9-figure-data` closed: the P9 status paragraph and the §4 row P9. No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.36 · 2026-11-19 · §4 row P9: task `p9-diagrams` dropped by the author; the diagrams are drawn by hand (draw.io, and the Mermaid web editor for sequence diagrams). No frozen value changed; §5, §6 and §7 are byte-identical.
 - 0.37 · 2026-11-23 · §10 [50] Hogg and Lerman (2012): "search only" → verified from its Crossref record, so the thesis cites it as the source of the Digg data (Chapter 3), as the Digg page asks. No frozen value changed; §5, §6 and §7 are byte-identical.
+- 0.38 · 2026-11-25 · An exploratory analysis is added to P7/P9: the group comparison of the supervisor's Orientation (step 5: Recall@10 for 5 or fewer against more than 20 earlier interactions, with NDCG@10), H against BL2 with a paired bootstrap interval and no p-value (`npm run orient`, `.docs/results/p9-orient-groups/`; Chapter 6, Table "E2 with the groups of the Orientation"), and Recall@K and Coverage@K at every K in Appendix B. The bounds are not the frozen history buckets (§7), which stay as they are; H1 and its decision are unchanged.
