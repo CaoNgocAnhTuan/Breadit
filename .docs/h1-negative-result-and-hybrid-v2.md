@@ -1,5 +1,7 @@
 # H1 failed: why, and a revised hybrid score (Hv2)
 
+Vietnamese version: `h1-negative-result-and-hybrid-v2.vi.md` (the same structure, line for line). This English version is the reference.
+
 Discussion note for the supervisor meeting of 2026-11-30 · written 2026-11-25 · task `.docs/works/2026-11-25-p9-negative-result-note/`
 
 How to read the numbers. `M:` is a key of `.docs/results/p7-report/macros.csv`. `R:` is a table of `.docs/results/p7-report/results.md`. `S:` is `.docs/super-plan.md`. `[n]` is the reference number of `S:` section 10. Each number has its source the first time it appears. Words in `code font` are names from the repository.
@@ -105,6 +107,20 @@ The user counts are `M: eTwoWTwoMNdcgTenZeroFourN` and `M: eTwoDiggNdcgTenZeroFo
 
 On Digg the gain is about 0 in every group (`R:` e2).
 
+**The metrics you proposed in the Orientation** (step 5: Recall@K and NDCG@K at K = 5, 10 and 20, and Coverage). All of them are computed for every method and every history group (`.docs/results/p7-main/summary.csv` and `coverage.csv`). The thesis shows NDCG@K at the three values of K (Appendix B) and Recall@10 and Coverage@10 (E1).
+
+**Your group comparison, with your bounds** (5 or fewer against more than 20 earlier interactions). This table is **exploratory**. It was computed on 2026-11-25, after the test run, from `eval/results/p7-main/per_user.csv` (its SHA-256 is in the run manifest), with a 95% paired bootstrap interval and no p-value or Holm correction. Script: `.docs/works/2026-11-25-p9-negative-result-note/recall-by-group.py` (output: `recall-by-group.txt`). The same script gives the 0–4 row, which matches `R:` e2, as a check.
+
+| Group | Dataset | Users | Recall@10 H / BL2 | Recall@10 gain (interval) | NDCG@10 gain (interval) |
+|---|---|---:|---:|---:|---:|
+| ≤5 | `syn-W2M-M` | 194 | 0.0825 / 0.0206 | 0.0619 (0.0206 to 0.1082) | 0.0383 (0.0110 to 0.0683) |
+| >20 | `syn-W2M-M` | 184 | 0.1467 / 0.0054 | 0.1413 (0.0924 to 0.1957) | 0.0810 (0.0494 to 0.1156) |
+| 0–4 (the H1 group) | `syn-W2M-M` | 174 | 0.0632 / 0.0230 | 0.0402 (0.0000 to 0.0862) | 0.0231 (−0.0029 to 0.0511) |
+| ≤5 | `digg2009` | 23,161 | 0.0548 / 0.0546 | 0.0002 (−0.0000 to 0.0005) | 0.0001 (0.0000 to 0.0002) |
+| >20 | `digg2009` | 22,393 | 0.0489 / 0.0489 | −0.0000 (−0.0003 to 0.0001) | −0.0000 (−0.0001 to 0.0001) |
+
+**Reading.** With the bound "5 or fewer", the synthetic interval is above 0 for both metrics. This group adds the 20 users with exactly 5 interactions to the 174 users of group 0–4. So the synthetic result for new users depends on where the bound is drawn, which is cause 3 (a small group). It does not change H1: H1 was frozen with group 0–4, NDCG@10 and the Holm p (section 2), and this table has no p-value. The Orientation gives both bounds: its sample abstract says "fewer than five prior interactions" (0–4), and its step 5 says "≤5". Users with more than 20 interactions gain the most on synthetic data, the opposite of the hope "better at cold start, not worse for existing users". On Digg, H is about equal to BL2 with every bound.
+
 **E1: all methods, all users** (`R:` e1; `M: eOne...`).
 
 | Method | `syn-W2M-M` | `digg2009` |
@@ -176,6 +192,7 @@ At `N_u = 0`, `trust(u,f,t) = (0 + m/|F_u|) / (0 + m) = 1/|F_u|` for every follo
 - Evidence: the gain on `syn-W2M-M` rises with history: 0.027 in group 0 and 0.078 in group 20 or more (section 4). Group 0–4 has only 174 users, so the interval is wide (−0.002 to 0.051). A real but small gain cannot be told from 0 with this many users. The prior strength changes group 0–4 in no clear line: 0.027 at m = 0, 0.043 at m = 2, 0.035 at m = 5 and 0.034 at m = 10, against 0.012 for BL2 (`R:` e4; one dataset, no interval).
 - Label: **not tested (our reading)**. The trend with history fits it. No run replaced the flat prior with another prior.
 - The wide interval is a separate problem, of power. Round 2 should not repeat it (section 8).
+- The result is also sensitive to the bound of the group: with "5 or fewer" instead of 0–4 (20 more users), the synthetic interval is above 0 (section 4, the exploratory table).
 
 ### Cause 4. The gain is a topic signal, not the follow graph
 

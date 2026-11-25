@@ -1,0 +1,15 @@
+input eval/results/p7-main/per_user.csv sha256 208623800cbea8d0… (listed in the manifest)
+
+syn-W2M-M  (K = 10; mean over users; diff = H - BL2; 95% paired bootstrap interval, 10000 resamples)
+group                    users   Recall H     BL2    diff          interval   NDCG H     BL2    diff          interval
+<=5 (supervisor)           194     0.0825  0.0206  0.0619   0.0206 to 0.1082     0.0489  0.0106  0.0383   0.0110 to 0.0683 
+>20 (supervisor)           184     0.1467  0.0054  0.1413   0.0924 to 0.1957     0.0844  0.0034  0.0810   0.0494 to 0.1156 
+0-4 (thesis, check)        174     0.0632  0.0230  0.0402   0.0000 to 0.0862     0.0348  0.0118  0.0231  -0.0029 to 0.0511 
+20+ (thesis, check)        190     0.1421  0.0053  0.1368   0.0895 to 0.1895     0.0817  0.0033  0.0784   0.0486 to 0.1129 
+
+digg2009  (K = 10; mean over users; diff = H - BL2; 95% paired bootstrap interval, 10000 resamples)
+group                    users   Recall H     BL2    diff          interval   NDCG H     BL2    diff          interval
+<=5 (supervisor)         23161     0.0548  0.0546  0.0002  -0.0000 to 0.0005     0.0289  0.0288  0.0001   0.0000 to 0.0002 
+>20 (supervisor)         22393     0.0489  0.0489 -0.0000  -0.0003 to 0.0001     0.0206  0.0206 -0.0000  -0.0001 to 0.0001 
+0-4 (thesis, check)      20644     0.0554  0.0552  0.0002  -0.0000 to 0.0006     0.0295  0.0293  0.0001   0.0000 to 0.0002 
+20+ (thesis, check)      23142     0.0485  0.0485 -0.0000  -0.0003 to 0.0001     0.0205  0.0205 -0.0000  -0.0001 to 0.0001 
