@@ -68,6 +68,18 @@ apps/frontend/public/uploads/*
 /.docs/Thesis-Report/*.bbl
 /.docs/Thesis-Report/*.blg
 /.docs/Thesis-Report/main.pdf
+# the slides (.docs/Thesis-Report/slides/), rebuilt the same way
+/.docs/Thesis-Report/slides/*.aux
+/.docs/Thesis-Report/slides/*.log
+/.docs/Thesis-Report/slides/*.out
+/.docs/Thesis-Report/slides/*.toc
+/.docs/Thesis-Report/slides/*.nav
+/.docs/Thesis-Report/slides/*.snm
+/.docs/Thesis-Report/slides/*.fls
+/.docs/Thesis-Report/slides/*.fdb_latexmk
+/.docs/Thesis-Report/slides/*.synctex.gz
+/.docs/Thesis-Report/slides/*.synctex(busy)
+/.docs/Thesis-Report/slides/*.pdf
 
 # raw public datasets (downloaded by hand, recorded by SHA-256 in .docs/datasets.md)
 datasets/raw/
