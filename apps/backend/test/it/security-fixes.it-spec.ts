@@ -278,4 +278,35 @@ describe('p10 security fixes', () => {
       expect(post.status).toBe(201);
     });
   });
+
+  describe('B5: a newly verified user can post with the same cookie', () => {
+    it('TC16 (DW11): 403 before the code, 201 with the same cookie after it', async () => {
+      const user = await createUser({ username: uniq('b5user'), verified: false });
+      await prisma().user.update({ where: { id: user.id }, data: { password: await bcrypt.hash('b5-pass-1', 4) } });
+      const login = await client(app).post('/api/auth/login', { email: user.email, password: 'b5-pass-1' });
+      expect(login.status).toBe(200);
+      const cookieA = ([] as string[])
+        .concat(login.headers['set-cookie'] as string | string[])
+        .map((c) => c.split(';')[0])
+        .find((c) => c.startsWith('breadit_session='))!;
+
+      expect((await client(app, cookieA).form('POST', '/api/posts', { desc: 'before verify' })).status).toBe(403);
+
+      await prisma().verificationToken.create({
+        data: {
+          identifier: `email-verify:${user.email}`,
+          token: `email-verify:${user.email}:424242`,
+          expires: new Date(Date.now() + 15 * 60 * 1000),
+        },
+      });
+      const verified = await client(app, undefined, '10.30.0.1').post('/api/auth/verify', {
+        email: user.email,
+        code: '424242',
+      });
+      expect(verified.status).toBe(200);
+
+      const after = await client(app, cookieA).form('POST', '/api/posts', { desc: 'after verify, same cookie' });
+      expect(after.status).toBe(201);
+    });
+  });
 });

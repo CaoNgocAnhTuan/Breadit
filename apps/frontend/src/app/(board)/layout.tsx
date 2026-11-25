@@ -30,6 +30,8 @@ export default async function BoardLayout({
   }
 
   const isUnverified = session?.user && !session.user.emailVerified;
+  // B5: the verify page needs the email to send the code with the form.
+  const verifyHref = session?.user?.email ? `/verify?email=${encodeURIComponent(session.user.email)}` : "/verify";
 
   const centerContent = (
     <>
@@ -39,7 +41,7 @@ export default async function BoardLayout({
             Please verify your email to post.
           </span>
           <Link
-            href="/verify"
+            href={verifyHref}
             className="text-iconBlue hover:underline font-medium"
           >
             Check your inbox
