@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { v2 as cloudinary, type UploadApiOptions } from 'cloudinary';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
 import sharp from 'sharp';
+import { VIDEO_EXT, mediaKind } from './media-types';
 
 export type BufferedFile = {
   buffer: Buffer;
@@ -54,6 +55,8 @@ export class UploadsService {
   }
 
   async saveFile(file: BufferedFile, imgType?: string): Promise<string> {
+    // S4: every upload (posts, comments, communities, /api/uploads) comes through here, on disk and on Cloudinary.
+    if (mediaKind(file.mimetype) === null) throw new BadRequestException('Unsupported file type');
     if (this.useCloudinary) {
       return this.saveToCloudinary(file, imgType);
     }
@@ -102,7 +105,7 @@ export class UploadsService {
   }
 
   private async saveToLocalDisk(file: BufferedFile, imgType?: string): Promise<string> {
-    if (file.mimetype.startsWith('image/')) {
+    if (mediaKind(file.mimetype) === 'image') {
       let image = sharp(file.buffer);
       if (imgType === 'square') {
         image = image.resize(600, 600, { fit: 'cover' });
@@ -111,19 +114,25 @@ export class UploadsService {
       } else {
         image = image.resize(600);
       }
-      const output = await image.jpeg({ quality: 80 }).toBuffer();
+      let output: Buffer;
+      try {
+        output = await image.jpeg({ quality: 80 }).toBuffer();
+      } catch {
+        // F8: a file that says it is an image but is not. Nothing is written.
+        throw new BadRequestException('The file is not a valid image');
+      }
       const filename = `${randomUUID()}.jpg`;
       await fs.writeFile(path.join(this.uploadDir, filename), output);
       return filename;
     }
 
-    const ext = path.extname(file.filename) || '.mp4';
-    const filename = `${randomUUID()}${ext}`;
+    // S4: the extension comes from the checked type (saveFile has refused every type outside VIDEO_EXT).
+    const filename = `${randomUUID()}${VIDEO_EXT[file.mimetype]}`;
     await fs.writeFile(path.join(this.uploadDir, filename), file.buffer);
     return filename;
   }
 
   isVideo(file: BufferedFile): boolean {
-    return file.mimetype.startsWith('video/');
+    return mediaKind(file.mimetype) === 'video';
   }
 }

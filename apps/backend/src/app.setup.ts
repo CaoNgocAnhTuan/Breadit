@@ -30,6 +30,10 @@ export async function setupApp(app: NestFastifyApplication, uploadDir: string) {
   await app.register(fastifyStatic as any, {
     root: path.resolve(uploadDir),
     prefix: '/uploads/',
+    // S4: the browser must trust the type the server sends and never guess a script from the content.
+    setHeaders: (res: { setHeader(name: string, value: string): unknown }) => {
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+    },
   });
 
   app.enableCors({

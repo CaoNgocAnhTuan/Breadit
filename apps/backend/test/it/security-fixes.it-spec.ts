@@ -1,7 +1,9 @@
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { client, createTestApp } from './helpers/app';
 import { closePrisma, createUserWithCookie, prisma, uniq } from './helpers/factory';
+import { TINY_PNG } from './helpers/multipart';
 import { connectSocket, listen, sleep, type TestSocket } from './helpers/socket';
+import * as fs from 'fs';
 
 type U = Awaited<ReturnType<typeof createUserWithCookie>>;
 
@@ -130,6 +132,41 @@ describe('p10 security fixes', () => {
 
       expect((await as(admin).post(`/api/admin/users/${victim.user.id}/unban`)).status).toBe(200);
       expect((await prisma().user.findUniqueOrThrow({ where: { id: victim.user.id } })).banned).toBe(false);
+    });
+  });
+
+  describe('S4: uploads keep only image and video types, with nosniff', () => {
+    const uploadDir = () => process.env.UPLOAD_DIR as string;
+    const filesOnDisk = () => fs.readdirSync(uploadDir()).sort();
+    const upload = (u: U, filename: string, type: string, data: Buffer) =>
+      as(u).form('POST', '/api/uploads', {}, [{ name: 'file', filename, type, data }]);
+
+    it('TC7 (DW5, F8): evil.html typed video/mp4 is stored as .mp4; text/html and a fake image give 400 and write nothing', async () => {
+      const bob = await createUserWithCookie({ username: uniq('s4user') });
+
+      const video = await upload(bob, 'evil.html', 'video/mp4', Buffer.from('<script>alert(1)</script>'));
+      expect(video.status).toBe(201);
+      expect(video.body.filename).toMatch(/\.mp4$/);
+      expect(video.body.filename).not.toMatch(/html/);
+      fs.rmSync(`${uploadDir()}/${video.body.filename}`, { force: true });
+
+      const before = filesOnDisk();
+      const html = await upload(bob, 'evil.html', 'text/html', Buffer.from('<script>alert(1)</script>'));
+      expect(html.status).toBe(400);
+      const fake = await upload(bob, 'fake.png', 'image/png', Buffer.from('this is not a picture'));
+      expect(fake.status).toBe(400);
+      const blob = await upload(bob, 'blob.bin', 'application/octet-stream', Buffer.from('abc'));
+      expect(blob.status).toBe(400);
+      expect(filesOnDisk()).toEqual(before);
+    });
+
+    it('TC8 (DW6): GET /uploads/<file> answers with X-Content-Type-Options: nosniff', async () => {
+      const bob = await createUserWithCookie({ username: uniq('s4nosniff') });
+      const up = await upload(bob, 'pic.png', 'image/png', TINY_PNG);
+      expect(up.status).toBe(201);
+      const res = await client(app).get(`/uploads/${up.body.filename}`);
+      expect(res.status).toBe(200);
+      expect(res.headers['x-content-type-options']).toBe('nosniff');
     });
   });
 });
