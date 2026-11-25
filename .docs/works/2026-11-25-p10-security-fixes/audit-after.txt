@@ -1,0 +1,220 @@
+# npm audit report
+
+@fastify/middie  <=9.3.1
+Severity: critical
+Fastify Middie Middleware Path Bypass - https://github.com/advisories/GHSA-cxrg-g7r8-w69p
+@fastify/middie has Improper Path Normalization when Using Path-Scoped Middleware - https://github.com/advisories/GHSA-8p85-9qpw-fwgw
+@fastify/middie vulnerable to middleware authentication bypass in child plugin scopes - https://github.com/advisories/GHSA-72c6-fx6q-fr5w
+@fastify/middie vulnerable to middleware bypass via deprecated ignoreDuplicateSlashes option - https://github.com/advisories/GHSA-v9ww-2j6r-98q6
+fix available via `npm audit fix --force`
+Will install @nestjs/platform-fastify@12.6.0, which is a breaking change
+node_modules/@fastify/middie
+  @nestjs/platform-fastify  <=11.2.8 || 12.0.0-alpha.0 - 12.0.0-alpha.7
+  Depends on vulnerable versions of @fastify/middie
+  Depends on vulnerable versions of @fastify/static
+  Depends on vulnerable versions of @nestjs/core
+  Depends on vulnerable versions of fastify
+  node_modules/@nestjs/platform-fastify
+
+@fastify/static  <=10.1.1
+Severity: high
+@fastify/static vulnerable to Authorization Bypass via Non-Canonical URL Paths - https://github.com/advisories/GHSA-8pvw-jcv7-9cmj
+@fastify/static vulnerable to route guard bypass via path traversal - https://github.com/advisories/GHSA-83w8-p2f5-377r
+fix available via `npm audit fix --force`
+Will install @fastify/static@10.1.12, which is a breaking change
+node_modules/@fastify/static
+
+@nestjs/core  <=11.1.17
+Severity: moderate
+@nestjs/core Improperly Neutralizes Special Elements in Output Used by a Downstream Component ('Injection') - https://github.com/advisories/GHSA-36xv-jgw5-4q75
+fix available via `npm audit fix --force`
+Will install @nestjs/core@12.6.0, which is a breaking change
+node_modules/@nestjs/core
+  @nestjs/testing  <=11.0.0-next.4
+  Depends on vulnerable versions of @nestjs/core
+  node_modules/@nestjs/testing
+  nestjs-throttler-storage-redis  <=0.1.19 || >=0.4.1
+  Depends on vulnerable versions of @nestjs/core
+  node_modules/nestjs-throttler-storage-redis
+
+
+ajv  7.0.0-alpha.0 - 8.17.1
+Severity: moderate
+ajv has ReDoS when using `$data` option - https://github.com/advisories/GHSA-2g4f-4pwh-qvx6
+fix available via `npm audit fix --force`
+Will install @nestjs/cli@12.0.15, which is a breaking change
+node_modules/@angular-devkit/core/node_modules/ajv
+  @angular-devkit/core  12.0.0-next.0 - 19.2.22 || 20.0.0-next.0 - 20.3.21 || 21.0.0-next.0 - 21.2.4 || 22.0.0-next.0 - 22.0.0-rc.3
+  Depends on vulnerable versions of ajv
+  Depends on vulnerable versions of picomatch
+  node_modules/@angular-devkit/core
+    @angular-devkit/schematics  12.0.0-next.0 - 19.2.21 || 20.0.0-next.0 - 20.3.17 || 21.0.0-next.0 - 21.1.4 || 21.2.0-next.0 - 21.2.0-rc.2
+    Depends on vulnerable versions of @angular-devkit/core
+    node_modules/@angular-devkit/schematics
+    @angular-devkit/schematics-cli  0.12.0-beta.0 - 19.2.21 || 20.0.0-next.0 - 20.3.17 || 21.0.0-next.0 - 21.1.4 || 21.2.0-next.0 - 21.2.0-rc.2
+    Depends on vulnerable versions of @angular-devkit/core
+    Depends on vulnerable versions of @angular-devkit/schematics
+    Depends on vulnerable versions of inquirer
+    node_modules/@angular-devkit/schematics-cli
+    @nestjs/cli  2.0.0-rc.1 - 11.0.16 || 12.0.0-alpha.0 - 12.0.0-alpha.9
+    Depends on vulnerable versions of @angular-devkit/core
+    Depends on vulnerable versions of @angular-devkit/schematics
+    Depends on vulnerable versions of @angular-devkit/schematics-cli
+    Depends on vulnerable versions of @nestjs/schematics
+    Depends on vulnerable versions of glob
+    Depends on vulnerable versions of inquirer
+    Depends on vulnerable versions of webpack
+    node_modules/@nestjs/cli
+    @nestjs/schematics  8.0.0 - 11.0.9
+    Depends on vulnerable versions of @angular-devkit/core
+    Depends on vulnerable versions of @angular-devkit/schematics
+    node_modules/@nestjs/schematics
+
+fastify  <=5.12.4
+Severity: high
+Fastify Vulnerable to DoS via Unbounded Memory Allocation in sendWebStream - https://github.com/advisories/GHSA-mrq3-vjjr-p77c
+Fastify's Content-Type header tab character allows body validation bypass - https://github.com/advisories/GHSA-jx2c-rxcm-jvmq
+fastify: request.protocol and request.host Spoofable via X-Forwarded-Proto/Host from Untrusted Connections - https://github.com/advisories/GHSA-444r-cwp2-x5xf
+fastify vulnerable to schema validation bypass via root primitive coercion mismatch - https://github.com/advisories/GHSA-w2qp-rph6-63g4
+fastify vulnerable to Denial of Service via unhandled exception on HTTP/2 trailer responses - https://github.com/advisories/GHSA-4mh8-r7rc-xpvc
+fastify vulnerable to request body replacement via an async validation result collision - https://github.com/advisories/GHSA-667r-xxjv-c9mm
+fastify vulnerable to authentication bypass via malformed URLs reaching encapsulated not-found handlers - https://github.com/advisories/GHSA-p68q-wchp-6fh7
+fastify vulnerable to request validation bypass via skipped boolean false schemas - https://github.com/advisories/GHSA-hwr6-493r-vm6h
+fastify vulnerable to header validation bypass via incomplete schema case normalization - https://github.com/advisories/GHSA-9q9j-q6p8-xq58
+Depends on vulnerable versions of find-my-way
+fix available via `npm audit fix --force`
+Will install fastify@5.12.8, which is a breaking change
+node_modules/@nestjs/platform-fastify/node_modules/fastify
+node_modules/fastify
+
+file-type  13.0.0 - 21.3.1
+Severity: moderate
+file-type affected by infinite loop in ASF parser on malformed input with zero-size sub-header - https://github.com/advisories/GHSA-5v7r-6r5c-r473
+file-type: ZIP Decompression Bomb DoS via [Content_Types].xml entry - https://github.com/advisories/GHSA-j47w-4g3g-c36v
+fix available via `npm audit fix`
+node_modules/file-type
+  @nestjs/common  10.4.16 - 10.4.22 || 11.0.16 - 11.1.16 || 12.0.0-alpha.0 - 12.0.0-alpha.7
+  Depends on vulnerable versions of file-type
+  node_modules/@nestjs/common
+
+find-my-way  <=9.6.0
+Severity: high
+find-my-way: DDoS with HTTP2 - https://github.com/advisories/GHSA-c96f-x56v-gq3h
+fix available via `npm audit fix --force`
+Will install fastify@5.12.8, which is a breaking change
+node_modules/find-my-way
+
+glob  9.0.0 - 14.0.1
+Severity: high
+glob CLI: Command injection via -c/--cmd executes matches with shell:true - https://github.com/advisories/GHSA-5j98-mcp5-4vw2
+Glob: AbortSignal cancellation bypass allows post-timeout filesystem traversal - https://github.com/advisories/GHSA-3g3m-2fjr-6pw4
+Depends on vulnerable versions of minimatch
+fix available via `npm audit fix --force`
+Will install @nestjs/cli@12.0.15, which is a breaking change
+node_modules/glob
+
+lodash  4.0.0 - 4.17.23
+Severity: high
+lodash vulnerable to Code Injection via `_.template` imports key names - https://github.com/advisories/GHSA-r5fr-rjxr-66jc
+Lodash has Prototype Pollution Vulnerability in `_.unset`, `_.omit`, and `_.pullAt` functions - https://github.com/advisories/GHSA-xxjr-mmjv-4gpg
+fix available via `npm audit fix --force`
+Will install @nestjs/config@12.1.1, which is a breaking change
+node_modules/lodash
+  @nestjs/config  1.1.6 - 4.0.3
+  Depends on vulnerable versions of lodash
+  node_modules/@nestjs/config
+
+minimatch  7.0.0 - 11.0.0
+Severity: moderate
+minimatch has potential denial of service via globparts amplification - https://github.com/advisories/GHSA-g3hv-75wg-m249
+fix available via `npm audit fix --force`
+Will install @nestjs/cli@12.0.15, which is a breaking change
+node_modules/glob/node_modules/minimatch
+
+nodemailer  <=10.1.3
+Severity: high
+Nodemailer: Message-level raw option bypasses disableFileAccess/disableUrlAccess, enabling arbitrary file read and full-response SSRF in the delivered message - https://github.com/advisories/GHSA-p6gq-j5cr-w38f
+Nodemailer: resolveContent() on a MailMessage bypasses disableFileAccess/disableUrlAccess when called with the legacy signature - https://github.com/advisories/GHSA-8m3c-c648-2xjj
+Nodemailer: IDN/Punycode domain allow-list bypass leads to email delivery to an attacker-controlled domain - https://github.com/advisories/GHSA-wmmp-3585-3rmp
+Nodemailer: Quadratic (O(n²)) time complexity in addressparser allows remote denial of service via a crafted address list - https://github.com/advisories/GHSA-2x7j-588g-ccc2
+Nodemailer: Recipient-domain validation bypass via RFC 5322 comment mis-parsing leads to email delivery to an attacker-controlled domain - https://github.com/advisories/GHSA-cc9r-2j5m-2m83
+Nodemailer: Process-global DNS cache reuses TLS `servername` across transports, enabling cross-tenant SMTP credential disclosure - https://github.com/advisories/GHSA-6vj9-mwq6-2f5v
+Nodemailer: Nested structured recipient arrays bypass the parser depth limit and cause stack exhaustion DoS - https://github.com/advisories/GHSA-8vvx-rff5-p5rq
+Nodemailer: Quadratic backtracking in the addressparser free-text fallback allows remote denial of service - https://github.com/advisories/GHSA-v53p-9fqp-m79j
+Nodemailer: Quadratic (O(n^2)) DKIM header unfolding lets a large folded header cause remote denial of service during signing - https://github.com/advisories/GHSA-39m8-27wv-hr27
+Nodemailer: A nested comment ends early in addressparser, releasing the rest of the comment as a recipient - https://github.com/advisories/GHSA-8c8m-p3m8-cjg8
+Nodemailer: A ";" inside a quoted string or comment ends an address group early in addressparser, turning display text into a recipient - https://github.com/advisories/GHSA-m943-m63m-w62w
+Nodemailer: A ">" inside a quoted local part ends an angle-addr early in addressparser, delivering to a domain the header does not name - https://github.com/advisories/GHSA-85x2-q946-cp5h
+Nodemailer: Quadratic backtracking in SMTP AUTH mechanism detection regexes allows pre-auth remote denial of service - https://github.com/advisories/GHSA-4ffr-jq9g-5ffx
+Nodemailer: RFC 5322 comment inside an angle-bracket address is never stripped - https://github.com/advisories/GHSA-g73g-hqqh-jr95
+Nodemailer: Quadratic (O(n^2)) SMTP client reply parsing lets a malicious server or MITM cause a pre-auth remote denial of service - https://github.com/advisories/GHSA-4g23-2xm8-66gc
+fix available via `npm audit fix --force`
+Will install nodemailer@10.6.1, which is a breaking change
+node_modules/nodemailer
+
+picomatch  4.0.0 - 4.0.3
+Severity: high
+Picomatch: Method Injection in POSIX Character Classes causes incorrect Glob Matching - https://github.com/advisories/GHSA-3v7f-55p6-f55p
+Picomatch has a ReDoS vulnerability via extglob quantifiers - https://github.com/advisories/GHSA-c2c7-rcm5-vvqj
+fix available via `npm audit fix --force`
+Will install @nestjs/cli@12.0.15, which is a breaking change
+node_modules/@angular-devkit/core/node_modules/picomatch
+
+postcss  <=8.5.22
+Severity: high
+PostCSS has XSS via Unescaped </style> in its CSS Stringify Output - https://github.com/advisories/GHSA-qx2v-qp2m-jg93
+PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments - https://github.com/advisories/GHSA-6g55-p6wh-862q
+PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset - https://github.com/advisories/GHSA-fxqj-rqcc-2cmp
+PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure - https://github.com/advisories/GHSA-r28c-9q8g-f849
+fix available via `npm audit fix --force`
+Will install next@16.4.6, which is a breaking change
+node_modules/next/node_modules/postcss
+  next  9.3.4-canary.0 - 16.3.0-preview.10
+  Depends on vulnerable versions of postcss
+  node_modules/next
+
+sharp  <=0.35.5-rc.1
+Severity: high
+sharp inherited vulnerabilities in libvips: CVE-2026-33327, CVE-2026-33328, CVE-2026-35590, CVE-2026-35591 - https://github.com/advisories/GHSA-f88m-g3jw-g9cj
+sharp: Vulnerabilities in libheif: GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545 - https://github.com/advisories/GHSA-rgj7-g3m4-5g8c
+sharp : Vulnerability in librsvg dependency CVE-2026-96889 - https://github.com/advisories/GHSA-wq5f-xc86-pv6w
+fix available via `npm audit fix --force`
+Will install sharp@0.35.5, which is a breaking change
+node_modules/sharp
+
+tmp  <=0.2.5
+Severity: high
+tmp allows arbitrary temporary file / directory write via symbolic link `dir` parameter - https://github.com/advisories/GHSA-52f5-9888-hmc6
+tmp has Path Traversal via unsanitized prefix/postfix that enables directory escape - https://github.com/advisories/GHSA-ph9p-34f9-6g65
+fix available via `npm audit fix --force`
+Will install @nestjs/cli@12.0.15, which is a breaking change
+node_modules/tmp
+  external-editor  >=1.1.1
+  Depends on vulnerable versions of tmp
+  node_modules/external-editor
+    inquirer  3.0.0 - 8.2.6 || 9.0.0 - 9.3.7
+    Depends on vulnerable versions of external-editor
+    node_modules/@angular-devkit/schematics-cli/node_modules/inquirer
+    node_modules/inquirer
+
+webpack  5.49.0 - 5.104.0
+webpack buildHttp: allowedUris allow-list bypass via URL userinfo (@) leading to build-time SSRF behavior - https://github.com/advisories/GHSA-8fgc-7cc6-rx7x
+webpack buildHttp HttpUriPlugin allowedUris bypass via HTTP redirects → SSRF + cache persistence - https://github.com/advisories/GHSA-38r7-794h-5758
+fix available via `npm audit fix --force`
+Will install @nestjs/cli@12.0.15, which is a breaking change
+node_modules/webpack
+
+zod  <4.6.6
+Severity: high
+Zod can exhaust memory while validating oversized constrained collections - https://github.com/advisories/GHSA-mrhx-c7xc-m3w5
+fix available via `npm audit fix --force`
+Will install zod@4.6.7, which is a breaking change
+node_modules/zod
+
+30 vulnerabilities (3 low, 12 moderate, 14 high, 1 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
