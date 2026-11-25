@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { CommunitiesService } from './communities.service';
 import { AddRuleDto, CreateCommunityDto, UpdateCommunityDto } from './dto/community.dto';
+import { ModeratePostDto, PromoteMemberDto } from './dto/moderation.dto';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { BannedUserGuard } from '../auth/banned-user.guard';
 import { EmailVerifiedGuard } from '../auth/email-verified.guard';
@@ -147,9 +148,9 @@ export class CommunitiesController {
     @Req() req: AuthedRequest,
     @Param('id', ParseIntPipe) id: number,
     @Param('targetUserId') targetUserId: string,
-    @Body('role') role: any,
+    @Body() dto: PromoteMemberDto,
   ) {
-    return this.communitiesService.promoteMember(req.user!.id, id, targetUserId, role);
+    return this.communitiesService.promoteMember(req.user!.id, id, targetUserId, dto.role);
   }
 
   @Delete(':id')
@@ -186,8 +187,8 @@ export class CommunitiesController {
     @Req() req: AuthedRequest,
     @Param('id', ParseIntPipe) id: number,
     @Param('postId', ParseIntPipe) postId: number,
-    @Body('action') action: 'APPROVE' | 'REMOVE',
+    @Body() dto: ModeratePostDto,
   ) {
-    return this.communitiesService.moderatePost(req.user!.id, id, postId, action);
+    return this.communitiesService.moderatePost(req.user!.id, id, postId, dto.action);
   }
 }

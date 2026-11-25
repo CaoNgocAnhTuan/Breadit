@@ -1,4 +1,10 @@
-import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { UploadsService, type BufferedFile } from '../uploads/uploads.service';
@@ -406,8 +412,11 @@ export class CommunitiesService {
           .filter((m) => m.userId !== post.userId)
           .map((m) => this.notificationsService.emit('COMMUNITY_NEW_POST', post.userId, m.userId, postId)),
       );
-    } else {
+    } else if (action === 'REMOVE') {
       await this.prisma.post.update({ where: { id: postId }, data: { deletedAt: new Date() } });
+    } else {
+      // B1: the DTO already refuses this. A direct call must never delete a post by mistake.
+      throw new BadRequestException('Action must be APPROVE or REMOVE');
     }
 
     return { success: true };

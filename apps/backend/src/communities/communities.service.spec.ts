@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { CommunityRole } from '@prisma/client';
 import { CommunitiesService } from './communities.service';
 
@@ -97,5 +98,18 @@ describe('CommunitiesService.deleteCommunity (B6, F21)', () => {
     await expect(service.deleteCommunity('mod', 7)).rejects.toThrow();
     expect(cache.del).not.toHaveBeenCalled();
     expect(cache.incrNumber).not.toHaveBeenCalled();
+  });
+});
+
+describe('CommunitiesService.moderatePost (B1, TC5)', () => {
+  it('refuses an action that is not APPROVE or REMOVE, and never touches the post', async () => {
+    const { service, prisma } = setup();
+    const post = { findFirst: jest.fn().mockResolvedValue({ id: 5, userId: 'author', updatedAt: new Date() }), update: jest.fn() };
+    (prisma as any).post = post;
+    prisma.communityMember.findUnique.mockResolvedValue({ role: CommunityRole.MOD });
+    for (const action of ['APROVE', '', undefined, 'approve']) {
+      await expect(service.moderatePost('mod', 7, 5, action as any)).rejects.toBeInstanceOf(BadRequestException);
+    }
+    expect(post.update).not.toHaveBeenCalled();
   });
 });

@@ -8,13 +8,17 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import type { FastifyRequest } from 'fastify';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { AdminService } from './admin.service';
 import { Cursor } from '../common/decorators/cursor.decorator';
+
+type AuthedRequest = FastifyRequest & { user?: { id: string; username: string } };
 
 @Controller('api/admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -32,14 +36,14 @@ export class AdminController {
 
   @Post('users/:id/ban')
   @HttpCode(HttpStatus.OK)
-  banUser(@Param('id') id: string) {
-    return this.adminService.setBanStatus(id, true);
+  banUser(@Req() req: AuthedRequest, @Param('id') id: string) {
+    return this.adminService.setBanStatus(req.user!.id, id, true);
   }
 
   @Post('users/:id/unban')
   @HttpCode(HttpStatus.OK)
-  unbanUser(@Param('id') id: string) {
-    return this.adminService.setBanStatus(id, false);
+  unbanUser(@Req() req: AuthedRequest, @Param('id') id: string) {
+    return this.adminService.setBanStatus(req.user!.id, id, false);
   }
 
   @Get('reports')

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 
@@ -43,12 +43,18 @@ export class AdminService {
     return { items: users, nextCursor: hasMore ? cursor + 1 : null };
   }
 
-  async setBanStatus(id: string, banned: boolean) {
+  async setBanStatus(actorId: string, id: string, banned: boolean) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: { id: true, username: true },
+      select: { id: true, username: true, role: true },
     });
     if (!user) throw new NotFoundException();
+
+    // R6: before the update and before the push. Unban is not limited.
+    if (banned) {
+      if (id === actorId) throw new BadRequestException('You cannot ban your own account');
+      if (user.role === 'ADMIN') throw new BadRequestException('You cannot ban an admin');
+    }
 
     await this.prisma.user.update({
       where: { id },
