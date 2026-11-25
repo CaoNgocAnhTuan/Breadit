@@ -235,7 +235,7 @@ ESM. The `.ts` files run directly on the pinned Node 22 (type stripping), tests 
 | PostgreSQL 16, schema `it_test` | integration test data | backend IT tests |
 | PostgreSQL 16, schema `eval_load` | a loaded synthetic dataset with explicit ids, emptied and refilled by each `npm run load` (task 7 chose a separate schema) | parity test, E7 |
 | PostgreSQL 16, schema `eval_demo` | `syn-W2M-M` loaded with `--rebase-to` the current time, plus one extra admin user (`demo_admin`); emptied and refilled by each `npm run demo:start` | demo |
-| Redis 7, db 0 | JSON cache, rate limit, Socket.IO adapter, token blacklist | backend |
+| Redis 7, db 0 | JSON cache, rate limit, Socket.IO adapter, token blacklist, the copy of `User.passwordVersion` (`auth:pwv:<userId>`, 1 hour) and the tries of the email code (`auth:verify-tries:<email>`, 15 minutes) | backend |
 | Redis 7, db 1 | integration tests | backend IT tests |
 | Redis 7, db 2 | parity test and the E7 prepare step | backend parity test, E7 |
 | Redis 7, db 3 | the demo backend's cache, login counters and logout blacklist; emptied by `demo:start` and `demo:stop` (E7 also uses db 3, and the two never run together) | demo, E7 |

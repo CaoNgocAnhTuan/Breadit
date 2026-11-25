@@ -51,15 +51,15 @@ Take "like a post": `POST /api/posts/:id/like`.
 
 1. **Global steps** (`main.ts`, `app.module.ts`). The rate limiter (`ThrottlerGuard`, counted in Redis) checks the request. The `ValidationPipe` with `whitelist: true` drops every body field that has no `class-validator` decorator in its DTO. Any error becomes one JSON shape through `AllExceptionsFilter`.
 2. **Route guards**, in the order written on the route. The like route has `@UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)` (`interactions.controller.ts`). `JwtAuthGuard` must be first, because it reads the cookie and sets `req.user`; the others read `req.user`:
-   - `JwtAuthGuard`: the `breadit_session` cookie must hold a valid HS256 token (library `jose`) whose `jti` is not in the Redis blacklist;
+   - `JwtAuthGuard`: the `breadit_session` cookie must hold a valid HS256 token (library `jose`) whose `jti` is not in the Redis blacklist and whose `pwv` claim is the current password version of the user (a password reset ends every older session);
    - `BannedUserGuard`: reads `banned` from the database again, because the token can be up to 30 days old;
-   - `EmailVerifiedGuard`: write actions need a verified email;
+   - `EmailVerifiedGuard`: write actions need a verified email. A token that says "not verified" is checked against the database, so a user who has just entered the code can post with the same cookie (finding B5). A token that says "verified" passes with no read;
    - `RolesGuard` with `@Roles('ADMIN')`: only on admin routes.
 3. **The service** does the work in Postgres, bumps the cache versions it changes (Section 4), and may create a notification (Section 3).
 
-Routes that work for guests use `OptionalJwtAuthGuard` instead: no cookie is fine, and `req.user` stays empty. A bad, expired or logged-out token is treated the same way, as a guest (finding S5, HTTP part). Both guards call one function, `readSession` (`auth/session.ts`), which checks the token and the blacklist.
+Routes that work for guests use `OptionalJwtAuthGuard` instead: no cookie is fine, and `req.user` stays empty. A bad, expired or logged-out token is treated the same way, as a guest (finding S5, HTTP part). Both guards call one function, `readSession` (`auth/session.ts`), which checks the token, the blacklist and the password version (`pwv`).
 
-**Login and logout.** Login sets the `breadit_session` cookie (httpOnly, 30 days). Logout writes the token's `jti` into Redis (`auth:blacklist:<jti>`), so the same token is refused from then on, also by the socket, and treated as a guest on the public routes. Email codes (verify, password reset) are rows of the `VerificationToken` table, sent by SMTP.
+**Login and logout.** Login sets the `breadit_session` cookie (httpOnly, 30 days). Logout writes the token's `jti` into Redis (`auth:blacklist:<jti>`), so the same token is refused from then on, also by the socket, and treated as a guest on the public routes. Login also puts the password version of the user in the token as the claim `pwv` (a token with no claim counts as 0). A password reset adds 1 to `User.passwordVersion`, so every token made before it is refused, on HTTP and on the socket (finding S6). `readSession` reads the version from a copy in Redis (`auth:pwv:<userId>`, in the same `MGET` as the blacklist key) and from the database only when the copy is missing, so a request costs no extra round trip. Email codes (verify, password reset) are rows of the `VerificationToken` table, sent by SMTP. The 6-digit code comes from `crypto.randomInt`, and the tries are counted for each email (5 in 15 minutes).
 
 ## 3. The real-time layer
 
@@ -70,7 +70,7 @@ Routes that work for guests use `OptionalJwtAuthGuard` instead: no cookie is fin
 A socket gets its user from the server, never from the client:
 
 1. The browser opens the socket with its cookies (`components/Socket.tsx`, the singleton in `src/socket.ts`).
-2. Before the connection exists, a middleware (`server.use`) runs `authenticate`: it reads `breadit_session` from the handshake, checks the token and the logout blacklist, and stores `{ id, username }` on `socket.data`. A missing, bad, expired or logged-out token is refused.
+2. Before the connection exists, a middleware (`server.use`) runs `authenticate`: it reads `breadit_session` from the handshake, calls `readSession` (the same check as the HTTP guards: the token, the logout blacklist and the password version), and stores `{ id, username }` on `socket.data`. A missing, bad, expired, logged-out or older-than-the-last-reset token is refused.
 3. On connect, the server puts the socket into the room named after the **username**. The client still sends `newUser`, but the name it sends is ignored.
 
 This is the fix of finding **S1**. Before it, the client chose its room by sending a username, so anyone could join "bob" and read Bob's messages. **S5** (socket part) added the blacklist check, so a logged-out token cannot connect.

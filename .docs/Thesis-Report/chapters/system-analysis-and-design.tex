@@ -70,9 +70,9 @@ The non-functional requirements are in Table~\ref{tab:design-nfr}. A finding suc
   \endhead
   \bottomrule
   \endlastfoot
-  NFR1 & Security: sessions & The session is a signed token (HS256) in an httpOnly cookie, with \texttt{sameSite=lax} and \texttt{secure} in production. Passwords are stored as bcrypt hashes. Signing out puts the token id in a Redis blacklist. \\
+  NFR1 & Security: sessions & The session is a signed token (HS256) in an httpOnly cookie, with \texttt{sameSite=lax} and \texttt{secure} in production. Passwords are stored as bcrypt hashes. Signing out puts the token id in a Redis blacklist. A password reset ends every session made before it: the token holds the password version of the user, and a token with another version is refused, on a request and on a socket connection. \\
   NFR2 & Security: access & Each route lists its guards: signed in, not banned (read from the database, because a token can be 30 days old), email verified, and the admin role. A socket gets its user from the cookie and never from the client (before this was fixed, a client could join the room of any user by sending a username: finding S1). A logged-out token cannot open a socket, and the public routes treat it as a guest (finding S5). The two HTTP guards, \texttt{JwtAuthGuard} and \texttt{OptionalJwtAuthGuard}, share one function, \texttt{readSession}, that checks the logout blacklist. \\
-  NFR3 & Security: input and abuse & A global validation pipe drops every field that no rule names. Text sizes are limited (a post 255 characters, a comment and a message 1,000). A Redis rate limiter allows by default 1,000 requests per minute for each route and IP address, and 5 to 10 for the sign-up, sign-in, verify and reset routes. \\
+  NFR3 & Security: input and abuse & A global validation pipe drops every field that no rule names. Text sizes are limited (a post 255 characters, a comment and a message 1,000). A Redis rate limiter allows by default 1,000 requests per minute for each route and IP address, and 5 to 10 for the sign-up, sign-in, verify and reset routes. The six-digit email code is also limited for each email: after 5 tries in 15 minutes, more tries are refused until the 15 minutes end, even with the right code. \\
   NFR4 & Real-time push & Notifications, direct messages, read marks, typing signals and bans reach an online user over a WebSocket, without a page reload. A notification is saved before it is pushed, so an offline user sees it later. With more than one backend process, the event still reaches the user. No delivery time target is set. \\
   NFR5 & Reproducibility of the ranking & The live feed is a pure function of the stored data and one time $t$: no clock and no randomness inside the ranking. The app and the evaluation call the same code, and a parity test checks that the live order equals the evaluation order. Every result of the evaluation is rebuilt by one command and compared by hash (Section~\ref{sec:method-repro}). \\
   NFR6 & Performance & No speed target is set. The cost of one feed page is measured only in experiment E7 (Section~\ref{sec:method-cost}). \\
@@ -221,7 +221,7 @@ We specify four use cases in detail (Tables~\ref{tab:design-uc-feed} to~\ref{tab
     \item The user does not exist: 404.
     \item The user is offline: no push is sent. The old token still works for reading, but the writes are refused (step 7), and the pages show ``Your account has been suspended''.
     \item Unban: \texttt{POST /api/admin/users/:id/unban} sets \texttt{banned} to false. No event is sent.
-    \item Known gap: the route does not refuse a ban of the admin's own account or of another admin (an open finding).
+    \item The user is the admin's own account or another admin: 400, and nothing changes.
   \end{enumerate} \\
   \bottomrule
 \end{longtable}}

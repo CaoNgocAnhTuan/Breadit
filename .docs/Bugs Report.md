@@ -13,16 +13,16 @@ How the report was made: first I read the code and listed 26 suspected problems.
 | | Count |
 |---|---|
 | Findings in the review | 36 (T1–T10, S1–S6, B1–B10, N1–N10) |
-| **Resolved** | **34** (14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed`, N6 in task `p7-cost-benchmark`, 11 in task `p9-bug-quick-wins`: R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7, and 5 in task `p10-demo-fixes`: V1–V5) |
-| **Still open** | **10 of the 36, plus 4 found later (R3–R6) = 14** |
+| **Resolved** | **40** (14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed`, N6 in task `p7-cost-benchmark`, 11 in task `p9-bug-quick-wins`: R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7, 5 in task `p10-demo-fixes`: V1–V5, and 6 in task `p10-security-fixes`: B1, S4, S6, B5, R3, R6) |
+| **Still open** | **6 of the 36, plus 2 found later (R4, R5) = 8** |
 | Open decision | 0 (D1 decided on 2026-10-28 and built on 2026-11-10, section 4) |
 
-Open items by priority: **P1 = 1, P2 = 5, P3 = 2, P4 = 6.** What the levels mean is in section 2.
+Open items by priority: **P1 = 1, P2 = 0, P3 = 1, P4 = 6.** What the levels mean is in section 2.
 
 The fixes were checked like this:
 - The same curl script ran on the unfixed code (**42 passed, 53 failed**) and on the final code on a freshly seeded database (**95 passed, 0 failed**). Output: [works/2026-10-21-bugs-sweep/sweep-before.txt](works/2026-10-21-bugs-sweep/sweep-before.txt) and [works/2026-10-21-bugs-sweep/sweep-after.txt](works/2026-10-21-bugs-sweep/sweep-after.txt).
 - 99 unit tests and 108 integration tests pass. Each fix started with a test that failed.
-- Task `p9-bug-quick-wins` (2026-11-20) added 7 unit tests and 22 integration tests (`quick-wins.it-spec.ts`). Task `p10-demo-fixes` (2026-11-20) added 3 integration tests (`demo-fixes.it-spec.ts`). The backend now has 211 unit tests and 171 integration tests.
+- Task `p9-bug-quick-wins` (2026-11-20) added 7 unit tests and 22 integration tests (`quick-wins.it-spec.ts`). Task `p10-demo-fixes` (2026-11-20) added 3 integration tests (`demo-fixes.it-spec.ts`). Task `p10-security-fixes` (2026-11-25) added 28 unit tests and 11 integration tests (`security-fixes.it-spec.ts`). The backend now has 239 unit tests and 182 integration tests.
 - In Chrome: B4, T1 and T8 were confirmed in the UI. A sweep of 26 page checks gave the expected status codes.
 - The demo sweep (task `p10-demo-sweep`, 2026-11-20) walked all 28 pages and 15 flows in Chrome: 5 new findings (V1–V5, fixed in task `p10-demo-fixes`, §5.5) and a new symptom of T6. Record: [works/2026-11-20-p10-demo-sweep/sweep.md](works/2026-11-20-p10-demo-sweep/sweep.md).
 
@@ -41,8 +41,8 @@ Effort guess: **XS** under 30 min, **S** under 2 hours, **M** half a day, **L** 
 
 **Suggested order**
 1. **By thesis phase:** T4, T3, B6, the pool part of R2 and the D1 product rule are done in **P6** (task `p6-social-feed`, 2026-11-10). N6 is done in **E7** (task `p7-cost-benchmark`, 2026-11-12). The interaction part of R2 is done in **P9** (task `p9-bug-quick-wins`, 2026-11-20). T6 waits for the schema migration, which the super plan cut (v0.2, §9); the social feed counts distinct followees instead.
-2. **Before sharing the app:** B1, S4, S6, B5, R3. (The S5 HTTP part is done in P9.)
-3. **Quick wins** (each XS or S, about half a day together). Done in **P9** (task `p9-bug-quick-wins`, 2026-11-20): R2 (interaction part), S5 (HTTP part), N2, R1, B7, B10, B2, B9, N5, N8, R7. Still open from this list: B1, N7.
+2. **Before sharing the app:** B1, S4, S6, B5, R3, R6. Done in **P10** (task `p10-security-fixes`, 2026-11-25). (The S5 HTTP part was done in P9.)
+3. **Quick wins** (each XS or S, about half a day together). Done in **P9** (task `p9-bug-quick-wins`, 2026-11-20): R2 (interaction part), S5 (HTTP part), N2, R1, B7, B10, B2, B9, N5, N8, R7. Still open from this list: N7.
 4. The rest of P3 and P4.
 
 ---
@@ -59,20 +59,13 @@ Code locations use function and file names, because line numbers moved during th
 
 ### 3.2 P2: before anyone else uses the app
 
-| ID | Problem and effect | Evidence from the run | How to fix | Effort |
-|---|---|---|---|---|
-| **B1** | `moderatePost` removes the post for any `action` other than `'APPROVE'`. The `promote` role is not checked. A typo in a request deletes a post. | `{"action":"APROVE"}` returned 201 and the post was soft-deleted. `{}` did too. Promote with `role:"ADMIN"` gave 500. | DTOs with `@IsIn(['APPROVE','REMOVE'])` and `@IsEnum(CommunityRole)`. | XS |
-| **S4** | On local disk, non-image uploads keep the user's file extension and are served from the API origin (`uploads.service.ts`). A verified user can host an `.html` file there. Not a problem with Cloudinary. | `evil.html` uploaded as `video/mp4` was saved as `<uuid>.html` and served as `text/html` (HTTP 200). | Allow only known image and video types, take the extension from the type, and send `X-Content-Type-Options: nosniff` on `/uploads/`. | S |
-| **S6** | Fallback secret `dev-secret-change-in-prod`. The email code uses `Math.random`. Code tries are limited only per IP (10 per minute). A password reset does not end old sessions. | After a password reset, the older session cookie still worked (`/me` 200). The other parts are from code only. | Refuse to start without `JWT_SECRET` in production. Use `crypto.randomInt`. Count tries per email. Keep `passwordChangedAt` and reject older tokens. | M |
-| **B5** | The "verify your email" banner links to `/verify` with no email, which shows "No email provided". The login token keeps `emailVerified: null` until the next login, while `/api/auth/me` reads the database. | After verifying, the old cookie got `/me` "verified" but `POST /api/posts` gave 403. A new login gave 201. In the UI, unverified `t_frank` saw the banner link to a page that says "No email provided". | Link to `/verify?email=…`. Let `EmailVerifiedGuard` read the database (like `BannedUserGuard`) or issue a new cookie after verifying. | S–M |
-| **R3** | Dependencies. `npm ci` reports **66 vulnerabilities (6 low, 18 moderate, 39 high, 3 critical)**. `nestjs-throttler-storage-redis` is deprecated. I did not check which packages or whether they matter. | From the `npm ci` output. | Run `npm audit`, update what is safe, and decide on the throttler storage package. | M–L |
+None. B1, S4, S6, B5 and R3 are resolved in task `p10-security-fixes` (2026-11-25), see §5.6. What is left of R3 (packages that need a major version) is listed there.
 
 ### 3.3 P3: bugs that users see
 
 | ID | Problem and effect | Evidence from the run | How to fix | Effort |
 |---|---|---|---|---|
 | **N3** | `findOrCreateConversation` checks, then creates, with no unique pair. Parallel requests make duplicate threads. | 5 parallel creates made 5 conversations. DM search returned the same person 4 times. | A unique pair key with an upsert (fits the schema migration), or a lock. | M |
-| **R6** | An admin can ban themselves or other admins (`setBanStatus`). A ban does not end the token, but `BannedUserGuard` now blocks writes. | The admin banned their own account (200), kept working, and unbanned it. Banning another admin was not run. | Refuse self and admin targets with 400. | S |
 
 ### 3.4 P4: minor
 
@@ -99,7 +92,7 @@ V1–V5 are resolved in task `p10-demo-fixes` (2026-11-20). See §5.5.
 
 ## 5. Resolved bugs
 
-The 34 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed` (2026-11-10), N6 in task `p7-cost-benchmark` (2026-11-12), 11 in task `p9-bug-quick-wins` (2026-11-20): R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7, and 5 in task `p10-demo-fixes` (2026-11-20): V1–V5. "Where" is the code at the tag `v1-prethesis`. Details of each sweep test are in [Pre-thesis verify.md](Pre-thesis%20verify.md).
+The 40 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 in task `p6-social-feed` (2026-11-10), N6 in task `p7-cost-benchmark` (2026-11-12), 11 in task `p9-bug-quick-wins` (2026-11-20): R2, S5, N2, R1, B7, B10, B2, B9, N5, N8, R7, 5 in task `p10-demo-fixes` (2026-11-20): V1–V5, and 6 in task `p10-security-fixes` (2026-11-25): B1, S4, S6, B5, R3, R6. "Where" is the code at the tag `v1-prethesis`. Details of each sweep test are in [Pre-thesis verify.md](Pre-thesis%20verify.md).
 
 ### 5.1 Thesis path
 
@@ -124,7 +117,7 @@ The 34 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 i
 |---|---|---|---|---|
 | **S1** | `newUser` joined any room by a username the client sent. `sendNotification` faked notifications. `joinConversation` had no member check (`notifications.gateway.ts`). | alice sent `newUser: "t_bob"` and received bob's private DM. Her fake notification reached carol. A non-member got typing events. | The server checks the login cookie before the socket connects, joins it to its own room, and ignores the username the client sends. `joinConversation` is for members only. Typing events use the real username. `sendNotification` is removed. | `3b62928` |
 | **S2** | `GET /api/users/:username` returned the whole user row except the password, to anyone (`findByUsername`). | With no cookie it returned email, `emailVerified`, `role` and `banned` of bob. | `email`, `emailVerified` and `banned` are removed for everyone except the owner. | `53fb757` |
-| **S3** | No `BannedUserGuard` on several writes. | Banned `t_eve` with her old cookie: post, comment, upload, new DM and create community all gave 201. Like, follow, report, delete gave 403. | The guard is added to post create, comment create, uploads, community create and all DM routes. A unit test keeps it there. (Admins banning themselves is still open: R6.) | `53fb757` |
+| **S3** | No `BannedUserGuard` on several writes. | Banned `t_eve` with her old cookie: post, comment, upload, new DM and create community all gave 201. Like, follow, report, delete gave 403. | The guard is added to post create, comment create, uploads, community create and all DM routes. A unit test keeps it there. (Admins banning themselves: fixed as R6, §5.6.) | `53fb757` |
 | **S5** | A logged-out token still worked. The socket part was fixed in the sweep (`3b62928`). The HTTP part: `optional-jwt.guard.ts` did not check the logout blacklist, so a logged-out cookie still got personal data on public routes. | After logout, `/me` and like gave 401, but `GET /api/posts/1` still returned `likes:[{id:2001}]`. A guest gets nothing. | One shared function `readSession(token, redis)` (`auth/session.ts`) does the check: verify the token, read `auth:blacklist:<jti>`, build the user. `JwtAuthGuard` answers 401 on `null`. `OptionalJwtAuthGuard` goes on as a guest on `null` and on a Redis error. Unit test `session.spec.ts` (TC1) and IT test TC2. | `1d6247f` (HTTP part) |
 
 ### 5.3 Other bugs
@@ -151,6 +144,7 @@ The 34 items below are fixed on `test-app`: 14 in the bug sweep, T3, T4 and B6 i
 - The Explore numbers in the old pre-thesis report were measured with the buggy counts and the old rate limit. They are not comparable with new runs (see section 7).
 - The P9 fixes (`p9-bug-quick-wins`) do not change the harness results either: the harness reads events, not the API, and the synthetic data have no pending interactions, deleted tags or blocked comments.
 - The `p10-demo-fixes` changes do not change the harness results either: they touch the approve path of a community post and four frontend files, not the ranking or the pool.
+- The `p10-security-fixes` changes do not change the harness results either: they touch moderation, bans, uploads, sessions, the email code and the dependencies, not the ranking or the pool. The parity test gives 102 of 102.
 - The setup commit `84e84a7` added the Jest tests, `app.setup.ts` and the two verify scripts (`scripts/verify-bug-sweep.sh`, `scripts/verify-socket.cjs`). No behavior change.
 
 ### 5.5 Demo fixes (task `p10-demo-fixes`, 2026-11-20)
@@ -165,6 +159,25 @@ Found by the demo sweep (task `p10-demo-sweep`, record in [works/2026-11-20-p10-
 | **V4** (P4) | After the owner approved a post, the community feed did not show it until the 10 s feed cache ran out and the page was reloaded. | W9: after Approve the header said "1 Posts" and the feed was empty; after 10 s and a reload the post was there. | Backend: approve bumps `v:user` of the approver and the author (one bump if they are the same user). Other members see the post within 10 s (the T3 rule). Frontend: `PendingPostsBanner` also invalidates the `["posts"]` queries after an approve. IT tests TC2 (owner) and TC3 (mod and author), with the cache on. | `8a28bbc`, `b0782fe` |
 | **V5** (P3) | `app/sign-in/layout.tsx` rendered its own `<html>` and `<body>` inside the root layout. On every client navigation to `/sign-in` (logout, a ban), React logged "In HTML, `<html>` cannot be a child of `<body>`" and "You are mounting a new html component …". | W13 and W15: three console errors right after the page reached `/sign-in`. | The sign-in layout returns only its children and keeps the `metadata` export (title "Breadit"). | `b0782fe` |
 
+### 5.6 Security fixes (task `p10-security-fixes`, 2026-11-25)
+
+Done so the app can be shown on a shared server. Each fix started with a test that failed: integration tests in `security-fixes.it-spec.ts` (TC1 to TC4, TC7, TC8, TC11, TC13, TC14, TC16) and unit tests next to the changed files (TC5, TC6, TC9, TC10, TC12, TC15, TC17). `test:parity` still gives 102 of 102.
+
+| ID | Problem (where) | Evidence before the fix | Fix | Commit |
+|---|---|---|---|---|
+| **B1** | `moderatePost` removed the post for any `action` other than `APPROVE`. The `promote` role was not checked (`communities.controller.ts`). | `{"action":"APROVE"}` returned 201 and the post was soft-deleted. `{}` did too. On 2026-11-25 a promote with `role:"ADMIN"` gave 400 (the Prisma error map of T7), but a missing role gave 201 and changed nothing. | `communities/dto/moderation.dto.ts`: `ModeratePostDto` (`@IsIn(['APPROVE','REMOVE'])`) and `PromoteMemberDto` (`@IsEnum(CommunityRole)`). `moderatePost` has an explicit `REMOVE` branch and a 400 after it, so a direct call cannot delete by mistake. The APPROVE path (V3, V4) is not changed. IT tests TC1 and TC2, unit test TC5. | `8d94cee` |
+| **R6** | An admin could ban their own account or another admin (`AdminService.setBanStatus`). | The run of 2026-10-21: the admin banned their own account (200). | `setBanStatus(actorId, id, banned)` answers 400 for a ban of the own account or of an admin, before the update and before the `accountBanned` push. Unban is not limited. IT tests TC3 (self, another admin, and two admins banning each other: `banned` stays false, no event) and TC4 (a normal user is still banned and unbanned). | `8d94cee` |
+| **S4** | On local disk, non-image uploads kept the extension of the client's file name and `/uploads/` had no `X-Content-Type-Options` (`uploads.service.ts`, `app.setup.ts`). | `evil.html` uploaded as `video/mp4` was saved as `<uuid>.html` and served as `text/html` (200). | `uploads/media-types.ts` (`VIDEO_EXT`, `mediaKind`). `saveFile`, the one entry of every upload, answers 400 "Unsupported file type" for a type that is not `image/*` or in `VIDEO_EXT`. The stored video extension comes from the type. A file that claims an image type but cannot be read by `sharp` is a 400 and nothing is written. `/uploads/` sends `X-Content-Type-Options: nosniff`. Unit test TC6, IT tests TC7 and TC8. Files saved before the fix are not changed. | `9becaf5` |
+| **S6** | Four parts: the fallback secret, `Math.random` for the email code, code tries limited only per IP, and a password reset that did not end old sessions (`auth.service.ts`, `session.ts`). | After a password reset, the older session cookie still worked (`/me` 200). The other parts are from code. | (1) `readJwtSecret` (`auth/auth.config.ts`): with `NODE_ENV=production` a missing, empty or shorter than 32 characters `JWT_SECRET` stops the backend at start (`main.ts`). (2) `randomInt` from `crypto`. (3) `verifyEmail` counts tries per email in Redis (`auth:verify-tries:<email>`, 5 tries, 15 minutes) and answers 429 above that, even for the right code. (4) New column `User.passwordVersion` (migration `20261125041656_user_password_version`). A reset adds 1; the token carries it as claim `pwv`; `readSession` refuses a token with another value, for HTTP and for the socket handshake. The version is read from a Redis copy (`auth:pwv:<userId>`) in the same `MGET` as the blacklist, and from the column only on a miss. Unit tests TC9, TC10, TC12, TC15, IT tests TC11, TC13, TC14. Prices: five wrong codes sent for someone else's email block that email for up to 15 minutes, and then a new code is needed (F6). A socket that is already open stays open after a reset, like after a logout. | `c12bc14` |
+| **B5** | The banner linked to `/verify` with no email, and the token kept `emailVerified: null` after the user verified. | After verifying, the old cookie got `/me` "verified" but `POST /api/posts` gave 403. | The banner link is `/verify?email=<email>`. `EmailVerifiedGuard` reads the database only for a token that says "not verified" and fills `req.user.emailVerified`. IT test TC16 (403, verify, then 201 with the same cookie), unit test TC17. | `731af00` |
+| **R3** | `npm audit` on 2026-11-25: 54 issues (6 low, 19 moderate, 26 high, 3 critical). | The count of 2026-10-21 was 66. | `npm audit fix --legacy-peer-deps` (never `--force`) and `next` with `eslint-config-next` from 15.1.0 to 15.5.29 (same major, still exact pins). Result: **30 issues (3 low, 12 moderate, 14 high, 1 critical)**. Full output: [works/2026-11-25-p10-security-fixes/audit-after.txt](works/2026-11-25-p10-security-fixes/audit-after.txt). `@prisma/client` stays at 6.2.1. `resend` and `uuid` are not flagged any more. | `fc60d2a` |
+
+**What is left of R3.** Every issue left needs a major version. This task takes none (the design excludes them: a large change late in the thesis, with risk for the parity test and the demo). They are future work.
+- **NestJS 10 → 12:** `@nestjs/platform-fastify`, `@nestjs/core`, `@nestjs/testing`, `@nestjs/schematics` and `@nestjs/config` (through `lodash`). `@nestjs/common` is flagged through `file-type`: `@nestjs/common` 10.4.22, the latest 10.x, pins the old `file-type`. The Nest CLI chain, used to build and not at run time: `@nestjs/cli` and, through it, `@angular-devkit/*`, `glob`, `minimatch`, `picomatch`, `tmp`, `ajv`, `webpack`, `inquirer`, `external-editor`.
+- **Fastify 4 → 5:** `fastify`, `find-my-way`, and `@fastify/static` 7 → 10. **The one critical issue is `@fastify/middie`** (path and authentication bypass of Fastify middleware). `@nestjs/platform-fastify` 10 pins it to 8.3.3, so the fix is NestJS 12 with Fastify 5. The backend registers no Nest or Fastify middleware (read in the code, not tested), so there is nothing for the bypass to skip.
+- **Single packages:** `nodemailer` 8 → 10, `sharp` 0.34 → 0.35 (libvips advisories), `zod` 3 → 4, and `next` (moderate, through its own `postcss`): the fix is Next 16.
+- **`nestjs-throttler-storage-redis`:** deprecated and flagged through `@nestjs/core`. It stays: the replacement is a new package.
+
 ---
 
 ## 6. Where each open bug is handled
@@ -175,9 +188,9 @@ Found by the demo sweep (task `p10-demo-sweep`, record in [works/2026-11-20-p10-
 | **P6** (hybrid scorer) | done in task `p6-social-feed` (2026-11-10): T4, T3, B6, the pool part of R2, and the D1 product rule. The interaction part of R2 was done in `p9-bug-quick-wins` |
 | **E7** (cost run) | done in task `p7-cost-benchmark` (2026-11-12): N6, and the T3 note (E7 ran with the cache off) |
 | **P9, before the demo** (task `p9-bug-quick-wins`, implementation-plan §5 row 20) | done on 2026-11-20: R2 (interaction part), N5, N8, B9, B10, B2, R1, N2, B7, S5 (HTTP part), R7, and the README corrections of section 7 |
-| **P10, before sharing the app** (task `p10-security-fixes`, row 29, only for a shared server) | B1, S4, S6, B5, R3, R6 |
+| **P10, before sharing the app** (task `p10-security-fixes`, row 29) | done on 2026-11-25: B1, S4, S6, B5, R3 (the part that needs no major version), R6 |
 | **P10, before the demo** (task `p10-demo-fixes`, row 21b) | done on 2026-11-20: V1–V5 |
-| **Future work** (thesis Chapter 9) | the schema migration above, R5, N7, N9, B8 |
+| **Future work** (thesis Chapter 9) | the schema migration above, R5, N7, N9, B8, and the packages of R3 that need a major version (§5.6) |
 
 ---
 

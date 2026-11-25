@@ -51,15 +51,15 @@ Lấy ví dụ "like một bài": `POST /api/posts/:id/like`.
 
 1. **Các bước chung** (`main.ts`, `app.module.ts`). Bộ giới hạn tần suất (`ThrottlerGuard`, đếm trong Redis) kiểm tra request. `ValidationPipe` với `whitelist: true` bỏ mọi field trong body không có decorator `class-validator` trong DTO. Mọi lỗi được đưa về một dạng JSON qua `AllExceptionsFilter`.
 2. **Guard của route**, theo thứ tự viết trên route. Route like có `@UseGuards(JwtAuthGuard, BannedUserGuard, EmailVerifiedGuard)` (`interactions.controller.ts`). `JwtAuthGuard` phải đứng đầu, vì nó đọc cookie và gán `req.user`; các guard khác đọc `req.user`:
-   - `JwtAuthGuard`: cookie `breadit_session` phải chứa token HS256 hợp lệ (thư viện `jose`) và `jti` của token không nằm trong blacklist ở Redis;
+   - `JwtAuthGuard`: cookie `breadit_session` phải chứa token HS256 hợp lệ (thư viện `jose`) `jti` của token không nằm trong blacklist ở Redis, và claim `pwv` của token bằng phiên bản mật khẩu hiện tại của người dùng (đặt lại mật khẩu sẽ chấm dứt mọi phiên cũ);
    - `BannedUserGuard`: đọc lại `banned` từ database, vì token có thể đã cũ tới 30 ngày;
-   - `EmailVerifiedGuard`: thao tác ghi cần email đã xác minh;
+   - `EmailVerifiedGuard`: thao tác ghi cần email đã xác minh. Token ghi "chưa xác minh" được kiểm tra lại với database, nên người dùng vừa nhập mã có thể đăng bài ngay với cùng cookie (finding B5). Token ghi "đã xác minh" thì qua mà không đọc gì;
    - `RolesGuard` với `@Roles('ADMIN')`: chỉ có trên route quản trị.
 3. **Service** làm việc với Postgres, tăng các version cache mà nó làm thay đổi (Mục 4), và có thể tạo một thông báo (Mục 3).
 
-Các route cho phép khách (chưa đăng nhập) dùng `OptionalJwtAuthGuard`: không có cookie cũng được, và `req.user` để trống. Token sai, hết hạn hoặc đã logout cũng bị xử lý như vậy, tức là như khách (finding S5, phần HTTP). Cả hai guard gọi cùng một hàm, `readSession` (`auth/session.ts`), hàm này kiểm tra token và blacklist.
+Các route cho phép khách (chưa đăng nhập) dùng `OptionalJwtAuthGuard`: không có cookie cũng được, và `req.user` để trống. Token sai, hết hạn hoặc đã logout cũng bị xử lý như vậy, tức là như khách (finding S5, phần HTTP). Cả hai guard gọi cùng một hàm, `readSession` (`auth/session.ts`), hàm này kiểm tra token, blacklist và phiên bản mật khẩu (`pwv`).
 
-**Đăng nhập và đăng xuất.** Đăng nhập đặt cookie `breadit_session` (httpOnly, 30 ngày). Đăng xuất ghi `jti` của token vào Redis (`auth:blacklist:<jti>`), nên từ đó token này bị từ chối, kể cả ở socket, và bị coi là khách ở các route công khai. Mã gửi qua email (xác minh, đặt lại mật khẩu) là các dòng của bảng `VerificationToken`, gửi bằng SMTP.
+**Đăng nhập và đăng xuất.** Đăng nhập đặt cookie `breadit_session` (httpOnly, 30 ngày). Đăng xuất ghi `jti` của token vào Redis (`auth:blacklist:<jti>`), nên từ đó token này bị từ chối, kể cả ở socket, và bị coi là khách ở các route công khai. Đăng nhập cũng ghi phiên bản mật khẩu của người dùng vào token dưới dạng claim `pwv` (token không có claim thì tính là 0). Đặt lại mật khẩu cộng 1 vào `User.passwordVersion`, nên mọi token tạo trước đó đều bị từ chối, ở HTTP và ở socket (finding S6). `readSession` đọc phiên bản từ một bản sao trong Redis (`auth:pwv:<userId>`, trong cùng một lệnh `MGET` với key blacklist) và chỉ đọc database khi chưa có bản sao, nên mỗi request không tốn thêm một lượt gọi. Mã gửi qua email (xác minh, đặt lại mật khẩu) là các dòng của bảng `VerificationToken`, gửi bằng SMTP. Mã 6 chữ số lấy từ `crypto.randomInt`, và số lần thử được đếm theo từng email (5 lần trong 15 phút).
 
 ## 3. Lớp real-time
 
@@ -70,7 +70,7 @@ Các route cho phép khách (chưa đăng nhập) dùng `OptionalJwtAuthGuard`: 
 Socket nhận user của nó từ server, không bao giờ từ client:
 
 1. Trình duyệt mở socket kèm cookie (`components/Socket.tsx`, singleton ở `src/socket.ts`).
-2. Trước khi kết nối được tạo, một middleware (`server.use`) chạy `authenticate`: đọc `breadit_session` từ handshake, kiểm tra token và blacklist, rồi lưu `{ id, username }` vào `socket.data`. Token thiếu, sai, hết hạn hoặc đã logout đều bị từ chối.
+2. Trước khi kết nối được tạo, một middleware (`server.use`) chạy `authenticate`: đọc `breadit_session` từ handshake, gọi `readSession` (cùng một kiểm tra với các guard HTTP: token, blacklist và phiên bản mật khẩu), rồi lưu `{ id, username }` vào `socket.data`. Token thiếu, sai, hết hạn, đã logout hoặc cũ hơn lần đặt lại mật khẩu gần nhất đều bị từ chối.
 3. Khi kết nối, server đưa socket vào room mang tên **username**. Client vẫn gửi `newUser`, nhưng cái tên nó gửi bị bỏ qua.
 
 Đây là cách sửa finding **S1**. Trước đó client tự chọn room bằng cách gửi một username, nên ai cũng có thể vào room "bob" và đọc tin nhắn của Bob. **S5** (phần socket) thêm bước kiểm tra blacklist, nên token đã logout không kết nối được.

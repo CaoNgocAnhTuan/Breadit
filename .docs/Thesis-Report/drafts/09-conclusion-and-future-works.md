@@ -50,7 +50,7 @@ Chapter 8 (Section 8.3) lists 8 open items that are future work: the four items 
 - **N9.** Follow, unfollow and follow again sends the notification again.
 - **B8.** The notification of a comment like says "liked your post".
 
-Six more items (B1, S4, S6, B5, R3 and R6) must be fixed before the app is put on a shared server, for example the fallback token secret (S6). Two kinds of test are also missing: the delay of a socket message, and an automatic test of the frontend.
+The packages that need a major version (NestJS 12 and Fastify 5, the rest of R3) are also left for later. Two kinds of test are also missing: the delay of a socket message, and an automatic test of the frontend.
 
 ### 9.4.3 Learned models
 

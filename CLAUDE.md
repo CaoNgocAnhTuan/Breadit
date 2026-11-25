@@ -116,12 +116,12 @@ There are two fetch paths, and the right one depends on where the code runs:
 
 ### Auth (backend `src/auth/`)
 
-- The JWT is HS256 via `jose`, stored in the httpOnly cookie `breadit_session` with a 30-day expiry. Logout blacklists the token's `jti` in Redis (`auth:blacklist:<jti>`).
+- The JWT is HS256 via `jose`, stored in the httpOnly cookie `breadit_session` with a 30-day expiry. Logout blacklists the token's `jti` in Redis (`auth:blacklist:<jti>`). `JWT_SECRET` (at least 32 characters) is required with `NODE_ENV=production`: `readJwtSecret` (`auth/auth.config.ts`) stops the backend at start otherwise. A password reset ends every older session: it adds 1 to `User.passwordVersion`, the token carries the value as the claim `pwv`, and `readSession` (`auth/session.ts`, used by both HTTP guards and the socket handshake) refuses another value. It reads the version from a Redis copy `auth:pwv:<userId>` in the same `MGET` as the blacklist key.
 - Guards are composed per route with `@UseGuards(...)`. `JwtAuthGuard` or `OptionalJwtAuthGuard` must come first because they populate `req.user`. The others build on it:
-  - `EmailVerifiedGuard`: blocks write actions until the email is verified.
+  - `EmailVerifiedGuard`: blocks write actions until the email is verified. A token that says "not verified" is checked against the database, so a user who just verified can post with the same cookie.
   - `BannedUserGuard`: re-checks the DB because the JWT payload can be up to 30 days stale.
   - `RolesGuard` with `@Roles('ADMIN')`.
-- Email (OTP verify, password reset) goes out over nodemailer SMTP from `AuthService`. OTP and reset codes are stored in the `VerificationToken` table, keyed by `email-verify:<email>` or `password-reset:<email>`.
+- Email (OTP verify, password reset) goes out over nodemailer SMTP from `AuthService`. OTP and reset codes are stored in the `VerificationToken` table, keyed by `email-verify:<email>` or `password-reset:<email>`. The 6-digit OTP comes from `crypto.randomInt`, and `verifyEmail` allows 5 tries per email in 15 minutes (Redis `auth:verify-tries:<email>`, then 429).
 
 ### Real-time (`src/notifications/notifications.gateway.ts`)
 
