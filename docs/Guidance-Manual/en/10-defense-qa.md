@@ -138,7 +138,7 @@ No. "Real-time" means push: the server sends notifications, direct messages, rea
 *Evidence:* `apps/backend/src/notifications/notifications.gateway.ts`, the socket IT tests (`apps/backend/test/it/socket.it-spec.ts`); document 12 §3.
 
 **Q32. How do you stop one user from reading another user's messages over the socket?**
-The server, not the client, decides who a socket is. Before the connection exists, it checks the login cookie and the logout blacklist, then puts the socket in the room of that user's username. A socket joins a conversation room only if the database says it is a member, and typing events carry the username from the login. This fixed finding S1, where a client could pick any room.
+The server, not the client, decides who a socket is. Before the connection exists, it checks the login cookie, the logout blacklist and the password version (a password reset ends every older session), then puts the socket in the room of that user's username. A socket joins a conversation room only if the database says it is a member, and typing events carry the username from the login. This fixed finding S1, where a client could pick any room.
 *Evidence:* the gateway's `authenticate` and `handleJoinConversation`; `socket.it-spec.ts` ("alice claims to be bob … does NOT get bob's DM"); Bugs Report S1.
 
 **Q33. On Digg the confidence interval of the gain is above zero. Why do you say H1 failed?**

@@ -44,7 +44,7 @@ If `start` prints other users, use those. The steps are the same.
 
 6. **An admin ban logs the user out.** In A, click the account menu (the dots at the bottom of the left bar) and **Logout**. Sign in as the admin. The admin's For You is empty (the admin follows nobody), so do not show it. Click **Admin Console** in the left bar: it opens **Manage Users**. Search `u0000000787`, click **Ban**.
    - Expected: the row shows BANNED. In B, which stays on any page, the user is logged out at once and lands on `/sign-in?banned=true` with "Your account has been suspended."
-   - Ban only the little user. Never ban `demo_admin` (an admin can ban themselves: known bug R6).
+   - Ban only the little user. Do not ban `demo_admin`: since task `p10-security-fixes` an admin cannot ban their own account or another admin (400).
 
 7. **Cleanup.** In a terminal, run `npm run demo:stop`.
    - Expected: it prints "bans: lifted for u0000000787" (the ban is lifted by SQL), then stops the frontend and the backend and empties Redis database 3. Ports 3000 and 4000 are free, and `bash .claude/hooks/run-safe.sh status` says "backend not running".

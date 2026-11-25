@@ -19,8 +19,8 @@ Table 8.1 gives one row for each level.
 | Level | What it checks | Tool and command | Tests | Result |
 |---|---|---|---|---|
 | Ranking unit tests | The pure ranking code: the as-of rule, the pool, the features, the 13 scorers, the final sort, the Explore score, and the ban on clock and randomness | Jest, `packages/ranking`; `npm run test -w @breadit/ranking` | 85 in 7 suites | 85 pass |
-| Backend unit tests | Services, guards, the feed module (options, cursor, constants, mapping), the gateway and the input rules; Prisma and Redis are test doubles | Jest project `unit`; `npm run test -w @breadit/backend` | 211 in 18 suites | 211 pass |
-| Backend integration tests | The real app on a real Postgres schema (`it_test`) and Redis database 1: feeds, visibility, input errors, counts, socket authentication | Jest project `it`, `apps/backend/test/it/`; `npm run test:it -w @breadit/backend` | 171 in 14 files | 171 pass |
+| Backend unit tests | Services, guards, the feed module (options, cursor, constants, mapping), the gateway and the input rules; Prisma and Redis are test doubles | Jest project `unit`; `npm run test -w @breadit/backend` | 239 in 22 suites | 239 pass |
+| Backend integration tests | The real app on a real Postgres schema (`it_test`) and Redis database 1: feeds, visibility, input errors, counts, socket authentication | Jest project `it`, `apps/backend/test/it/`; `npm run test:it -w @breadit/backend` | 182 in 15 files | 182 pass |
 | Parity test | The live order equals the harness order: `syn-W2M-M`, 100 pairs of a user and a time, 3 `algo` values | Jest project `parity`; `npm run test:parity -w @breadit/backend` | 102 | 102 pass |
 | Evaluation checks | The type check, then the tests of the evaluation code: generator, Digg adapter, harness (golden, leakage, double run), loader, report, manifests | `npm run verify -w @breadit/eval` (`tsc`, then `node --test`) | 434 in 43 files | type check clean, 434 pass |
 | Demo helper tests | The helpers of the demo script: the start time, the choice of the two users, the comparison of feeds | `node --test scripts/demo/lib.test.mjs` | 22 | 22 pass |
@@ -28,7 +28,7 @@ Table 8.1 gives one row for each level.
 | Manual UI sweep | Every page and every user flow, driven in Chrome (record `.docs/works/2026-11-20-p10-demo-sweep/sweep.md`) | Chrome | 28 pages, 15 flows | 15 flows pass; 24 pages pass, 4 fail (2 are V1, fixed since; 2 are T6, open) |
 | Demo rehearsal | The steps of the demo checklist on the demo data (record `.docs/works/2026-11-22-p10-demo-script/rehearsal.md`) | Chrome and a script | 9 steps | 9 pass |
 
-The first six rows are automatic tests: 1,025 tests in all, and all of them pass. The replay, the sweep and the rehearsal are checks that a person starts, so we count them apart. The parity test and the integration tests need `docker compose up db redis -d`, and the parity test also needs `syn-W2M-M` loaded into the schema `eval_load`.
+The first six rows are automatic tests: 1,064 tests in all, and all of them pass. The replay, the sweep and the rehearsal are checks that a person starts, so we count them apart. The parity test and the integration tests need `docker compose up db redis -d`, and the parity test also needs `syn-W2M-M` loaded into the schema `eval_load`.
 
 Two things are not tested. No test measures the speed of the feed or the delay of a socket message. The cost of one feed page is measured in experiment E7 (Section 6.12), and the thesis sets no delivery time target (NFR4). And there is no browser test suite, so the frontend is covered only by what a person sees in Chrome.
 

@@ -23,35 +23,39 @@ Seven suites, 85 tests. Run with `npm run test -w @breadit/ranking`.
 
 ### A.2 Backend unit tests
 
-Eighteen suites, 211 tests. Run with `npm run test -w @breadit/backend` (the Jest project `unit`). Prisma and Redis are replaced by test doubles.
+Twenty-two suites, 239 tests. Run with `npm run test -w @breadit/backend` (the Jest project `unit`). Prisma and Redis are replaced by test doubles.
 
 **Table A.2. Unit tests of `apps/backend/src`.**
 
 | File | Tests | What it covers |
 |---|---|---|
 | `all-exceptions.filter.spec.ts` | 9 | `AllExceptionsFilter`: Prisma errors become 400, 404 or 409 (T7), no database detail in the message, other errors become 500 |
+| `auth/auth.config.spec.ts` | 5 | `readJwtSecret`: in production a missing, empty or short `JWT_SECRET` stops the start; outside production the dev value (S6) |
+| `auth/auth.service.spec.ts` | 3 | The email code comes from `crypto` and has 6 digits; a failed Redis write after a reset deletes the copy of the password version (S6) |
 | `auth/banned-guard-coverage.spec.ts` | 6 | `BannedUserGuard` is on every write route, with `JwtAuthGuard` first (S3) |
-| `auth/session.spec.ts` | 7 | `readSession`: good, bad, expired and logged-out tokens (S5) |
+| `auth/email-verified.guard.spec.ts` | 6 | `EmailVerifiedGuard`: a verified token passes with no read; an unverified token is checked in the database (B5) |
+| `auth/session.spec.ts` | 15 | `readSession`: good, bad, expired and logged-out tokens (S5); the password version (claim `pwv`), its Redis copy and the database read (S6) |
 | `common/limits.spec.ts` | 4 | Text limits:<br>- they match the database column sizes<br>- an emoji counts as one character, like Postgres<br>- B3: exactly the maximum is allowed, one more is rejected<br>- `undefined` is not too long |
 | `common/parse-cursor.spec.ts` | 15 | `parseCursor`: bad, missing and repeated cursors (T7) |
 | `common/validators/image-ref.spec.ts` | 25 | The rule `@IsImageRef` for avatars and covers, and its allowed hosts (N4) |
-| `communities/communities.service.spec.ts` | 5 | Cache after a ban or a delete of a community (B6):<br>- a ban clears `graph:communities` and bumps `v:user` of the target, after the transaction<br>- no cache change when the actor is not a mod or an owner<br>- no cache change when the target is the owner<br>- a delete reads the member ids inside the transaction, then clears and bumps every former member after it<br>- no cache change when the caller is not the owner |
+| `communities/communities.service.spec.ts` | 6 | Cache after a ban or a delete of a community (B6), and the moderate action (B1):<br>- a ban clears `graph:communities` and bumps `v:user` of the target, after the transaction<br>- no cache change when the actor is not a mod or an owner<br>- no cache change when the target is the owner<br>- a delete reads the member ids inside the transaction, then clears and bumps every former member after it<br>- no cache change when the caller is not the owner<br>- B1: an action that is not `APPROVE` or `REMOVE` is refused, and the post is not changed |
 | `feed/feed.config.spec.ts` | 11 | `readFeedConfig`: `FEED_DEFAULT_ALGO` and `FEED_ASOF_ENABLED`, wrong values, the flag in production |
 | `feed/feed.constants.spec.ts` | 7 | The constants of the feed equal `frozen-v1.json` and the approved run config `p7-main.json` |
 | `feed/feed.cursor.spec.ts` | 28 | The cursor `t:score:id`: reading, writing, the 24 hour rule, and the page after a cursor |
 | `feed/feed.mapping.spec.ts` | 9 | Prisma rows to the plain types of the package, whole seconds, the bounds of the window |
 | `feed/feed.options.spec.ts` | 18 | `resolveFeedOptions`: the rules for `algo` and `asOf` |
 | `feed/feed.service.spec.ts` | 10 | `FeedService.rank` equals the package called by hand; the queries it makes; it does not read the clock |
-| `notifications/notifications.gateway.spec.ts` | 20 | The gateway: authentication before the connection, own room, `joinConversation`, typing events (S1, S5) |
+| `notifications/notifications.gateway.spec.ts` | 21 | The gateway: authentication before the connection (through `readSession`), own room, `joinConversation`, typing events (S1, S5, S6) |
 | `posts/engagement.spec.ts` | 6 | `engagementSelect`: counts ignore soft-deleted reposts and comments (T1, T2) |
 | `posts/posts.service.spec.ts` | 3 | Cache version of the author (T3):<br>- create bumps the author after the row is written<br>- remove bumps the author after the row is updated<br>- remove of a post that is not yours bumps nothing |
 | `throttle/throttle.config.spec.ts` | 14 | `readThrottleLimit`: the default 1,000 and the reading of `THROTTLE_LIMIT` (N6) |
+| `uploads/media-types.spec.ts` | 4 | `mediaKind`: images and four video types are kept, any other type is refused; the extension comes from the type (S4) |
 | `users/users.service.spec.ts` | 14 | Follow, block, suggestions and private profile fields (T5, T8, T9, S2) |
-| **Total** | **211** |  |
+| **Total** | **239** |  |
 
 ### A.3 Backend integration tests
 
-Fourteen files, 171 tests. Run with `npm run test:it -w @breadit/backend` (the Jest project `it`). The tests start the real app on the Postgres schema `it_test` and Redis database 1. A table-driven test counts once for each row of its table.
+Fifteen files, 182 tests. Run with `npm run test:it -w @breadit/backend` (the Jest project `it`). The tests start the real app on the Postgres schema `it_test` and Redis database 1. A table-driven test counts once for each row of its table.
 
 **Table A.3. Integration tests of `apps/backend/test/it`.**
 
@@ -69,9 +73,10 @@ Fourteen files, 171 tests. Run with `npm run test:it -w @breadit/backend` (the J
 | `health.it-spec.ts` | 2 | The test app:<br>- it boots the real app and answers `GET /api/health`<br>- it answers 401 on a protected route without a cookie |
 | `input-errors.it-spec.ts` | 53 | Bad or missing ids, bad cursors on eleven routes, text length limits, empty posts and comments, other unknown ids (T7, B3, N1) |
 | `quick-wins.it-spec.ts` | 22 | The fixes of task `p9-bug-quick-wins`: the logout blacklist on public routes (S5), no action on a pending post (R2), blocked comments (N2), reply counts (R1), trending hashtags (B7), the unread cache (B10), the community slug (B2) |
+| `security-fixes.it-spec.ts` | 11 | The fixes of task `p10-security-fixes`: moderation and promote bodies (B1), no ban of oneself or of another admin (R6), only image and video uploads, with `nosniff` (S4), the code limit for each email and a reset that ends older sessions on HTTP and sockets (S6), a newly verified user can post with the same cookie (B5) |
 | `socket.it-spec.ts` | 9 | Real Socket.IO clients: a client cannot take another user's room or push a fake notification, typing events for members only, logged-out and missing cookies cannot connect, `accountBanned` arrives (S1, S5) |
 | `visibility.it-spec.ts` | 17 | Posts waiting for approval, private profile fields, banned users cannot write (T10, S2, S3) |
-| **Total** | **171** |  |
+| **Total** | **182** |  |
 
 ### A.4 Parity test
 

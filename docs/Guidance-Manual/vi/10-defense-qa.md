@@ -140,7 +140,7 @@ Không. "Real-time" nghĩa là đẩy (push): server gửi thông báo, tin nh�
 *Bằng chứng:* `apps/backend/src/notifications/notifications.gateway.ts`, các IT của socket (`apps/backend/test/it/socket.it-spec.ts`); tài liệu 12 §3.
 
 **Q32. Làm sao bạn ngăn một user đọc tin nhắn của user khác qua socket?**
-Server, không phải client, quyết định một socket là của ai. Trước khi kết nối được tạo, server kiểm tra cookie đăng nhập và blacklist khi logout, rồi đưa socket vào room mang username của user đó. Một socket chỉ vào được room của một cuộc trò chuyện nếu database xác nhận nó là thành viên, và sự kiện gõ mang username lấy từ phiên đăng nhập. Điều này sửa finding S1, khi client có thể chọn bất kỳ room nào.
+Server, không phải client, quyết định một socket là của ai. Trước khi kết nối được tạo, server kiểm tra cookie đăng nhập, blacklist khi logout và phiên bản mật khẩu (đặt lại mật khẩu sẽ kết thúc mọi phiên cũ hơn), rồi đưa socket vào room mang username của user đó. Một socket chỉ vào được room của một cuộc trò chuyện nếu database xác nhận nó là thành viên, và sự kiện gõ mang username lấy từ phiên đăng nhập. Điều này sửa finding S1, khi client có thể chọn bất kỳ room nào.
 *Bằng chứng:* `authenticate` và `handleJoinConversation` của gateway; `socket.it-spec.ts` ("alice claims to be bob … does NOT get bob's DM"); Bugs Report S1.
 
 **Q33. Trên Digg, khoảng tin cậy của gain nằm trên 0. Vì sao bạn nói H1 fail?**

@@ -63,7 +63,7 @@ Seven suites, 85 tests. Run with \texttt{npm run test -w @breadit/ranking}.
 
 \subsection*{A.2 Backend unit tests}
 
-Eighteen suites, 211 tests. Run with \texttt{npm run test -w @breadit/backend} (the Jest project \texttt{unit}). Prisma and Redis are replaced by test doubles.
+Twenty-two suites, 239 tests. Run with \texttt{npm run test -w @breadit/backend} (the Jest project \texttt{unit}). Prisma and Redis are replaced by test doubles.
 
 {\scriptsize\singlespacing
 \setlength{\tabcolsep}{3pt}
@@ -83,9 +83,15 @@ Eighteen suites, 211 tests. Run with \texttt{npm run test -w @breadit/backend} (
   \endlastfoot
   \path{all-exceptions.filter.spec.ts} & 9 & \texttt{AllExceptionsFilter}: Prisma errors become 400, 404 or 409 (T7), no database detail in the message, other errors become 500 \\
   \addlinespace[2pt]
+  \path{auth/auth.config.spec.ts} & 5 & \texttt{readJwtSecret}: in production a missing, empty or short \texttt{JWT\_SECRET} stops the start; outside production the dev value (S6) \\
+  \addlinespace[2pt]
+  \path{auth/auth.service.spec.ts} & 3 & The email code comes from \texttt{crypto} and has 6 digits; a failed Redis write after a reset deletes the copy of the password version (S6) \\
+  \addlinespace[2pt]
   \path{auth/banned-guard-coverage.spec.ts} & 6 & \texttt{BannedUserGuard} is on every write route, with \texttt{JwtAuthGuard} first (S3) \\
   \addlinespace[2pt]
-  \path{auth/session.spec.ts} & 7 & \texttt{readSession}: good, bad, expired and logged-out tokens (S5) \\
+  \path{auth/email-verified.guard.spec.ts} & 6 & \texttt{EmailVerifiedGuard}: a verified token passes with no read; an unverified token is checked in the database (B5) \\
+  \addlinespace[2pt]
+  \path{auth/session.spec.ts} & 15 & \texttt{readSession}: good, bad, expired and logged-out tokens (S5); the password version (claim \texttt{pwv}), its Redis copy and the database read (S6) \\
   \addlinespace[2pt]
   \path{common/limits.spec.ts} & 4 & Text limits:\newline
     -- they match the database column sizes\newline
@@ -97,12 +103,13 @@ Eighteen suites, 211 tests. Run with \texttt{npm run test -w @breadit/backend} (
   \addlinespace[2pt]
   \path{common/validators/image-ref.spec.ts} & 25 & The rule \texttt{@IsImageRef} for avatars and covers, and its allowed hosts (N4) \\
   \addlinespace[2pt]
-  \path{communities/communities.service.spec.ts} & 5 & Cache after a ban or a delete of a community (B6):\newline
+  \path{communities/communities.service.spec.ts} & 6 & Cache after a ban or a delete of a community (B6), and the moderate action (B1):\newline
     -- a ban clears \texttt{graph:communities} and bumps \texttt{v:user} of the target, after the transaction\newline
     -- no cache change when the actor is not a mod or an owner\newline
     -- no cache change when the target is the owner\newline
     -- a delete reads the member ids inside the transaction, then clears and bumps every former member after it\newline
-    -- no cache change when the caller is not the owner \\
+    -- no cache change when the caller is not the owner\newline
+    -- B1: an action that is not \texttt{APPROVE} or \texttt{REMOVE} is refused, and the post is not changed \\
   \addlinespace[2pt]
   \path{feed/feed.config.spec.ts} & 11 & \texttt{readFeedConfig}: \texttt{FEED\_DEFAULT\_ALGO} and \texttt{FEED\_ASOF\_ENABLED}, wrong values, the flag in production \\
   \addlinespace[2pt]
@@ -116,7 +123,7 @@ Eighteen suites, 211 tests. Run with \texttt{npm run test -w @breadit/backend} (
   \addlinespace[2pt]
   \path{feed/feed.service.spec.ts} & 10 & \texttt{FeedService.rank} equals the package called by hand; the queries it makes; it does not read the clock \\
   \addlinespace[2pt]
-  \path{notifications/notifications.gateway.spec.ts} & 20 & The gateway: authentication before the connection, own room, \texttt{joinConversation}, typing events (S1, S5) \\
+  \path{notifications/notifications.gateway.spec.ts} & 21 & The gateway: authentication before the connection (through \texttt{readSession}), own room, \texttt{joinConversation}, typing events (S1, S5, S6) \\
   \addlinespace[2pt]
   \path{posts/engagement.spec.ts} & 6 & \texttt{engagementSelect}: counts ignore soft-deleted reposts and comments (T1, T2) \\
   \addlinespace[2pt]
@@ -127,14 +134,16 @@ Eighteen suites, 211 tests. Run with \texttt{npm run test -w @breadit/backend} (
   \addlinespace[2pt]
   \path{throttle/throttle.config.spec.ts} & 14 & \texttt{readThrottleLimit}: the default 1,000 and the reading of \texttt{THROTTLE\_LIMIT} (N6) \\
   \addlinespace[2pt]
+  \path{uploads/media-types.spec.ts} & 4 & \texttt{mediaKind}: images and four video types are kept, any other type is refused; the extension comes from the type (S4) \\
+  \addlinespace[2pt]
   \path{users/users.service.spec.ts} & 14 & Follow, block, suggestions and private profile fields (T5, T8, T9, S2) \\
   \addlinespace[2pt]
-  \textbf{Total} & \textbf{211} & \\
+  \textbf{Total} & \textbf{239} & \\
 \end{longtable}}
 
 \subsection*{A.3 Backend integration tests}
 
-Fourteen files, 171 tests. Run with \texttt{npm run test:it -w @breadit/backend} (the Jest project \texttt{it}). The tests start the real app on the Postgres schema \texttt{it\_test} and Redis database 1. A table-driven test counts once for each row of its table.
+Fifteen files, 182 tests. Run with \texttt{npm run test:it -w @breadit/backend} (the Jest project \texttt{it}). The tests start the real app on the Postgres schema \texttt{it\_test} and Redis database 1. A table-driven test counts once for each row of its table.
 
 {\scriptsize\singlespacing
 \setlength{\tabcolsep}{3pt}
@@ -192,11 +201,13 @@ Fourteen files, 171 tests. Run with \texttt{npm run test:it -w @breadit/backend}
   \addlinespace[2pt]
   \path{quick-wins.it-spec.ts} & 22 & The fixes of task \texttt{p9-bug-quick-wins}: the logout blacklist on public routes (S5), no action on a pending post (R2), blocked comments (N2), reply counts (R1), trending hashtags (B7), the unread cache (B10), the community slug (B2) \\
   \addlinespace[2pt]
+  \path{security-fixes.it-spec.ts} & 11 & The fixes of task \texttt{p10-security-fixes}: moderation and promote bodies (B1), no ban of oneself or of another admin (R6), only image and video uploads, with \texttt{nosniff} (S4), the code limit for each email and a reset that ends older sessions on HTTP and sockets (S6), a newly verified user can post with the same cookie (B5) \\
+  \addlinespace[2pt]
   \path{socket.it-spec.ts} & 9 & Real Socket.IO clients: a client cannot take another user's room or push a fake notification, typing events for members only, logged-out and missing cookies cannot connect, \texttt{accountBanned} arrives (S1, S5) \\
   \addlinespace[2pt]
   \path{visibility.it-spec.ts} & 17 & Posts waiting for approval, private profile fields, banned users cannot write (T10, S2, S3) \\
   \addlinespace[2pt]
-  \textbf{Total} & \textbf{171} & \\
+  \textbf{Total} & \textbf{182} & \\
 \end{longtable}}
 
 \subsection*{A.4 Parity test}

@@ -142,7 +142,7 @@ We specify four use cases in detail (Tables~\ref{tab:design-uc-feed} to~\ref{tab
   \midrule
   \textbf{Main flow} &
   \begin{enumerate}[nosep,leftmargin=*,label=\arabic*.]
-    \item When Bob's page loads, his browser opens the socket with the cookie. The gateway checks the cookie and the logout blacklist, and joins the socket to the room named after Bob's username.
+    \item When Bob's page loads, his browser opens the socket with the cookie. The gateway checks the cookie, the logout blacklist and the password version, and joins the socket to the room named after Bob's username.
     \item Alice sends \texttt{POST /api/conversations/:id/messages} with \texttt{body} (up to 1,000 characters) or \texttt{mediaUrl}.
     \item The guards \texttt{JwtAuthGuard}, \texttt{BannedUserGuard} and \texttt{EmailVerifiedGuard} pass.
     \item The service checks that Alice is a member and that there is no block between the two members.
@@ -279,7 +279,7 @@ Four sequence diagrams show the order of the calls between the components: the s
 
 Figure~\ref{fig:design-session} shows the session. At sign-in, the backend finds the user by email and compares the password with the bcrypt hash. A wrong email or password gives 401. Otherwise it signs a token with HS256, a new \texttt{jti} (a unique token id) and a life of 30 days, and sets it in the httpOnly cookie \texttt{breadit\_session}. The token holds the id, the username, the email, the \texttt{emailVerified} date, the role and the \texttt{banned} flag. Sign-in does not refuse a banned or an unverified user; the guards stop their writes later.
 
-On every later request, \texttt{JwtAuthGuard} verifies the token, asks Redis whether \texttt{auth:blacklist:<jti>} exists, and fills \texttt{req.user}. At sign-out, the backend stores that key in Redis for the rest of the token's life, so the list cleans itself. A request with the old token then gets 401.
+On every later request, \texttt{JwtAuthGuard} verifies the token, asks Redis whether \texttt{auth:blacklist:<jti>} exists, checks that the password version in the token (claim \texttt{pwv}) is the user's current one, and fills \texttt{req.user}. At sign-out, the backend stores that key in Redis for the rest of the token's life, so the list cleans itself. A request with the old token then gets 401. A password reset adds 1 to the user's password version, so every token made before it gets 401 in the same way.
 
 \begin{figure}[htbp]
   \centering
@@ -297,7 +297,7 @@ Figure~\ref{fig:design-like} shows the pattern of every notification: a guard ch
   \label{fig:design-like}
 \end{figure}
 
-Figure~\ref{fig:design-dm} shows a direct message. When Bob's page loads, his socket connects with the cookie. The gateway checks the cookie and the blacklist, and joins the socket to the room named after Bob. The server decides this, and the name that the client sends is ignored (finding S1). When Alice sends a message, the guards run, and the service checks that Alice is a member of the conversation and that no block exists between the two. If not, the answer is 403. Otherwise the service writes the message and the conversation time in one transaction. Then it pushes \texttt{newMessage} to the room of Bob, deletes the cached unread count of Bob for this conversation, and answers 201 with the message. Typing signals use the rooms \texttt{conversation:<id>}, and a socket can join such a room only if it is a member.
+Figure~\ref{fig:design-dm} shows a direct message. When Bob's page loads, his socket connects with the cookie. The gateway checks the cookie, the blacklist and the password version, and joins the socket to the room named after Bob. The server decides this, and the name that the client sends is ignored (finding S1). When Alice sends a message, the guards run, and the service checks that Alice is a member of the conversation and that no block exists between the two. If not, the answer is 403. Otherwise the service writes the message and the conversation time in one transaction. Then it pushes \texttt{newMessage} to the room of Bob, deletes the cached unread count of Bob for this conversation, and answers 201 with the message. Typing signals use the rooms \texttt{conversation:<id>}, and a socket can join such a room only if it is a member.
 
 \begin{figure}[htbp]
   \centering
