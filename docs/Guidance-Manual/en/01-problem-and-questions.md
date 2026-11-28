@@ -53,7 +53,7 @@ Hypotheses were frozen before the first test-split run. Each has a rule written 
 
 | | Claim | How it is judged |
 |---|---|---|
-| **H0** (sanity, checked first) | In the null world W0, where follows carry no influence, H does **not** beat BL2 | On `syn-W0-M`, the 95% CI of H − BL2 (NDCG@10, all users) must not lie above 0. If it does: a bug or a leak. Stop and fix |
+| **H0** (sanity, checked first) | In the null world W0, where follows carry no influence, **H-follow** (H without the community term) does **not** beat BL2 | On `syn-W0-M`, the 95% CI of H-follow − BL2 (NDCG@10, all users) must not lie above 0. If it does: a bug or a leak. Stop and fix. Until 2026-11-11 the gate used the full H; it changed before the test split ([05 §11](05-evaluation-protocol.md)). The full H does beat BL2 on W0, through its community term |
 | **H1** (RQ1) | For users with 0–4 earlier interactions, H has a higher NDCG@10 than BL2 | Holm-adjusted p < 0.05 **and** CI lower end > 0. Tested twice, each on its own: `syn-W2M-M` and `digg2009` |
 | **H2** (RQ2) | The gain over BL2 grows with social density and is about zero for a user with no followee and no community | the gain is tabulated by density bin (experiment E3); shown with confidence intervals, no single p-value |
 
@@ -63,7 +63,7 @@ Hypotheses were frozen before the first test-split run. Each has a rule written 
 
 ## 6. What the thesis does not do
 
-No graph neural network or other learned social model, no real-user pilot or A/B test, no impression logs, no Python in the main pipeline (super-plan §9). The time is four weeks (deadline 2026-11-20), and the question is about which signal helps, which a transparent score answers best. See [10 Defense Q&A](10-defense-qa.md), Q2.
+No graph neural network or other learned social model, no real-user pilot or A/B test, no impression logs, no Python in the main pipeline (super-plan §9). The time was short, and the question is about which signal helps, which a transparent score answers best. See [10 Defense Q&A](10-defense-qa.md), Q2.
 
 ## 7. The thesis in one picture
 
@@ -82,5 +82,5 @@ deliver:  the default feed changes only if H1 and H0 pass
 
 1. Which of the four gaps does the hybrid score close, and which does the evaluation close?
 2. Why is a cold-start user hard for popularity and for learned models, but not for the social graph?
-3. What would it mean if H beat BL2 in W0?
+3. What would it mean if H-follow beat BL2 in W0? Why may the full H beat it there?
 4. Why are there two H1 tests, and why is each judged on its own?

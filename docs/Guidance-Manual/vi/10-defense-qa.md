@@ -17,12 +17,12 @@ Một điểm "For You" hybrid cộng follow trust và community affinity (đã 
 *Bằng chứng:* super-plan §1, §6; [03](03-hybrid-score.md).
 
 **Q2. Sao không dùng mô hình machine learning (LightFM, matrix factorization, graph neural network)?**
-Ba lý do. (1) Câu hỏi là *tín hiệu nào* giúp ích; một điểm tự xây có các term tắt được từng cái một (ablation), còn mô hình học sẽ che mất điều đó. (2) Mô hình học cần lịch sử, mà thesis nhắm vào user gần như chưa có lịch sử. (3) Thời gian: kế hoạch có bốn tuần. Các mô hình social có học (SoRec, SocialMF, DiffNet) được bàn trong phần related work và future work.
+Ba lý do. (1) Câu hỏi là *tín hiệu nào* giúp ích; một điểm tự xây có các term tắt được từng cái một (ablation), còn mô hình học sẽ che mất điều đó. (2) Mô hình học cần lịch sử, mà thesis nhắm vào user gần như chưa có lịch sử. (3) Thời gian: không đủ thời gian để xây, tune và bảo vệ cho tốt một mô hình học. Các mô hình social có học (SoRec, SocialMF, DiffNet) được bàn trong phần related work và future work.
 *Bằng chứng:* super-plan §9 (ngoài phạm vi); `.docs/related-work.md`.
 
 **Q3. Vì sao hybrid là "social-graph-aware" chứ không chỉ là "độ phổ biến cộng bạn bè"?**
-Vì trust được tính theo hành vi trước đây của chính user và được làm trơn. BL6 đúng là "độ phổ biến cộng số bạn bè", và nó là một baseline. Hiệu giữa H và BL6 cho thấy trọng số trust thêm được gì.
-*Bằng chứng:* [03 §5](03-hybrid-score.md); E1 (`.docs/results/p7-main/summary.csv`): NDCG@10 trên `syn-W2M-M` là 0.054 cho H và 0.011 cho BL6; trên `digg2009` là 0.024 cho H và 0.025 cho BL6.
+Vì trust được tính theo hành vi trước đây của chính user và được làm trơn. BL6 đúng là "độ phổ biến cộng số bạn bè", và nó là một baseline. Muốn biết trọng số trust thêm được gì, phải so **H-follow** với BL6, **không phải H** với BL6: BL6 không có community term, mà phần lớn gain của H đến từ term đó. Cặp này chưa được tính khoảng tin cậy, và mỗi bên dùng α riêng (1024 cho H-follow, lấy từ H, và 16 cho BL6 trên `syn-W2M-M`).
+*Bằng chứng:* [00 §4.4](00-core-in-one-file.md); E1 (`.docs/results/p7-main/summary.csv`) và E4 (`.docs/results/p7-e4-terms/summary.csv`), NDCG@10, mọi user. `syn-W2M-M`: H-follow 0.016, BL6 0.011 (H 0.054, H-comm 0.052). `digg2009`: H-follow 0.024, BL6 0.025.
 
 **Q4. Vì sao dùng m-estimate smoothing? Vì sao m = 5?**
 Không làm trơn thì trust của user mới là 0/0. m-estimate (Cestnik 1990) là cách chuẩn để trộn một tỉ lệ quan sát với một prior. m = 5 nghĩa là "prior có giá trị bằng năm tương tác": sau 5 tương tác thì prior chiếm một nửa. Giá trị này được frozen trước mọi lần chạy test, và E4 báo cáo m = 0, 2, 5, 10 để người đọc thấy kết quả nhạy tới đâu.
@@ -51,7 +51,7 @@ Chỉ trên dữ liệu synthetic. Đây là một giới hạn đã nêu: khôn
 *Bằng chứng:* super-plan §8.
 
 **Q10. Dữ liệu synthetic có giống thật không?**
-Tham số của nó được hiệu chỉnh theo số liệu của Digg: độ lệch hoạt động (trên Digg, 20% user hoạt động nhiều nhất tạo khoảng 84% số vote), số followee và follower mỗi user, số vote mỗi user. Mọi giá trị hiệu chỉnh đều nằm trong dung sai trên `syn-W2M-M`.
+Tham số của nó được hiệu chỉnh theo số liệu của Digg: độ lệch hoạt động (trên Digg, 20% user hoạt động nhiều nhất tạo khoảng 84% số vote), số followee và follower mỗi user, số vote mỗi user. Mọi giá trị hiệu chỉnh đều nằm trong dung sai trên `syn-W2M-M`. Nhưng việc hiệu chỉnh chỉ khớp các tỉ lệ và giá trị trung bình, không khớp cả phân bố. Trong `syn-W2M-M` không user nào có danh sách follow từ 1 đến 9 tài khoản, còn trên Digg, trong số user có danh sách, 58.1% follow 1–4 và 17.4% follow 5–9 ([00 §2.3](00-core-in-one-file.md)).
 *Bằng chứng:* `eval/config/synthetic-v1.json`; file `check_output.txt` của task P3.
 
 ## C. Giao thức
@@ -81,7 +81,7 @@ H1 hỏi "có tốt hơn cái app đang làm không?" BL2 là điểm của prod
 Có. BL2t, BL4, BL5 và BL6 mỗi cái có một tham số được tune trên một lưới có chứa giá trị đã công bố, theo cùng luật như H. Điều này tránh vấn đề đã biết là chỉ thắng baseline yếu (Ferrari Dacrema và cộng sự 2019).
 
 **Q18. Các trường hợp hoà điểm ảnh hưởng kết quả thế nào?**
-Hoà điểm được tách bằng post id. E6 chạy lại toàn bộ với tie-break đảo ngược. Nếu kết luận thay đổi thì tie có ảnh hưởng, và thesis sẽ nói vậy.
+Hoà điểm được tách bằng post id. E6 chạy lại chín phương pháp của E1 trên `syn-W2M-M` và `digg2009` với tie-break đảo ngược (W0 và các thế giới khác không được chạy lại, và không tính khoảng tin cậy hay p-value mới). Nếu các giá trị thay đổi nhiều thì tie có ảnh hưởng, và thesis sẽ nói vậy.
 *Bằng chứng:* E6 (`.docs/results/p7-e6-ties/`): đảo tie-break làm NDCG@10 thay đổi nhiều nhất 0.001, nên kết luận không đổi.
 
 ## D. Thống kê
@@ -123,7 +123,7 @@ Nó là một công thức rẻ trên các số đếm mà database đã có. T�
 ## F. Giới hạn và đạo đức
 
 **Q28. Các giới hạn chính là gì?**
-Không có kiểm thử với user thật (chỉ offline); Digg nhỏ và cũ; bằng chứng về community chỉ từ synthetic; chỉ có positive (không có dislike hay thời gian xem); mỗi user một item held-out. α và β sau khi tune thường nằm ở đỉnh lưới (1,024). Trên Digg, các social term quá nhỏ so với số vote nên không đổi được thứ tự.
+Không có kiểm thử với user thật (chỉ offline); Digg nhỏ và cũ; bằng chứng về community chỉ từ synthetic; chỉ có positive (không có dislike hay thời gian xem); mỗi user một item held-out. α và β sau khi tune thường nằm ở đỉnh lưới (1,024). Trong dữ liệu synthetic không user nào có danh sách follow từ 1 đến 9 tài khoản, nên mật độ social thấp chưa được kiểm tra. Trên Digg, H bằng BL2 ở ba chữ số thập phân; cách đọc của chúng em là các social term quá nhỏ so với số vote, nhưng điều này **chưa được kiểm tra**.
 
 **Q29. Feed social có tạo ra bong bóng lọc (filter bubble) không?**
 Có thể, một feed ưu tiên bạn bè có thể thu hẹp những gì người ta thấy. Coverage@K được báo cáo để cho thấy H có hiển thị ít bài khác nhau hơn các baseline không. Kiểm soát độ đa dạng là future work.
@@ -148,7 +148,7 @@ Luật được cố định trước test split cần cả p Holm dưới 0.05 
 *Bằng chứng:* `.docs/results/p7-main/compare.csv`, dòng `digg2009,F1,H,BL2,10,0-4`; implementation-plan §3.4; tài liệu 11 §6.
 
 **Q34. Vì sao hybrid giúp user có nhiều lịch sử hơn là user mới?**
-Với user chưa có lịch sử, smoothing cho mọi followee cùng một trust và mọi community đã tham gia cùng một trọng số, nên điểm chỉ nói được "bài của người bạn follow" hoặc "bài trong community bạn tham gia". Khi lịch sử tăng, các con số đếm của chính user thay thế prior và điểm trở nên cá nhân. Trên `syn-W2M-M`, gain là 0.023 với 0–4 interaction và 0.078 với từ 20 trở lên.
+Đây là cách đọc của chúng em: nó khớp với các số, nhưng chưa có lần chạy nào tách riêng nó ra (**chưa được kiểm tra**). Với user chưa có lịch sử, smoothing cho mọi followee cùng một trust và mọi community đã tham gia cùng một trọng số, nên điểm chỉ nói được "bài của người bạn follow" hoặc "bài trong community bạn tham gia". Khi lịch sử tăng, các con số đếm của chính user thay thế prior và điểm trở nên cá nhân. Trên `syn-W2M-M`, gain là 0.023 với 0–4 interaction và 0.078 với từ 20 trở lên.
 *Bằng chứng:* bảng e2; công thức ở tài liệu 03; Chương 7.
 
 **Q35. Nếu H1 fail, thesis đóng góp được gì?**

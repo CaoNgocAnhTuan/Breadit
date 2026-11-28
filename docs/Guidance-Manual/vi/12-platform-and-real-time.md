@@ -139,14 +139,16 @@ Các trang feed sống 10 giây, và key của chúng gồm `algo`, version `v:u
 
 ## 6. Các test và mỗi loại chứng minh điều gì
 
-| Mức | Ở đâu | Số lượng (2026-11-19) | Chứng minh điều gì |
+| Mức | Ở đâu | Số lượng (2026-11-25) | Chứng minh điều gì |
 |---|---|---|---|
 | Unit test của ranking | `packages/ranking/src/*.spec.ts` | 85 | Mỗi scorer, luật pool và các feature as-of cho đúng giá trị đã tính tay. |
-| Unit test của backend | `apps/backend/src/**/*.spec.ts` | 204 | Service và guard tách riêng, ví dụ α và β đã tune bằng đúng run config đã duyệt, các luật của gateway. |
-| Integration test (IT) | `apps/backend/test/it/` | 146 | App thật trên Postgres thật (schema `it_test`) và Redis (database 1): route, guard, feed, và socket (`socket.it-spec.ts`). |
-| Parity test | `npm run test:parity` | 300 trên 300, hai lần | Thứ tự feed live bằng thứ tự của harness cho 100 cặp (user, thời điểm) lấy mẫu, ở module feed và qua HTTP. |
-| Test của eval | `npm run verify -w @breadit/eval` | 432 | Generator, adapter Digg, harness (golden, leakage, double run), thống kê và report. |
-| Test của hook | `.claude/hooks/test-hooks.cjs` | 96 | Các luật của quy trình: thư mục đóng băng, code cần duyệt, commit trên `test-app`. |
+| Unit test của backend | `apps/backend/src/**/*.spec.ts` | 239 | Service và guard tách riêng, ví dụ α và β đã tune bằng đúng run config đã duyệt, các luật của gateway. |
+| Integration test (IT) | `apps/backend/test/it/` | 182 | App thật trên Postgres thật (schema `it_test`) và Redis (database 1): route, guard, feed, và socket (`socket.it-spec.ts`). |
+| Parity test | `npm run test:parity` | 102 test; 300 trên 300 thứ tự, hai lần | Thứ tự feed live bằng thứ tự của harness cho 100 cặp (user, thời điểm) lấy mẫu, ở module feed và qua HTTP. |
+| Test của eval | `npm run verify -w @breadit/eval` | 434 | Generator, adapter Digg, harness (golden, leakage, double run), thống kê và report. |
+| Test của hook | `.claude/hooks/test-hooks.cjs` | 96 (2026-11-19) | Các luật của quy trình: thư mục đóng băng, code cần duyệt, commit trên `test-app`. |
+
+Chương 8 của thesis đếm **1,064 test tự động**: năm dòng đầu (parity test tính 102) và 22 test của các helper cho demo, không tính test của hook. Các số này chép từ Chương 8.
 
 `bash .claude/hooks/verify.sh` chạy tất cả, trừ parity test (cần một dataset đã nạp) và test của hook.
 

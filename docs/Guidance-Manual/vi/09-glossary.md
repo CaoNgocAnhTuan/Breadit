@@ -58,7 +58,7 @@ Thuật ngữ chuyên ngành được giữ nguyên tiếng Anh, vì thesis và 
 | **BL3** | Độ phổ biến toàn cục: nhiều like nhất trước. |
 | **BL4** | Công thức "hot" của Reddit, like coi như upvote. Tune hệ số chia thời gian (bản công bố là 45.000 s). |
 | **BL5** | Công thức xếp hạng của Hacker News. Tune gravity (bản công bố là 1,8). Baseline mạnh nhất trong bảng P5. |
-| **BL6** | Engagement + α × (số followee có liên quan tới bài). Tức là hybrid nhưng không có trọng số trust. |
+| **BL6** | Engagement + α × (số followee có liên quan tới bài). Đây là H-follow với mọi trọng số trust đặt bằng 1: nó không có community term. |
 | **H** | Hybrid: engagement + α·social + β·community. |
 | **H-follow / H-comm** | H chỉ có social term / chỉ có community term. |
 | **H-noauthor / H-noengager** | H bỏ phần author / bỏ phần engager của social term. |

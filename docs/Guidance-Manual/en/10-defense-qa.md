@@ -15,12 +15,12 @@ A hybrid "For You" score that adds smoothed follow trust and community affinity 
 *Evidence:* super-plan §1, §6; [03](03-hybrid-score.md).
 
 **Q2. Why not a machine learning model (LightFM, matrix factorization, a graph neural network)?**
-Three reasons. (1) The question is *which signal* helps; a hand-built score has terms we can switch off one by one (ablations), and a learned model would hide this. (2) Learned models need history, and the thesis targets users with almost none. (3) Time: the plan has four weeks. Learned social models (SoRec, SocialMF, DiffNet) are discussed as related work and future work.
+Three reasons. (1) The question is *which signal* helps; a hand-built score has terms we can switch off one by one (ablations), and a learned model would hide this. (2) Learned models need history, and the thesis targets users with almost none. (3) Time: there was too little time to build, tune and defend a learned model well. Learned social models (SoRec, SocialMF, DiffNet) are discussed as related work and future work.
 *Evidence:* super-plan §9 (out of scope); `.docs/related-work.md`.
 
 **Q3. Why is the hybrid "social-graph-aware" and not just "popularity plus friends"?**
-Because trust is weighted by the user's own past behavior and smoothed. BL6 is exactly "popularity plus a count of friends", and it is a baseline. The difference between H and BL6 shows what trust weights add.
-*Evidence:* [03 §5](03-hybrid-score.md); E1 (`.docs/results/p7-main/summary.csv`): NDCG@10 on `syn-W2M-M` is 0.054 for H and 0.011 for BL6; on `digg2009` it is 0.024 for H and 0.025 for BL6.
+Because trust is weighted by the user's own past behavior and smoothed. BL6 is exactly "popularity plus a count of friends", and it is a baseline. To see what the trust weights add, compare **H-follow** with BL6, **not H** with BL6: BL6 has no community term, and most of H's gain comes from that term. No interval was computed for this pair, and each side uses its own α (1024 for H-follow, taken from H, and 16 for BL6 on `syn-W2M-M`).
+*Evidence:* [00 §4.4](00-core-in-one-file.md); E1 (`.docs/results/p7-main/summary.csv`) and E4 (`.docs/results/p7-e4-terms/summary.csv`), NDCG@10, all users. `syn-W2M-M`: H-follow 0.016, BL6 0.011 (H 0.054, H-comm 0.052). `digg2009`: H-follow 0.024, BL6 0.025.
 
 **Q4. Why m-estimate smoothing? Why m = 5?**
 Without smoothing, trust for a new user is 0/0. The m-estimate (Cestnik 1990) is a standard way to mix an observed rate with a prior. m = 5 means "the prior is worth five interactions": after 5 interactions the prior weighs one half. It was frozen before any test run, and E4 reports m = 0, 2, 5, 10 so the reader can see how sensitive the result is.
@@ -49,7 +49,7 @@ On synthetic data only. This is a stated limitation: no public dataset found has
 *Evidence:* super-plan §8.
 
 **Q10. Is the synthetic data realistic?**
-Its parameters are calibrated to Digg numbers: activity skew (top 20% of users make about 84% of votes on Digg), followees and followers per user, votes per user. Every calibrated value is within its tolerance on `syn-W2M-M`.
+Its parameters are calibrated to Digg numbers: activity skew (top 20% of users make about 84% of votes on Digg), followees and followers per user, votes per user. Every calibrated value is within its tolerance on `syn-W2M-M`. But the calibration matched shares and means, not whole distributions. In `syn-W2M-M` no user has a follow list of 1–9 accounts, while on Digg 58.1% of the users with a list follow 1–4 and 17.4% follow 5–9 ([00 §2.3](00-core-in-one-file.md)).
 *Evidence:* `eval/config/synthetic-v1.json`; the P3 task's `check_output.txt`.
 
 ## C. The protocol
@@ -79,7 +79,7 @@ H1 asks "is it better than what the app does now?" BL2 is the production score. 
 Yes. BL2t, BL4, BL5 and BL6 each have a tuned parameter on a grid that includes the published value, with the same rule as H. This avoids the known problem of beating only weak baselines (Ferrari Dacrema et al. 2019).
 
 **Q18. How do ties affect the result?**
-Ties are broken by post id. E6 reruns everything with the reversed tie-break. If the conclusions change, ties matter and the thesis says so.
+Ties are broken by post id. E6 reruns the nine methods of E1 on `syn-W2M-M` and `digg2009` with the reversed tie-break (W0 and the other worlds are not rerun, and no new interval or p-value is computed). If the values change much, ties matter and the thesis says so.
 *Evidence:* E6 (`.docs/results/p7-e6-ties/`): the reversed tie-break changes NDCG@10 by at most 0.001, so the conclusions do not change.
 
 ## D. Statistics
@@ -121,7 +121,7 @@ So that the evaluation runs exactly the production code without starting the ser
 ## F. Limits and ethics
 
 **Q28. What are the main limitations?**
-No real-user test (offline only); Digg is small and old; community evidence is synthetic only; positives only (no dislikes or time spent); one held-out item per user. The tuned α and β often sit at the top of the grid (1,024). On Digg, the social terms are too small next to the vote counts to change the order.
+No real-user test (offline only); Digg is small and old; community evidence is synthetic only; positives only (no dislikes or time spent); one held-out item per user. The tuned α and β often sit at the top of the grid (1,024). In the synthetic data no user has a follow list of 1–9 accounts, so low social density is not tested. On Digg, H equals BL2 at three decimals; our reading is that the social terms are too small next to the vote counts, but this was **not tested**.
 
 **Q29. Can a social feed create filter bubbles?**
 Yes, a feed that favors friends can narrow what people see. Coverage@K is reported to show whether H shows fewer distinct posts than the baselines. Diversity controls are future work.
@@ -146,7 +146,7 @@ The rule, fixed before the test split, needs both a Holm p below 0.05 and an int
 *Evidence:* `.docs/results/p7-main/compare.csv`, row `digg2009,F1,H,BL2,10,0-4`; implementation-plan §3.4; document 11 §6.
 
 **Q34. Why does the hybrid help users with a long history more than new users?**
-For a user with no history, the smoothing gives every followee the same trust and every joined community the same weight, so the score only says "by someone you follow" or "in a community you joined". As history grows, the user's own counts replace the prior and the score becomes personal. On `syn-W2M-M` the gain is 0.023 for 0–4 interactions and 0.078 for 20 or more.
+This is our reading: it fits the numbers, but no run isolated it (**not tested**). For a user with no history, the smoothing gives every followee the same trust and every joined community the same weight, so the score only says "by someone you follow" or "in a community you joined". As history grows, the user's own counts replace the prior and the score becomes personal. On `syn-W2M-M` the gain is 0.023 for 0–4 interactions and 0.078 for 20 or more.
 *Evidence:* table e2; the formula in document 03; Chapter 7.
 
 **Q35. If H1 failed, what does the thesis contribute?**

@@ -56,7 +56,7 @@ Every term and symbol used in the thesis, in one place. Each entry is one or two
 | **BL3** | Global popularity: most likes first. |
 | **BL4** | Reddit "hot", likes as upvotes. Tuned time divisor (published 45,000 s). |
 | **BL5** | Hacker News ranking. Tuned gravity (published 1.8). Strongest baseline in the P5 table. |
-| **BL6** | Engagement + α × (number of followees involved). The hybrid without trust weights. |
+| **BL6** | Engagement + α × (number of followees involved). It is H-follow with every trust weight set to 1: it has no community term. |
 | **H** | The hybrid: engagement + α·social + β·community. |
 | **H-follow / H-comm** | H with only the social term / only the community term. |
 | **H-noauthor / H-noengager** | H without the author part / without the engager part of the social term. |

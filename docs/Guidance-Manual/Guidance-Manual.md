@@ -1,6 +1,6 @@
 # Guidance Manual · Sổ tay hướng dẫn
 
-Version 1.2 · 2026-11-19
+Version 1.3 · 2026-11-28
 
 A reading path for the author and for first-time reviewers of the Breadit thesis. It goes from **why** (the problem), to **how** (the score, the data, the protocol), to **how to defend it**. Each file answers one question and has a worked example you can check by hand.
 
@@ -18,6 +18,7 @@ Mỗi file có hai bản cùng nội dung: tiếng Anh (`en/`) và tiếng Việ
 
 | # | Topic · Chủ đề | Question · Câu hỏi | EN | VI | Status |
 |---|---|---|---|---|---|
+| 00 | The core in one file · Nền tảng trong một file | What do I need to know, in one thread from raw data to the verdict? · Cần biết gì, theo một mạch từ dữ liệu thô đến kết luận? | [en](en/00-core-in-one-file.md) | [vi](vi/00-core-in-one-file.md) | ✅ |
 | 01 | Problem and research questions · Bài toán và câu hỏi nghiên cứu | Why this thesis? · Vì sao có thesis này? | [en](en/01-problem-and-questions.md) | [vi](vi/01-problem-and-questions.md) | ✅ |
 | 02 | Recommender basics · Kiến thức nền về recommender | What words do I need? · Cần biết những khái niệm nào? | [en](en/02-recommender-basics.md) | [vi](vi/02-recommender-basics.md) | ✅ |
 | 03 | The hybrid score and the baselines · Điểm hybrid và các baseline | How does the ranking work? · Xếp hạng hoạt động thế nào? | [en](en/03-hybrid-score.md) | [vi](vi/03-hybrid-score.md) | ✅ |
@@ -30,6 +31,8 @@ Mỗi file có hai bản cùng nội dung: tiếng Anh (`en/`) và tiếng Việ
 | 10 | Defense question bank · Ngân hàng câu hỏi bảo vệ | What will the committee ask? · Hội đồng sẽ hỏi gì? | [en](en/10-defense-qa.md) | [vi](vi/10-defense-qa.md) | ✅ |
 | 11 | The experiments and what the results mean · Các thí nghiệm và ý nghĩa kết quả | What did each experiment show, and what can the thesis claim? · Mỗi thí nghiệm cho thấy gì, và thesis được phép kết luận gì? | [en](en/11-experiments-and-results.md) | [vi](vi/11-experiments-and-results.md) | ✅ |
 | 12 | The platform and the real-time layer · Nền tảng và lớp real-time | How does the whole system work, beyond the feed? · Toàn bộ hệ thống hoạt động thế nào, ngoài feed? | [en](en/12-platform-and-real-time.md) | [vi](vi/12-platform-and-real-time.md) | ✅ |
+
+**Start here · Bắt đầu từ đây:** [00](en/00-core-in-one-file.md) ([vi](vi/00-core-in-one-file.md)). It covers the data, the five worlds, the nine methods, the metrics, one real user, and H0 to H2. The other files go deeper. · File này gồm dữ liệu, năm thế giới, chín phương pháp, các metric, một user thật, và H0 đến H2. Các file khác đi sâu hơn.
 
 **Full path (about 5 hours) · Lộ trình đầy đủ (khoảng 5 giờ):** 01 → 12 in order · đọc theo thứ tự.
 

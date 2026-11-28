@@ -139,7 +139,11 @@ The gain of H over BL2 by the number of followees at test time (Table e3; figure
 
 (The bin 1–4 holds only one user in each synthetic world, so it is not read.)
 
-**What it means:** H2 says the gain grows with density and is about 0 for a user who follows nobody. Neither holds: the gain is already there at 0 followees, because the community term needs no follows, and it does not rise with more followees. **H2 is not supported.** This experiment measures density by followees only; H2 also names friend engagement in the pool, which was not measured.
+**What it means:** H2 has two parts.
+- **Part (a),** the gain grows with density: **not supported**. The gain does not rise with more followees.
+- **Part (b),** the gain is about 0 for a user who follows nobody **and has no community**: this table cannot test it. The bin 0 also holds users with a community, and their community term gives the gain. Part (b) holds by construction: with both terms at 0, H equals BL2 ([00 §8.3](00-core-in-one-file.md)).
+
+So **H2 is not supported**, because of part (a). The text of Chapter 6 (E3) still says "neither part holds", which is wrong for part (b). This experiment measures density by followees only; H2 also names friend engagement in the pool, which was not measured. Also, in the synthetic data no user has a follow list of 1–9 accounts ([00 §2.3](00-core-in-one-file.md)).
 
 ## 8. E4: which term matters
 

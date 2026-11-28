@@ -53,7 +53,7 @@ Các giả thuyết được frozen trước lần chạy split test đầu tiê
 
 | | Khẳng định | Cách phán xét |
 |---|---|---|
-| **H0** (kiểm tra tỉnh táo, làm đầu tiên) | Trong thế giới null W0, nơi follow không có ảnh hưởng, H **không** thắng BL2 | Trên `syn-W0-M`, CI 95% của H − BL2 (NDCG@10, mọi user) không được nằm hẳn trên 0. Nếu có: có bug hoặc leak. Dừng lại và sửa |
+| **H0** (kiểm tra tỉnh táo, làm đầu tiên) | Trong thế giới null W0, nơi follow không có ảnh hưởng, **H-follow** (H không có community term) **không** thắng BL2 | Trên `syn-W0-M`, CI 95% của H-follow − BL2 (NDCG@10, mọi user) không được nằm hẳn trên 0. Nếu có: có bug hoặc leak. Dừng lại và sửa. Trước 2026-11-11 cổng dùng H đầy đủ; nó được đổi trước khi chạy test split ([05 §11](05-evaluation-protocol.md)). H đầy đủ có thắng BL2 trên W0, nhờ community term |
 | **H1** (RQ1) | Với user có 0–4 tương tác trước đó, H có NDCG@10 cao hơn BL2 | p sau Holm < 0,05 **và** đầu dưới CI > 0. Kiểm hai lần, mỗi lần riêng: `syn-W2M-M` và `digg2009` |
 | **H2** (RQ2) | Mức cải thiện so với BL2 tăng theo mật độ social, và gần bằng 0 với user không follow ai và không ở community nào | mức cải thiện được lập bảng theo nhóm mật độ (thí nghiệm E3); trình bày bằng khoảng tin cậy, không có một p-value duy nhất |
 
@@ -63,7 +63,7 @@ Các giả thuyết được frozen trước lần chạy split test đầu tiê
 
 ## 6. Những gì thesis không làm
 
-Không có graph neural network hay mô hình social có học, không có pilot với user thật hay A/B test, không có log hiển thị, không có Python trong pipeline chính (super-plan §9). Thời gian là bốn tuần (hạn 2026-11-20), và câu hỏi là tín hiệu nào giúp ích, điều mà một điểm số minh bạch trả lời tốt nhất. Xem [10 Ngân hàng câu hỏi](10-defense-qa.md), Q2.
+Không có graph neural network hay mô hình social có học, không có pilot với user thật hay A/B test, không có log hiển thị, không có Python trong pipeline chính (super-plan §9). Thời gian ngắn, và câu hỏi là tín hiệu nào giúp ích, điều mà một điểm số minh bạch trả lời tốt nhất. Xem [10 Ngân hàng câu hỏi](10-defense-qa.md), Q2.
 
 ## 7. Thesis trong một hình
 
@@ -84,5 +84,5 @@ Tạm dịch: bài toán là "For You" không cá nhân hoá; ý tưởng là c�
 
 1. Điểm hybrid lấp lỗ hổng nào trong bốn cái, và phần evaluation lấp cái nào?
 2. Vì sao user cold-start khó với độ phổ biến và với mô hình học, nhưng không khó với social graph?
-3. Nếu H thắng BL2 trong W0 thì nghĩa là gì?
+3. Nếu H-follow thắng BL2 trong W0 thì nghĩa là gì? Vì sao H đầy đủ lại được phép thắng ở đó?
 4. Vì sao có hai kiểm định H1, và vì sao mỗi cái được phán xét riêng?

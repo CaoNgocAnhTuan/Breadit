@@ -72,7 +72,7 @@ S(u, p, t)      = [u follows author(p)] + number of followees of u who acted on 
 
 **Did it work?** The P3 check measures the **social lift**: how much more likely a user acts on a post a followee "showed" them, compared with chance. On size M: W0 1.09, W1 1.57, W2L 2.24, W2M 3.78, W2H 7.64. W0 is near 1 (no effect), W1 is higher (homophily alone makes friends agree), and the W2 cells grow with influence. That is exactly the design.
 
-**Why W0 matters most.** If H beats BL2 in W0, it is not using a real social effect, because there is none. It must be a bug or a leak (the H0 gate).
+**Why W0 matters most.** In W0, follows have no effect. So if **H-follow** (H without the community term) beats BL2 there, it is not using a real social effect: it must be a bug or a leak (the H0 gate). The full H **does** beat BL2 on W0 (E5: +0.012). That is not a bug: its community term finds the user's topic interest, because a community is a topic ([00 §3.2](00-core-in-one-file.md)).
 
 ## 5. Sizes and dataset ids
 
@@ -123,6 +123,7 @@ A follow counts for a test only if it is dated before that test's time, so no la
 - Synthetic results show that the **mechanism** works when the effect exists; they are not proof about real users.
 - Digg: 3,553 stories over 36 days, only front-page stories (all already popular, which helps popularity baselines); about 41% of voters are not in the friend table; the graph is one crawl from July 2009.
 - On Digg, 55% of kept cold-start test users follow nobody at their test time; for them H equals BL2.
+- The follow lists of the synthetic data do not have Digg's shape. In `syn-W2M-M` a user follows nobody or at least 10 accounts; on Digg, 58.1% of the users with a list follow 1–4. So the synthetic data cannot test H2 at low follow counts ([00 §2.3](00-core-in-one-file.md)). Found on 2026-11-28; the thesis does not say this yet.
 - No dataset found has follows, interactions and communities together, so community evidence is synthetic only. Hive was the one real candidate. Task `p7-hive-check` (2026-11-12) could not get its data. The SoChainDB copy on BigQuery refused access. HiveSQL is paid and keeps community joins and follows with no time. So Hive is future work.
 
 ## 11. Check yourself

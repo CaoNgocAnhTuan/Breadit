@@ -111,7 +111,7 @@ Bạn có thể tự kiểm mọi con số: `scorer('H')` trong `@breadit/rankin
 | BL3 | nhiều like nhất | mức sàn của độ phổ biến thuần |
 | BL4 | "hot" của Reddit (có tune) | một heuristic mạnh, nổi tiếng |
 | BL5 | Hacker News (có tune) | một heuristic mạnh, nổi tiếng; mạnh nhất trong bảng P5 |
-| BL6 | engagement + α × số followee có liên quan | H không có trọng số trust: cho thấy trust thêm được gì so với việc chỉ đếm |
+| BL6 | engagement + α × số followee có liên quan | H-follow với mọi trọng số trust đặt bằng 1 (không có community term): so nó với H-follow để biết trust thêm được gì so với việc chỉ đếm |
 
 Trong ví dụ, BL6 cho p1 = 2,5 + 8·2 = 18,5 với cả hai user. Nó không phân biệt được user mới với user cũ, vì nó bỏ qua lịch sử. H thì phân biệt được.
 

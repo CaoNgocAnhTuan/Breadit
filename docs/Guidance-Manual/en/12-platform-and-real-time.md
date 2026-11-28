@@ -139,14 +139,16 @@ The feed pages live 10 s, and their key includes `algo`, the `v:user` version an
 
 ## 6. The tests and what each one proves
 
-| Level | Where | Count (2026-11-19) | What it proves |
+| Level | Where | Count (2026-11-25) | What it proves |
 |---|---|---|---|
 | Ranking unit tests | `packages/ranking/src/*.spec.ts` | 85 | Each scorer, the pool rule and the as-of features give the hand-checked values. |
-| Backend unit tests | `apps/backend/src/**/*.spec.ts` | 204 | Services and guards in isolation, e.g. the tuned α and β equal the approved run config, the gateway rules. |
-| Integration tests (IT) | `apps/backend/test/it/` | 146 | The real app on a real Postgres (schema `it_test`) and Redis (database 1): routes, guards, feeds, and the socket (`socket.it-spec.ts`). |
-| Parity test | `npm run test:parity` | 300 of 300, twice | The live feed order equals the harness order for 100 sampled (user, time) pairs, at the feed module and over HTTP. |
-| Eval tests | `npm run verify -w @breadit/eval` | 432 | The generator, the Digg adapter, the harness (golden, leakage, double run), the statistics and the report. |
-| Hook tests | `.claude/hooks/test-hooks.cjs` | 96 | The workflow rules: frozen folders, gated code, commits on `test-app`. |
+| Backend unit tests | `apps/backend/src/**/*.spec.ts` | 239 | Services and guards in isolation, e.g. the tuned α and β equal the approved run config, the gateway rules. |
+| Integration tests (IT) | `apps/backend/test/it/` | 182 | The real app on a real Postgres (schema `it_test`) and Redis (database 1): routes, guards, feeds, and the socket (`socket.it-spec.ts`). |
+| Parity test | `npm run test:parity` | 102 tests; 300 of 300 orders, twice | The live feed order equals the harness order for 100 sampled (user, time) pairs, at the feed module and over HTTP. |
+| Eval tests | `npm run verify -w @breadit/eval` | 434 | The generator, the Digg adapter, the harness (golden, leakage, double run), the statistics and the report. |
+| Hook tests | `.claude/hooks/test-hooks.cjs` | 96 (2026-11-19) | The workflow rules: frozen folders, gated code, commits on `test-app`. |
+
+Chapter 8 of the thesis counts **1,064 automatic tests**: the first five rows (102 for the parity test) and 22 tests of the demo helpers, without the hook tests. The counts are copied from Chapter 8.
 
 `bash .claude/hooks/verify.sh` runs all of them except the parity test (which needs a loaded dataset) and the hook tests.
 

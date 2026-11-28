@@ -24,7 +24,7 @@ The key idea: **the live app and the evaluation call the same ranking code.** On
 
 ## 2. Before and after
 
-| | Pre-thesis (today) | Proposed (after P6–P8) |
+| | Pre-thesis | Thesis, with `algo=social` (built in P6–P8) |
 |---|---|---|
 | "For You" order | posts of you and your followees, newest first | `algo=social`: the hybrid score H, which uses follow trust and community affinity |
 | Community posts | not in "For You" or Explore | approved community posts enter the candidate pool |
@@ -439,7 +439,7 @@ Version 1 of this file proposed an offline ML pipeline: export interactions from
 
 - The thesis question is whether the **social graph** improves the feed for new users (RQ1, RQ2). A heuristic hybrid answers it directly, and each term can be switched off (ablations, E4). A learned model would hide which signal helped.
 - A batch table is stale between runs and needs a second language and runtime.
-- The deadline (2026-11-20) leaves no time for a model and its tuning (super-plan §9, out of scope).
+- There was too little time to build and tune a learned model well (super-plan §9, out of scope).
 
 The "Trending Service" of version 1 is the existing Explore score, now in `@breadit/ranking` as BL2.
 

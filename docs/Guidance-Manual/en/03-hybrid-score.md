@@ -111,7 +111,7 @@ You can check every number: `scorer('H')` in `@breadit/ranking` gives 1050, 1000
 | BL3 | most likes | a pure popularity floor |
 | BL4 | Reddit "hot" (tuned) | a well-known strong heuristic |
 | BL5 | Hacker News (tuned) | a well-known strong heuristic; the strongest one in the P5 table |
-| BL6 | engagement + α × number of followees involved | H without trust weights: shows what trust adds over a plain count |
+| BL6 | engagement + α × number of followees involved | H-follow with every trust weight set to 1 (no community term): compare it with H-follow to see what trust adds over a plain count |
 
 In the example, BL6 gives p1 = 2.5 + 8·2 = 18.5 for both users. It cannot tell the new user from the old one, because it ignores history. H can.
 

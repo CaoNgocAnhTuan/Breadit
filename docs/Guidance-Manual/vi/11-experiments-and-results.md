@@ -139,7 +139,11 @@ Gain của H so với BL2 theo số followee tại thời điểm test (bảng e
 
 (Nhóm 1–4 chỉ có một user trong mỗi world synthetic, nên không đọc.)
 
-**Ý nghĩa:** H2 nói gain tăng theo mật độ và gần bằng 0 với user không follow ai. Cả hai đều không đúng: gain đã có ngay ở 0 followee, vì community term không cần follow, và nó không tăng khi có nhiều followee hơn. **H2 không được ủng hộ.** Thí nghiệm này chỉ đo mật độ bằng số followee; H2 còn nêu lượng tương tác của bạn bè trong pool, phần này không được đo.
+**Ý nghĩa:** H2 có hai vế.
+- **Vế (a),** gain tăng theo mật độ: **không được ủng hộ**. Gain không tăng khi có nhiều followee hơn.
+- **Vế (b),** gain gần bằng 0 với user không follow ai **và không có community**: bảng này không kiểm tra được. Bin 0 còn chứa cả user có community, và community term của họ tạo ra gain. Vế (b) đúng theo cách xây dựng công thức: cả hai term bằng 0 thì H bằng BL2 ([00 §8.3](00-core-in-one-file.md)).
+
+Vì vậy **H2 không được ủng hộ**, do vế (a). Chữ ở Chương 6 (E3) vẫn viết "neither part holds" (cả hai vế đều không đúng); với vế (b) câu đó sai. Thí nghiệm này chỉ đo mật độ bằng số followee; H2 còn nêu lượng tương tác của bạn bè trong pool, phần này không được đo. Ngoài ra, trong dữ liệu synthetic không user nào có danh sách follow từ 1 đến 9 tài khoản ([00 §2.3](00-core-in-one-file.md)).
 
 ## 8. E4: term nào quan trọng
 

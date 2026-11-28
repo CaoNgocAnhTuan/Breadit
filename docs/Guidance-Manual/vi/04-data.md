@@ -72,7 +72,7 @@ S(u, p, t)      = [u follows author(p)] + number of followees of u who acted on 
 
 **Có hoạt động không?** Bước kiểm của P3 đo **social lift**: user dễ hành động trên một bài mà followee đã "cho họ thấy" hơn bao nhiêu lần so với ngẫu nhiên. Ở cỡ M: W0 1,09, W1 1,57, W2L 2,24, W2M 3,78, W2H 7,64. W0 gần 1 (không có hiệu ứng), W1 cao hơn (chỉ homophily thôi cũng khiến bạn bè đồng ý với nhau), và các ô W2 tăng theo mức ảnh hưởng. Đúng như thiết kế.
 
-**Vì sao W0 quan trọng nhất.** Nếu H thắng BL2 trong W0, nó không thể đang dùng một hiệu ứng social thật, vì ở đó không có hiệu ứng nào. Chắc chắn là bug hoặc leak (cổng H0).
+**Vì sao W0 quan trọng nhất.** Trong W0, follow không có tác dụng. Vì vậy nếu **H-follow** (H không có community term) thắng BL2 ở đó, nó không thể đang dùng một hiệu ứng social thật: chắc chắn là bug hoặc leak (cổng H0). H đầy đủ **có** thắng BL2 trên W0 (E5: +0.012). Đó không phải bug: community term của nó tìm ra mối quan tâm theo chủ đề của user, vì một community là một chủ đề ([00 §3.2](00-core-in-one-file.md)).
 
 ## 5. Kích cỡ và dataset id
 
@@ -123,6 +123,7 @@ Một follow chỉ được tính cho một lần test nếu ngày của nó tr�
 - Kết quả synthetic cho thấy **cơ chế** hoạt động khi hiệu ứng có thật; chúng không phải bằng chứng về user thật.
 - Digg: 3.553 bài trong 36 ngày, chỉ bài lên trang nhất (bài nào cũng đã phổ biến, có lợi cho baseline phổ biến); khoảng 41% người vote không có trong bảng friend; đồ thị là một lần crawl từ tháng 7/2009.
 - Trên Digg, 55% user test cold-start được giữ lại không follow ai tại thời điểm test của họ; với họ H bằng BL2.
+- Danh sách follow của dữ liệu synthetic không có hình dạng như Digg. Trong `syn-W2M-M`, một user hoặc không follow ai, hoặc follow ít nhất 10 tài khoản; trên Digg, 58.1% user có danh sách chỉ follow 1–4. Vì vậy dữ liệu synthetic không kiểm tra được H2 ở mức follow thấp ([00 §2.3](00-core-in-one-file.md)). Phát hiện ngày 2026-11-28; thesis chưa viết điều này.
 - Không tìm được dataset nào có cùng lúc follow, tương tác và community, nên bằng chứng về community chỉ từ synthetic. Hive là ứng viên thật duy nhất. Task `p7-hive-check` (2026-11-12) không lấy được dữ liệu của nó. Bản SoChainDB trên BigQuery từ chối truy cập. HiveSQL phải trả phí và lưu việc join community và follow mà không có thời gian. Vì vậy Hive là hướng phát triển sau (future work).
 
 ## 11. Tự kiểm tra

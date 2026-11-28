@@ -143,5 +143,5 @@ Chi tiết, kèm ví dụ tính tay, nằm trong [06 Thống kê](06-statistics.
 1. Positive cuối cùng sau T của một user là một comment trên bài họ đã like trước T. Đó có phải item test không? *(Không: phải là bài họ chưa từng tương tác. Item test là positive cuối cùng sau T trên một bài mới.)*
 2. Rank 2, 2, 11 với K = 10: Recall và NDCG bằng bao nhiêu? *(Recall 2/3 = 0,667; NDCG (0,631 + 0,631 + 0) / 3 = 0,421.)*
 3. Vì sao pool bỏ các bài user đã tương tác?
-4. Nếu H thắng BL2 trong W0 thì nghĩa là gì?
+4. Nếu H-follow thắng BL2 trong W0 thì nghĩa là gì? Vì sao việc H đầy đủ thắng BL2 ở đó không mang cùng ý nghĩa?
 5. Vì sao split test chỉ chạy một lần?

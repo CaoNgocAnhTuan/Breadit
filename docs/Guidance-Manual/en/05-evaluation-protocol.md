@@ -143,5 +143,5 @@ The details, with worked examples, are in [06 Statistics](06-statistics.md).
 1. A user's last positive after T is a comment on a post they had liked before T. Is it the test item? *(No: it must be a post they had not touched before. The test item is their last positive after T on a new post.)*
 2. Ranks 2, 2, 11 at K = 10: what are Recall and NDCG? *(Recall 2/3 = 0.667; NDCG (0.631 + 0.631 + 0) / 3 = 0.421.)*
 3. Why does the pool drop posts the user already touched?
-4. What does it mean if H beats BL2 in W0?
+4. What does it mean if H-follow beats BL2 in W0? Why does the full H beating BL2 there not mean the same?
 5. Why is the test split run only once?
