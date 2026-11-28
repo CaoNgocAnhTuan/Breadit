@@ -1,6 +1,15 @@
 %% THESIS — the school format, taken unchanged from the pre-thesis report
 %% (docs/Pre-thesis/Latex/main_docx.tex). Only the title page wording, the "Thesis additions" block
 %% and the chapter list differ. Build: latexmk -pdf main.tex (in this folder).
+
+%% ── Layout switch ────────────────────────────────────────────────────────────
+%% Default (line below commented out): every page is centred, for reading on screen.
+%% For printing and binding, remove the % : the school format, the wider margin on the binding
+%% side (odd pages move right, even pages move left). It changes the margins (see "Page Layout") and adds one blank page before Chapter 1.
+%% Both layouts have the same text width, so line breaks and page numbers do not change.
+\newif\ifprintlayout
+% \printlayouttrue
+
 \documentclass[12pt, twoside]{report}
 % \documentclass[12pt, twoside, draft]{report} - Xuất file ko hình ảnh = xoá %
 
@@ -32,8 +41,14 @@
 \usetikzlibrary{calc}
 \usepackage{float}   % provides [H] float specifier (place figure HERE exactly)
 
-%% ── Page Layout (identical to main.tex) ─────────────────────────────────────
-\usepackage[a4paper, top=2.5cm, bottom=2cm, left=3cm, right=2cm, bindingoffset=5mm]{geometry}
+%% ── Page Layout ──────────────────────────────────────────────────────────────
+%% Print: the school margins (identical to the pre-thesis main.tex), 3.5cm inside and 2cm outside.
+%% Screen: the same 5.5cm split in two, 2.75cm on each side. See the layout switch at the top.
+\ifprintlayout
+  \usepackage[a4paper, top=2.5cm, bottom=2cm, left=3cm, right=2cm, bindingoffset=5mm]{geometry}
+\else
+  \usepackage[a4paper, top=2.5cm, bottom=2cm, left=2.75cm, right=2.75cm]{geometry}
+\fi
 \usepackage{fancyhdr}
 \usepackage{titlesec}
 
@@ -279,6 +294,8 @@
 
 %% ── CHAPTERS ─────────────────────────────────────────────────────────────────
 %% Nine chapters, about 95 pages (drafts/Report Architecture.md). Each chapter has its Markdown draft in drafts/.
+%% Print only: page 1 must be a front side (odd sheet side), or the binding margins of the whole body are on the wrong side.
+\ifprintlayout\cleardoublepage\fi
 \chapter{INTRODUCTION}
 \pagenumbering{arabic}
 \setcounter{page}{1}
